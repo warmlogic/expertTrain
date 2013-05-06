@@ -194,7 +194,7 @@ if ~cfg.keys.keysAreSet
   % cfg.keys.randKeyOrder = randperm(length(cfg.keys.speciesKeys));
   % debug - not randomized
   cfg.keys.randKeyOrder = 1:length(cfg.keys.speciesKeys);
-  fprintf('NB: Debug code. Not actually randomizing!\n');
+  fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.s00 = KbName('space');
@@ -555,28 +555,86 @@ try
     % Viewing+Naming task
     %%%%%%%%%%%%%%%%%%%%%%
     
-    % family 1
-    % shuffle the stimuli
-    % randsel = randperm(length(expParam.session.pretest.match.f1Trained));
+    % get the stimuli from both families for selection (shuffle later)
+    f1Trained = expParam.session.pretest.match.f1Trained;
+    f2Trained = expParam.session.pretest.match.f2Trained;
+    
+    % randomize the order in which species are added
+    %speciesOrder_f1 = randperm(1:cfg.stim.nSpecies);
+    %speciesOrder_f2 = randperm(1:cfg.stim.nSpecies);
+    fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
     % debug
-    % randsel = 1:length(expParam.session.pretest.match.f1Trained);
-    expParam.session.train1.viewname.f1Trained = expParam.session.pretest.match.f1Trained;
+    speciesOrder_f1 = (1:cfg.stim.nSpecies);
+    speciesOrder_f2 = (1:cfg.stim.nSpecies);
     
-    % family 2
-    % shuffle the stimuli
-    %randsel = randperm(length(expParam.session.pretest.match.f1Trained));
-    % debug
-    % randsel = 1:length(expParam.session.pretest.match.f1Trained);
-    expParam.session.train1.viewname.f2Trained = expParam.session.pretest.match.f2Trained;
+    % hard coded order of which species are presented in each block
+    % (counterbalanced)
+    blockSpeciesOrder = {...
+      [1, 2],[1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4, 5],[3, 4, 5, 6],...
+      [4, 5, 6, 7],[5, 6, 7, 8],[6, 7, 8, 9],[7, 8, 9, 10],...
+      [8, 9, 10, 1],[9, 10, 2, 3],[10, 4, 5, 6],[7, 8, 9, 10]};
     
-    % shuffle the species order
+    % hard coded stimulus indices for viewing and naming block presentation
+    % (counterbalanced)
+    viewIndices = {...
+      [1, 1], [4, 4, 1], [2, 2, 4, 1], [5, 5, 2, 4, 1],[5, 2, 4, 1],...
+      [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1],...
+      [5, 2, 4, 3], [5, 2, 3, 3], [5, 2, 3, 3], [3, 3, 3, 3]};
+    nameIndices = {...
+      [2, 3, 2, 3], [5, 6, 5, 6, 2, 3], [3, 4, 3, 4, 5, 6, 2, 3], [1, 6, 1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
+      [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
+      [1, 6, 3, 4, 5, 6, 4, 5], [1, 6, 3, 4, 5, 6, 5, 6], [1, 6, 5, 6, 5, 6, 5, 6], [5, 6, 5, 6, 5, 6, 5, 6]};
+    
+    % number of examplars per viewing and naming block
+    cfg.stim.examplarPerView = 1;
+    cfg.stim.exemplarPerName = 2;
+    
+    % initialize viewing and naming cells, one for each block
+    expParam.session.train1.viewname.view = cell(1,length(blockSpeciesOrder));
+    expParam.session.train1.viewname.name = cell(1,length(blockSpeciesOrder));
+    
+    for b = 1:length(blockSpeciesOrder)
+      for s = 1:length(blockSpeciesOrder{b})
+        sInd_f1 = find([f1Trained.speciesNum] == speciesOrder_f1(blockSpeciesOrder{b}(s)));
+        sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(blockSpeciesOrder{b}(s)));
+        
+        % shuffle the stimulus index
+        %randsel_f1 = randperm(length(sInd_f1));
+        % debug
+        randsel_f1 = 1:length(sInd_f1);
+        %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+        % shuffle the exemplars
+        thisSpecies_f1 = f1Trained(sInd_f1(randsel_f1));
+        
+        % add them to the list
+        %fprintf('view f1: block %d, species %d, examplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
+        expParam.session.train1.viewname.view{b} = cat(1,expParam.session.train1.viewname.view{b},thisSpecies_f1(viewIndices{b}(s)));
+        
+        %fprintf('\tname f1: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
+        expParam.session.train1.viewname.name{b} = cat(1,expParam.session.train1.viewname.name{b},thisSpecies_f1(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
+        
+        % shuffle the stimulus index
+        %randsel_f2 = randperm(length(sInd_f2));
+        % debug
+        randsel_f2 = 1:length(sInd_f2);
+        %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+        % shuffle the exemplars
+        thisSpecies_f2 = f2Trained(sInd_f2(randsel_f2));
+        
+        % add them to the viewing list
+        %fprintf('view f2: block %d, species %d, examplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
+        expParam.session.train1.viewname.view{b} = cat(1,expParam.session.train1.viewname.view{b},thisSpecies_f2(viewIndices{b}(s)));
+        
+        % add them to the naming list
+        %fprintf('\tname f2: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
+        expParam.session.train1.viewname.name{b} = cat(1,expParam.session.train1.viewname.name{b},thisSpecies_f2(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
+      end
+    end
+    
+    % TODO: basic and subordinate families should be intermixed, right now
+    % they're just getting concatenated onto each other
     
     
-    % TODO: shuffle within a species, then put in order
-    
-    % TODO: Question: Are there 13 blocks with 4 species each (2 basic, 2
-    % subordinate), meaning the families are intermixed? Or are the
-    % families blocked separately, making 26 blocks?
     
     %%%%%%%%%%%%%%%%%%%%%%
     % Naming task (all stimuli)
@@ -588,7 +646,7 @@ try
     %randsel = randperm(length(expParam.session.train1.name.allStim));
     % debug
     randsel = 1:length(expParam.session.train1.name.allStim);
-    fprintf('NB: Debug code. Not actually randomizing!\n');
+    fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
     expParam.session.train1.name.allStim = expParam.session.train1.name.allStim(randsel);
     
     %%%%%%%%%%%%%%%%%%%%%%
