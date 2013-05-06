@@ -1,11 +1,12 @@
-function [shuffledStims] = et_shuffleStims(stims,maxConsecFamily)
-% function [shuffledStims] = et_shuffleStims(stims,maxConsecFamily)
+function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
+% function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 %
 % Input:
-%  stims:           Struct of stimuli to shuffle. Assumes that the field
-%                   stims.familyNum consists of 1s and 2s.
-%  maxConsecFamily: Integer. Maximum number of consecutive stimuli from the
-%                   same family.
+%  stims:      Struct. Stimuli to shuffle. Assumes that the field
+%              stims.(valueField) consists of integers.
+%  valueField: String. Name of the field on which the order is contingent.
+%  maxConsec:  Integer. Maximum number of consecutive stimuli with the same
+%              value.
 %
 % Output:
 %  shuffledStims: Stimuli in shuffled order.
@@ -24,46 +25,34 @@ while not_good
   % shuffle the exemplars
   stims = stims(randsel);
   
-  familyNums = [stims.familyNum];
-  if familyNums(1) == 1
-    consecCount_f1 = 1;
-    consecCount_f2 = 0;
-  elseif familyNums(1) == 2
-    consecCount_f1 = 0;
-    consecCount_f2 = 1;
-  end
+  stimValues = [stims.(valueField)];
+  possibleValues = unique(stimValues);
+  consecCount = zeros(1,length(possibleValues));
   
-  for i = 2:length(familyNums)
-    if familyNums(i) == familyNums(i-1)
-      if familyNums(i) == 1
-        consecCount_f1 = consecCount_f1 + 1;
-        %consecCount_f2_v = 0;
-        if consecCount_f1 > maxConsecFamily
-          break
-        end
-      elseif familyNums(i) == 2
-        %consecCount_f1_v = 0;
-        consecCount_f2 = consecCount_f2 + 1;
-        if consecCount_f2 > maxConsecFamily
-          break
-        end
+  consecCount(stimValues(1)) = 1;
+  
+  for i = 2:length(stimValues)
+    if stimValues(i) == stimValues(i-1)
+      % if we found a repeat, add 1 to the count
+      consecCount(stimValues(i)) = consecCount(stimValues(i)) + 1;
+      if consecCount(stimValues(i)) > maxConsec
+        fprintf('omg\n');
+        % if we hit the maximum number, break out
+        break
       end
     else
-      if familyNums(i) == 1
-        consecCount_f1 = 1;
-        consecCount_f2 = 0;
-      elseif familyNums(i) == 2
-        consecCount_f1 = 0;
-        consecCount_f2 = 1;
-      end
+      % if it's not a repeat, reset the count
+      consecCount = zeros(1,length(possibleValues));
+      consecCount(stimValues(i)) = 1;
     end
   end
-  if consecCount_f1 <= maxConsecFamily && consecCount_f2 <= maxConsecFamily
+  if any(consecCount) > maxConsec
+    shuffleCount = shuffleCount + 1;
+  else
     not_good = false;
     shuffledStims = stims;
-  else
-    shuffleCount = shuffleCount + 1;
   end
+  
   if shuffleCount == maxShuffle
     error('Performed %d shuffle attempts. That is too many.',maxShuffle);
   end
