@@ -1,6 +1,10 @@
 function [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields,rmStims)
 % [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields,rmStims)
 %
+% Description:
+%  Shuffle a stimulus set and slice out a subset of each species.  Return
+%  in a specific heirarchy of struct fields.
+%
 % Input:
 %  cfg:        config structure.
 %  expParam:   experiment parameter structure.

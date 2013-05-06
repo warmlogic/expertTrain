@@ -1,6 +1,10 @@
 function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 % function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 %
+% Description:
+%  Shuffle stimuli until there are no more than X consecutive stimuli of a
+%  given type in a row.
+%
 % Input:
 %  stims:      Struct. Stimuli to shuffle. Assumes that the field
 %              stims.(valueField) consists of integers.
