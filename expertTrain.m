@@ -560,12 +560,12 @@ try
     f2Trained = expParam.session.pretest.match.f2Trained;
     
     % randomize the order in which species are added
-    %speciesOrder_f1 = randperm(1:cfg.stim.nSpecies);
-    %speciesOrder_f2 = randperm(1:cfg.stim.nSpecies);
-    fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+    speciesOrder_f1 = randperm(cfg.stim.nSpecies);
+    speciesOrder_f2 = randperm(cfg.stim.nSpecies);
     % debug
-    speciesOrder_f1 = (1:cfg.stim.nSpecies);
-    speciesOrder_f2 = (1:cfg.stim.nSpecies);
+    %speciesOrder_f1 = (1:cfg.stim.nSpecies);
+    %speciesOrder_f2 = (1:cfg.stim.nSpecies);
+    %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
     
     % hard coded order of which species are presented in each block
     % (counterbalanced)
@@ -589,19 +589,22 @@ try
     cfg.stim.examplarPerView = 1;
     cfg.stim.exemplarPerName = 2;
     
+    % maximum number of repeated exemplars from each family
+    cfg.stim.viewMaxConsecFamily = 3;
+    cfg.stim.nameMaxConsecFamily = 3;
+    
     % initialize viewing and naming cells, one for each block
     expParam.session.train1.viewname.view = cell(1,length(blockSpeciesOrder));
     expParam.session.train1.viewname.name = cell(1,length(blockSpeciesOrder));
     
     for b = 1:length(blockSpeciesOrder)
       for s = 1:length(blockSpeciesOrder{b})
+        % family 1
         sInd_f1 = find([f1Trained.speciesNum] == speciesOrder_f1(blockSpeciesOrder{b}(s)));
-        sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(blockSpeciesOrder{b}(s)));
-        
         % shuffle the stimulus index
-        %randsel_f1 = randperm(length(sInd_f1));
+        randsel_f1 = randperm(length(sInd_f1));
         % debug
-        randsel_f1 = 1:length(sInd_f1);
+        %randsel_f1 = 1:length(sInd_f1);
         %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
         % shuffle the exemplars
         thisSpecies_f1 = f1Trained(sInd_f1(randsel_f1));
@@ -613,10 +616,12 @@ try
         %fprintf('\tname f1: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
         expParam.session.train1.viewname.name{b} = cat(1,expParam.session.train1.viewname.name{b},thisSpecies_f1(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
         
+        % family 2
+        sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(blockSpeciesOrder{b}(s)));
         % shuffle the stimulus index
-        %randsel_f2 = randperm(length(sInd_f2));
+        randsel_f2 = randperm(length(sInd_f2));
         % debug
-        randsel_f2 = 1:length(sInd_f2);
+        %randsel_f2 = 1:length(sInd_f2);
         %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
         % shuffle the exemplars
         thisSpecies_f2 = f2Trained(sInd_f2(randsel_f2));
@@ -629,12 +634,132 @@ try
         %fprintf('\tname f2: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
         expParam.session.train1.viewname.name{b} = cat(1,expParam.session.train1.viewname.name{b},thisSpecies_f2(nameIndices{b}(((s*cfg.stim.exemplarPerName)-1):(s*cfg.stim.exemplarPerName))));
       end
-    end
+      
+      % if there are more than X consecutive exemplars from the same
+      % family, reshuffle. There's probably a better way to do this.
+      
+      % viewing
+      [expParam.session.train1.viewname.view{b}] = et_shuffleStims(expParam.session.train1.viewname.view{b},cfg.stim.viewMaxConsecFamily);
+      % naming
+      [expParam.session.train1.viewname.name{b}] = et_shuffleStims(expParam.session.train1.viewname.name{b},cfg.stim.nameMaxConsecFamily);
+      
+    end % for each block
     
-    % TODO: basic and subordinate families should be intermixed, right now
-    % they're just getting concatenated onto each other
-    
-    
+%       not_good = true;
+%       maxShuffle = 1000;
+%       shuffleCount = 0;
+%       while not_good
+%         %randsel_v = randperm(length(expParam.session.train1.viewname.view{b}));
+%         % debug
+%         randsel_v = 1:length(expParam.session.train1.viewname.view{b});
+%         fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%         % shuffle the exemplars
+%         expParam.session.train1.viewname.view{b} = expParam.session.train1.viewname.view{b}(randsel_v);
+%         
+%         familyNums = [expParam.session.train1.viewname.view{b}.familyNum];
+%         if familyNums(1) == 1
+%           consecCount_f1_v = 1;
+%           consecCount_f2_v = 0;
+%         elseif familyNums(1) == 2
+%           consecCount_f1_v = 0;
+%           consecCount_f2_v = 1;
+%         end
+%         
+%         for i = 2:length(familyNums)
+%           if familyNums(i) == familyNums(i-1)
+%             if familyNums(i) == 1
+%               consecCount_f1_v = consecCount_f1_v + 1;
+%               %consecCount_f2_v = 0;
+%               if consecCount_f1_v > cfg.stim.viewMaxConsecFamily
+%                 break
+%               end
+%             elseif familyNums(i) == 2
+%               %consecCount_f1_v = 0;
+%               consecCount_f2_v = consecCount_f2_v + 1;
+%               if consecCount_f2_v > cfg.stim.viewMaxConsecFamily
+%                 break
+%               end
+%             end
+%           else
+%             if familyNums(i) == 1
+%               consecCount_f1_v = 1;
+%               consecCount_f2_v = 0;
+%             elseif familyNums(i) == 2
+%               consecCount_f1_v = 0;
+%               consecCount_f2_v = 1;
+%             end
+%           end
+%         end
+%         if consecCount_f1_v <= cfg.stim.viewMaxConsecFamily && consecCount_f2_v <= cfg.stim.viewMaxConsecFamily
+%           not_good = false;
+%         else
+%           shuffleCount = shuffleCount + 1;
+%         end
+%         if shuffleCount == maxShuffle
+%           error('Performed %d Training Day 1 viewing task shuffle attempts. That is too many.',maxShuffle);
+%         end
+%       end % while
+%       
+%       % naming
+%       
+%       % if there are more than X consecutive exemplars from the same
+%       % family, reshuffle. There's probably a better way to do this.
+%       not_good = true;
+%       maxShuffle = 1000;
+%       shuffleCount = 0;
+%       while not_good
+%         %randsel_n = randperm(length(expParam.session.train1.viewname.name{b}));
+%         % debug
+%         randsel_n = 1:length(expParam.session.train1.viewname.name{b});
+%         fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%         % shuffle the exemplars
+%         expParam.session.train1.viewname.name{b} = expParam.session.train1.viewname.name{b}(randsel_n);
+%         
+%         familyNums = [expParam.session.train1.viewname.name{b}.familyNum];
+%         if familyNums(1) == 1
+%           consecCount_f1_n = 1;
+%           consecCount_f2_n = 0;
+%         elseif familyNums(1) == 2
+%           consecCount_f1_n = 0;
+%           consecCount_f2_n = 1;
+%         end
+%         
+%         for i = 2:length(familyNums)
+%           if familyNums(i) == familyNums(i-1)
+%             if familyNums(i) == 1
+%               consecCount_f1_n = consecCount_f1_n + 1;
+%               %consecCount_f2_n = 0;
+%               if consecCount_f1_n > cfg.stim.nameMaxConsecFamily
+%                 break
+%               end
+%             elseif familyNums(i) == 2
+%               %consecCount_f1_n = 0;
+%               consecCount_f2_n = consecCount_f2_n + 1;
+%               if consecCount_f2_n > cfg.stim.nameMaxConsecFamily
+%                 break
+%               end
+%             end
+%           else
+%             if familyNums(i) == 1
+%               consecCount_f1_n = 1;
+%               consecCount_f2_n = 0;
+%             elseif familyNums(i) == 2
+%               consecCount_f1_n = 0;
+%               consecCount_f2_n = 1;
+%             end
+%           end
+%         end
+%         if consecCount_f1_n <= cfg.stim.nameMaxConsecFamily && consecCount_f2_n <= cfg.stim.nameMaxConsecFamily
+%           not_good = false;
+%         else
+%           shuffleCount = shuffleCount + 1;
+%         end
+%         if shuffleCount == maxShuffle
+%           error('Performed %d Training Day 1 naming task shuffle attempts. That is too many.',maxShuffle);
+%         end
+%       end % while
+%       
+%     end % for each block
     
     %%%%%%%%%%%%%%%%%%%%%%
     % Naming task (all stimuli)
