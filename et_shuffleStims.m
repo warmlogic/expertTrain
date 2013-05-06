@@ -17,10 +17,10 @@ not_good = true;
 maxShuffle = 1000;
 shuffleCount = 0;
 while not_good
-  randsel = randperm(length(stims));
+  %randsel = randperm(length(stims));
   % debug
-  %randsel = 1:length(stims);
-  %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+  randsel = 1:length(stims);
+  fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   % shuffle the exemplars
   stims = stims(randsel);
   
