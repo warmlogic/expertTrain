@@ -1,5 +1,5 @@
-function [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields)
-% [stim,expParam] = et_divvyStims(cfg,expParam,stim,nCond,dest)
+function [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields,rmStims)
+% [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields,rmStims)
 %
 % Input:
 %  cfg:        config structure.
@@ -9,9 +9,11 @@ function [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields)
 %  destFields: 3-element cell array denoting the fields in expParam.session
 %              to store the chosen stimuli for this condition.
 %              e.g., {'pretest','recog','targ'} or {'pretest','recog','lure'}
+%  rmStims:    true or false, whether to remove stimuli. (default = true)
 %
 % Output:
-%  stim:     original stimulus structure with the chosen stimuli removed
+%  stim:     original stimulus structure with the chosen stimuli removed if
+%            rmStims = true.
 %  expParam: experiment parameter structure with the chosen stimuli
 %
 % NB:
@@ -19,6 +21,10 @@ function [stim,expParam] = et_divvyStims(cfg,expParam,stim,nStim,destFields)
 %   e.g., expParam.session.pretest.recog.targ = [];
 %      or expParam.session.pretest.recog.lure = [];
 %
+
+if ~exist('rmStims','var') || isempty(rmStims)
+  rmStims = true;
+end
 
 % Make sure the destination fields exist
 if ~isfield(expParam.session,destFields{1})
@@ -38,15 +44,17 @@ for s = 1:cfg.stim.nSpecies
   %randsel = randperm(length(sInd));
   % debug
   randsel = 1:length(sInd);
-  fprintf('NB: Debug code. Not actually randomizing!\n');
+  fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   % get the indices of the stimuli that we want
   chosenInd = sInd(randsel(1:nStim));
   % add them to the list
   expParam.session.(destFields{1}).(destFields{2}).(destFields{3}) = cat(1,expParam.session.(destFields{1}).(destFields{2}).(destFields{3}),stim(chosenInd));
   
-  % remove the randomly chosen stimuli from the available pool
-  for rm = 1:length(chosenInd)
-    stim([stim.number] == chosenInd(rm)) = [];
+  if rmStims
+    % remove the randomly chosen stimuli from the available pool
+    for rm = 1:length(chosenInd)
+      stim([stim.number] == chosenInd(rm)) = [];
+    end
   end
 end
 
