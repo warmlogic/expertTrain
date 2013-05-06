@@ -68,3 +68,5 @@ while not_good
     error('Performed %d shuffle attempts. That is too many.',maxShuffle);
   end
 end % while
+
+end
