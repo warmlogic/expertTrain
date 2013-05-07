@@ -55,10 +55,7 @@ for s = 1:cfg.stim.nSpecies
   expParam.session.(destFields{1}).(destFields{2}).(destFields{3}) = cat(1,expParam.session.(destFields{1}).(destFields{2}).(destFields{3}),stim(chosenInd));
   
   if rmStims
-    % remove the randomly chosen stimuli from the available pool
-    for rm = 1:length(chosenInd)
-      stim([stim.number] == chosenInd(rm)) = [];
-    end
+    stim(chosenInd) = [];
   end
 end
 
