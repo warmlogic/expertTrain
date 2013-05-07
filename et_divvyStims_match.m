@@ -37,7 +37,6 @@ function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameS
 %  chosenStimsSame: stimuli for the "same" condition.
 %  chosenStimsDiff: stimuli for the "diff" condition.
 %
-%
 
 if ~exist('rmStims_orig','var') || isempty(rmStims_orig)
   rmStims_orig = true;
