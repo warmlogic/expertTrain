@@ -1,4 +1,5 @@
-function et_saveStimList(cfg)
+function [cfg] = et_saveStimList(cfg)
+% function [cfg] = et_saveStimList(cfg)
 
 fprintf('Creating stimulus list: %s...',cfg.stim.file);
 
@@ -36,6 +37,7 @@ for s = 1:cfg.stim.nSpecies
   % put them in the "correct" order
   fam1_tmp(specStart:fam1Count) = fam1Species(j);
   specStart = specStart + length(fam1Species);
+  cfg.stim.nExemplars(1,s) = length(fam1Species);
 end
 filled_cells = cell2mat(cellfun(@(x) ~isempty(x), fam1_tmp, 'UniformOutput', false));
 fam1 = fam1_tmp(filled_cells);
@@ -75,6 +77,7 @@ for s = 1:cfg.stim.nSpecies
   % put them in the "correct" order
   fam2_tmp(specStart:fam2Count) = fam2Species(j);
   specStart = specStart + length(fam2Species);
+  cfg.stim.nExemplars(2,s) = length(fam2Species);
 end
 filled_cells = cell2mat(cellfun(@(x) ~isempty(x), fam2_tmp, 'UniformOutput', false));
 fam2 = fam2_tmp(filled_cells);
