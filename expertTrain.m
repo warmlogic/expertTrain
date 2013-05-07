@@ -326,8 +326,8 @@ try
     cfg.stim.familyNames = {'a','s'};
     % assumes that each family has the same number of species
     cfg.stim.nSpecies = 10;
-    % assumes that each species has the same number of exemplars
-    cfg.stim.nExemplars = 99;
+    % number of exemplars for each species
+    cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
     
     % counterbalance basic and subordinate families
     if expParam.isEven
@@ -471,24 +471,23 @@ try
     cfg.stim.posttest_delay.recog.nStudyTarg = 16;
     cfg.stim.posttest_delay.recog.nTestLure = 8;
     
-    
     %% create the stimulus list if it doesn't exist
     if ~exist(cfg.stim.file,'file')
-      et_saveStimList(cfg);
+      cfg = et_saveStimList(cfg);
     end
     
     % read in the stimulus list
     fprintf('Loading stimulus list: %s...',cfg.stim.file);
     fid = fopen(cfg.stim.file);
-    stimuli = textscan(fid,'%s%s%d%s%d%d%d','Delimiter','\t','Headerlines',1);
+    stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t','Headerlines',1);
     fclose(fid);
     fprintf('Done.\n');
     
     % create a structure for each family with all the stim information
     f1Ind = stimuli{3} == 1;
-    f1Stim = struct('filename',stimuli{1}(f1Ind),'familyStr',stimuli{2}(f1Ind),'familyNum',num2cell(stimuli{3}(f1Ind)),'speciesStr',stimuli{4}(f1Ind),'speciesNum',num2cell(stimuli{5}(f1Ind)),'exemplar',num2cell(stimuli{6}(f1Ind)),'number',num2cell(stimuli{7}(f1Ind)));
+    f1Stim = struct('filename',stimuli{1}(f1Ind),'familyStr',stimuli{2}(f1Ind),'familyNum',num2cell(stimuli{3}(f1Ind)),'speciesStr',stimuli{4}(f1Ind),'speciesNum',num2cell(stimuli{5}(f1Ind)),'exemplarName',num2cell(stimuli{6}(f1Ind)),'exemplarNum',num2cell(stimuli{7}(f1Ind)),'number',num2cell(stimuli{8}(f1Ind)));
     f2Ind = stimuli{3} == 2;
-    f2Stim = struct('filename',stimuli{1}(f2Ind),'familyStr',stimuli{2}(f2Ind),'familyNum',num2cell(stimuli{3}(f2Ind)),'speciesStr',stimuli{4}(f2Ind),'speciesNum',num2cell(stimuli{5}(f2Ind)),'exemplar',num2cell(stimuli{6}(f2Ind)),'number',num2cell(stimuli{7}(f2Ind)));
+    f2Stim = struct('filename',stimuli{1}(f2Ind),'familyStr',stimuli{2}(f2Ind),'familyNum',num2cell(stimuli{3}(f2Ind)),'speciesStr',stimuli{4}(f2Ind),'speciesNum',num2cell(stimuli{5}(f2Ind)),'exemplarName',num2cell(stimuli{6}(f2Ind)),'exemplarNum',num2cell(stimuli{7}(f2Ind)),'number',num2cell(stimuli{8}(f2Ind)));
     
     % debug
     f1Stim_orig = f1Stim;
