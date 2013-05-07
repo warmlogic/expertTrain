@@ -15,11 +15,11 @@ function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 % Output:
 %  shuffledStims: Stimuli in shuffled order.
 %
-% NB: Makes 10000 shuffle attempts before erroring.
+% NB: Makes 100000 shuffle attempts before erroring.
 %
 
 not_good = true;
-maxShuffle = 10000;
+maxShuffle = 100000;
 shuffleCount = 0;
 while not_good
   randsel = randperm(length(stims));
