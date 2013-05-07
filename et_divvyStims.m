@@ -7,21 +7,23 @@ function [origStims,chosenStims] = et_divvyStims(origStims,chosenStims,nStims,rm
 %  new fields and values to the chosen stimuli (newField and newValue).
 %
 % Input:
-%  origStims:   stimulus structure that you want to select from.
-%  chosenStims: Empty array or existing struct to add the chosen. If it's
-%               an existing struct, must have the same fields as what
+%  origStims:   Stimulus structure that you want to select from.
+%  chosenStims: Empty array or existing struct to add the chosen to. If
+%               it's an existing struct, must have the same fields as what
 %               you're expecting to return (i.e., newField/newValue).
-%  nStims:      integer denoting the number of stimuli for this condition.
-%  rmStims:     true or false, whether to remove stimuli. (default = true)
-%  newField:    in case you want to add a new field to all these stimuli
-%               (e.g., targ or lure). Optional (default = {}).
-%  newValue:    the value for the new field. Optional (default = {}).
+%  nStims:      Integer. The number of stimuli to choose from each species.
+%  rmStims:     True or false, whether to remove stimuli. (default = true)
+%  newField:    String(s) in a cell. In case you want to add a new field to
+%               all these stimuli (e.g., targ or lure).
+%               Optional (default = {}).
+%  newValue:    Cell (same number of elements as newField). The value(s)
+%               for the new field(s). Optional (default = {}).
 %
 % Output:
-%  origStims:   original stimulus structure with the chosen stimuli removed
+%  origStims:   Original stimulus structure with the chosen stimuli removed
 %               if rmStims = true.
 %  chosenStims: Struct containing the chosen stimuli from each available
-%               species. This is where the new fields and values get added.
+%               species. New fields and values are added to these stims.
 %
 
 if ~exist('rmStims','var') || isempty(rmStims)
