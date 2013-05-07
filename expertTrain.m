@@ -63,6 +63,7 @@ cfg.exp.gray = 181;
 %% Set up the subject number and data
 
 % debug
+cd('/Users/matt/Documents/experiments/expertTrain');
 subject = 'ECRE001';
 
 if ~strcmp(subject(1:length(expParam.expName)),expParam.expName)
@@ -504,23 +505,27 @@ try
     % trained
     expParam.session.pretest.match.f1Trained = [];
     [f1Stim,expParam] = et_divvyStims(cfg,expParam,f1Stim,...
-      cfg.stim.pretest.match.nTrained,{'pretest','match','f1Trained'});
+      cfg.stim.pretest.match.nTrained,{'pretest','match','f1Trained'},...
+      true,'trained',1);
     % untrained
     expParam.session.pretest.match.f1Untrained = [];
     [f1Stim,expParam] = et_divvyStims(cfg,expParam,f1Stim,...
-      cfg.stim.pretest.match.nUntrained,{'pretest','match','f1Untrained'});
+      cfg.stim.pretest.match.nUntrained,{'pretest','match','f1Untrained'},...
+      true,'trained',0);
     
     % family 2
     
     % trained
     expParam.session.pretest.match.f2Trained = [];
     [f2Stim,expParam] = et_divvyStims(cfg,expParam,f2Stim,...
-      cfg.stim.pretest.match.nTrained,{'pretest','match','f2Trained'});
+      cfg.stim.pretest.match.nTrained,{'pretest','match','f2Trained'},...
+      true,'trained',1);
     
     % untrained
     expParam.session.pretest.match.f2Untrained = [];
     [f2Stim,expParam] = et_divvyStims(cfg,expParam,f2Stim,...
-      cfg.stim.pretest.match.nUntrained,{'pretest','match','f2Untrained'});
+      cfg.stim.pretest.match.nUntrained,{'pretest','match','f2Untrained'},...
+      true,'trained',0);
     
     %%%%%%%%%%%%%%%%%%%%%%
     % Recognition task
@@ -534,19 +539,23 @@ try
     
     % targets
     [f1Stim,expParam] = et_divvyStims(cfg,expParam,f1Stim,...
-      cfg.stim.pretest.recog.nStudyTarg,{'pretest','recog','targ'});
+      cfg.stim.pretest.recog.nStudyTarg,{'pretest','recog','targ'},...
+      true,'targ',1);
     % lures
     [f1Stim,expParam] = et_divvyStims(cfg,expParam,f1Stim,...
-      cfg.stim.pretest.recog.nTestLure,{'pretest','recog','lure'});
+      cfg.stim.pretest.recog.nTestLure,{'pretest','recog','lure'},...
+      true,'targ',0);
     
     % family 2
     
     % targets
     [f2Stim,expParam] = et_divvyStims(cfg,expParam,f2Stim,...
-      cfg.stim.pretest.recog.nStudyTarg,{'pretest','recog','targ'});
+      cfg.stim.pretest.recog.nStudyTarg,{'pretest','recog','targ'},...
+      true,'targ',1);
     % lures
     [f2Stim,expParam] = et_divvyStims(cfg,expParam,f2Stim,...
-      cfg.stim.pretest.recog.nTestLure,{'pretest','recog','lure'});
+      cfg.stim.pretest.recog.nTestLure,{'pretest','recog','lure'},...
+      true,'targ',1);
     
     %% Training Day 1
     
