@@ -19,8 +19,9 @@ function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 %
 
 not_good = true;
-maxShuffle = 100000;
+maxShuffle = 1000000;
 shuffleCount = 0;
+fprintf('Shuffle count: %s',repmat(' ',1,length(num2str(maxShuffle))));
 while not_good
   randsel = randperm(length(stims));
   % debug
@@ -51,7 +52,7 @@ while not_good
   end
   if any(consecCount > maxConsec)
     shuffleCount = shuffleCount + 1;
-    fprintf('.');
+    fprintf(1,[repmat('\b',1,length(num2str(shuffleCount))),'%d'],shuffleCount);
   else
     not_good = false;
     shuffledStims = stims;
