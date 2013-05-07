@@ -56,10 +56,13 @@ if ~isempty(newField)
   stims(1).(newField) = [];
 end
 
+% only go through the species in the available stimuli
+theseSpecies = unique([stims.speciesNum]);
+
 % loop through every species
-for s = 1:cfg.stim.nSpecies
+for s = 1:length(theseSpecies)
   % which indices does this species occupy?
-  sInd = find([stims.speciesNum] == s);
+  sInd = find([stims.speciesNum] == theseSpecies(s));
   
   % shuffle the stimulus index
   %randsel = randperm(length(sInd));
