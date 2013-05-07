@@ -298,17 +298,17 @@ try
       cfg.stim.famSubord = 1;
     end
     
+    % Number of trained and untrained per species per family
+    cfg.stim.nTrained = 6;
+    cfg.stim.nUntrained = 6;
+    
     %%%%%%%%%%%%%%%%%%%%%%
     % pretest configuration
     %%%%%%%%%%%%%%%%%%%%%%
     
-    % Matching: number of trained and untrained per species per family;
-    cfg.stim.pretest.match.nTrained = 6;
-    cfg.stim.pretest.match.nUntrained = 6;
     % every stimulus is in both the same and the different condition.
-    % TODO: implement this
-    cfg.stim.pretest.match.nSame = cfg.stim.pretest.match.nTrained;
-    cfg.stim.pretest.match.nDiff = cfg.stim.pretest.match.nTrained;
+    cfg.stim.pretest.match.nSame = cfg.stim.nTrained;
+    cfg.stim.pretest.match.nDiff = cfg.stim.nTrained;
     
     % Recognition: number of target and lure stimuli (assumes all targets
     % are lures are tested)
@@ -342,8 +342,8 @@ try
     
     % number per species per family (half because each stimulus is only in
     % same or different condition)
-    cfg.stim.train1.match.nSame = cfg.stim.pretest.match.nTrained / 2;
-    cfg.stim.train1.match.nDiff = cfg.stim.pretest.match.nTrained / 2;
+    cfg.stim.train1.match.nSame = cfg.stim.nTrained / 2;
+    cfg.stim.train1.match.nDiff = cfg.stim.nTrained / 2;
     
     
     %%%%%%%%%%%%%%%%%%%%%%
@@ -472,36 +472,61 @@ try
     f1Stim_orig = f1Stim;
     f2Stim_orig = f2Stim;
     
+    %% Decide which will be the trained and untrained stimuli from each family
+    
+    % family 1 trained
+    expParam.session.f1Trained = [];
+    [f1Stim,expParam.session.f1Trained] = et_divvyStims(...
+      f1Stim,[],cfg.stim.nTrained,true,{'trained'},{1});
+    
+    % family 1 untrained
+    expParam.session.f1Untrained = [];
+    [f1Stim,expParam.session.f1Untrained] = et_divvyStims(...
+      f1Stim,[],cfg.stim.nUntrained,true,{'trained'},{0});
+    
+    % family 2 trained
+    expParam.session.f2Trained = [];
+    [f2Stim,expParam.session.f2Trained] = et_divvyStims(...
+      f2Stim,[],cfg.stim.nTrained,true,{'trained'},{1});
+    
+    % family 2 untrained
+    expParam.session.f2Untrained = [];
+    [f2Stim,expParam.session.f2Untrained] = et_divvyStims(...
+      f2Stim,[],cfg.stim.nUntrained,true,{'trained'},{0});
+    
     %% Pretest
     
     %%%%%%%%%%%%%%%%%%%%%%
     % Matching task
     %%%%%%%%%%%%%%%%%%%%%%
     
-    % TODO: redo matching task like in Training Day 1
+    % initialize to hold all the same and different stimuli
+    expParam.session.pretest.match.same = [];
+    expParam.session.pretest.match.diff = [];
     
-    % family 1
+    % family 1 trained
+    [expParam.session.pretest.match.same,expParam.session.pretest.match.diff] = et_divvyStims_match(...
+      expParam.session.f1Trained,...
+      expParam.session.pretest.match.same,expParam.session.pretest.match.diff,...
+      cfg.stim.pretest.match.nSame,cfg.stim.pretest.match.nDiff,false,true);
     
-    % trained
-    expParam.session.pretest.match.f1Trained = []; % origStims,chosenStims,nStims,rmStims,newField,newValue
-    [f1Stim,expParam.session.pretest.match.f1Trained] = et_divvyStims(...
-      f1Stim,[],cfg.stim.pretest.match.nTrained,true,{'trained'},{1});
-    % untrained
-    expParam.session.pretest.match.f1Untrained = [];
-    [f1Stim,expParam.session.pretest.match.f1Untrained] = et_divvyStims(...
-      f1Stim,[],cfg.stim.pretest.match.nUntrained,true,{'trained'},{0});
+    % family 1 untrained
+    [expParam.session.pretest.match.same,expParam.session.pretest.match.diff] = et_divvyStims_match(...
+      expParam.session.f1Untrained,...
+      expParam.session.pretest.match.same,expParam.session.pretest.match.diff,...
+      cfg.stim.pretest.match.nSame,cfg.stim.pretest.match.nDiff,false,true);
     
-    % family 2
+    % family 2 trained
+    [expParam.session.pretest.match.same,expParam.session.pretest.match.diff] = et_divvyStims_match(...
+      expParam.session.f2Trained,...
+      expParam.session.pretest.match.same,expParam.session.pretest.match.diff,...
+      cfg.stim.pretest.match.nSame,cfg.stim.pretest.match.nDiff,false,true);
     
-    % trained
-    expParam.session.pretest.match.f2Trained = [];
-    [f2Stim,expParam.session.pretest.match.f2Trained] = et_divvyStims(...
-      f2Stim,[],cfg.stim.pretest.match.nTrained,true,{'trained'},{1});
-    
-    % untrained
-    expParam.session.pretest.match.f2Untrained = [];
-    [f2Stim,expParam.session.pretest.match.f2Untrained] = et_divvyStims(...
-      f2Stim,[],cfg.stim.pretest.match.nUntrained,true,{'trained'},{0});
+    % family 2 untrained
+    [expParam.session.pretest.match.same,expParam.session.pretest.match.diff] = et_divvyStims_match(...
+      expParam.session.f2Untrained,...
+      expParam.session.pretest.match.same,expParam.session.pretest.match.diff,...
+      cfg.stim.pretest.match.nSame,cfg.stim.pretest.match.nDiff,false,true);
     
     %%%%%%%%%%%%%%%%%%%%%%
     % Recognition task
@@ -539,8 +564,8 @@ try
     %%%%%%%%%%%%%%%%%%%%%%
     
     % get the stimuli from both families for selection (will shuffle later)
-    f1Trained = expParam.session.pretest.match.f1Trained;
-    f2Trained = expParam.session.pretest.match.f2Trained;
+    f1Trained = expParam.session.f1Trained;
+    f2Trained = expParam.session.f2Trained;
     
     % randomize the order in which species are added; order is different
     % for each family
@@ -631,7 +656,7 @@ try
     %%%%%%%%%%%%%%%%%%%%%%
     
     % put all the stimuli together
-    expParam.session.train1.name.allStim = cat(1,expParam.session.pretest.match.f1Trained,expParam.session.pretest.match.f2Trained);
+    expParam.session.train1.name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
     % Reshuffle. No more than X conecutive exemplars from the same family.
     [expParam.session.train1.name.allStim] = et_shuffleStims(...
       expParam.session.train1.name.allStim,'familyNum',cfg.stim.train1.name.nameMaxConsecFamily);
@@ -640,73 +665,33 @@ try
     % Matching task
     %%%%%%%%%%%%%%%%%%%%%%
     
-    % family 1
-    f1Trained = expParam.session.pretest.match.f1Trained;
-    % stim2
+    % initialize to hold all the same and different stimuli
     expParam.session.train1.match.same = [];
-    [f1Trained,expParam.session.train1.match.same] = et_divvyStims(...
-      f1Trained,[],cfg.stim.train1.match.nSame,true,{'matchStimNum'},{2});
-    % stim2
     expParam.session.train1.match.diff = [];
-    [f1Trained,expParam.session.train1.match.diff] = et_divvyStims(...
-      f1Trained,[],cfg.stim.train1.match.nDiff,true,{'matchStimNum'},{2});
     
-    % store the stimuli for slicing before modifying
-    stim2_same = expParam.session.train1.match.same;
-    stim2_diff = expParam.session.train1.match.diff;
-    stim1_same = expParam.session.train1.match.diff;
-    stim1_diff = expParam.session.train1.match.same;
+    % family 1 trained
+    [expParam.session.train1.match.same,expParam.session.train1.match.diff] = et_divvyStims_match(...
+      expParam.session.f1Trained,...
+      expParam.session.train1.match.same,expParam.session.train1.match.diff,...
+      cfg.stim.train1.match.nSame,cfg.stim.train1.match.nDiff,true,true);
     
-    % find stimulus 1s for the same condition (same species)
-    pairCount = 1;
-    for s = 1:cfg.stim.nSpecies
-      sInd_stim2 = find([stim2_same.speciesNum] == s);
-      stim1_spec = stim1_same([stim1_same.speciesNum] == s);
-      for e = 1:length(sInd_stim2)
-        expParam.session.train1.match.same(sInd_stim2(e)).matchPairNum = pairCount;
-        [stim1_spec,expParam.session.train1.match.same] = et_divvyStims(...
-          stim1_spec,expParam.session.train1.match.same,1,true,{'matchStimNum', 'matchPairNum'},{1, pairCount});
-        pairCount = pairCount + 1;
-      end
-    end
+    % family 1 untrained
+    [expParam.session.train1.match.same,expParam.session.train1.match.diff] = et_divvyStims_match(...
+      expParam.session.f1Untrained,...
+      expParam.session.train1.match.same,expParam.session.train1.match.diff,...
+      cfg.stim.train1.match.nSame,cfg.stim.train1.match.nDiff,true,true);
     
-    % find stimulus 1s for the different condition (any other species)
-    pairCount = 1;
-    % find a species to pair each stimulus 2 with
-    not_good = true;
-    while not_good
-      speciesPair = randperm(cfg.stim.nSpecies);
-      if ~any(speciesPair == 1:cfg.stim.nSpecies)
-        not_good = false;
-      end
-    end
-    for s = 1:cfg.stim.nSpecies
-      sInd_stim2 = find([stim2_diff.speciesNum] == s);
-      sInd_stim1 = [stim1_diff.speciesNum] == speciesPair(s);
-      stim1_spec = stim1_diff(sInd_stim1);
-      for e = 1:length(sInd_stim2)
-        expParam.session.train1.match.diff(sInd_stim2(e)).matchPairNum = pairCount;
-        [stim1_spec,expParam.session.train1.match.diff] = et_divvyStims(...
-          stim1_spec,expParam.session.train1.match.diff,1,true,{'matchStimNum', 'matchPairNum'},{1, pairCount});
-        pairCount = pairCount + 1;
-      end
-    end
-
-    % family 2
+    % family 2 trained
+    [expParam.session.train1.match.same,expParam.session.train1.match.diff] = et_divvyStims_match(...
+      expParam.session.f2Trained,...
+      expParam.session.train1.match.same,expParam.session.train1.match.diff,...
+      cfg.stim.train1.match.nSame,cfg.stim.train1.match.nDiff,true,true);
     
-    % TODO: when processing family 2, need to be careful about same and
-    % diff fields. Should probably modify divvyStims to it just outputs to
-    % a stimOut struct and not the entire experParam struct.  Still need to
-    % initialize stimOut struct.
-    
-%     f2Trained = expParam.session.pretest.match.f2Trained;
-%     expParam.session.train1.match.same = [];
-%     [f2Trained,expParam] = et_divvyStims(cfg,expParam,f2Trained,...
-%       cfg.stim.train1.match.nSame,{'train1','match','same'},true,{'matchStimNum'},{2});
-%     expParam.session.train1.match.diff = [];
-%     [f2Trained,expParam] = et_divvyStims(cfg,expParam,f2Trained,...
-%       cfg.stim.train1.match.nDiff,{'train1','match','diff'},true,{'matchStimNum'},{2});
-    
+    % family 2 untrained
+    [expParam.session.train1.match.same,expParam.session.train1.match.diff] = et_divvyStims_match(...
+      expParam.session.f2Untrained,...
+      expParam.session.train1.match.same,expParam.session.train1.match.diff,...
+      cfg.stim.train1.match.nSame,cfg.stim.train1.match.nDiff,true,true);
     
     %% Training Day 2
     
