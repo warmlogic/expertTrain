@@ -555,11 +555,12 @@ try
     % Viewing+Naming task
     %%%%%%%%%%%%%%%%%%%%%%
     
-    % get the stimuli from both families for selection (shuffle later)
+    % get the stimuli from both families for selection (will shuffle later)
     f1Trained = expParam.session.pretest.match.f1Trained;
     f2Trained = expParam.session.pretest.match.f2Trained;
     
-    % randomize the order in which species are added
+    % randomize the order in which species are added; order is different
+    % for each family
     %speciesOrder_f1 = randperm(cfg.stim.nSpecies);
     %speciesOrder_f2 = randperm(cfg.stim.nSpecies);
     % debug
@@ -586,7 +587,7 @@ try
       [1, 6, 3, 4, 5, 6, 4, 5], [1, 6, 3, 4, 5, 6, 5, 6], [1, 6, 5, 6, 5, 6, 5, 6], [5, 6, 5, 6, 5, 6, 5, 6]};
     
     % number of examplars per viewing and naming block
-    cfg.stim.examplarPerView = 1;
+    %cfg.stim.examplarPerView = 1;
     cfg.stim.exemplarPerName = 2;
     
     % maximum number of repeated exemplars from each family
@@ -628,6 +629,8 @@ try
         
         % add them to the viewing list
         %fprintf('view f2: block %d, species %d, examplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
+        % NB: not actually using cfg.stim.examplarPerView. This needs to be
+        % modified if there's more than 1 exemplar per view from a species.
         expParam.session.train1.viewname.view{b} = cat(1,expParam.session.train1.viewname.view{b},thisSpecies_f2(viewIndices{b}(s)));
         
         % add them to the naming list
@@ -639,9 +642,9 @@ try
       % family, reshuffle. There's probably a better way to do this.
       
       % viewing
-      [expParam.session.train1.viewname.view{b}] = et_shuffleStims(expParam.session.train1.viewname.view{b},cfg.stim.viewMaxConsecFamily);
+      [expParam.session.train1.viewname.view{b}] = et_shuffleStims(expParam.session.train1.viewname.view{b},'familyNum',cfg.stim.viewMaxConsecFamily);
       % naming
-      [expParam.session.train1.viewname.name{b}] = et_shuffleStims(expParam.session.train1.viewname.name{b},cfg.stim.nameMaxConsecFamily);
+      [expParam.session.train1.viewname.name{b}] = et_shuffleStims(expParam.session.train1.viewname.name{b},'familyNum',cfg.stim.nameMaxConsecFamily);
       
     end % for each block
     
@@ -651,24 +654,63 @@ try
     
     % put all the stimuli together
     expParam.session.train1.name.allStim = cat(1,expParam.session.pretest.match.f1Trained,expParam.session.pretest.match.f2Trained);
-    % shuffle the stimuli
-    %randsel = randperm(length(expParam.session.train1.name.allStim));
-    % debug
-    randsel = 1:length(expParam.session.train1.name.allStim);
-    fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
-    expParam.session.train1.name.allStim = expParam.session.train1.name.allStim(randsel);
+    % Reshuffle. No more than X conecutive exemplars from the same family.
+    [expParam.session.train1.name.allStim] = et_shuffleStims(expParam.session.train1.name.allStim,'familyNum',cfg.stim.nameMaxConsecFamily);
     
     %%%%%%%%%%%%%%%%%%%%%%
     % Matching task
     %%%%%%%%%%%%%%%%%%%%%%
     
-    % family 1
-    expParam.session.train1.match.f1Trained = expParam.session.pretest.match.f1Trained;
-    expParam.session.train1.match.f1Untrained = expParam.session.pretest.match.f1Untrained;
+%     % family 1
+%     % shuffle the stimulus index
+%     %randsel_f1 = randperm(length(expParam.session.pretest.match.f1Trained));
+%     % debug
+%     randsel_f1 = 1:length(expParam.session.pretest.match.f1Trained);
+%     fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%     expParam.session.train1.match.f1Trained = expParam.session.pretest.match.f1Trained(randsel_f1);
+%     % shuffle the stimulus index
+%     %randsel_f1 = randperm(length(expParam.session.pretest.match.f1Trained));
+%     % debug
+%     randsel_f1 = 1:length(expParam.session.pretest.match.f1Untrained);
+%     fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%     expParam.session.train1.match.f1Untrained = expParam.session.pretest.match.f1Untrained(randsel_f1);
     
-    % family 2
-    expParam.session.train1.match.f2Trained = expParam.session.pretest.match.f2Trained;
-    expParam.session.train1.match.f2Untrained = expParam.session.pretest.match.f2Untrained;
+%     % family 2
+%     % shuffle the stimulus index
+%     %randsel_f2 = randperm(length(expParam.session.pretest.match.f2Trained));
+%     % debug
+%     randsel_f2 = 1:length(expParam.session.pretest.match.f2Trained);
+%     fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%     expParam.session.train1.match.f2Trained = expParam.session.pretest.match.f2Trained(randsel_f2);
+%     % shuffle the stimulus index
+%     %randsel_f2 = randperm(length(expParam.session.pretest.match.f2Trained));
+%     % debug
+%     randsel_f2 = 1:length(expParam.session.pretest.match.f2Untrained);
+%     fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%     expParam.session.train1.match.f2Untrained = expParam.session.pretest.match.f2Untrained(randsel_f2);
+
+    % number per species per family
+    cfg.stim.train1.match.nSame = cfg.stim.pretest.match.nTrained / 2;
+    cfg.stim.train1.match.nDiff = cfg.stim.pretest.match.nTrained / 2;
+    
+    % family 1
+    f1Trained = expParam.session.pretest.match.f1Trained;
+    expParam.session.train1.match.same = [];
+    [f1Trained,expParam] = et_divvyStims(cfg,expParam,f1Trained,...
+      cfg.stim.train1.match.nSame,{'train1','match','same'});
+    expParam.session.train1.match.diff = [];
+    [f1Trained,expParam] = et_divvyStims(cfg,expParam,f1Trained,...
+      cfg.stim.train1.match.nDiff,{'train1','match','diff'});
+    
+    % family 1
+    f2Trained = expParam.session.pretest.match.f2Trained;
+    expParam.session.train1.match.same = [];
+    [f2Trained,expParam] = et_divvyStims(cfg,expParam,f2Trained,...
+      cfg.stim.train1.match.nSame,{'train1','match','same'});
+    expParam.session.train1.match.diff = [];
+    [f2Trained,expParam] = et_divvyStims(cfg,expParam,f2Trained,...
+      cfg.stim.train1.match.nDiff,{'train1','match','diff'});
+    
     
     %% Training Day 2
     
