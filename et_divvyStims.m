@@ -44,16 +44,24 @@ if ~exist('rmStims','var') || isempty(rmStims)
 end
 
 if ~exist('newField','var') || isempty(newField)
-  newField = [];
+  newField = {};
 end
 
 if ~exist('newValue','var') || isempty(newValue)
-  newValue = [];
+  newValue = {};
+end
+
+if ~isempty(newField)
+  if length(newField) ~= length(newValue)
+    error('newField and newValue are not the same length');
+  end
 end
 
 % add the new field to all stims so we can concatenate
 if ~isempty(newField)
-  stims(1).(newField) = [];
+  for f = 1:length(newField)
+    stims(1).(newField{f}) = [];
+  end
 end
 
 % only go through the species in the available stimuli
@@ -71,6 +79,16 @@ for s = 1:length(theseSpecies)
   fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   % get the indices of the stimuli that we want
   chosenInd = sInd(randsel(1:nStim));
+  
+  if ~isempty(newField)
+    for f = 1:length(newField)
+      % add the new field and value to these stimuli
+      for e = 1:length(chosenInd)
+        stims(chosenInd(e)).(newField{f}) = newValue{f};
+      end
+    end
+  end
+  
   % add them to the list
   expParam.session.(destFields{1}).(destFields{2}).(destFields{3}) = cat(1,expParam.session.(destFields{1}).(destFields{2}).(destFields{3}),stims(chosenInd));
   
@@ -80,12 +98,10 @@ for s = 1:length(theseSpecies)
 end
 
 if ~isempty(newField)
-% add the new field and value
-  for e = 1:length(expParam.session.(destFields{1}).(destFields{2}).(destFields{3}))
-    expParam.session.(destFields{1}).(destFields{2}).(destFields{3})(e).(newField) = newValue;
+  % remove the field from the stims struct
+  for f = 1:length(newField)
+    stims = rmfield(stims,newField{f});
   end
-% remove the field from the stims struct
-  stims = rmfield(stims,newField);
 end
 
 end
