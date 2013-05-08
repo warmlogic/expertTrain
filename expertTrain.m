@@ -173,24 +173,39 @@ if exist(cfg.files.sesLogFile,'file')
   error('Log file for this session already exists (%s). Resume support is not yet enabled.',cfg.files.sesLogFile);
 end
 
-%% Define the response keys
+%% Stimulus parameters
 
-% keys for naming species (subordinate-level naming)
+cfg.files.stimDir = fullfile(cfg.files.expDir,'images','Creatures');
+cfg.stim.file = fullfile(cfg.files.stimDir,'stimList.txt');
 
-% % I can't get PTB to use the semicolon
-%cfg.keys.possibleKeys = {'a','s','d','f','v','n','j','k','l','semicolon'};
-cfg.keys.speciesKeys = {'a','s','d','f','v','b','h','j','k','l'};
-
-if ~isfield(cfg.keys,'keysAreSet')
-  cfg.keys.keysAreSet = false;
+% create the stimulus list if it doesn't exist
+if ~exist(cfg.stim.file,'file')
+  cfg = et_saveStimList(cfg);
 end
 
-% only set the keys in a random order once per subject
-if ~cfg.keys.keysAreSet
-  % cfg.keys.randKeyOrder = randperm(length(cfg.keys.speciesKeys));
-  % debug - not randomized
-  cfg.keys.randKeyOrder = 1:length(cfg.keys.speciesKeys);
-  fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+%% make an initial save of experiment data
+save(cfg.files.expParamFile,'cfg','expParam');
+
+%% If this is session 1, setup the experiment
+
+if expParam.sessionNum == 1
+  
+  %% Define the response keys
+  
+  % TODO: do we want the key order to be yoked to the training day 1 order
+  % in the viewname task?
+  
+  % keys for naming species (subordinate-level naming)
+  
+  % % I can't get PTB to use the semicolon
+  %cfg.keys.possibleKeys = {'a','s','d','f','v','n','j','k','l','semicolon'};
+  cfg.keys.speciesKeys = {'a','s','d','f','v','b','h','j','k','l'};
+  
+  % only set the keys in a random order once per subject
+  cfg.keys.randKeyOrder = randperm(length(cfg.keys.speciesKeys));
+  % % debug - not randomized
+  % cfg.keys.randKeyOrder = 1:length(cfg.keys.speciesKeys);
+  % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.s00 = KbName('space');
@@ -201,26 +216,1074 @@ if ~cfg.keys.keysAreSet
     cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeys{cfg.keys.randKeyOrder(i)});
   end
   
-  % and store that we set the keys so we don't do it again next session
-  cfg.keys.keysAreSet = true;
+  %% Stimulus basics
+  
+  cfg.files.stimFileExt = '.bmp';
+  cfg.stim.nFamilies = 2;
+  % family names correspond to the directories in which stimuli reside
+  cfg.stim.familyNames = {'a','s'};
+  % assumes that each family has the same number of species
+  cfg.stim.nSpecies = 10;
+  % initialize to store the number of exemplars for each species
+  cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
+  
+  % counterbalance basic and subordinate families based on subject num
+  if expParam.isEven
+    cfg.stim.famNumBasic = 1;
+    cfg.stim.famNumSubord = 2;
+  else
+    cfg.stim.famNumBasic = 2;
+    cfg.stim.famNumSubord = 1;
+  end
+  
+  % Number of trained and untrained per species per family
+  cfg.stim.nTrained = 6;
+  cfg.stim.nUntrained = 6;
+  
+  %% Session/phase configuration
+  
+  % TODO: add event timing information
+  
+  
+  % TODO: add text size informaiton for instructions and on-screen text
+  
+  % Define text size (TODO: fix for this experiment)
+  cfg.exp.txtsize_instruct = 35;
+  cfg.exp.txtsize_break = 28;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % pretest configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching: every stimulus is in both the same and the different
+  % condition.
+  cfg.stim.pretest.match.nSame = cfg.stim.nTrained;
+  cfg.stim.pretest.match.nDiff = cfg.stim.nTrained;
+  
+  % Recognition: number of target and lure stimuli (assumes all targets
+  % are lures are tested)
+  cfg.stim.pretest.recog.nStudyTarg = 16;
+  cfg.stim.pretest.recog.nTestLure = 8;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Training Day 1 configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Viewing+Naming
+  
+  % number of exemplars per viewing block in viewname; don't need
+  %cfg.stim.train1.viewname.exemplarPerView = 1;
+  % maximum number of repeated exemplars from each family in viewname
+  cfg.stim.train1.viewname.viewMaxConsecFamily = 3;
+  
+  % number of exemplars per naming block in viewname
+  cfg.stim.train1.viewname.exemplarPerName = 2;
+  % maximum number of repeated exemplars from each family in viewname
+  cfg.stim.train1.viewname.nameMaxConsecFamily = 3;
+  
+  % Naming
+  
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train1.name.nameMaxConsecFamily = 3;
+  
+  % Matching
+  
+  % number per species per family (half because each stimulus is only in
+  % same or different condition)
+  cfg.stim.train1.match.nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train1.match.nDiff = cfg.stim.nTrained / 2;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Training Day 2 configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching 1
+  matchNum = 1;
+  cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  % Naming
+  
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train2.name.nameMaxConsecFamily = 3;
+  
+  % Matching
+  matchNum = 2;
+  cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Training Day 3 configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching 1
+  matchNum = 1;
+  cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  % Naming
+  
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train3.name.nameMaxConsecFamily = 3;
+  
+  % Matching
+  matchNum = 2;
+  cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Training Day 4 configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching 1
+  matchNum = 1;
+  cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  % Naming
+  
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train4.name.nameMaxConsecFamily = 3;
+  
+  % Matching
+  matchNum = 2;
+  cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Training Day 5 configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching 1
+  matchNum = 1;
+  cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  % Naming
+  
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train5.name.nameMaxConsecFamily = 3;
+  
+  % Matching
+  matchNum = 2;
+  cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Training Day 6 configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching 1
+  matchNum = 1;
+  cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  % Naming
+  
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train6.name.nameMaxConsecFamily = 3;
+  
+  % Matching
+  matchNum = 2;
+  cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
+  cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Posttest configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching: every stimulus is in both the same and the different
+  % condition.
+  cfg.stim.posttest.match.nSame = cfg.stim.nTrained;
+  cfg.stim.posttest.match.nDiff = cfg.stim.nTrained;
+  
+  % Recognition: number of target and lure stimuli (assumes all targets
+  % are lures are tested)
+  cfg.stim.posttest.recog.nStudyTarg = 16;
+  cfg.stim.posttest.recog.nTestLure = 8;
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Posttest Delayed configuration
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % Matching: every stimulus is in both the same and the different
+  % condition.
+  cfg.stim.posttest_delay.match.nSame = cfg.stim.nTrained;
+  cfg.stim.posttest_delay.match.nDiff = cfg.stim.nTrained;
+  
+  % Recognition: number of target and lure stimuli (assumes all targets
+  % are lures are tested)
+  cfg.stim.posttest_delay.recog.nStudyTarg = 16;
+  cfg.stim.posttest_delay.recog.nTestLure = 8;
+  
+  %% Initial processing of the stimuli
+  
+  % read in the stimulus list
+  fprintf('Loading stimulus list: %s...',cfg.stim.file);
+  fid = fopen(cfg.stim.file);
+  stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t','Headerlines',1);
+  fclose(fid);
+  fprintf('Done.\n');
+  
+  % create a structure for each family with all the stim information
+  f1Ind = stimuli{3} == 1;
+  f1Stim = struct('filename',stimuli{1}(f1Ind),'familyStr',stimuli{2}(f1Ind),'familyNum',num2cell(stimuli{3}(f1Ind)),'speciesStr',stimuli{4}(f1Ind),'speciesNum',num2cell(stimuli{5}(f1Ind)),'exemplarName',num2cell(stimuli{6}(f1Ind)),'exemplarNum',num2cell(stimuli{7}(f1Ind)),'number',num2cell(stimuli{8}(f1Ind)));
+  f2Ind = stimuli{3} == 2;
+  f2Stim = struct('filename',stimuli{1}(f2Ind),'familyStr',stimuli{2}(f2Ind),'familyNum',num2cell(stimuli{3}(f2Ind)),'speciesStr',stimuli{4}(f2Ind),'speciesNum',num2cell(stimuli{5}(f2Ind)),'exemplarName',num2cell(stimuli{6}(f2Ind)),'exemplarNum',num2cell(stimuli{7}(f2Ind)),'number',num2cell(stimuli{8}(f2Ind)));
+  
+  %% Decide which will be the trained and untrained stimuli from each family
+  
+  rmStims = true;
+  shuffleFirst = true;
+  
+  % family 1 trained
+  expParam.session.f1Trained = [];
+  [f1Stim,expParam.session.f1Trained] = et_divvyStims(...
+    f1Stim,[],cfg.stim.nTrained,rmStims,shuffleFirst,{'trained'},{1});
+  
+  % family 1 untrained
+  expParam.session.f1Untrained = [];
+  [f1Stim,expParam.session.f1Untrained] = et_divvyStims(...
+    f1Stim,[],cfg.stim.nUntrained,rmStims,shuffleFirst,{'trained'},{0});
+  
+  % family 2 trained
+  expParam.session.f2Trained = [];
+  [f2Stim,expParam.session.f2Trained] = et_divvyStims(...
+    f2Stim,[],cfg.stim.nTrained,rmStims,shuffleFirst,{'trained'},{1});
+  
+  % family 2 untrained
+  expParam.session.f2Untrained = [];
+  [f2Stim,expParam.session.f2Untrained] = et_divvyStims(...
+    f2Stim,[],cfg.stim.nUntrained,rmStims,shuffleFirst,{'trained'},{0});
+  
+  %% Pretest
+  
+  sesName = 'pretest';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % rmStims_orig is false because we're using all stimuli in both conds
+  rmStims_orig = false;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match.same = [];
+  expParam.session.(sesName).match.diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Recognition task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  rmStims = true;
+  shuffleFirst = true;
+  
+  % initialize for storing both families together
+  expParam.session.(sesName).recog.targ = [];
+  expParam.session.(sesName).recog.lure = [];
+  
+  % family 1
+  
+  % targets
+  [f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % lures
+  [f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % family 2
+  
+  % add targets to the existing list
+  [f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % add lures to the existing list
+  [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  %% Training Day 1
+  
+  sesName = 'train1';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Viewing+Naming task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % get the stimuli from both families for selection (will shuffle later)
+  f1Trained = expParam.session.f1Trained;
+  f2Trained = expParam.session.f2Trained;
+  
+  % randomize the order in which species are added; order is different
+  % for each family
+  speciesOrder_f1 = randperm(cfg.stim.nSpecies);
+  speciesOrder_f2 = randperm(cfg.stim.nSpecies);
+  % % debug
+  % speciesOrder_f1 = (1:cfg.stim.nSpecies);
+  % speciesOrder_f2 = (1:cfg.stim.nSpecies);
+  % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+  
+  % hard coded order of which species are presented in each block
+  % (counterbalanced)
+  blockSpeciesOrder = {...
+    [1, 2],[1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4, 5],[3, 4, 5, 6],...
+    [4, 5, 6, 7],[5, 6, 7, 8],[6, 7, 8, 9],[7, 8, 9, 10],...
+    [8, 9, 10, 1],[9, 10, 2, 3],[10, 4, 5, 6],[7, 8, 9, 10]};
+  
+  % hard coded stimulus indices for viewing and naming block presentation
+  % (counterbalanced)
+  viewIndices = {...
+    [1, 1], [4, 4, 1], [2, 2, 4, 1], [5, 5, 2, 4, 1],[5, 2, 4, 1],...
+    [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1],...
+    [5, 2, 4, 3], [5, 2, 3, 3], [5, 2, 3, 3], [3, 3, 3, 3]};
+  nameIndices = {...
+    [2, 3, 2, 3], [5, 6, 5, 6, 2, 3], [3, 4, 3, 4, 5, 6, 2, 3], [1, 6, 1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
+    [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
+    [1, 6, 3, 4, 5, 6, 4, 5], [1, 6, 3, 4, 5, 6, 5, 6], [1, 6, 5, 6, 5, 6, 5, 6], [5, 6, 5, 6, 5, 6, 5, 6]};
+  
+  % initialize viewing and naming cells, one for each block
+  expParam.session.(sesName).viewname.view = cell(1,length(blockSpeciesOrder));
+  expParam.session.(sesName).viewname.name = cell(1,length(blockSpeciesOrder));
+  
+  for b = 1:length(blockSpeciesOrder)
+    for s = 1:length(blockSpeciesOrder{b})
+      % family 1
+      sInd_f1 = find([f1Trained.speciesNum] == speciesOrder_f1(blockSpeciesOrder{b}(s)));
+      % shuffle the stimulus index
+      randind_f1 = randperm(length(sInd_f1));
+      % % debug
+      % randind_f1 = 1:length(sInd_f1);
+      % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+      
+      % shuffle the exemplars
+      thisSpecies_f1 = f1Trained(sInd_f1(randind_f1));
+      
+      % add them to the list
+      %fprintf('view f1: block %d, species %d, exemplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
+      expParam.session.(sesName).viewname.view{b} = cat(1,expParam.session.(sesName).viewname.view{b},thisSpecies_f1(viewIndices{b}(s)));
+      
+      %fprintf('\tname f1: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
+      expParam.session.(sesName).viewname.name{b} = cat(1,expParam.session.(sesName).viewname.name{b},thisSpecies_f1(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
+      
+      % family 2
+      sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(blockSpeciesOrder{b}(s)));
+      % shuffle the stimulus index
+      randind_f2 = randperm(length(sInd_f2));
+      % % debug
+      % randind_f2 = 1:length(sInd_f2);
+      % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+      
+      % shuffle the exemplars
+      thisSpecies_f2 = f2Trained(sInd_f2(randind_f2));
+      
+      % add them to the viewing list
+      %fprintf('view f2: block %d, species %d, exemplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
+      % NB: not actually using cfg.stim.(sesName).viewname.exemplarPerView.
+      % This needs to be modified if there's more than 1 exemplar per
+      % view from a species. Currently "hardcoded" because number of
+      % exemplars = viewIndices{b}(s).
+      expParam.session.(sesName).viewname.view{b} = cat(1,expParam.session.(sesName).viewname.view{b},thisSpecies_f2(viewIndices{b}(s)));
+      
+      % add them to the naming list
+      %fprintf('\tname f2: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
+      expParam.session.(sesName).viewname.name{b} = cat(1,expParam.session.(sesName).viewname.name{b},thisSpecies_f2(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
+    end
+    
+    % if there are more than X consecutive exemplars from the same
+    % family, reshuffle. There's probably a better way to do this.
+    
+    % viewing
+    [expParam.session.(sesName).viewname.view{b}] = et_shuffleStims(...
+      expParam.session.(sesName).viewname.view{b},'familyNum',cfg.stim.(sesName).viewname.viewMaxConsecFamily);
+    % naming
+    [expParam.session.(sesName).viewname.name{b}] = et_shuffleStims(...
+      expParam.session.(sesName).viewname.name{b},'familyNum',cfg.stim.(sesName).viewname.nameMaxConsecFamily);
+    
+  end % for each block
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Naming task (all stimuli)
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % put all the stimuli together
+  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle. No more than X conecutive exemplars from the same family.
+  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
+    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match.same = [];
+  expParam.session.(sesName).match.diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %% Training Day 2
+  
+  sesName = 'train2';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 1;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Naming task (all stimuli)
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % put all the stimuli together
+  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle. No more than X conecutive exemplars from the same family.
+  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
+    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 2;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %% Training Day 3
+  
+  sesName = 'train3';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 1;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Naming task (all stimuli)
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % put all the stimuli together
+  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle. No more than X conecutive exemplars from the same family.
+  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
+    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 2;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %% Training Day 4
+  
+  sesName = 'train4';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 1;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Naming task (all stimuli)
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % put all the stimuli together
+  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle. No more than X conecutive exemplars from the same family.
+  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
+    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 2;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %% Training Day 5
+  
+  sesName = 'train5';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 1;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Naming task (all stimuli)
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % put all the stimuli together
+  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle. No more than X conecutive exemplars from the same family.
+  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
+    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 2;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %% Training Day 6
+  
+  sesName = 'train6';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 1;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Naming task (all stimuli)
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % put all the stimuli together
+  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle. No more than X conecutive exemplars from the same family.
+  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
+    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  matchNum = 2;
+  % rmStims_orig is true because we're using half of stimuli in each cond
+  rmStims_orig = true;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match(matchNum).same = [];
+  expParam.session.(sesName).match(matchNum).diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %% Posttest
+  
+  sesName = 'posttest';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % rmStims_orig is false because we're using all stimuli in both conds
+  rmStims_orig = false;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match.same = [];
+  expParam.session.(sesName).match.diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Recognition task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  rmStims = true;
+  shuffleFirst = true;
+  
+  % initialize for storing both families together
+  expParam.session.(sesName).recog.targ = [];
+  expParam.session.(sesName).recog.lure = [];
+  
+  % family 1
+  
+  % targets
+  [f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % lures
+  [f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % family 2
+  
+  % add targets to the existing list
+  [f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % add lures to the existing list
+  [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  %% Posttest Delayed
+  
+  sesName = 'posttest_delay';
+  fprintf('Configuring %s...\n',sesName);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Matching task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % rmStims_orig is false because we're using all stimuli in both conds
+  rmStims_orig = false;
+  rmStims_pair = true;
+  shuffleFirst = true;
+  
+  % initialize to hold all the same and different stimuli
+  expParam.session.(sesName).match.same = [];
+  expParam.session.(sesName).match.diff = [];
+  
+  % family 1 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 1 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f1Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 trained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Trained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % family 2 untrained
+  [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
+    expParam.session.f2Untrained,...
+    expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
+    cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Recognition task
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  rmStims = true;
+  shuffleFirst = true;
+  
+  % initialize for storing both families together
+  expParam.session.(sesName).recog.targ = [];
+  expParam.session.(sesName).recog.lure = [];
+  
+  % family 1
+  
+  % targets
+  [f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % lures
+  [f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % family 2
+  
+  % add targets to the existing list
+  [f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % add lures to the existing list
+  [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  %% save the parameters
+  
+  save(cfg.files.expParamFile,'cfg','expParam');
+  
 end
 
-%% Stimulus parameters
-
-cfg.files.stimDir = fullfile(cfg.files.expDir,'images','Creatures');
-cfg.stim.file = fullfile(cfg.files.stimDir,'stimList.txt');
-
 %% Run the experiment
+fprintf('Running experiment: %s, subject %s, session %d...\n',expParam.expName,expParam.subject,expParam.sessionNum);
 
 % Embed core of code in try ... catch statement. If anything goes wrong
 % inside the 'try' block (Matlab error), the 'catch' block is executed to
 % clean up, save results, close the onscreen window etc.
 try
-  fprintf('Running experiment: %s, subject %s, session %d...\n',expParam.expName,expParam.subject,expParam.sessionNum);
-  
-  % make an initial save of experiment data
-  save(cfg.files.expParamFile,'cfg','expParam');
-  
   %% Start data logging
   
   % Open data file and write column headers
@@ -228,7 +1291,6 @@ try
   
   % TODO: set up logging for expertise experiment
   fprintf(logFile,'\nDate\tSubjno\tTrial\tCategory_Label\tBird_image\tCondition\tResp\tAccuray\tRT\tAnswer\tObj_ID_Number\tLabel_img_match\tBird_Family\tStimuli_Set\tBlock\tCounterbalance\tCorr_RT\tCount_Hit\tCount_FA\tCount_CR\tCount_Miss');
-  
   
   %% Begin PTB display setup
   
@@ -265,1111 +1327,56 @@ try
   priorityLevel = MaxPriority(w);
   Priority(priorityLevel);
   
-  % Each of the functions below defines a block of the experiment.
-  % Which stimuli list is uploaded to each block is defined according to
-  % which counterbalance the participant is in (look at lines: 88-99)
+  %% Run through the experiment
   
-  %% If session 1, do stimulus setup
+  % TODO: only pass this phase's cfg struct to each task?
   
-  if expParam.sessionNum == 1
-    
-    %% configure stimuli
-    
-    cfg.files.stimFileExt = '.bmp';
-    cfg.stim.nFamilies = 2;
-    % family names correspond to the directories in which stimuli reside
-    cfg.stim.familyNames = {'a','s'};
-    % assumes that each family has the same number of species
-    cfg.stim.nSpecies = 10;
-    % number of exemplars for each species
-    cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
-    
-    % counterbalance basic and subordinate families
-    if expParam.isEven
-      cfg.stim.famBasic = 1;
-      cfg.stim.famSubord = 2;
-    else
-      cfg.stim.famBasic = 2;
-      cfg.stim.famSubord = 1;
-    end
-    
-    % Number of trained and untrained per species per family
-    cfg.stim.nTrained = 6;
-    cfg.stim.nUntrained = 6;
-    
-    % TODO: add event timing information
-    
-    
-    % TODO: add text size informaiton for instructions and on-screen text
-    
-    % Define text size (TODO: fix for this experiment)
-    cfg.exp.txtsize_instruct = 35;
-    cfg.exp.txtsize_break = 28;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % pretest configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching: every stimulus is in both the same and the different
-    % condition.
-    cfg.stim.pretest.match.nSame = cfg.stim.nTrained;
-    cfg.stim.pretest.match.nDiff = cfg.stim.nTrained;
-    
-    % Recognition: number of target and lure stimuli (assumes all targets
-    % are lures are tested)
-    cfg.stim.pretest.recog.nStudyTarg = 16;
-    cfg.stim.pretest.recog.nTestLure = 8;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Training Day 1 configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Viewing+Naming
-    
-    % number of examplars per viewing block in viewname
-    %cfg.stim.train1.viewname.examplarPerView = 1;
-    % maximum number of repeated exemplars from each family in viewname
-    cfg.stim.train1.viewname.viewMaxConsecFamily = 3;
-    
-    % number of examplars per naming block in viewname
-    cfg.stim.train1.viewname.exemplarPerName = 2;
-    % maximum number of repeated exemplars from each family in viewname
-    cfg.stim.train1.viewname.nameMaxConsecFamily = 3;
-    
-    % Naming
-    
-    % maximum number of repeated exemplars from each family in naming
-    cfg.stim.train1.name.nameMaxConsecFamily = 3;
-    
-    % Matching
-    cfg.stim.train1.match.nTrained = 0;
-    cfg.stim.train1.match.nUntrained = 0;
-    
-    % number per species per family (half because each stimulus is only in
-    % same or different condition)
-    cfg.stim.train1.match.nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train1.match.nDiff = cfg.stim.nTrained / 2;
-    
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Training Day 2 configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching 1
-    matchNum = 1;
-    cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    % Naming
-    
-    % maximum number of repeated exemplars from each family in naming
-    cfg.stim.train2.name.nameMaxConsecFamily = 3;
-    
-    % Matching
-    matchNum = 2;
-    cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Training Day 3 configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching 1
-    matchNum = 1;
-    cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    % Naming
-    
-    % maximum number of repeated exemplars from each family in naming
-    cfg.stim.train3.name.nameMaxConsecFamily = 3;
-    
-    % Matching
-    matchNum = 2;
-    cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Training Day 4 configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching 1
-    matchNum = 1;
-    cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    % Naming
-    
-    % maximum number of repeated exemplars from each family in naming
-    cfg.stim.train4.name.nameMaxConsecFamily = 3;
-    
-    % Matching
-    matchNum = 2;
-    cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Training Day 5 configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching 1
-    matchNum = 1;
-    cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    % Naming
-    
-    % maximum number of repeated exemplars from each family in naming
-    cfg.stim.train5.name.nameMaxConsecFamily = 3;
-    
-    % Matching
-    matchNum = 2;
-    cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Training Day 6 configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching 1
-    matchNum = 1;
-    cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    % Naming
-    
-    % maximum number of repeated exemplars from each family in naming
-    cfg.stim.train6.name.nameMaxConsecFamily = 3;
-    
-    % Matching
-    matchNum = 2;
-    cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
-    cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Posttest configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching: every stimulus is in both the same and the different
-    % condition.
-    cfg.stim.posttest.match.nSame = cfg.stim.nTrained;
-    cfg.stim.posttest.match.nDiff = cfg.stim.nTrained;
-    
-    % Recognition: number of target and lure stimuli (assumes all targets
-    % are lures are tested)
-    cfg.stim.posttest.recog.nStudyTarg = 16;
-    cfg.stim.posttest.recog.nTestLure = 8;
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Posttest Delayed configuration
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % Matching: every stimulus is in both the same and the different
-    % condition.
-    cfg.stim.posttest_delay.match.nSame = cfg.stim.nTrained;
-    cfg.stim.posttest_delay.match.nDiff = cfg.stim.nTrained;
-    
-    % Recognition: number of target and lure stimuli (assumes all targets
-    % are lures are tested)
-    cfg.stim.posttest_delay.recog.nStudyTarg = 16;
-    cfg.stim.posttest_delay.recog.nTestLure = 8;
-    
-    %% create the stimulus list if it doesn't exist
-    if ~exist(cfg.stim.file,'file')
-      cfg = et_saveStimList(cfg);
-    end
-    
-    % read in the stimulus list
-    fprintf('Loading stimulus list: %s...',cfg.stim.file);
-    fid = fopen(cfg.stim.file);
-    stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t','Headerlines',1);
-    fclose(fid);
-    fprintf('Done.\n');
-    
-    % create a structure for each family with all the stim information
-    f1Ind = stimuli{3} == 1;
-    f1Stim = struct('filename',stimuli{1}(f1Ind),'familyStr',stimuli{2}(f1Ind),'familyNum',num2cell(stimuli{3}(f1Ind)),'speciesStr',stimuli{4}(f1Ind),'speciesNum',num2cell(stimuli{5}(f1Ind)),'exemplarName',num2cell(stimuli{6}(f1Ind)),'exemplarNum',num2cell(stimuli{7}(f1Ind)),'number',num2cell(stimuli{8}(f1Ind)));
-    f2Ind = stimuli{3} == 2;
-    f2Stim = struct('filename',stimuli{1}(f2Ind),'familyStr',stimuli{2}(f2Ind),'familyNum',num2cell(stimuli{3}(f2Ind)),'speciesStr',stimuli{4}(f2Ind),'speciesNum',num2cell(stimuli{5}(f2Ind)),'exemplarName',num2cell(stimuli{6}(f2Ind)),'exemplarNum',num2cell(stimuli{7}(f2Ind)),'number',num2cell(stimuli{8}(f2Ind)));
-    
-    % debug
-    f1Stim_orig = f1Stim;
-    f2Stim_orig = f2Stim;
-    
-    %% Decide which will be the trained and untrained stimuli from each family
-    
-    rmStims = true;
-    shuffleFirst = true;
-    
-    % family 1 trained
-    expParam.session.f1Trained = [];
-    [f1Stim,expParam.session.f1Trained] = et_divvyStims(...
-      f1Stim,[],cfg.stim.nTrained,rmStims,shuffleFirst,{'trained'},{1});
-    
-    % family 1 untrained
-    expParam.session.f1Untrained = [];
-    [f1Stim,expParam.session.f1Untrained] = et_divvyStims(...
-      f1Stim,[],cfg.stim.nUntrained,rmStims,shuffleFirst,{'trained'},{0});
-    
-    % family 2 trained
-    expParam.session.f2Trained = [];
-    [f2Stim,expParam.session.f2Trained] = et_divvyStims(...
-      f2Stim,[],cfg.stim.nTrained,rmStims,shuffleFirst,{'trained'},{1});
-    
-    % family 2 untrained
-    expParam.session.f2Untrained = [];
-    [f2Stim,expParam.session.f2Untrained] = et_divvyStims(...
-      f2Stim,[],cfg.stim.nUntrained,rmStims,shuffleFirst,{'trained'},{0});
-    
-    %% Pretest
-    
-    sesName = 'pretest';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % rmStims_orig is false because we're using all stimuli in both conds
-    rmStims_orig = false;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match.same = [];
-    expParam.session.(sesName).match.diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Recognition task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    rmStims = true;
-    shuffleFirst = true;
-    
-    % initialize for storing both families together
-    expParam.session.(sesName).recog.targ = [];
-    expParam.session.(sesName).recog.lure = [];
-    
-    % family 1
-    
-    % targets
-    [f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-      f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-    % lures
-    [f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-      f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-    
-    % family 2
-    
-    % add targets to the existing list
-    [f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-      f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-    % add lures to the existing list
-    [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-      f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-    
-    %% Training Day 1
-    
-    sesName = 'train1';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Viewing+Naming task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % get the stimuli from both families for selection (will shuffle later)
-    f1Trained = expParam.session.f1Trained;
-    f2Trained = expParam.session.f2Trained;
-    
-    % randomize the order in which species are added; order is different
-    % for each family
-    %speciesOrder_f1 = randperm(cfg.stim.nSpecies);
-    %speciesOrder_f2 = randperm(cfg.stim.nSpecies);
-    % debug
-    speciesOrder_f1 = (1:cfg.stim.nSpecies);
-    speciesOrder_f2 = (1:cfg.stim.nSpecies);
-    fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
-    
-    % hard coded order of which species are presented in each block
-    % (counterbalanced)
-    blockSpeciesOrder = {...
-      [1, 2],[1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4, 5],[3, 4, 5, 6],...
-      [4, 5, 6, 7],[5, 6, 7, 8],[6, 7, 8, 9],[7, 8, 9, 10],...
-      [8, 9, 10, 1],[9, 10, 2, 3],[10, 4, 5, 6],[7, 8, 9, 10]};
-    
-    % hard coded stimulus indices for viewing and naming block presentation
-    % (counterbalanced)
-    viewIndices = {...
-      [1, 1], [4, 4, 1], [2, 2, 4, 1], [5, 5, 2, 4, 1],[5, 2, 4, 1],...
-      [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1],...
-      [5, 2, 4, 3], [5, 2, 3, 3], [5, 2, 3, 3], [3, 3, 3, 3]};
-    nameIndices = {...
-      [2, 3, 2, 3], [5, 6, 5, 6, 2, 3], [3, 4, 3, 4, 5, 6, 2, 3], [1, 6, 1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
-      [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
-      [1, 6, 3, 4, 5, 6, 4, 5], [1, 6, 3, 4, 5, 6, 5, 6], [1, 6, 5, 6, 5, 6, 5, 6], [5, 6, 5, 6, 5, 6, 5, 6]};
-    
-    % initialize viewing and naming cells, one for each block
-    expParam.session.(sesName).viewname.view = cell(1,length(blockSpeciesOrder));
-    expParam.session.(sesName).viewname.name = cell(1,length(blockSpeciesOrder));
-    
-    for b = 1:length(blockSpeciesOrder)
-      for s = 1:length(blockSpeciesOrder{b})
-        % family 1
-        sInd_f1 = find([f1Trained.speciesNum] == speciesOrder_f1(blockSpeciesOrder{b}(s)));
-        % shuffle the stimulus index
-        %randind_f1 = randperm(length(sInd_f1));
-        % debug
-        randind_f1 = 1:length(sInd_f1);
-        fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
-        % shuffle the exemplars
-        thisSpecies_f1 = f1Trained(sInd_f1(randind_f1));
-        
-        % add them to the list
-        %fprintf('view f1: block %d, species %d, examplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
-        expParam.session.(sesName).viewname.view{b} = cat(1,expParam.session.(sesName).viewname.view{b},thisSpecies_f1(viewIndices{b}(s)));
-        
-        %fprintf('\tname f1: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
-        expParam.session.(sesName).viewname.name{b} = cat(1,expParam.session.(sesName).viewname.name{b},thisSpecies_f1(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
-        
-        % family 2
-        sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(blockSpeciesOrder{b}(s)));
-        % shuffle the stimulus index
-        %randind_f2 = randperm(length(sInd_f2));
-        % debug
-        randind_f2 = 1:length(sInd_f2);
-        fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
-        % shuffle the exemplars
-        thisSpecies_f2 = f2Trained(sInd_f2(randind_f2));
-        
-        % add them to the viewing list
-        %fprintf('view f2: block %d, species %d, examplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
-        % NB: not actually using cfg.stim.(sesName).viewname.examplarPerView.
-        % This needs to be modified if there's more than 1 exemplar per
-        % view from a species.
-        expParam.session.(sesName).viewname.view{b} = cat(1,expParam.session.(sesName).viewname.view{b},thisSpecies_f2(viewIndices{b}(s)));
-        
-        % add them to the naming list
-        %fprintf('\tname f2: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
-        expParam.session.(sesName).viewname.name{b} = cat(1,expParam.session.(sesName).viewname.name{b},thisSpecies_f2(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
-      end
-      
-      % if there are more than X consecutive exemplars from the same
-      % family, reshuffle. There's probably a better way to do this.
-      
-      % viewing
-      [expParam.session.(sesName).viewname.view{b}] = et_shuffleStims(...
-        expParam.session.(sesName).viewname.view{b},'familyNum',cfg.stim.(sesName).viewname.viewMaxConsecFamily);
-      % naming
-      [expParam.session.(sesName).viewname.name{b}] = et_shuffleStims(...
-        expParam.session.(sesName).viewname.name{b},'familyNum',cfg.stim.(sesName).viewname.nameMaxConsecFamily);
-      
-    end % for each block
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Naming task (all stimuli)
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % put all the stimuli together
-    expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-    % Reshuffle. No more than X conecutive exemplars from the same family.
-    [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-      expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match.same = [];
-    expParam.session.(sesName).match.diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %% Training Day 2
-    
-    sesName = 'train2';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 1;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Naming task (all stimuli)
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % put all the stimuli together
-    expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-    % Reshuffle. No more than X conecutive exemplars from the same family.
-    [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-      expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 2;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %% Training Day 3
-    
-    sesName = 'train3';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 1;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Naming task (all stimuli)
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % put all the stimuli together
-    expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-    % Reshuffle. No more than X conecutive exemplars from the same family.
-    [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-      expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 2;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %% Training Day 4
-    
-    sesName = 'train4';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 1;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Naming task (all stimuli)
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % put all the stimuli together
-    expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-    % Reshuffle. No more than X conecutive exemplars from the same family.
-    [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-      expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 2;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %% Training Day 5
-    
-    sesName = 'train5';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 1;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Naming task (all stimuli)
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % put all the stimuli together
-    expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-    % Reshuffle. No more than X conecutive exemplars from the same family.
-    [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-      expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 2;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %% Training Day 6
-    
-    sesName = 'train6';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 1;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Naming task (all stimuli)
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % put all the stimuli together
-    expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-    % Reshuffle. No more than X conecutive exemplars from the same family.
-    [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-      expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    matchNum = 2;
-    % rmStims_orig is true because we're using half of stimuli in each cond
-    rmStims_orig = true;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match(matchNum).same = [];
-    expParam.session.(sesName).match(matchNum).diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
-      cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %% Posttest
-    
-    sesName = 'posttest';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % rmStims_orig is false because we're using all stimuli in both conds
-    rmStims_orig = false;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match.same = [];
-    expParam.session.(sesName).match.diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Recognition task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    rmStims = true;
-    shuffleFirst = true;
-    
-    % initialize for storing both families together
-    expParam.session.(sesName).recog.targ = [];
-    expParam.session.(sesName).recog.lure = [];
-    
-    % family 1
-    
-    % targets
-    [f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-      f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-    % lures
-    [f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-      f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-    
-    % family 2
-    
-    % add targets to the existing list
-    [f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-      f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-    % add lures to the existing list
-    [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-      f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-    
-    %% Posttest Delayed
-    
-    sesName = 'posttest_delay';
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Matching task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    % rmStims_orig is false because we're using all stimuli in both conds
-    rmStims_orig = false;
-    rmStims_pair = true;
-    shuffleFirst = true;
-    
-    % initialize to hold all the same and different stimuli
-    expParam.session.(sesName).match.same = [];
-    expParam.session.(sesName).match.diff = [];
-    
-    % family 1 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 1 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f1Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 trained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Trained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    % family 2 untrained
-    [expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff] = et_divvyStims_match(...
-      expParam.session.f2Untrained,...
-      expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
-      cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
-    
-    %%%%%%%%%%%%%%%%%%%%%%
-    % Recognition task
-    %%%%%%%%%%%%%%%%%%%%%%
-    
-    rmStims = true;
-    shuffleFirst = true;
-    
-    % initialize for storing both families together
-    expParam.session.(sesName).recog.targ = [];
-    expParam.session.(sesName).recog.lure = [];
-    
-    % family 1
-    
-    % targets
-    [f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-      f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-    % lures
-    [f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-      f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-    
-    % family 2
-    
-    % add targets to the existing list
-    [f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-      f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-    % add lures to the existing list
-    [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-      f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-    
-    %% save the parameters
-    
-    save(cfg.files.expParamFile,'cfg','expParam');
-    
+  % find out what session this will be
+  thisSession = expParam.sesTypes{expParam.sessionNum};
+  
+  % make sure this session type has been configured
+  if ~isfield(expParam.session,thisSession)
+    error('%s is not a configured session type',thisSession);
   end
   
-  %% session type
-  
-  thisSession = expParam.sesTypes{expParam.sessionNum};
+  % for each phase in this session, run the correct function
   for p = 1:length(expParam.session.(thisSession).phases)
-    %% Practice
     
-    % not sure what they'll do for practice
-    
-    %% (Passive) Viewing task, with category response
-    
-    % TODO: individual cfgs for each task?
-    
-    if strcmp(expParam.session.(thisSession).phases{p},'viewname')
-      [cfg,expParam] = et_viewingNaming(cfg,expParam,logFile);
-      continue
+    switch expParam.session.(thisSession).phases{p}
+      
+      case {'practice'}
+        % Practice session
+        
+        % TODO: not sure what they'll do for practice
+        fprintf('Not sure what to do for practice\n');
+        
+      case {'viewname'}
+        % (Passive) Viewing task, with category response
+        
+        [cfg,expParam] = et_viewingNaming(cfg,expParam,logFile);
+        
+        % TODO: should this be separate et_viewing and et_naming functions?
+        % Could step through blocks as
+        % length(expParam.session.train1.viewname)
+        
+      case {'name'}
+        % (Active) Naming task
+        
+        [cfg,expParam] = et_naming(cfg,expParam,logFile);
+        
+      case{'match'}
+        % Subordinate Matching task (same/different)
+        
+        [cfg,expParam] = et_matching(cfg,expParam,logFile);
+        
+      case {'recog'}
+        % Recognition (old/new) task
+        
+        [cfg,expParam] = et_recognition(cfg,expParam,logFile);
+        
+      otherwise
+        warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(thisSession).phases{p},thisSession);
     end
-    
-    %% (Active) Naming task
-    
-    if strcmp(expParam.session.(thisSession).phases{p},'name')
-      [cfg,expParam] = et_naming(cfg,expParam,logFile);
-      continue
-    end
-    
-    %% Subordinate Matching task (same/different)
-    
-    if strcmp(expParam.session.(thisSession).phases{p},'match')
-      [cfg,expParam] = et_matching(cfg,expParam,logFile);
-      continue
-    end
-    
-    %% Recognition (old/new) task
-    
-    if strcmp(expParam.session.(thisSession).phases{p},'recog')
-      [cfg,expParam] = et_recognition(cfg,expParam,logFile);
-      continue
-    end
-    
-    % TODO: do we need to catch a case where thisSession does not have a
-    % field in expParam.session?
   end
   
   %% Session is done
@@ -1378,28 +1385,27 @@ try
   expParam.sessionNum = expParam.sessionNum + 1;
   
   % save the experiment data
-  save(cfg.files.expParamFile,'cfg','expParam');  
+  save(cfg.files.expParamFile,'cfg','expParam');
   
-%   %% Practice Block (see corresponding m.file)
-%   blockPractice(practicefilename, windowPtr, spaceBar, sameresp, diffresp, ...
-%     fixdur, catdur, duration, nxt_trial_dur, blankdur, practise_img,  ...
-%     timeout_img, txtsize_test, Res);
-%   %% Test Block 1 (see corresponding m.file)
-%   blockTest(testfilenameSetA1, windowPtr, spaceBar, sameresp, diffresp, ...
-%     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
-%     subNum, cbNum, test_img1, timeout_img, txtsize_test, ...
-%     corr_rt, Res, txtsize_takebreak);
-%   %% Test Block 2 (see corresponding m.file)
-%   blockTest(testfilenameSetA2, windowPtr, spaceBar, sameresp, diffresp, ...
-%     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
-%     subNum, cbNum, test_img2, timeout_img, txtsize_test, ...
-%     corr_rt, Res, txtsize_takebreak);
-%   %% Test Block 3 (see corresponding m.file)
-%   blockTest(testfilenameSetA3, windowPtr, spaceBar, sameresp, diffresp, ...
-%     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
-%     subNum, cbNum, test_img3, timeout_img, txtsize_test, ...
-%     corr_rt, Res, txtsize_takebreak);
-  
+  %   %% Practice Block (see corresponding m.file)
+  %   blockPractice(practicefilename, windowPtr, spaceBar, sameresp, diffresp, ...
+  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, practise_img,  ...
+  %     timeout_img, txtsize_test, Res);
+  %   %% Test Block 1 (see corresponding m.file)
+  %   blockTest(testfilenameSetA1, windowPtr, spaceBar, sameresp, diffresp, ...
+  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
+  %     subNum, cbNum, test_img1, timeout_img, txtsize_test, ...
+  %     corr_rt, Res, txtsize_takebreak);
+  %   %% Test Block 2 (see corresponding m.file)
+  %   blockTest(testfilenameSetA2, windowPtr, spaceBar, sameresp, diffresp, ...
+  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
+  %     subNum, cbNum, test_img2, timeout_img, txtsize_test, ...
+  %     corr_rt, Res, txtsize_takebreak);
+  %   %% Test Block 3 (see corresponding m.file)
+  %   blockTest(testfilenameSetA3, windowPtr, spaceBar, sameresp, diffresp, ...
+  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
+  %     subNum, cbNum, test_img3, timeout_img, txtsize_test, ...
+  %     corr_rt, Res, txtsize_takebreak);
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%  Finish Message  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1415,7 +1421,7 @@ try
     if keycode(cfg.keys.s00)
       break
     else
-      touch=0;
+      touch = 0;
     end
   end
   while KbCheck; end
@@ -1424,8 +1430,6 @@ try
   touch = 0;
   Screen('Close');
   
-  save(cfg.files.expParamFile,'cfg','expParam');
-  
   % Cleanup at end of experiment - Close window, show mouse cursor, close
   % result file, switch Matlab/Octave back to priority 0 -- normal
   % priority:
@@ -1433,8 +1437,9 @@ try
   ShowCursor;
   fclose('all');
   Priority(0);
+  
   % End of experiment:
-  return;
+  return
   
 catch ME
   % catch error: This is executed in case something goes wrong in the
@@ -1452,21 +1457,4 @@ catch ME
   psychrethrow(psychlasterror);
   
 end % try ... catch
-
-
-
-
-%% boneyard
-
-% cfg.stim.filename = stimuli{1};
-% cfg.stim.familyStr = stimuli{2};
-% cfg.stim.familyNum = stimuli{3};
-% cfg.stim.speciesStr = stimuli{4};
-% cfg.stim.speciesNum = stimuli{5};
-% cfg.stim.exemplar = stimuli{6};
-% % TODO: do we need "number"?
-% cfg.stim.number = stimuli{7}; % for calculating number of trials
-
-% basicShuffled = randperm(sum(cfg.stim.familyNum == cfg.stim.famBasic));
-% subordShuffled = randperm(sum(cfg.stim.familyNum == cfg.stim.famSubord));
 

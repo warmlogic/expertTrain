@@ -20,7 +20,6 @@ fam1_alpha = cell2mat(unique(specChar));
 for s = 1:cfg.stim.nSpecies
   % slice out only this species
   sInd = ismember(specChar,fam1_alpha(s));
-  %sInd = (((s*cfg.stim.nExemplars)+1)-cfg.stim.nExemplars:s*cfg.stim.nExemplars);
   % save the exemplar number
   fam1_eNum(sInd) = 1:length(find(sInd));
   fam1Species = fam1(sInd);
@@ -60,7 +59,6 @@ fam2_alpha = cell2mat(unique(specChar));
 for s = 1:cfg.stim.nSpecies
   % slice out only this species
   sInd = ismember(specChar,fam2_alpha(s));
-  %sInd = (((s*cfg.stim.nExemplars)+1)-cfg.stim.nExemplars:s*cfg.stim.nExemplars);
   % save the exemplar number
   fam2_eNum(sInd) = 1:length(find(sInd));
   fam2Species = fam2(sInd);

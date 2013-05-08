@@ -24,6 +24,7 @@ maxShuffle = 1000000;
 shuffleCount = 0;
 fprintf('Shuffle count: %s',repmat(' ',1,length(num2str(maxShuffle))));
 while not_good
+  % shuffle the stimuli
   randind = randperm(length(stims));
   % debug
   %randind = 1:length(stims);
