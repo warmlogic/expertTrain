@@ -1,5 +1,5 @@
-function [origStims,chosenStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,newField,newValue)
-% [origStims,selectedStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,newField,newValue)
+function [origStims,chosenStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
+% [origStims,selectedStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
 %
 % Description:
 %  Shuffle a stimulus set (origStims) and slice out a subset (nStims) of
@@ -7,17 +7,20 @@ function [origStims,chosenStims] = et_divvyStims(origStims,chosenStims,nStims,rm
 %  new fields and values to the chosen stimuli (newField and newValue).
 %
 % Input:
-%  origStims:   Stimulus structure that you want to select from.
-%  chosenStims: Empty array or existing struct to add the chosen to. If
-%               it's an existing struct, must have the same fields as what
-%               you're expecting to return (i.e., newField/newValue).
-%  nStims:      Integer. The number of stimuli to choose from each species.
-%  rmStims:     True or false, whether to remove stimuli. (default = true)
-%  newField:    String(s) in a cell. In case you want to add a new field to
-%               all these stimuli (e.g., targ or lure).
-%               Optional (default = {}).
-%  newValue:    Cell (same number of elements as newField). The value(s)
-%               for the new field(s). Optional (default = {}).
+%  origStims:    Stimulus structure that you want to select from.
+%  chosenStims:  Empty array or existing struct to add the chosen to. If
+%                it's an existing struct, must have the same fields as what
+%                you're expecting to return (i.e., newField/newValue).
+%  nStims:       Integer. The number of stimuli to choose from each species.
+%  rmStims:      True or false. Whether to remove stimuli. (default = true)
+%  shuffleFirst: True or false. Randomly shuffle stimuli before selecting
+%                nStim from each species. False = select first nStim for
+%                each species. Optional (default = true).
+%  newField:     String(s) in a cell. In case you want to add a new field to
+%                all these stimuli (e.g., targ or lure).
+%                Optional (default = {}).
+%  newValue:     Cell (same number of elements as newField). The value(s)
+%                for the new field(s). Optional (default = {}).
 %
 % Output:
 %  origStims:   Original stimulus structure with the chosen stimuli removed
@@ -60,12 +63,13 @@ for s = 1:length(theseSpecies)
   sInd = find([origStims.speciesNum] == theseSpecies(s));
   
   % shuffle the stimulus index
-  %randsel = randperm(length(sInd));
-  % debug
-  randsel = 1:length(sInd);
-  fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
+  if shuffleFirst
+    randind = randperm(length(sInd));
+  else
+    randind = 1:length(sInd);
+  end
   % get the indices of the stimuli that we want
-  chosenInd = sInd(randsel(1:nStims));
+  chosenInd = sInd(randind(1:nStims));
   
   if ~isempty(newField)
     % add new fields and values to these stimuli

@@ -1,5 +1,5 @@
-function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair)
-%function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair)
+function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst)
+%function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst)
 %
 % Description:
 %  Divide stimuli for the subordinate matching task.
@@ -14,24 +14,27 @@ function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameS
 %   and the opposite matchPairNum (1 or 2).
 %
 % Input:
-%  origStims:       Stimulus structure that you want to select from.
-%  sameStims:       Empty array or existing struct to add the chosen "same"
-%                   condition stimuli to.
-%  diffStims:       Empty array or existing struct to add the chosen "diff"
-%                   condition stimuli to.
+%  origStims:    Stimulus structure that you want to select from.
+%  sameStims:    Empty array or existing struct to add the chosen "same"
+%                condition stimuli to.
+%  diffStims:    Empty array or existing struct to add the chosen "diff"
+%                condition stimuli to.
 %
-%  nSame:           Integer. Number of "same" stimuli to choose from each
-%                   available species.
-%  nDiff:           Integer. Number of "diff" stimuli to choose from each
-%                   available species.
-%  rmStims_orig:    True or false. Whether to remove stimuli during the
-%                   dividing of same and different stimuli into stim2 (from
-%                   origStims). If true, these conditions cannot overlap.
-%                   Use false when all stimuli should be in both same and
-%                   diff conditions (length(origStims) == nSame or nDiff).
-%                   Default = true.
-%  rmStims_pair:    Whether to remove stims when finding the stim1 pair for
-%                   the corresponding stim2. Default = true.
+%  nSame:        Integer. Number of "same" stimuli to choose from each
+%                available species.
+%  nDiff:        Integer. Number of "diff" stimuli to choose from each
+%                available species.
+%  rmStims_orig: True or false. Whether to remove stimuli during the
+%                dividing of same and different stimuli into stim2 (from
+%                origStims). If true, these conditions cannot overlap.
+%                Use false when all stimuli should be in both same and
+%                diff conditions (length(origStims) == nSame or nDiff).
+%                Default = true.
+%  rmStims_pair: Whether to remove stims when finding the stim1 pair for
+%                the corresponding stim2. Default = true.
+%  shuffleFirst: True or false. Randomly shuffle stimuli before selecting
+%                nSame and nSiff from each species. False = select first
+%                nSame/nDiff for each species. Optional (default = true).
 %
 % Output:
 %  chosenStimsSame: stimuli for the "same" condition.
@@ -46,6 +49,10 @@ if ~exist('rmStims_pair','var') || isempty(rmStims_pair)
   rmStims_pair = true;
 end
 
+if ~exist('shuffleFirst','var') || isempty(shuffleFirst)
+  shuffleFirst = true;
+end
+
 if nSame == length(sameStims)
   fprintf('Setting rmStims_orig to false because nSame == length(sameStims).\n');
   rmStims_orig = false;
@@ -57,11 +64,13 @@ theseSpecies = unique([origStims.speciesNum]);
 % same: half are stim2 in "same" condition
 theseSameStims = [];
 [origStims,theseSameStims] = et_divvyStims(...
-  origStims,theseSameStims,nSame,rmStims_orig,{'matchStimNum', 'matchPairNum'},{2, []});
+  origStims,theseSameStims,nSame,rmStims_orig,shuffleFirst,...
+  {'matchStimNum', 'matchPairNum'},{2, []});
 % different: other half are stim2 in "different" condition
 theseDiffStims = [];
 [origStims,theseDiffStims] = et_divvyStims(...
-  origStims,theseDiffStims,nDiff,rmStims_orig,{'matchStimNum', 'matchPairNum'},{2, []});
+  origStims,theseDiffStims,nDiff,rmStims_orig,shuffleFirst,...
+  {'matchStimNum', 'matchPairNum'},{2, []});
 
 % store the stimuli for slicing before modifying
 stim2_same = theseSameStims;
@@ -84,7 +93,8 @@ for s = 1:length(theseSpecies)
     theseSameStims(sInd_stim2(e)).matchPairNum = pairCount;
     % choose 1 stim1 for each stim2, setting the same pair number
     [stim1_spec,theseSameStims] = et_divvyStims(...
-      stim1_spec,theseSameStims,1,rmStims_pair,{'matchStimNum', 'matchPairNum'},{1, pairCount});
+      stim1_spec,theseSameStims,1,rmStims_pair,shuffleFirst,...
+      {'matchStimNum', 'matchPairNum'},{1, pairCount});
     pairCount = pairCount + 1;
   end
 end
@@ -113,7 +123,8 @@ for s = 1:length(theseSpecies)
     theseDiffStims(sInd_stim2(e)).matchPairNum = pairCount;
     % choose 1 stim1 for each stim2, setting the same pair number
     [stim1_spec,theseDiffStims] = et_divvyStims(...
-      stim1_spec,theseDiffStims,1,rmStims_pair,{'matchStimNum', 'matchPairNum'},{1, pairCount});
+      stim1_spec,theseDiffStims,1,rmStims_pair,shuffleFirst,...
+      {'matchStimNum', 'matchPairNum'},{1, pairCount});
     pairCount = pairCount + 1;
   end
 end
