@@ -24,12 +24,12 @@ maxShuffle = 1000000;
 shuffleCount = 0;
 fprintf('Shuffle count: %s',repmat(' ',1,length(num2str(maxShuffle))));
 while not_good
-  randsel = randperm(length(stims));
+  randind = randperm(length(stims));
   % debug
-  %randsel = 1:length(stims);
+  %randind = 1:length(stims);
   %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   % shuffle the exemplars
-  stims = stims(randsel);
+  stims = stims(randind);
   
   stimValues = [stims.(valueField)];
   possibleValues = unique(stimValues);
