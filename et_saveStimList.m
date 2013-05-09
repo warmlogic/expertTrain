@@ -135,7 +135,7 @@ for i = 1:fam2Count
   fStr = fam2{i}(1);
   fNum = find(ismember(cfg.stim.familyNames,fStr));
   sStr = fam2{i}(2);
-  sNum = cfg.stim.specNumInd(fNum,ismember(fam1_specChar,sStr));
+  sNum = cfg.stim.specNumInd(fNum,ismember(fam2_specChar,sStr));
   [~,name] = fileparts(fam2{i});
   eName = str2double(strrep(name,[fStr sStr],''));
   fprintf(fid,'%s\t%s\t%d\t%s\t%d\t%d\t%d\t%d\n',fam2{i},fStr,fNum,sStr,sNum,eName,fam2_eNum(i),i);
