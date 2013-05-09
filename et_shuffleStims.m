@@ -21,7 +21,7 @@ function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 
 not_good = true;
 maxShuffle = 1000000;
-shuffleCount = 0;
+shuffleCount = 1;
 fprintf('Shuffle count: %s',repmat(' ',1,length(num2str(maxShuffle))));
 while not_good
   % shuffle the stimuli
@@ -31,6 +31,7 @@ while not_good
   %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   % shuffle the exemplars
   stims = stims(randind);
+  fprintf(1,[repmat('\b',1,length(num2str(shuffleCount))),'%d'],shuffleCount);
   
   stimValues = [stims.(valueField)];
   possibleValues = unique(stimValues);
@@ -54,14 +55,13 @@ while not_good
   end
   if any(consecCount > maxConsec)
     shuffleCount = shuffleCount + 1;
-    fprintf(1,[repmat('\b',1,length(num2str(shuffleCount))),'%d'],shuffleCount);
   else
     not_good = false;
     shuffledStims = stims;
     fprintf('\nSuccessfully shuffled the stimuli contingent on the %s field.\n',valueField);
   end
   
-  if shuffleCount == maxShuffle
+  if shuffleCount == maxShuffle && not_good
     error('\nPerformed %d shuffle attempts. That is too many.',maxShuffle);
   end
 end % while

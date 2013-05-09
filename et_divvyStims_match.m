@@ -11,7 +11,7 @@ function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameS
 %   are combined, find the corresponding pair by searching for a matching
 %   familyNum (basic or subordinate), a matching or different speciesNum
 %   field (same or diff condition), a matching or different trained field,
-%   and the opposite matchPairNum (1 or 2).
+%   the same matchPairNum, and the opposite matchStimNum (1 or 2).
 %
 % Input:
 %  origStims:    Stimulus structure that you want to select from.
