@@ -259,6 +259,9 @@ if expParam.sessionNum == 1
   % condition.
   cfg.stim.pretest.match.nSame = cfg.stim.nTrained;
   cfg.stim.pretest.match.nDiff = cfg.stim.nTrained;
+  % minimum number of trials needed between exact repeats of a given
+  % stimulus as stim2
+  cfg.stim.pretest.match.stim2MinRepeatSpacing = 2;
   
   % Recognition: number of target and lure stimuli (assumes all targets
   % are lures are tested)
@@ -497,6 +500,9 @@ if expParam.sessionNum == 1
     expParam.session.f2Untrained,...
     expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
     cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % shuffle them together for the experiment
+  [expParam.session.(sesName).match.allStims] = et_shuffleStims_match(expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,cfg.stim.(sesName).match.stim2MinRepeatSpacing);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Recognition task
@@ -1332,17 +1338,17 @@ try
   % TODO: only pass this phase's cfg struct to each task?
   
   % find out what session this will be
-  thisSession = expParam.sesTypes{expParam.sessionNum};
+  sesName = expParam.sesTypes{expParam.sessionNum};
   
   % make sure this session type has been configured
-  if ~isfield(expParam.session,thisSession)
-    error('%s is not a configured session type',thisSession);
+  if ~isfield(expParam.session,sesName)
+    error('%s is not a configured session type',sesName);
   end
   
   % for each phase in this session, run the correct function
-  for p = 1:length(expParam.session.(thisSession).phases)
+  for p = 1:length(expParam.session.(sesName).phases)
     
-    switch expParam.session.(thisSession).phases{p}
+    switch expParam.session.(sesName).phases{p}
       
       case {'practice'}
         % Practice session
@@ -1353,7 +1359,7 @@ try
       case {'viewname'}
         % (Passive) Viewing task, with category response
         
-        [cfg,expParam] = et_viewingNaming(cfg,expParam,logFile);
+        [cfg,logFile] = et_viewingNaming(cfg,expParam,logFile);
         
         % TODO: should this be separate et_viewing and et_naming functions?
         % Could step through blocks as
@@ -1362,20 +1368,20 @@ try
       case {'name'}
         % (Active) Naming task
         
-        [cfg,expParam] = et_naming(cfg,expParam,logFile);
+        [cfg,logFile] = et_naming(cfg,expParam,logFile);
         
       case{'match'}
         % Subordinate Matching task (same/different)
         
-        [cfg,expParam] = et_matching(cfg,expParam,logFile);
+        [cfg,logFile] = et_matching(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case {'recog'}
         % Recognition (old/new) task
         
-        [cfg,expParam] = et_recognition(cfg,expParam,logFile);
+        [cfg,logFile] = et_recognition(cfg,expParam,logFile);
         
       otherwise
-        warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(thisSession).phases{p},thisSession);
+        warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(sesName).phases{p},sesName);
     end
   end
   
