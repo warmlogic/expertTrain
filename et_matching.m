@@ -52,7 +52,7 @@ for i = 1:length(allStims2Ind)
       ([allStims.matchStimNum] ~= allStims(allStims2Ind(i)).matchStimNum));
   end
   
-  % generate random display times for fixation cross
+  % generate random durations for fixation crosses
   preStim1 = 0.5 + (0.7 - 0.5).*rand(1,1);
   preStim2 = 1.0 + (1.2 - 1.0).*rand(1,1);
   
