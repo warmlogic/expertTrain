@@ -1,6 +1,14 @@
-function [cfg,expParam,logFile] = et_recognition(cfg,expParam,logFile,targ,lure)
+function [logFile] = et_recognition(cfg,expParam,logFile,sesName,phase)
 
-% TODO: intermix target and lure stimuli
+% cfg.keys.recogYes
+% cfg.stim.recogNo
+
+
+% Run study task
+
+
+
+% Intermix target and lure stimuli for test task
 
 
 end

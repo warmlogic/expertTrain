@@ -12,6 +12,12 @@ function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
 %   field (same or diff condition), a matching or different trained field,
 %   the same matchPairNum, and the opposite matchStimNum (1 or 2).
 
+
+
+% cfg.keys.matchSame
+% cfg.keys.matchDiff
+
+
 phaseCfg = cfg.stim.(sesName).(phase);
 allStims = expParam.session.(sesName).(phase).allStims;
 
@@ -45,6 +51,10 @@ for i = 1:length(allStims2Ind)
       ([allStims.matchPairNum] == allStims(allStims2Ind(i)).matchPairNum) &...
       ([allStims.matchStimNum] ~= allStims(allStims2Ind(i)).matchStimNum));
   end
+  
+  % generate random display times for fixation cross
+  preStim1 = 0.5 + (0.7 - 0.5).*rand(1,1);
+  preStim2 = 1.0 + (1.2 - 1.0).*rand(1,1);
   
   if stim1.familyNum == cfg.stim.famNumBasic
     % expect a basic level response
