@@ -295,6 +295,9 @@ if expParam.sessionNum == 1
   % same or different condition)
   cfg.stim.train1.match.nSame = cfg.stim.nTrained / 2;
   cfg.stim.train1.match.nDiff = cfg.stim.nTrained / 2;
+  % minimum number of trials needed between exact repeats of a given
+  % stimulus as stim2
+  cfg.stim.train1.match.stim2MinRepeatSpacing = 2;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 2 configuration
@@ -304,6 +307,7 @@ if expParam.sessionNum == 1
   matchNum = 1;
   cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train2.match(matchNum).stim2MinRepeatSpacing = 2;
   
   % Naming
   
@@ -314,6 +318,7 @@ if expParam.sessionNum == 1
   matchNum = 2;
   cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train2.match(matchNum).stim2MinRepeatSpacing = 2;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 3 configuration
@@ -323,6 +328,7 @@ if expParam.sessionNum == 1
   matchNum = 1;
   cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train3.match(matchNum).stim2MinRepeatSpacing = 2;
   
   % Naming
   
@@ -333,6 +339,7 @@ if expParam.sessionNum == 1
   matchNum = 2;
   cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train3.match(matchNum).stim2MinRepeatSpacing = 2;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 4 configuration
@@ -342,6 +349,7 @@ if expParam.sessionNum == 1
   matchNum = 1;
   cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train4.match(matchNum).stim2MinRepeatSpacing = 2;
   
   % Naming
   
@@ -352,6 +360,7 @@ if expParam.sessionNum == 1
   matchNum = 2;
   cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train4.match(matchNum).stim2MinRepeatSpacing = 2;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 5 configuration
@@ -361,6 +370,7 @@ if expParam.sessionNum == 1
   matchNum = 1;
   cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train5.match(matchNum).stim2MinRepeatSpacing = 2;
   
   % Naming
   
@@ -371,6 +381,7 @@ if expParam.sessionNum == 1
   matchNum = 2;
   cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train5.match(matchNum).stim2MinRepeatSpacing = 2;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 6 configuration
@@ -380,6 +391,7 @@ if expParam.sessionNum == 1
   matchNum = 1;
   cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train6.match(matchNum).stim2MinRepeatSpacing = 2;
   
   % Naming
   
@@ -390,6 +402,7 @@ if expParam.sessionNum == 1
   matchNum = 2;
   cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
+  cfg.stim.train6.match(matchNum).stim2MinRepeatSpacing = 2;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Posttest configuration
@@ -399,6 +412,7 @@ if expParam.sessionNum == 1
   % condition.
   cfg.stim.posttest.match.nSame = cfg.stim.nTrained;
   cfg.stim.posttest.match.nDiff = cfg.stim.nTrained;
+  cfg.stim.posttest.match.stim2MinRepeatSpacing = 2;
   
   % Recognition: number of target and lure stimuli (assumes all targets
   % are lures are tested)
@@ -413,6 +427,7 @@ if expParam.sessionNum == 1
   % condition.
   cfg.stim.posttest_delay.match.nSame = cfg.stim.nTrained;
   cfg.stim.posttest_delay.match.nDiff = cfg.stim.nTrained;
+  cfg.stim.posttest_delay.match.stim2MinRepeatSpacing = 2;
   
   % Recognition: number of target and lure stimuli (assumes all targets
   % are lures are tested)
@@ -501,7 +516,7 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
     cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
-  % shuffle them together for the experiment
+  % shuffle same and diff together for the experiment
   [expParam.session.(sesName).match.allStims] = et_shuffleStims_match(expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,cfg.stim.(sesName).match.stim2MinRepeatSpacing);
   
   %%%%%%%%%%%%%%%%%%%%%%
@@ -532,6 +547,10 @@ if expParam.sessionNum == 1
   % add lures to the existing list
   [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
     f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % TODO: shuffle targs and lures together for the experiment
+  
+  
   
   %% Training Day 1
   
@@ -680,6 +699,9 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
     cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match.allStims] = et_shuffleStims_match(expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,cfg.stim.(sesName).match.stim2MinRepeatSpacing);
+  
   %% Training Day 2
   
   sesName = 'train2';
@@ -722,6 +744,11 @@ if expParam.sessionNum == 1
     expParam.session.f2Untrained,...
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Naming task (all stimuli)
@@ -770,6 +797,11 @@ if expParam.sessionNum == 1
     expParam.session.f2Untrained,...
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
   
   %% Training Day 3
   
@@ -814,6 +846,11 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
@@ -861,6 +898,11 @@ if expParam.sessionNum == 1
     expParam.session.f2Untrained,...
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
   
   %% Training Day 4
   
@@ -905,6 +947,11 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
@@ -952,6 +999,11 @@ if expParam.sessionNum == 1
     expParam.session.f2Untrained,...
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
   
   %% Training Day 5
   
@@ -996,6 +1048,11 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
@@ -1043,6 +1100,11 @@ if expParam.sessionNum == 1
     expParam.session.f2Untrained,...
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
+  
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
   
   %% Training Day 6
   
@@ -1087,6 +1149,11 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
@@ -1135,6 +1202,11 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match(matchNum).same,expParam.session.(sesName).match(matchNum).diff,...
     cfg.stim.(sesName).match(matchNum).nSame,cfg.stim.(sesName).match(matchNum).nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match(matchNum).allStims] = et_shuffleStims_match(expParam.session.(sesName).match(matchNum).same,...
+    expParam.session.(sesName).match(matchNum).diff,...
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing);
+  
   %% Posttest
   
   sesName = 'posttest';
@@ -1177,6 +1249,9 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
     cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match.allStims] = et_shuffleStims_match(expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,cfg.stim.(sesName).match.stim2MinRepeatSpacing);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Recognition task
   %%%%%%%%%%%%%%%%%%%%%%
@@ -1205,6 +1280,10 @@ if expParam.sessionNum == 1
   % add lures to the existing list
   [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
     f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % TODO: shuffle targs and lures together for the experiment
+  
+  
   
   %% Posttest Delayed
   
@@ -1248,6 +1327,9 @@ if expParam.sessionNum == 1
     expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,...
     cfg.stim.(sesName).match.nSame,cfg.stim.(sesName).match.nDiff,rmStims_orig,rmStims_pair,shuffleFirst);
   
+  % shuffle same and diff together for the experiment
+  [expParam.session.(sesName).match.allStims] = et_shuffleStims_match(expParam.session.(sesName).match.same,expParam.session.(sesName).match.diff,cfg.stim.(sesName).match.stim2MinRepeatSpacing);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Recognition task
   %%%%%%%%%%%%%%%%%%%%%%
@@ -1276,6 +1358,10 @@ if expParam.sessionNum == 1
   % add lures to the existing list
   [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
     f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % TODO: shuffle targs and lures together for the experiment
+  
+  
   
   %% save the parameters
   
