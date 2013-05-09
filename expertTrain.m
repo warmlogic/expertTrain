@@ -53,18 +53,6 @@ expParam.expName = expName;
 if isnumeric(subNum)
   % store the subject number
   expParam.subject = sprintf('%s%.3d',expParam.expName,subNum);
-  
-  % for counterbalancing
-  if mod(subNum,2) == 0
-    expParam.isEven = true;
-  else
-    expParam.isEven = false;
-  end
-  if str2double(expParam.subject(end)) >= 1 && str2double(expParam.subject(end)) <= 5
-    expParam.is15 = true;
-  else
-    expParam.is15 = false;
-  end
 else
   fprintf('As subject number (variable: ''subNum''), you entered: ');
   disp(subNum);
@@ -111,7 +99,7 @@ end
 %% Load the experiment's config file. Must create this for each experiment.
 
 if exist(fullfile(pwd,sprintf('config_%s.m',expParam.expName)),'file')
-  eval(sprintf('[cfg,expParam] = config_%s(cfg,expParam);',expParam.expName))
+  [cfg,expParam] = eval(sprintf('config_%s(cfg,expParam);',expParam.expName));
 else
   error('Configuration file for %s experiment does not exist: %s',fullfile(pwd,sprintf('config_%s.m',expParam.expName)));
 end
@@ -129,7 +117,7 @@ end
 % set name of the session log file
 cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.log');
 if exist(cfg.files.sesLogFile,'file')
-  error('Log file for this session already exists (%s). Resume support is not yet enabled.',cfg.files.sesLogFile);
+  error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
 end
 
 %% Save the current experiment data
