@@ -199,21 +199,41 @@ if expParam.sessionNum == 1
   
   % % I can't get PTB to use the semicolon
   %cfg.keys.possibleKeys = {'a','s','d','f','v','n','j','k','l','semicolon'};
-  cfg.keys.speciesKeys = {'a','s','d','f','v','b','h','j','k','l'};
+  cfg.keys.speciesKeyNames = {'a','s','d','f','v','b','h','j','k','l'};
   
   % only set the keys in a random order once per subject
-  cfg.keys.randKeyOrder = randperm(length(cfg.keys.speciesKeys));
+  cfg.keys.randKeyOrder = randperm(length(cfg.keys.speciesKeyNames));
   % % debug - not randomized
-  % cfg.keys.randKeyOrder = 1:length(cfg.keys.speciesKeys);
+  % cfg.keys.randKeyOrder = 1:length(cfg.keys.speciesKeyNames);
   % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.s00 = KbName('space');
   
   % set the species keys
-  for i = 1:length(cfg.keys.speciesKeys)
+  for i = 1:length(cfg.keys.speciesKeyNames)
     % sXX, where XX is an integer, buffered with a zero if i <= 9
-    cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeys{cfg.keys.randKeyOrder(i)});
+    cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeyNames{cfg.keys.randKeyOrder(i)});
+  end
+  
+  % subordinate matching keys (counterbalanced)
+  cfg.keys.matchKeyNames = {'f','h'};
+  if expParam.is15
+    cfg.keys.matchSame = KbName(cfg.keys.matchKeyNames{1});
+    cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{2});
+  else
+    cfg.keys.matchSame = KbName(cfg.keys.matchKeyNames{2});
+    cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{1});
+  end
+  
+  % recognition keys (counterbalanced)
+  cfg.keys.recogKeyNames = {'f','h'};
+  if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
+    cfg.keys.recogYes = KbName(cfg.keys.recogKeyNames{1});
+    cfg.keys.recogNo = KbName(cfg.keys.recogKeyNames{2});
+  elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
+    cfg.keys.recogYes = KbName(cfg.keys.recogKeyNames{2});
+    cfg.keys.recogNo = KbName(cfg.keys.recogKeyNames{1});
   end
   
   %% Stimulus basics
@@ -242,9 +262,6 @@ if expParam.sessionNum == 1
   
   %% Session/phase configuration
   
-  % TODO: add event timing information
-  
-  
   % TODO: add text size informaiton for instructions and on-screen text
   
   % Define text size (TODO: fix for this experiment)
@@ -255,18 +272,40 @@ if expParam.sessionNum == 1
   % pretest configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % Matching: every stimulus is in both the same and the different
-  % condition.
+  % Matching
+  
+  % every stimulus is in both the same and the different condition.
   cfg.stim.pretest.match.nSame = cfg.stim.nTrained;
   cfg.stim.pretest.match.nDiff = cfg.stim.nTrained;
   % minimum number of trials needed between exact repeats of a given
   % stimulus as stim2
   cfg.stim.pretest.match.stim2MinRepeatSpacing = 2;
   
-  % Recognition: number of target and lure stimuli (assumes all targets
-  % are lures are tested)
+  % durations, in seconds
+  cfg.stim.pretest.match.isi = 0.5;
+  cfg.stim.pretest.match.stim1 = 0.8;
+  cfg.stim.pretest.match.stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.pretest.match.preStim1 = 0.5 to 0.7;
+  %cfg.stim.pretest.match.preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.pretest.match.response = 1.0;
+  
+  % Recognition
+  
+  % number of target and lure stimuli. Assumes all targets and lures are
+  % tested.
   cfg.stim.pretest.recog.nStudyTarg = 16;
   cfg.stim.pretest.recog.nTestLure = 8;
+  
+  % durations, in seconds
+  cfg.stim.pretest.recog.study_isi = 0.8;
+  cfg.stim.pretest.recog.study_preTarg = 0.2;
+  cfg.stim.pretest.recog.test_isi = 0.8;
+  cfg.stim.pretest.recog.test_preTarg = 0.2;
+  cfg.stim.pretest.recog.test_stim = 1.5;
+  % TODO: do we need response?
+  cfg.stim.pretest.recog.response = 1.5;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 1 configuration
@@ -284,10 +323,22 @@ if expParam.sessionNum == 1
   % maximum number of repeated exemplars from each family in viewname
   cfg.stim.train1.viewname.nameMaxConsecFamily = 3;
   
+  % durations, in seconds
+  cfg.stim.train1.viewname.view_isi = 0.8;
+  cfg.stim.train1.viewname.view_preStim = 0.2;
+  cfg.stim.train1.viewname.view_stim = 4.0;
+  
   % Naming
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.train1.name.nameMaxConsecFamily = 3;
+  
+  % durations, in seconds
+  cfg.stim.train1.name.name_isi = 0.5;
+  % cfg.stim.train1.name.name_preStim = 0.5 to 0.7;
+  cfg.stim.train1.name.name_stim = 1.0;
+  cfg.stim.train1.name.name_response = 2.0;
+  cfg.stim.train1.name.name_feedback = 1.0;
   
   % Matching
   
@@ -299,140 +350,339 @@ if expParam.sessionNum == 1
   % stimulus as stim2
   cfg.stim.train1.match.stim2MinRepeatSpacing = 2;
   
+  % durations, in seconds
+  cfg.stim.train1.match.isi = 0.5;
+  cfg.stim.train1.match.stim1 = 0.8;
+  cfg.stim.train1.match.stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train1.match.preStim1 = 0.5 to 0.7;
+  %cfg.stim.train1.match.preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train1.match.response = 1.0;
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 2 configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
+  
   matchNum = 1;
   cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train2.match(matchNum).isi = 0.5;
+  cfg.stim.train2.match(matchNum).stim1 = 0.8;
+  cfg.stim.train2.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train2.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train2.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train2.match(matchNum).response = 1.0;
   
   % Naming
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.train2.name.nameMaxConsecFamily = 3;
   
-  % Matching
+  % durations, in seconds
+  cfg.stim.train2.name.name_isi = 0.5;
+  % cfg.stim.train2.name.name_preStim = 0.5 to 0.7;
+  cfg.stim.train2.name.name_stim = 1.0;
+  cfg.stim.train2.name.name_response = 2.0;
+  cfg.stim.train2.name.name_feedback = 1.0;
+  
+  % Matching 2
+  
   matchNum = 2;
   cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train2.match(matchNum).isi = 0.5;
+  cfg.stim.train2.match(matchNum).stim1 = 0.8;
+  cfg.stim.train2.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train2.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train2.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train2.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 3 configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
+  
   matchNum = 1;
   cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train3.match(matchNum).isi = 0.5;
+  cfg.stim.train3.match(matchNum).stim1 = 0.8;
+  cfg.stim.train3.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train3.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train3.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train3.match(matchNum).response = 1.0;
   
   % Naming
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.train3.name.nameMaxConsecFamily = 3;
   
-  % Matching
+  % durations, in seconds
+  cfg.stim.train3.name.name_isi = 0.5;
+  % cfg.stim.train3.name.name_preStim = 0.5 to 0.7;
+  cfg.stim.train3.name.name_stim = 1.0;
+  cfg.stim.train3.name.name_response = 2.0;
+  cfg.stim.train3.name.name_feedback = 1.0;
+  
+  % Matching 2
+  
   matchNum = 2;
   cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train3.match(matchNum).isi = 0.5;
+  cfg.stim.train3.match(matchNum).stim1 = 0.8;
+  cfg.stim.train3.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train3.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train3.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train3.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 4 configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
+  
   matchNum = 1;
   cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train4.match(matchNum).isi = 0.5;
+  cfg.stim.train4.match(matchNum).stim1 = 0.8;
+  cfg.stim.train4.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train4.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train4.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train4.match(matchNum).response = 1.0;
   
   % Naming
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.train4.name.nameMaxConsecFamily = 3;
   
-  % Matching
+  % durations, in seconds
+  cfg.stim.train4.name.name_isi = 0.5;
+  % cfg.stim.train4.name.name_preStim = 0.5 to 0.7;
+  cfg.stim.train4.name.name_stim = 1.0;
+  cfg.stim.train4.name.name_response = 2.0;
+  cfg.stim.train4.name.name_feedback = 1.0;
+  
+  % Matching 2
+  
   matchNum = 2;
   cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train4.match(matchNum).isi = 0.5;
+  cfg.stim.train4.match(matchNum).stim1 = 0.8;
+  cfg.stim.train4.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train4.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train4.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train4.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 5 configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
+  
   matchNum = 1;
   cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).stim2MinRepeatSpacing = 2;
   
+  % durations, in seconds
+  cfg.stim.train5.match(matchNum).isi = 0.5;
+  cfg.stim.train5.match(matchNum).stim1 = 0.8;
+  cfg.stim.train5.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train5.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train5.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train5.match(matchNum).response = 1.0;
+  
   % Naming
+  
+  % durations, in seconds
+  cfg.stim.train5.name.name_isi = 0.5;
+  % cfg.stim.train5.name.name_preStim = 0.5 to 0.7;
+  cfg.stim.train5.name.name_stim = 1.0;
+  cfg.stim.train5.name.name_response = 2.0;
+  cfg.stim.train5.name.name_feedback = 1.0;
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.train5.name.nameMaxConsecFamily = 3;
   
-  % Matching
+  % Matching 2
+  
   matchNum = 2;
   cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).stim2MinRepeatSpacing = 2;
+  
+  % durations, in seconds
+  cfg.stim.train5.match(matchNum).isi = 0.5;
+  cfg.stim.train5.match(matchNum).stim1 = 0.8;
+  cfg.stim.train5.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train5.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train5.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train5.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Training Day 6 configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
+  
   matchNum = 1;
   cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).stim2MinRepeatSpacing = 2;
   
+  % durations, in seconds
+  cfg.stim.train6.match(matchNum).isi = 0.5;
+  cfg.stim.train6.match(matchNum).stim1 = 0.8;
+  cfg.stim.train6.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train6.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train6.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train6.match(matchNum).response = 1.0;
+  
   % Naming
+  
+  % durations, in seconds
+  cfg.stim.train6.name.name_isi = 0.5;
+  % cfg.stim.train6.name.name_preStim = 0.5 to 0.7;
+  cfg.stim.train6.name.name_stim = 1.0;
+  cfg.stim.train6.name.name_response = 2.0;
+  cfg.stim.train6.name.name_feedback = 1.0;
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.train6.name.nameMaxConsecFamily = 3;
   
-  % Matching
+  % Matching 2
+  
   matchNum = 2;
   cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).stim2MinRepeatSpacing = 2;
   
+  % durations, in seconds
+  cfg.stim.train6.match(matchNum).isi = 0.5;
+  cfg.stim.train6.match(matchNum).stim1 = 0.8;
+  cfg.stim.train6.match(matchNum).stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.train6.match(matchNum).preStim1 = 0.5 to 0.7;
+  %cfg.stim.train6.match(matchNum).preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.train6.match(matchNum).response = 1.0;
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Posttest configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % Matching: every stimulus is in both the same and the different
-  % condition.
+  % Matching
+  
+  % every stimulus is in both the same and the different condition.
   cfg.stim.posttest.match.nSame = cfg.stim.nTrained;
   cfg.stim.posttest.match.nDiff = cfg.stim.nTrained;
   cfg.stim.posttest.match.stim2MinRepeatSpacing = 2;
   
-  % Recognition: number of target and lure stimuli (assumes all targets
-  % are lures are tested)
+  % durations, in seconds
+  cfg.stim.posttest.match.isi = 0.5;
+  cfg.stim.posttest.match.stim1 = 0.8;
+  cfg.stim.posttest.match.stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.posttest.match.preStim1 = 0.5 to 0.7;
+  %cfg.stim.posttest.match.preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.posttest.match.response = 1.0;
+  
+  % Recognition
+  
+  % number of target and lure stimuli. Assumes all targets and lures are
+  % tested.
   cfg.stim.posttest.recog.nStudyTarg = 16;
   cfg.stim.posttest.recog.nTestLure = 8;
+  
+  % durations, in seconds
+  cfg.stim.posttest.recog.study_isi = 0.8;
+  cfg.stim.posttest.recog.study_preTarg = 0.2;
+  cfg.stim.posttest.recog.test_isi = 0.8;
+  cfg.stim.posttest.recog.test_preTarg = 0.2;
+  cfg.stim.posttest.recog.test_stim = 1.5;
+  % TODO: do we need response?
+  cfg.stim.posttest.recog.response = 1.5;
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Posttest Delayed configuration
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % Matching: every stimulus is in both the same and the different
-  % condition.
+  % Matching
+  
+  % every stimulus is in both the same and the different condition.
   cfg.stim.posttest_delay.match.nSame = cfg.stim.nTrained;
   cfg.stim.posttest_delay.match.nDiff = cfg.stim.nTrained;
   cfg.stim.posttest_delay.match.stim2MinRepeatSpacing = 2;
   
-  % Recognition: number of target and lure stimuli (assumes all targets
-  % are lures are tested)
+  % durations, in seconds
+  cfg.stim.posttest_delay.match.isi = 0.5;
+  cfg.stim.posttest_delay.match.stim1 = 0.8;
+  cfg.stim.posttest_delay.match.stim2 = 0.8;
+  % random intervals are generated on the fly
+  %cfg.stim.posttest_delay.match.preStim1 = 0.5 to 0.7;
+  %cfg.stim.posttest_delay.match.preStim2 = 1.0 to 1.2;
+  % TODO: do we need response?
+  cfg.stim.posttest_delay.match.response = 1.0;
+  
+  % Recognition
+  
+  % number of target and lure stimuli. Assumes all targets and lures are
+  % tested.
   cfg.stim.posttest_delay.recog.nStudyTarg = 16;
   cfg.stim.posttest_delay.recog.nTestLure = 8;
+  
+  % durations, in seconds
+  cfg.stim.posttest_delay.recog.study_isi = 0.8;
+  cfg.stim.posttest_delay.recog.study_preTarg = 0.2;
+  cfg.stim.posttest_delay.recog.test_isi = 0.8;
+  cfg.stim.posttest_delay.recog.test_preTarg = 0.2;
+  cfg.stim.posttest_delay.recog.test_stim = 1.5;
+  % TODO: do we need response?
+  cfg.stim.posttest_delay.recog.response = 1.5;
   
   %% Initial processing of the stimuli
   
@@ -482,6 +732,10 @@ if expParam.sessionNum == 1
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
   %%%%%%%%%%%%%%%%%%%%%%
+  
+  % TODO: don't need to store expParam.session.(sesName).match.same and
+  % expParam.session.(sesName).match.diff because allStims gets created and
+  % is all we need. Instead, replace them with sameStims and diffStims.
   
   % rmStims_orig is false because we're using all stimuli in both conds
   rmStims_orig = false;
@@ -548,10 +802,6 @@ if expParam.sessionNum == 1
   [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
     f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
   
-  % TODO: shuffle targs and lures together for the experiment
-  
-  
-  
   %% Training Day 1
   
   sesName = 'train1';
@@ -593,8 +843,8 @@ if expParam.sessionNum == 1
     [1, 6, 3, 4, 5, 6, 4, 5], [1, 6, 3, 4, 5, 6, 5, 6], [1, 6, 5, 6, 5, 6, 5, 6], [5, 6, 5, 6, 5, 6, 5, 6]};
   
   % initialize viewing and naming cells, one for each block
-  expParam.session.(sesName).viewname.view = cell(1,length(blockSpeciesOrder));
-  expParam.session.(sesName).viewname.name = cell(1,length(blockSpeciesOrder));
+  expParam.session.(sesName).viewname.viewStims = cell(1,length(blockSpeciesOrder));
+  expParam.session.(sesName).viewname.nameStims = cell(1,length(blockSpeciesOrder));
   
   for b = 1:length(blockSpeciesOrder)
     for s = 1:length(blockSpeciesOrder{b})
@@ -611,10 +861,10 @@ if expParam.sessionNum == 1
       
       % add them to the list
       %fprintf('view f1: block %d, species %d, exemplar %d\n',b,blockSpeciesOrder{b}(s),viewIndices{b}(s));
-      expParam.session.(sesName).viewname.view{b} = cat(1,expParam.session.(sesName).viewname.view{b},thisSpecies_f1(viewIndices{b}(s)));
+      expParam.session.(sesName).viewname.viewStims{b} = cat(1,expParam.session.(sesName).viewname.viewStims{b},thisSpecies_f1(viewIndices{b}(s)));
       
       %fprintf('\tname f1: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
-      expParam.session.(sesName).viewname.name{b} = cat(1,expParam.session.(sesName).viewname.name{b},thisSpecies_f1(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
+      expParam.session.(sesName).viewname.nameStims{b} = cat(1,expParam.session.(sesName).viewname.nameStims{b},thisSpecies_f1(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
       
       % family 2
       sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(blockSpeciesOrder{b}(s)));
@@ -633,22 +883,23 @@ if expParam.sessionNum == 1
       % This needs to be modified if there's more than 1 exemplar per
       % view from a species. Currently "hardcoded" because number of
       % exemplars = viewIndices{b}(s).
-      expParam.session.(sesName).viewname.view{b} = cat(1,expParam.session.(sesName).viewname.view{b},thisSpecies_f2(viewIndices{b}(s)));
+      expParam.session.(sesName).viewname.viewStims{b} = cat(1,expParam.session.(sesName).viewname.viewStims{b},thisSpecies_f2(viewIndices{b}(s)));
       
       % add them to the naming list
       %fprintf('\tname f2: block %d, species %d, exemplar%s\n',b,blockSpeciesOrder{b}(s),sprintf(repmat(' %d',1,length(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName)))),nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
-      expParam.session.(sesName).viewname.name{b} = cat(1,expParam.session.(sesName).viewname.name{b},thisSpecies_f2(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
+      expParam.session.(sesName).viewname.nameStims{b} = cat(1,expParam.session.(sesName).viewname.nameStims{b},thisSpecies_f2(nameIndices{b}(((s*cfg.stim.(sesName).viewname.exemplarPerName)-1):(s*cfg.stim.(sesName).viewname.exemplarPerName))));
     end
     
     % if there are more than X consecutive exemplars from the same
-    % family, reshuffle. There's probably a better way to do this.
+    % family, reshuffle for the experiment. There's probably a better way
+    % to do this but it works.
     
     % viewing
-    [expParam.session.(sesName).viewname.view{b}] = et_shuffleStims(...
-      expParam.session.(sesName).viewname.view{b},'familyNum',cfg.stim.(sesName).viewname.viewMaxConsecFamily);
+    [expParam.session.(sesName).viewname.viewStims{b}] = et_shuffleStims(...
+      expParam.session.(sesName).viewname.viewStims{b},'familyNum',cfg.stim.(sesName).viewname.viewMaxConsecFamily);
     % naming
-    [expParam.session.(sesName).viewname.name{b}] = et_shuffleStims(...
-      expParam.session.(sesName).viewname.name{b},'familyNum',cfg.stim.(sesName).viewname.nameMaxConsecFamily);
+    [expParam.session.(sesName).viewname.nameStims{b}] = et_shuffleStims(...
+      expParam.session.(sesName).viewname.nameStims{b},'familyNum',cfg.stim.(sesName).viewname.nameMaxConsecFamily);
     
   end % for each block
   
@@ -656,11 +907,12 @@ if expParam.sessionNum == 1
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % put all the stimuli together
-  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-  % Reshuffle. No more than X conecutive exemplars from the same family.
-  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  % put all the trained stimuli together
+  expParam.session.(sesName).name.nameStims = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle for the experiment. No more than X conecutive exemplars from
+  % the same family.
+  [expParam.session.(sesName).name.nameStims] = et_shuffleStims(...
+    expParam.session.(sesName).name.nameStims,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
@@ -754,11 +1006,12 @@ if expParam.sessionNum == 1
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % put all the stimuli together
-  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-  % Reshuffle. No more than X conecutive exemplars from the same family.
-  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  % put all the trained stimuli together
+  expParam.session.(sesName).name.nameStims = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle for the experiment. No more than X conecutive exemplars from
+  % the same family.
+  [expParam.session.(sesName).name.nameStims] = et_shuffleStims(...
+    expParam.session.(sesName).name.nameStims,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
@@ -855,11 +1108,12 @@ if expParam.sessionNum == 1
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % put all the stimuli together
-  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-  % Reshuffle. No more than X conecutive exemplars from the same family.
-  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  % put all the trained stimuli together
+  expParam.session.(sesName).name.nameStims = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle for the experiment. No more than X conecutive exemplars from
+  % the same family.
+  [expParam.session.(sesName).name.nameStims] = et_shuffleStims(...
+    expParam.session.(sesName).name.nameStims,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
@@ -956,11 +1210,12 @@ if expParam.sessionNum == 1
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % put all the stimuli together
-  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-  % Reshuffle. No more than X conecutive exemplars from the same family.
-  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  % put all the trained stimuli together
+  expParam.session.(sesName).name.nameStims = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle for the experiment. No more than X conecutive exemplars from
+  % the same family.
+  [expParam.session.(sesName).name.nameStims] = et_shuffleStims(...
+    expParam.session.(sesName).name.nameStims,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
@@ -1057,11 +1312,12 @@ if expParam.sessionNum == 1
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % put all the stimuli together
-  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-  % Reshuffle. No more than X conecutive exemplars from the same family.
-  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  % put all the trained stimuli together
+  expParam.session.(sesName).name.nameStims = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle for the experiment. No more than X conecutive exemplars from
+  % the same family.
+  [expParam.session.(sesName).name.nameStims] = et_shuffleStims(...
+    expParam.session.(sesName).name.nameStims,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
@@ -1158,11 +1414,12 @@ if expParam.sessionNum == 1
   % Naming task (all stimuli)
   %%%%%%%%%%%%%%%%%%%%%%
   
-  % put all the stimuli together
-  expParam.session.(sesName).name.allStim = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
-  % Reshuffle. No more than X conecutive exemplars from the same family.
-  [expParam.session.(sesName).name.allStim] = et_shuffleStims(...
-    expParam.session.(sesName).name.allStim,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
+  % put all the trained stimuli together
+  expParam.session.(sesName).name.nameStims = cat(1,expParam.session.f1Trained,expParam.session.f2Trained);
+  % Reshuffle for the experiment. No more than X conecutive exemplars from
+  % the same family.
+  [expParam.session.(sesName).name.nameStims] = et_shuffleStims(...
+    expParam.session.(sesName).name.nameStims,'familyNum',cfg.stim.(sesName).name.nameMaxConsecFamily);
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Matching task
@@ -1281,10 +1538,6 @@ if expParam.sessionNum == 1
   [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
     f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
   
-  % TODO: shuffle targs and lures together for the experiment
-  
-  
-  
   %% Posttest Delayed
   
   sesName = 'posttest_delay';
@@ -1358,10 +1611,6 @@ if expParam.sessionNum == 1
   % add lures to the existing list
   [f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
     f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-  
-  % TODO: shuffle targs and lures together for the experiment
-  
-  
   
   %% save the parameters
   
@@ -1443,18 +1692,25 @@ try
         fprintf('Not sure what to do for practice\n');
         
       case {'viewname'}
-        % (Passive) Viewing task, with category response
+        % (Passive) Viewing task, with category response; intermixed with
+        % (Active) Naming task
         
-        [cfg,logFile] = et_viewingNaming(cfg,expParam,logFile);
+        % for each view/name block
+        for b = 1:length(expParam.session.train1.viewname.viewStims)
+          % run the viewing task
+          [cfg,logFile] = et_viewing(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          
+          % then run the naming task
+          [cfg,logFile] = et_viewing(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        end
         
-        % TODO: should this be separate et_viewing and et_naming functions?
-        % Could step through blocks as
-        % length(expParam.session.train1.viewname)
+        % old
+        %[cfg,logFile] = et_viewingNaming(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case {'name'}
         % (Active) Naming task
         
-        [cfg,logFile] = et_naming(cfg,expParam,logFile);
+        [cfg,logFile] = et_naming(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case{'match'}
         % Subordinate Matching task (same/different)
@@ -1464,7 +1720,7 @@ try
       case {'recog'}
         % Recognition (old/new) task
         
-        [cfg,logFile] = et_recognition(cfg,expParam,logFile);
+        [cfg,logFile] = et_recognition(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(sesName).phases{p},sesName);
