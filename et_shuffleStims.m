@@ -35,22 +35,24 @@ while not_good
   
   stimValues = [stims.(valueField)];
   possibleValues = unique(stimValues);
+  % initialize to count how many of each value we find
   consecCount = zeros(1,length(possibleValues));
   
-  consecCount(stimValues(1)) = 1;
+  % increment the value for the first stimulus
+  consecCount(stimValues(1) == possibleValues) = 1;
   
   for i = 2:length(stimValues)
     if stimValues(i) == stimValues(i-1)
       % if we found a repeat, add 1 to the count
-      consecCount(stimValues(i)) = consecCount(stimValues(i)) + 1;
-      if consecCount(stimValues(i)) > maxConsec
+      consecCount(stimValues(i) == possibleValues) = consecCount(stimValues(i) == possibleValues) + 1;
+      if consecCount(stimValues(i) == possibleValues) > maxConsec
         % if we hit the maximum number, break out
         break
       end
     else
       % if it's not a repeat, reset the count
       consecCount = zeros(1,length(possibleValues));
-      consecCount(stimValues(i)) = 1;
+      consecCount(stimValues(i) == possibleValues) = 1;
     end
   end
   if any(consecCount > maxConsec)
