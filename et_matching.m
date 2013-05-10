@@ -1,22 +1,54 @@
 function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
-
-% stimuli are: basic/subordinate x trained/untrained x same/different
-
+% function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
+%
+% Description:
+%  This function runs the matching task.
+%
+%  The stimuli for the matching task must already be in presentation order.
+%  They are stored in expParam.session.(sesName).(phase).allStims as a
+%  struct.
+%
+%
+% Inputs:
+%
+%
+% Outputs:
+%
+%
+%
+% NB:
+%  Once agian, stimuli must already be sorted in presentation order!
+%
+% NB:
 %  Field 'matchStimNum' denotes whether a stimulus is stim1 or stim2.
 %  Field 'matchPairNum' denotes which two stimuli are paired. matchPairNum
 %   overlaps in the same and different condition
+%
+% NB:
+%  When same and diff stimuli are combined, to find the corresponding pair
+%  search for a matching familyNum (basic or subordinate), a matching or
+%  different speciesNum field (same or diff condition), a matching or
+%  different trained field, the same matchPairNum, and the opposite
+%  matchStimNum (1 or 2).
 
-%   if same and diff stimuli
-%   are combined, find the corresponding pair by searching for a matching
-%   familyNum (basic or subordinate), a matching or different speciesNum
-%   field (same or diff condition), a matching or different trained field,
-%   the same matchPairNum, and the opposite matchStimNum (1 or 2).
+% ECRE stimuli are basic/subordinate x trained/untrained x same/different.
 
+% debug
+sesName = 'pretest';
+phase = 'match';
 
+% % durations, in seconds
+% cfg.stim.(sesName).(phase).isi = 0.5;
+% cfg.stim.(sesName).(phase).stim1 = 0.8;
+% cfg.stim.(sesName).(phase).stim2 = 0.8;
+% % random intervals are generated on the fly
+% %cfg.stim.(sesName).(phase).preStim1 = 0.5 to 0.7;
+% %cfg.stim.(sesName).(phase).preStim2 = 1.0 to 1.2;
+% % TODO: do we need response?
+% cfg.stim.(sesName).(phase).response = 1.0;
 
 % cfg.keys.matchSame
 % cfg.keys.matchDiff
-
 
 phaseCfg = cfg.stim.(sesName).(phase);
 allStims = expParam.session.(sesName).(phase).allStims;
