@@ -47,26 +47,20 @@ phaseCfg = cfg.stim.(sesName).(phase);
 
 % make sure we have enough stimuli
 if (phaseCfg.nBlocks * phaseCfg.nTargPerBlock) > length(expParam.session.(sesName).(phase).targStims)
-  error('Not enough target stimuli per block!');
+  error('Not enough target stimuli per study block!');
 end
 if (phaseCfg.nBlocks * phaseCfg.nLurePerBlock) > length(expParam.session.(sesName).(phase).lureStims)
-  error('Not enough lure stimuli per block!');
+  error('Not enough lure stimuli per test block!');
 end
 
-
-% % Concatenate target and lure stimuli for test task
-% allStims = cat(1,expParam.session.(sesName).(phase).targStims,expParam.session.(sesName).(phase).lureStims);
-% % shuffle so there are only a given number of targets or lures in a row
-% [allStims] = et_shuffleStims(allStims,'targ',phaseCfg.testMaxConsec);
-
 for i = 1:phaseCfg.nBlocks
-
-% Run study task
-
-
-% Run test task
-
-
+  
+  % Run study task
+  
+  
+  % Run test task
+  
+  
 end
 
 end

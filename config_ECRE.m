@@ -560,8 +560,8 @@ if expParam.sessionNum == 1
   
   % number of target and lure stimuli. Assumes all targets and lures are
   % tested.
-  cfg.stim.posttest.recog.nStudyTarg = 16;
-  cfg.stim.posttest.recog.nTestLure = 8;
+  cfg.stim.posttest.recog.nStudyTarg = 2;
+  cfg.stim.posttest.recog.nTestLure = 1;
   % maximum number of same family in a row during study task
   cfg.stim.posttest.recog.studyMaxConsecFamily = 4;
   % maximum number of targets or lures in a row during test task
@@ -606,17 +606,17 @@ if expParam.sessionNum == 1
   
   % number of target and lure stimuli. Assumes all targets and lures are
   % tested.
-  cfg.stim.posttest_delay.recog.nStudyTarg = 16;
-  cfg.stim.posttest_delay.recog.nTestLure = 8;
+  cfg.stim.posttest_delay.recog.nStudyTarg = 2;
+  cfg.stim.posttest_delay.recog.nTestLure = 1;
   % maximum number of same family in a row during study task
   cfg.stim.posttest_delay.recog.studyMaxConsecFamily = 4;
   % maximum number of targets or lures in a row during test task
   cfg.stim.posttest_delay.recog.testMaxConsec = 3;
   
   % task parameters
-  cfg.stim.posttest.recog.nBlocks = 8;
-  cfg.stim.posttest.recog.nTargPerBlock = 40;
-  cfg.stim.posttest.recog.nLurePerBlock = 20;
+  cfg.stim.posttest_delay.recog.nBlocks = 8;
+  cfg.stim.posttest_delay.recog.nTargPerBlock = 40;
+  cfg.stim.posttest_delay.recog.nLurePerBlock = 20;
   
   % durations, in seconds
   cfg.stim.posttest_delay.recog.study_isi = 0.8;

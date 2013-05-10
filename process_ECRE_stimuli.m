@@ -157,7 +157,7 @@ for b = 1:cfg.stim.(sesName).recog.nBlocks
   
   % put the test stims together
   expParam.session.(sesName).recog.allStims{b} = cat(1,expParam.session.(sesName).recog.targStims{b},expParam.session.(sesName).recog.lureStims{b});
-  % shuffle so there are only a given number of targets or lures in a row
+  % shuffle so there are no more than X targets or lures in a row
   fprintf('Shuffling %s recognition test task stimuli.\n',sesName);
   [expParam.session.(sesName).recog.allStims{b}] = et_shuffleStims(expParam.session.(sesName).recog.allStims{b},'targ',cfg.stim.(sesName).recog.testMaxConsec);
 end
@@ -941,7 +941,7 @@ for b = 1:cfg.stim.(sesName).recog.nBlocks
   
   % put the test stims together
   expParam.session.(sesName).recog.allStims{b} = cat(1,expParam.session.(sesName).recog.targStims{b},expParam.session.(sesName).recog.lureStims{b});
-  % shuffle so there are only a given number of targets or lures in a row
+  % shuffle so there are no more than X targets or lures in a row
   fprintf('Shuffling %s recognition test task stimuli.\n',sesName);
   [expParam.session.(sesName).recog.allStims{b}] = et_shuffleStims(expParam.session.(sesName).recog.allStims{b},'targ',cfg.stim.(sesName).recog.testMaxConsec);
 end
@@ -1034,7 +1034,7 @@ for b = 1:cfg.stim.(sesName).recog.nBlocks
   
   % put the test stims together
   expParam.session.(sesName).recog.allStims{b} = cat(1,expParam.session.(sesName).recog.targStims{b},expParam.session.(sesName).recog.lureStims{b});
-  % shuffle so there are only a given number of targets or lures in a row
+  % shuffle so there are no more than X targets or lures in a row
   fprintf('Shuffling %s recognition test task stimuli.\n',sesName);
   [expParam.session.(sesName).recog.allStims{b}] = et_shuffleStims(expParam.session.(sesName).recog.allStims{b},'targ',cfg.stim.(sesName).recog.testMaxConsec);
 end
