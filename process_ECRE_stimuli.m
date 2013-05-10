@@ -1,5 +1,12 @@
 function [expParam] = process_ECRE_stimuli(cfg,expParam)
 % function [expParam] = process_ECRE_stimuli(cfg,expParam)
+%
+% Description:
+%  Prepares the stimuli, mostly in experiment presentation order. This
+%  function is run by config_ECRE.
+%
+% see also: config_ECRE, et_divvyStims, et_divvyStims_match,
+% et_shuffleStims, et_shuffleStims_match
 
 %% Initial processing of the stimuli
 
@@ -119,32 +126,41 @@ rmStims = true;
 shuffleFirst = true;
 
 % initialize for storing both families together
-expParam.session.(sesName).recog.targ = [];
-expParam.session.(sesName).recog.lure = [];
+expParam.session.(sesName).recog.targStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
+expParam.session.(sesName).recog.lureStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
+expParam.session.(sesName).recog.allStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
 
-% family 1
-
-% targets
-[f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-  f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-% lures
-[f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-  f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-
-% family 2
-
-% add targets to the existing list
-[f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-  f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-% add lures to the existing list
-[f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-  f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-
-% shuffle the study stims so no more than X of the same family appear in
-% a row
-fprintf('Shuffling %s recognition study task stimuli.\n',sesName);
-[expParam.session.(sesName).recog.targ] = et_shuffleStims(...
-  expParam.session.(sesName).recog.targ,'familyNum',cfg.stim.(sesName).recog.studyMaxConsecFamily);
+for b = 1:cfg.stim.(sesName).recog.nBlocks
+  % family 1
+  
+  % targets
+  [f1Stim,expParam.session.(sesName).recog.targStims{b}] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % lures
+  [f1Stim,expParam.session.(sesName).recog.lureStims{b}] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % family 2
+  
+  % add targets to the existing list
+  [f2Stim,expParam.session.(sesName).recog.targStims{b}] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.targStims{b},cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % add lures to the existing list
+  [f2Stim,expParam.session.(sesName).recog.lureStims{b}] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.lureStims{b},cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % shuffle the study stims so no more than X of the same family appear in
+  % a row
+  fprintf('Shuffling %s recognition study task stimuli.\n',sesName);
+  [expParam.session.(sesName).recog.targStims{b}] = et_shuffleStims(...
+    expParam.session.(sesName).recog.targStims{b},'familyNum',cfg.stim.(sesName).recog.studyMaxConsecFamily);
+  
+  % put the test stims together
+  expParam.session.(sesName).recog.allStims{b} = cat(1,expParam.session.(sesName).recog.targStims{b},expParam.session.(sesName).recog.lureStims{b});
+  % shuffle so there are only a given number of targets or lures in a row
+  fprintf('Shuffling %s recognition test task stimuli.\n',sesName);
+  [expParam.session.(sesName).recog.allStims{b}] = et_shuffleStims(expParam.session.(sesName).recog.allStims{b},'targ',cfg.stim.(sesName).recog.testMaxConsec);
+end
 
 %% Training Day 1
 
@@ -894,32 +910,41 @@ rmStims = true;
 shuffleFirst = true;
 
 % initialize for storing both families together
-expParam.session.(sesName).recog.targ = [];
-expParam.session.(sesName).recog.lure = [];
+expParam.session.(sesName).recog.targStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
+expParam.session.(sesName).recog.lureStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
+expParam.session.(sesName).recog.allStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
 
-% family 1
-
-% targets
-[f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-  f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-% lures
-[f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-  f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-
-% family 2
-
-% add targets to the existing list
-[f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-  f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-% add lures to the existing list
-[f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-  f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-
-% shuffle the study stims so no more than X of the same family appear in
-% a row
-fprintf('Shuffling %s recognition task stimuli.\n',sesName);
-[expParam.session.(sesName).recog.targ] = et_shuffleStims(...
-  expParam.session.(sesName).recog.targ,'familyNum',cfg.stim.(sesName).recog.studyMaxConsecFamily);
+for b = 1:cfg.stim.(sesName).recog.nBlocks
+  % family 1
+  
+  % targets
+  [f1Stim,expParam.session.(sesName).recog.targStims{b}] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % lures
+  [f1Stim,expParam.session.(sesName).recog.lureStims{b}] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % family 2
+  
+  % add targets to the existing list
+  [f2Stim,expParam.session.(sesName).recog.targStims{b}] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.targStims{b},cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % add lures to the existing list
+  [f2Stim,expParam.session.(sesName).recog.lureStims{b}] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.lureStims{b},cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % shuffle the study stims so no more than X of the same family appear in
+  % a row
+  fprintf('Shuffling %s recognition study task stimuli.\n',sesName);
+  [expParam.session.(sesName).recog.targStims{b}] = et_shuffleStims(...
+    expParam.session.(sesName).recog.targStims{b},'familyNum',cfg.stim.(sesName).recog.studyMaxConsecFamily);
+  
+  % put the test stims together
+  expParam.session.(sesName).recog.allStims{b} = cat(1,expParam.session.(sesName).recog.targStims{b},expParam.session.(sesName).recog.lureStims{b});
+  % shuffle so there are only a given number of targets or lures in a row
+  fprintf('Shuffling %s recognition test task stimuli.\n',sesName);
+  [expParam.session.(sesName).recog.allStims{b}] = et_shuffleStims(expParam.session.(sesName).recog.allStims{b},'targ',cfg.stim.(sesName).recog.testMaxConsec);
+end
 
 %% Posttest Delayed
 
@@ -978,30 +1003,39 @@ rmStims = true;
 shuffleFirst = true;
 
 % initialize for storing both families together
-expParam.session.(sesName).recog.targ = [];
-expParam.session.(sesName).recog.lure = [];
+expParam.session.(sesName).recog.targStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
+expParam.session.(sesName).recog.lureStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
+expParam.session.(sesName).recog.allStims = cell(1,cfg.stim.(sesName).recog.nBlocks);
 
-% family 1
-
-% targets
-[f1Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-  f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-% lures
-[f1Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-  f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-
-% family 2
-
-% add targets to the existing list
-[f2Stim,expParam.session.(sesName).recog.targ] = et_divvyStims(...
-  f2Stim,expParam.session.(sesName).recog.targ,cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
-% add lures to the existing list
-[f2Stim,expParam.session.(sesName).recog.lure] = et_divvyStims(...
-  f2Stim,expParam.session.(sesName).recog.lure,cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
-
-% shuffle the study stims so no more than X of the same family appear in
-% a row
-fprintf('Shuffling %s recognition task stimuli.\n',sesName);
-[expParam.session.(sesName).recog.targ] = et_shuffleStims(...
-  expParam.session.(sesName).recog.targ,'familyNum',cfg.stim.(sesName).recog.studyMaxConsecFamily);
+for b = 1:cfg.stim.(sesName).recog.nBlocks
+  % family 1
+  
+  % targets
+  [f1Stim,expParam.session.(sesName).recog.targStims{b}] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % lures
+  [f1Stim,expParam.session.(sesName).recog.lureStims{b}] = et_divvyStims(...
+    f1Stim,[],cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % family 2
+  
+  % add targets to the existing list
+  [f2Stim,expParam.session.(sesName).recog.targStims{b}] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.targStims{b},cfg.stim.(sesName).recog.nStudyTarg,rmStims,shuffleFirst,{'targ'},{1});
+  % add lures to the existing list
+  [f2Stim,expParam.session.(sesName).recog.lureStims{b}] = et_divvyStims(...
+    f2Stim,expParam.session.(sesName).recog.lureStims{b},cfg.stim.(sesName).recog.nTestLure,rmStims,shuffleFirst,{'targ'},{0});
+  
+  % shuffle the study stims so no more than X of the same family appear in
+  % a row
+  fprintf('Shuffling %s recognition study task stimuli.\n',sesName);
+  [expParam.session.(sesName).recog.targStims{b}] = et_shuffleStims(...
+    expParam.session.(sesName).recog.targStims{b},'familyNum',cfg.stim.(sesName).recog.studyMaxConsecFamily);
+  
+  % put the test stims together
+  expParam.session.(sesName).recog.allStims{b} = cat(1,expParam.session.(sesName).recog.targStims{b},expParam.session.(sesName).recog.lureStims{b});
+  % shuffle so there are only a given number of targets or lures in a row
+  fprintf('Shuffling %s recognition test task stimuli.\n',sesName);
+  [expParam.session.(sesName).recog.allStims{b}] = et_shuffleStims(expParam.session.(sesName).recog.allStims{b},'targ',cfg.stim.(sesName).recog.testMaxConsec);
+end
 

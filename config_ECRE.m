@@ -2,8 +2,11 @@ function [cfg,expParam] = config_ECRE(cfg,expParam)
 % function [cfg,expParam] = config_ECRE(cfg,expParam)
 %
 % Description:
-%  configuration function for creature expertise training experiment
+%  Configuration function for creature expertise training experiment. This
+%  file should be edited for your particular experiment. This function runs
+%  process_ECRE_stimuli to prepare the stimuli for experiment presentation.
 %
+% see also: et_saveStimList, process_ECRE_stimuli
 
 %% Experiment session information
 
@@ -83,7 +86,9 @@ if expParam.sessionNum == 1
   if ~exist(cfg.stim.file,'file')
     [cfg] = et_saveStimList(cfg,shuffleSpecies);
   else
-    error('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
+    % debug = warning instead of error
+    warning('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
+    %error('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
@@ -151,6 +156,8 @@ if expParam.sessionNum == 1
     cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{2});
     cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{1});
   end
+  % TODO: 5 responses: definitely/maybe unfamiliar/familiar, and recollect;
+  %       a, s, d, f, h
   
   %% Session/phase configuration
   
@@ -185,14 +192,19 @@ if expParam.sessionNum == 1
   
   % Recognition
   
-  % number of target and lure stimuli. Assumes all targets and lures are
-  % tested.
-  cfg.stim.pretest.recog.nStudyTarg = 16;
-  cfg.stim.pretest.recog.nTestLure = 8;
+  % number of target and lure stimuli per species per family per study/test
+  % block. Assumes all targets and lures are tested in a block.
+  cfg.stim.pretest.recog.nStudyTarg = 2;
+  cfg.stim.pretest.recog.nTestLure = 1;
   % maximum number of same family in a row during study task
   cfg.stim.pretest.recog.studyMaxConsecFamily = 4;
   % maximum number of targets or lures in a row during test task
   cfg.stim.pretest.recog.testMaxConsec = 3;
+  
+  % task parameters
+  cfg.stim.pretest.recog.nBlocks = 8;
+  cfg.stim.pretest.recog.nTargPerBlock = 40;
+  cfg.stim.pretest.recog.nLurePerBlock = 20;
   
   % durations, in seconds
   cfg.stim.pretest.recog.study_isi = 0.8;
@@ -555,6 +567,11 @@ if expParam.sessionNum == 1
   % maximum number of targets or lures in a row during test task
   cfg.stim.posttest.recog.testMaxConsec = 3;
   
+  % task parameters
+  cfg.stim.posttest.recog.nBlocks = 8;
+  cfg.stim.posttest.recog.nTargPerBlock = 40;
+  cfg.stim.posttest.recog.nLurePerBlock = 20;
+  
   % durations, in seconds
   cfg.stim.posttest.recog.study_isi = 0.8;
   cfg.stim.posttest.recog.study_preTarg = 0.2;
@@ -595,6 +612,11 @@ if expParam.sessionNum == 1
   cfg.stim.posttest_delay.recog.studyMaxConsecFamily = 4;
   % maximum number of targets or lures in a row during test task
   cfg.stim.posttest_delay.recog.testMaxConsec = 3;
+  
+  % task parameters
+  cfg.stim.posttest.recog.nBlocks = 8;
+  cfg.stim.posttest.recog.nTargPerBlock = 40;
+  cfg.stim.posttest.recog.nLurePerBlock = 20;
   
   % durations, in seconds
   cfg.stim.posttest_delay.recog.study_isi = 0.8;
