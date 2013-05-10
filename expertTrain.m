@@ -12,6 +12,11 @@ function expertTrain(expName,subNum)
 %  - Active naming
 %
 % Controlled by a cfg struct
+%
+%
+% see also: et_saveStimList, config_ECRE, process_ECRE_stimuli,
+% et_matching, et_viewing, et_naming, et_recognition
+%
 
 % TODO: Net Station integration http://docs.psychtoolbox.org/NetStation
 
@@ -148,17 +153,17 @@ try
   screenNumber = max(screens);
   
   % Open a double buffered fullscreen window on the stimulation screen
-  % 'screenNumber' and choose/draw a gray background. 'windowPtr' is the handle
+  % 'screenNumber' and choose/draw a gray background. 'w' is the handle
   % used to direct all drawing commands to that window - the "Name" of
-  % the window. 'screenRect' is a rectangle defining the size of the window.
+  % the window. 'wRect' is a rectangle defining the size of the window.
   % See "help PsychRects" for help on such rectangles and useful helper
   % functions:
-  [windowPtr, screenRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray, [0, 0, cfg.screen.xy(1), cfg.screen.xy(2)], 32, 2);
+  [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray, [0, 0, cfg.screen.xy(1), cfg.screen.xy(2)], 32, 2);
   
   % midWidth=round(RectWidth(ScreenRect)/2);    % get center coordinates
   % midLength=round(RectHeight(ScreenRect)/2);
-  Screen('FillRect', windowPtr, cfg.screen.gray);  % put on a grey screen
-  Screen('Flip',windowPtr);
+  Screen('FillRect', w, cfg.screen.gray);  % put on a grey screen
+  Screen('Flip',w);
   
   % Hide the mouse cursor:
   HideCursor;
@@ -168,7 +173,7 @@ try
   % in the wrong moment:
   KbCheck;
   WaitSecs(0.1);
-  startExpt = GetSecs;
+  GetSecs;
   
   % Set priority for script execution to realtime priority:
   priorityLevel = MaxPriority(w);
@@ -202,7 +207,7 @@ try
         % (Active) Naming task
         
         % for each view/name block
-        for b = 1:length(expParam.session.train1.viewname.viewStims)
+        for b = 1:length(cfg.stim.train1.viewname.blockSpeciesOrder)
           % run the viewing task
           [cfg,logFile] = et_viewing(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
           
@@ -242,21 +247,21 @@ try
   save(cfg.files.expParamFile,'cfg','expParam');
   
   %   %% Practice Block (see corresponding m.file)
-  %   blockPractice(practicefilename, windowPtr, spaceBar, sameresp, diffresp, ...
+  %   blockPractice(practicefilename, w, spaceBar, sameresp, diffresp, ...
   %     fixdur, catdur, duration, nxt_trial_dur, blankdur, practise_img,  ...
   %     timeout_img, txtsize_test, Res);
   %   %% Test Block 1 (see corresponding m.file)
-  %   blockTest(testfilenameSetA1, windowPtr, spaceBar, sameresp, diffresp, ...
+  %   blockTest(testfilenameSetA1, w, spaceBar, sameresp, diffresp, ...
   %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
   %     subNum, cbNum, test_img1, timeout_img, txtsize_test, ...
   %     corr_rt, Res, txtsize_takebreak);
   %   %% Test Block 2 (see corresponding m.file)
-  %   blockTest(testfilenameSetA2, windowPtr, spaceBar, sameresp, diffresp, ...
+  %   blockTest(testfilenameSetA2, w, spaceBar, sameresp, diffresp, ...
   %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
   %     subNum, cbNum, test_img2, timeout_img, txtsize_test, ...
   %     corr_rt, Res, txtsize_takebreak);
   %   %% Test Block 3 (see corresponding m.file)
-  %   blockTest(testfilenameSetA3, windowPtr, spaceBar, sameresp, diffresp, ...
+  %   blockTest(testfilenameSetA3, w, spaceBar, sameresp, diffresp, ...
   %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
   %     subNum, cbNum, test_img3, timeout_img, txtsize_test, ...
   %     corr_rt, Res, txtsize_takebreak);
@@ -265,8 +270,8 @@ try
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%  Finish Message  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  Screen('PutImage', windowPtr, final_img, [1, 1, cfg.screen.xy(1), cfg.screen.xy(2)]);
-  Screen('Flip', windowPtr);
+  Screen('PutImage', w, final_img, [1, 1, cfg.screen.xy(1), cfg.screen.xy(2)]);
+  Screen('Flip', w);
   
   touch = 0; % Detect spacebar press to continue
   while ~touch
