@@ -27,6 +27,15 @@ function [logFile] = et_recognition(cfg,expParam,logFile,sesName,phase)
 %
 %
 
+% using these
+% cfg.keys.recogKeyNames
+% cfg.keys.recogDefUn
+% cfg.keys.recogMayUn
+% cfg.keys.recogMayF
+% cfg.keys.recogDefF
+% cfg.keys.recogRecoll
+
+% % not using these
 % cfg.keys.recogOld
 % cfg.stim.recogNew
 
