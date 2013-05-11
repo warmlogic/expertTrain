@@ -41,17 +41,6 @@ end
 
 if expParam.sessionNum == 1
   
-  %% PTB display information
-  
-  % get screen dimensions
-  cfg.screen.xy = get(0,'ScreenSize');
-  cfg.screen.xy = cfg.screen.xy(3:4); % e.g., [1440 900]
-  % % debug
-  % cfg.screen.xy = [1440 900];
-  
-  % Set up the gray color value to be used
-  cfg.screen.gray = 181;
-  
   %% Subject parameters
   
   % for counterbalancing
@@ -147,15 +136,24 @@ if expParam.sessionNum == 1
     cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{1});
   end
   
-  % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
-  cfg.keys.recogKeyNames = {'f','h'};
-  if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
-    cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{1});
-    cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{2});
-  elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
-    cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{2});
-    cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{1});
-  end
+  % recognition keys (not counterbalanced)
+  cfg.keys.recogKeyNames = {'a','s','d','f','h'};
+  cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{1});
+  cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{2});
+  cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
+  cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{4});
+  cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{5});
+  
+  % % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
+  % cfg.keys.recogKeyNames = {'f','h'};
+  % if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
+  %   cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{1});
+  %   cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{2});
+  % elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
+  %   cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{2});
+  %   cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{1});
+  % end
+  
   % TODO: 5 responses: definitely/maybe unfamiliar/familiar, and recollect;
   %       a, s, d, f, h
   
