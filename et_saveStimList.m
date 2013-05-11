@@ -122,7 +122,7 @@ cfg.stim.specStr(2,:) = fam1_specStr;
 
 % for this subject, write out the file containing all stimuli
 fid = fopen(cfg.stim.file,'w');
-fprintf(fid,'Filename\tFamilyStr\tFamilyNum\tSpeciesStr\tSpeciesNum\tExemplarName\tExemplarNum\tNumber\n');
+fprintf(fid,'fileName\tfamilyStr\tfamilyNum\tspeciesStr\tspeciesNum\texemplarName\texemplarNum\tstimNum\n');
 
 for i = 1:fam1Count
   fStr = fam1{i}(1);
