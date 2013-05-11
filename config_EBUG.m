@@ -165,9 +165,9 @@ if expParam.sessionNum == 1
   cfg.text.txtsize_instruct = 35;
   cfg.text.txtsize_break = 28;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % pretest configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching
   
@@ -195,9 +195,9 @@ if expParam.sessionNum == 1
   cfg.stim.pretest.recog.nStudyTarg = 2;
   cfg.stim.pretest.recog.nTestLure = 1;
   % maximum number of same family in a row during study task
-  cfg.stim.pretest.recog.studyMaxConsecFamily = 4;
+  cfg.stim.pretest.recog.studyMaxConsecFamily = 0;
   % maximum number of targets or lures in a row during test task
-  cfg.stim.pretest.recog.testMaxConsec = 3;
+  cfg.stim.pretest.recog.testMaxConsec = 0;
   
   % task parameters
   cfg.stim.pretest.recog.nBlocks = 8;
@@ -213,9 +213,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.pretest.recog.response = 1.5;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 1 configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Viewing+Naming
   
@@ -283,9 +283,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.train1.match.response = 1.0;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 2 configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
   
@@ -333,9 +333,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.train2.match(matchNum).response = 1.0;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 3 configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
   
@@ -383,9 +383,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.train3.match(matchNum).response = 1.0;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 4 configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
   
@@ -433,9 +433,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.train4.match(matchNum).response = 1.0;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 5 configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
   
@@ -483,9 +483,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.train5.match(matchNum).response = 1.0;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 6 configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching 1
   
@@ -533,9 +533,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.train6.match(matchNum).response = 1.0;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Posttest configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching
   
@@ -561,9 +561,9 @@ if expParam.sessionNum == 1
   cfg.stim.posttest.recog.nStudyTarg = 2;
   cfg.stim.posttest.recog.nTestLure = 1;
   % maximum number of same family in a row during study task
-  cfg.stim.posttest.recog.studyMaxConsecFamily = 4;
+  cfg.stim.posttest.recog.studyMaxConsecFamily = 0;
   % maximum number of targets or lures in a row during test task
-  cfg.stim.posttest.recog.testMaxConsec = 3;
+  cfg.stim.posttest.recog.testMaxConsec = 0;
   
   % task parameters
   cfg.stim.posttest.recog.nBlocks = 8;
@@ -579,9 +579,9 @@ if expParam.sessionNum == 1
   % TODO: do we need response?
   cfg.stim.posttest.recog.response = 1.5;
   
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Posttest Delayed configuration
-  %%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Matching
   
@@ -607,9 +607,9 @@ if expParam.sessionNum == 1
   cfg.stim.posttest_delay.recog.nStudyTarg = 2;
   cfg.stim.posttest_delay.recog.nTestLure = 1;
   % maximum number of same family in a row during study task
-  cfg.stim.posttest_delay.recog.studyMaxConsecFamily = 4;
+  cfg.stim.posttest_delay.recog.studyMaxConsecFamily = 0;
   % maximum number of targets or lures in a row during test task
-  cfg.stim.posttest_delay.recog.testMaxConsec = 3;
+  cfg.stim.posttest_delay.recog.testMaxConsec = 0;
   
   % task parameters
   cfg.stim.posttest_delay.recog.nBlocks = 8;
@@ -627,7 +627,7 @@ if expParam.sessionNum == 1
   
   %% process the stimuli for the entire experiment
   
-  [expParam] = process_ECRE_stimuli(cfg,expParam);
+  [expParam] = process_EBUG_stimuli(cfg,expParam);
   
   %% save the parameters
   
