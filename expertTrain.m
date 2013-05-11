@@ -152,6 +152,19 @@ try
   screens = Screen('Screens');
   screenNumber = max(screens);
   
+  % Hide the mouse cursor:
+  HideCursor;
+  
+  % get screen dimensions
+  cfg.screen.xy = get(0,'ScreenSize');
+  cfg.screen.xy = cfg.screen.xy(3:4); % e.g., [1440 900]
+  % % debug
+  % cfg.screen.xy = [1440 900];
+  
+  % Set up the gray color value to be used
+  cfg.screen.gray = 181;
+  %cfg.screen.gray = GrayIndex(screenNumber);
+  
   % Open a double buffered fullscreen window on the stimulation screen
   % 'screenNumber' and choose/draw a gray background. 'w' is the handle
   % used to direct all drawing commands to that window - the "Name" of
@@ -160,13 +173,10 @@ try
   % functions:
   [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray, [0, 0, cfg.screen.xy(1), cfg.screen.xy(2)], 32, 2);
   
-  % midWidth=round(RectWidth(ScreenRect)/2);    % get center coordinates
-  % midLength=round(RectHeight(ScreenRect)/2);
+  % midWidth=round(RectWidth(wRect)/2);    % get center coordinates
+  % midLength=round(RectHeight(wRect)/2);
   Screen('FillRect', w, cfg.screen.gray);  % put on a grey screen
   Screen('Flip',w);
-  
-  % Hide the mouse cursor:
-  HideCursor;
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
   % they are loaded and ready when we need them - without delays
@@ -180,8 +190,6 @@ try
   Priority(priorityLevel);
   
   %% Run through the experiment
-  
-  % TODO: only pass this phase's cfg struct to each task?
   
   % find out what session this will be
   sesName = expParam.sesTypes{expParam.sessionNum};
