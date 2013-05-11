@@ -1,12 +1,12 @@
-function [cfg,expParam] = config_ECRE(cfg,expParam)
-% function [cfg,expParam] = config_ECRE(cfg,expParam)
+function [cfg,expParam] = config_EBUG(cfg,expParam)
+% function [cfg,expParam] = config_EBUG(cfg,expParam)
 %
 % Description:
 %  Configuration function for creature expertise training experiment. This
 %  file should be edited for your particular experiment. This function runs
-%  process_ECRE_stimuli to prepare the stimuli for experiment presentation.
+%  process_EBUG_stimuli to prepare the stimuli for experiment presentation.
 %
-% see also: et_saveStimList, process_ECRE_stimuli
+% see also: et_saveStimList, process_EBUG_stimuli
 
 %% Experiment session information
 

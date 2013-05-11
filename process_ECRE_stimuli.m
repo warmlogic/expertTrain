@@ -1,11 +1,11 @@
-function [expParam] = process_ECRE_stimuli(cfg,expParam)
-% function [expParam] = process_ECRE_stimuli(cfg,expParam)
+function [expParam] = process_EBUG_stimuli(cfg,expParam)
+% function [expParam] = process_EBUG_stimuli(cfg,expParam)
 %
 % Description:
 %  Prepares the stimuli, mostly in experiment presentation order. This
-%  function is run by config_ECRE.
+%  function is run by config_EBUG.
 %
-% see also: config_ECRE, et_divvyStims, et_divvyStims_match,
+% see also: config_EBUG, et_divvyStims, et_divvyStims_match,
 % et_shuffleStims, et_shuffleStims_match
 
 %% Initial processing of the stimuli

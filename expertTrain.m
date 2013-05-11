@@ -14,7 +14,7 @@ function expertTrain(expName,subNum)
 % Controlled by a cfg struct
 %
 %
-% see also: et_saveStimList, config_ECRE, process_ECRE_stimuli,
+% see also: et_saveStimList, config_EBUG, process_EBUG_stimuli,
 % et_matching, et_viewing, et_naming, et_recognition
 %
 
@@ -41,8 +41,8 @@ rng('shuffle');
 
 % debug
 cd('/Users/matt/Documents/experiments/expertTrain');
-expName = 'ECRE'; % expertise - creature
-%expName = 'EBRD'; % expertise - bird
+expName = 'EBUG'; % expertise - creatures/shinebugs
+%expName = 'EBRD'; % expertise - birds
 subNum = 1;
 
 %% Experiment database struct preparation
