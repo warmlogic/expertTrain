@@ -27,13 +27,13 @@ fam1_eNum = zeros(size(fam1));
 % output of 'dir')
 
 % get all the species letters for this family
-specChar = cellfun(@(x) x(2), fam1, 'UniformOutput', false);
+specStr = cellfun(@(x) x(2), fam1, 'UniformOutput', false);
 % get the unique species letters for this family
-fam1_specChar = unique(specChar,'stable');
+fam1_specStr = unique(specStr,'stable');
 
-for s = 1:length(fam1_specChar)
+for s = 1:length(fam1_specStr)
   % slice out only this species
-  sInd = ismember(specChar,fam1_specChar(s));
+  sInd = ismember(specStr,fam1_specStr(s));
   % save the exemplar number
   fam1_eNum(sInd) = 1:length(find(sInd));
   fam1Species = fam1(sInd);
@@ -72,13 +72,13 @@ fam2_eNum = zeros(size(fam1));
 % output of 'dir')
 
 % get all the species letters for this family
-specChar = cellfun(@(x) x(2), fam2, 'UniformOutput', false);
+specStr = cellfun(@(x) x(2), fam2, 'UniformOutput', false);
 % get the unique species letters for this family
-fam2_specChar = unique(specChar,'stable');
+fam2_specStr = unique(specStr,'stable');
 
-for s = 1:length(fam2_specChar);
+for s = 1:length(fam2_specStr);
   % slice out only this species
-  sInd = ismember(specChar,fam2_specChar(s));
+  sInd = ismember(specStr,fam2_specStr(s));
   % save the exemplar number
   fam2_eNum(sInd) = 1:length(find(sInd));
   fam2Species = fam2(sInd);
@@ -104,18 +104,21 @@ fam2_eNum = fam2_eNum(filled_cells);
 % randomize the species number so every subject gets a random species
 % assigned to each number
 if shuffleSpecies
-  fam1_specNumInd = randperm(length(fam1_specChar));
-  fam2_specNumInd = randperm(length(fam2_specChar));
+  fam1_specNum = randperm(length(fam1_specStr));
+  fam2_specNum = randperm(length(fam2_specStr));
 else
-  fam1_specNumInd = 1:length(fam1_specChar);
-  fam2_specNumInd = 1:length(fam2_specChar);
+  fam1_specNum = 1:length(fam1_specStr);
+  fam2_specNum = 1:length(fam2_specStr);
 end
 % store the indices for later
-cfg.stim.specNumInd = nan(cfg.stim.nFamilies,cfg.stim.nSpecies);
-cfg.stim.specNumInd(1,:) = fam1_specNumInd;
-cfg.stim.specNumInd(2,:) = fam2_specNumInd;
-%cfg.stim.fam1_specNumInd = fam1_specNumInd;
-%cfg.stim.fam2_specNumInd = fam2_specNumInd;
+cfg.stim.specNum = nan(cfg.stim.nFamilies,cfg.stim.nSpecies);
+cfg.stim.specNum(1,:) = fam1_specNum;
+cfg.stim.specNum(2,:) = fam2_specNum;
+%cfg.stim.fam1_specNum = fam1_specNum;
+%cfg.stim.fam2_specNum = fam2_specNum;
+cfg.stim.specStr = cell(cfg.stim.nFamilies,cfg.stim.nSpecies);
+cfg.stim.specStr(1,:) = fam1_specStr;
+cfg.stim.specStr(2,:) = fam1_specStr;
 
 % for this subject, write out the file containing all stimuli
 fid = fopen(cfg.stim.file,'w');
@@ -125,7 +128,7 @@ for i = 1:fam1Count
   fStr = fam1{i}(1);
   fNum = find(ismember(cfg.stim.familyNames,fStr));
   sStr = fam1{i}(2);
-  sNum = cfg.stim.specNumInd(fNum,ismember(fam1_specChar,sStr));
+  sNum = cfg.stim.specNum(fNum,ismember(fam1_specStr,sStr));
   [~,name] = fileparts(fam1{i});
   eName = str2double(strrep(name,[fStr sStr],''));
   fprintf(fid,'%s\t%s\t%d\t%s\t%d\t%d\t%d\t%d\n',fam1{i},fStr,fNum,sStr,sNum,eName,fam1_eNum(i),i);
@@ -135,7 +138,7 @@ for i = 1:fam2Count
   fStr = fam2{i}(1);
   fNum = find(ismember(cfg.stim.familyNames,fStr));
   sStr = fam2{i}(2);
-  sNum = cfg.stim.specNumInd(fNum,ismember(fam2_specChar,sStr));
+  sNum = cfg.stim.specNum(fNum,ismember(fam2_specStr,sStr));
   [~,name] = fileparts(fam2{i});
   eName = str2double(strrep(name,[fStr sStr],''));
   fprintf(fid,'%s\t%s\t%d\t%s\t%d\t%d\t%d\t%d\n',fam2{i},fStr,fNum,sStr,sNum,eName,fam2_eNum(i),i);

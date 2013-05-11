@@ -2,7 +2,8 @@ function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
 % function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
 %
 % Description:
-%  This function runs the matching task.
+%  This function runs the matching task. There are no blocks, only short
+%  (blink) breaks.
 %
 %  The stimuli for the matching task must already be in presentation order.
 %  They are stored in expParam.session.(sesName).(phase).allStims as a

@@ -93,10 +93,12 @@ if expParam.sessionNum == 1
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
   
-  %% Define the response keys
+  % % subordinate family species numbers
+  % cfg.stim.specNum(cfg.stim.famNumSubord,:)
+  % % subordinate family species letters
+  % cfg.stim.specStr(cfg.stim.famNumSubord,:)
   
-  % TODO: do we want the key order to be yoked to the training day 1 order
-  % in the viewname task?
+  %% Define the response keys
   
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.otherKeyNames = {'space'};
@@ -106,18 +108,9 @@ if expParam.sessionNum == 1
   
   % keys for naming particular species (subordinate-level naming)
   
-  % % I can't get PTB to use the semicolon
+  % % NB: I can't get PTB to use the semicolon
   %cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l','semicolon'};
   cfg.keys.speciesKeyNames = {'a','s','d','f','v','b','h','j','k','l'};
-  
-  % % only set the keys in a random order once per subject
-  % cfg.keys.randKeyOrder = randperm(length(cfg.keys.speciesKeyNames));
-  % % % debug - not randomized
-  % % cfg.keys.randKeyOrder = 1:length(cfg.keys.speciesKeyNames);
-  % % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
-  
-  % % subordinate family species number indices
-  % cfg.stim.specNumInd(famNumSubord,:)
   
   % set the species keys
   for i = 1:length(cfg.keys.speciesKeyNames)
@@ -153,9 +146,6 @@ if expParam.sessionNum == 1
   %   cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{2});
   %   cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{1});
   % end
-  
-  % TODO: 5 responses: definitely/maybe unfamiliar/familiar, and recollect;
-  %       a, s, d, f, h
   
   %% Session/phase configuration
   
