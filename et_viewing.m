@@ -1,5 +1,5 @@
-function [logFile] = et_viewing(cfg,expParam,logFile,sesName,phase)
-% function [logFile] = et_viewing(cfg,expParam,logFile,sesName,phase)
+function [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phase)
+% function [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phase)
 %
 % Descrption:
 %  This function runs the viewing task.

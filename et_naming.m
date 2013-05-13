@@ -1,5 +1,5 @@
-function [logFile] = et_naming(cfg,expParam,logFile,sesName,phase)
-% function [logFile] = et_naming(cfg,expParam,logFile,sesName,phase)
+function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phase)
+% function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phase)
 %
 % Description:
 %  This function runs the naming task.

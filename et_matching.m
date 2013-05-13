@@ -1,9 +1,11 @@
-function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
-% function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
+function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phase)
+% function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phase)
 %
 % Description:
 %  This function runs the matching task. There are no blocks, only short
 %  (blink) breaks.
+%  TODO: Maybe add a longer break in the middle and tell subjects that this
+%  is the middle of the experiment.
 %
 %  The stimuli for the matching task must already be in presentation order.
 %  They are stored in expParam.session.(sesName).(phase).allStims as a
@@ -32,7 +34,7 @@ function [logFile] = et_matching(cfg,expParam,logFile,sesName,phase)
 %  different trained field, the same matchPairNum, and the opposite
 %  matchStimNum (1 or 2).
 
-% ECRE stimuli are basic/subordinate x trained/untrained x same/different.
+% EBUG stimuli are basic/subordinate x trained/untrained x same/different.
 
 % debug
 sesName = 'pretest';
@@ -50,6 +52,9 @@ phase = 'match';
 
 % cfg.keys.matchSame
 % cfg.keys.matchDiff
+
+% debug
+
 
 phaseCfg = cfg.stim.(sesName).(phase);
 allStims = expParam.session.(sesName).(phase).allStims;

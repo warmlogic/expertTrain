@@ -217,10 +217,10 @@ try
         % for each view/name block
         for b = 1:length(cfg.stim.train1.viewname.blockSpeciesOrder)
           % run the viewing task
-          [cfg,logFile] = et_viewing(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          [cfg,logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
           
           % then run the naming task
-          [cfg,logFile] = et_viewing(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          [cfg,logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         end
         
         % old
@@ -229,17 +229,17 @@ try
       case {'name'}
         % (Active) Naming task
         
-        [cfg,logFile] = et_naming(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [cfg,logFile] = et_naming(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case{'match'}
         % Subordinate Matching task (same/different)
         
-        [cfg,logFile] = et_matching(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [cfg,logFile] = et_matching(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case {'recog'}
         % Recognition (old/new) task
         
-        [cfg,logFile] = et_recognition(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [cfg,logFile] = et_recognition(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(sesName).phases{p},sesName);
