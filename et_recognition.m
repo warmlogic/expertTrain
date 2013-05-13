@@ -1,5 +1,5 @@
 function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
-% function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phase)
+% function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
 %
 % Description:
 %  This function runs the recognition study and test tasks.
@@ -22,10 +22,10 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
 %  in presentation order!
 %
 
+fprintf('Running recognition task for %s %s...\n',sesName,phase);
+
 % TODO:
-%  make instruction files. read in during config? make images like simon?
-%
-%
+%  make instruction files. read in during config?
 
 % using these
 % cfg.keys.recogKeyNames
@@ -49,9 +49,10 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
 % % TODO: do we need response?
 % cfg.stim.(sesName).(phase).response = 1.5;
 
-% debug
-sesName = 'pretest';
-phase = 'recog';
+
+% % debug
+% sesName = 'pretest';
+% phase = 'recog';
 
 phaseCfg = cfg.stim.(sesName).(phase);
 
@@ -65,27 +66,30 @@ phaseCfg = cfg.stim.(sesName).(phase);
 % end
 
 
-% Run study task
-recogphase = 'study';
-
-% TODO: instructions
-instructions = sprintf('Press ''%s'' to begin study.',KbName(cfg.keys.s00));
-% put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', WhiteIndex(w));
-% Update the display to show the instruction text:
-Screen('Flip', w);
-% wait until spacebar is pressed
-RestrictKeysForKbCheck(cfg.keys.s00);
-KbWait(-1);
-RestrictKeysForKbCheck([]);
-% Clear screen to background color (our 'gray' as set at the
-% beginning):
-Screen('Flip', w);
-
-% Wait a second before starting trial
-WaitSecs(1.000);
-
 for b = 1:phaseCfg.nBlocks
+  % Run study task
+  recogphase = 'study';
+  
+  % TODO: instructions
+  instructions = sprintf('Press ''%s'' to begin study.',KbName(cfg.keys.s00));
+  % put the instructions on the screen
+  DrawFormattedText(w, instructions, 'center', 'center', WhiteIndex(w));
+  % Update the display to show the instruction text:
+  Screen('Flip', w);
+  % wait until spacebar is pressed
+  RestrictKeysForKbCheck(cfg.keys.s00);
+  KbWait(-1);
+  RestrictKeysForKbCheck([]);
+  % Clear screen to background color (our 'gray' as set at the
+  % beginning):
+  Screen('Flip', w);
+  Screen('Close');
+  
+  % Wait a second before starting trial
+  WaitSecs(1.000);
+
+  % debug
+  fprintf('study block %d\n',b);
   
   % load up the stimuli for this block (TODO: should we load all blocks?)
   blockStims = cell(1,length(expParam.session.(sesName).(phase).targStims{b}));
@@ -94,25 +98,34 @@ for b = 1:phaseCfg.nBlocks
     stimFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phase).targStims{b}(i).familyStr,expParam.session.(sesName).(phase).targStims{b}(i).fileName);
     if exist(stimFile,'file')
       stimimg = imread(stimFile);
-      blockStims{i} = Screen(w,'MakeTexture',stimimg);
+      blockStims{i} = Screen('MakeTexture',w,stimimg);
     else
       error('Study stimulus %s does not exist!',stimFile);
     end
   end
   
   for i = 1:length(blockStims)
+    % debug
+    fprintf('\tstim %d\n',i);
+    
     % ISI between trials
     WaitSecs(cfg.stim.(sesName).(phase).study_isi);
+    fprintf('wait\n');
     
     % draw fixation
-    Screen('TextSize', w, fixsize);
-    DrawFormattedText(w,'+','center','center',white);
+    %Screen('TextSize', w, cfg.text.cfg.text.fixsize);
+    %fprintf('textsize\n');
+    DrawFormattedText(w,'+','center','center',WhiteIndex(w));
+    fprintf('draw +\n');
     Screen('Flip',w);
+    fprintf('flip\n');
     % fixation on screen before starting trial
     WaitSecs(cfg.stim.(sesName).(phase).study_preTarg);
+    fprintf('wait\n');
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStims{i});
+    fprintf('draw stim\n');
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
@@ -126,39 +139,52 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(0.001);
     end
     
-    fprintf(logFile,'\n');
+    % Write presentation to file:
+    fprintf(logFile,'%d %s %i %i %s %s %i %i %i\n',...
+      VBLTimestamp,...
+      recogphase,...
+      b,...
+      i,...
+      'RECOGSTUDY_TARG',...
+      expParam.session.(sesName).(phase).allStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phase).allStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phase).allStims{b}(i).exemplarName,...
+      expParam.session.(sesName).(phase).allStims{b}(i).targ);
     
     % Clear screen to background color after fixed 'duration'
     Screen('Flip', w);
     
+    % Flush out screens before next trial
+    %Screen('Close');
+    
   end % for stimuli
   
-end % for nBlocks
   
   
-
-% Run test task
-recogphase = 'test';
-
-% TODO: instructions
-instructions = sprintf('Press ''%s'' to begin test.',KbName(cfg.keys.s00));
-% put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', WhiteIndex(w));
-% Update the display to show the instruction text:
-Screen('Flip', w);
-% wait until spacebar is pressed
-RestrictKeysForKbCheck(cfg.keys.s00);
-KbWait(-1);
-RestrictKeysForKbCheck([]);
-% Clear screen to background color (our 'gray' as set at the
-% beginning):
-Screen('Flip', w);
-
-% Wait a second before starting trial
-WaitSecs(1.000);
-
-for b = 1:phaseCfg.nBlocks
-
+  
+  % Run test task
+  recogphase = 'test';
+  
+  % TODO: instructions
+  instructions = sprintf('Press ''%s'' to begin test.',KbName(cfg.keys.s00));
+  % put the instructions on the screen
+  DrawFormattedText(w, instructions, 'center', 'center', WhiteIndex(w));
+  % Update the display to show the instruction text:
+  Screen('Flip', w);
+  % wait until spacebar is pressed
+  RestrictKeysForKbCheck(cfg.keys.s00);
+  KbWait(-1);
+  RestrictKeysForKbCheck([]);
+  % Clear screen to background color (our 'gray' as set at the
+  % beginning):
+  Screen('Flip', w);
+  
+  % Wait a second before starting trial
+  WaitSecs(1.000);
+  
+  % debug
+  fprintf('test block %d\n',b);
+  
   % load up the stimuli for this block (TODO: should we load all blocks?)
   blockStims = cell(1,length(expParam.session.(sesName).(phase).allStims{b}));
   for i = 1:length(expParam.session.(sesName).(phase).allStims{b})
@@ -166,7 +192,7 @@ for b = 1:phaseCfg.nBlocks
     stimFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phase).allStims{b}(i).familyStr,expParam.session.(sesName).(phase).allStims{b}(i).fileName);
     if exist(stimFile,'file')
       stimimg = imread(stimFile);
-      blockStims{i} = Screen(w,'MakeTexture',stimimg);
+      blockStims{i} = Screen('MakeTexture',w,stimimg);
     else
       error('Test stimulus %s does not exist!',stimFile);
     end
@@ -177,8 +203,8 @@ for b = 1:phaseCfg.nBlocks
     WaitSecs(cfg.stim.(sesName).(phase).test_isi);
     
     % draw fixation
-    Screen('TextSize', w, fixsize);
-    DrawFormattedText(w,'+','center','center',white);
+    Screen('TextSize', w, cfg.text.fixsize);
+    DrawFormattedText(w,'+','center','center',WhiteIndex(w));
     Screen('Flip',w);
     % fixation on screen before starting trial
     WaitSecs(cfg.stim.(sesName).(phase).test_preStim);
@@ -190,8 +216,8 @@ for b = 1:phaseCfg.nBlocks
     % and record stimulus onset time in 'startRT':
     [VBLTimestamp, startRT] = Screen('Flip', w);
     
-    % Write trial result to file:
-    fprintf(logFile,'%i %s %i %i %s %s %i %i %s %i %i\n',...
+    % Write presentation to file:
+    fprintf(logFile,'%d %s %i %i %s %s %s %i %i\n',...
       VBLTimestamp,...
       recogphase,...
       b,...
@@ -211,36 +237,40 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % poll for a resp
-    while KeyCode(cfg.keys.recogDefUn) == 0 && KeyCode(cfg.keys.recogMayUn) == 0 && KeyCode(cfg.keys.recogMayF) == 0 && KeyCode(cfg.keys.recogDefF) == 0 && KeyCode(cfg.keys.recogRecoll) == 0
-      [KeyIsDown, endRT, KeyCode] = KbCheck;
+    while keyCode(cfg.keys.recogDefUn) == 0 && keyCode(cfg.keys.recogMayUn) == 0 && keyCode(cfg.keys.recogMayF) == 0 && keyCode(cfg.keys.recogDefF) == 0 && keyCode(cfg.keys.recogRecoll) == 0
+      [keyIsDown, endRT, keyCode] = KbCheck;
       WaitSecs(0.001);
     end
-    %if KeyCode(cfg.keys.recogDefUn) == 1 || KeyCode(cfg.keys.recogMayUn) == 1 || KeyCode(cfg.keys.recogMayF) == 1 || KeyCode(cfg.keys.recogDefF) == 1 || KeyCode(cfg.keys.recogRecoll) == 1
+    %if keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1 || keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1
     %  break
     %end
-    %[KeyIsDown, endRT, KeyCode] = KbCheck;
+    %[KeyIsDown, endRT, keyCode] = KbCheck;
     
     % Clear screen to background color after fixed 'duration'
     % or after subjects response (on test phase)
     Screen('Flip', w);
     
+    % Flush out screens before next trial
+    FlushEvents('keyDown');
+    Screen('Close');
+    
     % compute response time
     rt = round(1000 * (endRT - startRT));
     
     % compute accuracy
-    if expParam.session.(sesName).(phase).allStims{b}(i).targ && (KeyCode(cfg.keys.recogMayF) == 1 || KeyCode(cfg.keys.recogDefF) == 1 || KeyCode(cfg.keys.recogRecoll) == 1)
+    if expParam.session.(sesName).(phase).allStims{b}(i).targ && (keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1)
       acc = 1;
-    elseif ~expParam.session.(sesName).(phase).allStims{b}(i).targ && (KeyCode(cfg.keys.recogDefUn) == 1 || KeyCode(cfg.keys.recogMayUn) == 1)
+    elseif ~expParam.session.(sesName).(phase).allStims{b}(i).targ && (keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1)
       acc = 1;
     else
       acc = 0;
     end
     
     % get key pressed by subject
-    resp = KbName(KeyCode);
+    resp = KbName(keyCode);
     
     % Write trial result to file:
-    fprintf(logFile,'%i %s %i %i %s %s %s %i %i %s %i %i\n',...
+    fprintf(logFile,'%d %s %i %i %s %s %i %i %i %s %i %i\n',...
       endRT,...
       recogphase,...
       b,...
