@@ -39,11 +39,11 @@ KbName('UnifyKeyNames');
 % Reseed the random-number generator for each experiment:
 rng('shuffle');
 
-% debug
-cd('/Users/matt/Documents/experiments/expertTrain');
-expName = 'EBUG'; % expertise - creatures/shinebugs
-%expName = 'EBRD'; % expertise - birds
-subNum = 1;
+% % debug
+% cd('/Users/matt/Documents/experiments/expertTrain');
+% expName = 'EBUG'; % expertise - creatures/shinebugs
+% %expName = 'EBRD'; % expertise - birds
+% subNum = 1;
 
 %% Experiment database struct preparation
 
@@ -96,17 +96,27 @@ cfg.files.expParamFile = fullfile(cfg.files.subSaveDir,'experimentParams.mat');
 if exist(cfg.files.expParamFile,'file')
   % if it exists that means this subject has already run a session
   load(cfg.files.expParamFile);
+  
+  % Make sure there is a session left to run.
+  %
+  % session number is incremented after the run, so after the final
+  % session has been run it will be 1 greater than expParam.nSessions
+  if expParam.sessionNum <= expParam.nSessions
+    fprintf('Starting session %d (%s).\n',expParam.sessionNum,expParam.sesTypes{expParam.sessionNum});
+  else
+    error('All %s sessions have already been run!',expParam.nSessions);
+  end
+  
 else
   % if it doesn't exist that means we're starting a new subject
   expParam.sessionNum = 1;
-end
-
-%% Load the experiment's config file. Must create this for each experiment.
-
-if exist(fullfile(pwd,sprintf('config_%s.m',expParam.expName)),'file')
-  [cfg,expParam] = eval(sprintf('config_%s(cfg,expParam);',expParam.expName));
-else
-  error('Configuration file for %s experiment does not exist: %s',fullfile(pwd,sprintf('config_%s.m',expParam.expName)));
+  
+  % Load the experiment's config file. Must create this for each experiment.
+  if exist(fullfile(pwd,sprintf('config_%s.m',expParam.expName)),'file')
+    [cfg,expParam] = eval(sprintf('config_%s(cfg,expParam);',expParam.expName));
+  else
+    error('Configuration file for %s experiment does not exist: %s',fullfile(pwd,sprintf('config_%s.m',expParam.expName)));
+  end
 end
 
 %% Make sure the session number is in order and directories/files exist
@@ -120,10 +130,12 @@ if ~exist(cfg.files.sesSaveDir,'dir')
   end
 end
 % set name of the session log file
-cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.log');
-if exist(cfg.files.sesLogFile,'file')
-  error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
-end
+cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.txt');
+%cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.log');
+% debug - commented out
+% if exist(cfg.files.sesLogFile,'file')
+%   error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
+% end
 
 %% Save the current experiment data
 
@@ -142,7 +154,7 @@ try
   logFile = fopen(cfg.files.sesLogFile,'w');
   
   % TODO: set up logging for expertise experiment
-  fprintf(logFile,'\nDate\tSubjno\tTrial\tCategory_Label\tBird_image\tCondition\tResp\tAccuray\tRT\tAnswer\tObj_ID_Number\tLabel_img_match\tBird_Family\tStimuli_Set\tBlock\tCounterbalance\tCorr_RT\tCount_Hit\tCount_FA\tCount_CR\tCount_Miss');
+  %fprintf(logFile,'\nDate\tSubjno\tTrial\tCategory_Label\tBird_image\tCondition\tResp\tAccuray\tRT\tAnswer\tObj_ID_Number\tLabel_img_match\tBird_Family\tStimuli_Set\tBlock\tCounterbalance\tCorr_RT\tCount_Hit\tCount_FA\tCount_CR\tCount_Miss');
   
   %% Begin PTB display setup
   
@@ -177,6 +189,9 @@ try
   % midLength=round(RectHeight(wRect)/2);
   Screen('FillRect', w, cfg.screen.gray);  % put on a grey screen
   Screen('Flip',w);
+  
+  % basic text size
+  Screen('TextSize', w, cfg.text.basic);
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
   % they are loaded and ready when we need them - without delays
@@ -217,10 +232,10 @@ try
         % for each view/name block
         for b = 1:length(cfg.stim.train1.viewname.blockSpeciesOrder)
           % run the viewing task
-          [cfg,logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
           
           % then run the naming task
-          [cfg,logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         end
         
         % old
@@ -229,18 +244,18 @@ try
       case {'name'}
         % (Active) Naming task
         
-        [cfg,logFile] = et_naming(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case{'match'}
         % Subordinate Matching task (same/different)
         
-        [cfg,logFile] = et_matching(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
         
       case {'recog'}
         % Recognition (old/new) task
         
-        [cfg,logFile] = et_recognition(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
-        
+        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(sesName).phases{p},sesName);
     end
@@ -305,6 +320,8 @@ try
   fclose('all');
   Priority(0);
   
+  fprintf('\n');
+  
   % End of experiment:
   return
   
@@ -319,6 +336,8 @@ catch ME
   ShowCursor;
   fclose('all');
   Priority(0);
+  
+  fprintf('\n');
   
   % Output the error message that describes the error:
   psychrethrow(psychlasterror);

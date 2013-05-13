@@ -15,27 +15,24 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 
 expParam.nSessions = 9;
 
-% Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
-expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
-
+% debug
+expParam.sesTypes = {'pretest'};
 % set up a field for each session type
-expParam.session.pretest.phases = {'match','recog'};
-expParam.session.train1.phases = {'viewname','name','match'};
-expParam.session.train2.phases = {'match','name','match'};
-expParam.session.train3.phases = {'match','name','match'};
-expParam.session.train4.phases = {'match','name','match'};
-expParam.session.train5.phases = {'match','name','match'};
-expParam.session.train6.phases = {'match','name','match'};
-expParam.session.posttest.phases = {'match','recog'};
-expParam.session.posttest_delay.phases = {'match','recog'};
+expParam.session.pretest.phases = {'recog'};
 
-% session number is incremented after the run, so after the final
-% session has been run it will be 1 greater than expParam.nSessions
-if expParam.sessionNum <= expParam.nSessions
-  fprintf('Starting session %d (%s).\n',expParam.sessionNum,expParam.sesTypes{expParam.sessionNum});
-else
-  error('All %s sessions have already been run!',expParam.nSessions);
-end
+% % Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
+% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
+% 
+% % set up a field for each session type
+% expParam.session.pretest.phases = {'match','recog'};
+% expParam.session.train1.phases = {'viewname','name','match'};
+% expParam.session.train2.phases = {'match','name','match'};
+% expParam.session.train3.phases = {'match','name','match'};
+% expParam.session.train4.phases = {'match','name','match'};
+% expParam.session.train5.phases = {'match','name','match'};
+% expParam.session.train6.phases = {'match','name','match'};
+% expParam.session.posttest.phases = {'match','recog'};
+% expParam.session.posttest_delay.phases = {'match','recog'};
 
 %% If this is session 1, setup the experiment
 
@@ -150,6 +147,9 @@ if expParam.sessionNum == 1
   %% Session/phase configuration
   
   % TODO: add text size informaiton for instructions and on-screen text
+  
+  cfg.text.basic = 32;
+  cfg.text.fixsize = 32;
   
   % Define text size (TODO: fix for this experiment)
   cfg.text.txtsize_instruct = 35;
