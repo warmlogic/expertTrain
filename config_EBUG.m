@@ -197,8 +197,9 @@ if expParam.sessionNum == 1
   % durations, in seconds
   cfg.stim.pretest.recog.study_isi = 0.8;
   cfg.stim.pretest.recog.study_preTarg = 0.2;
+  cfg.stim.pretest.recog.study_targ = 2.0;
   cfg.stim.pretest.recog.test_isi = 0.8;
-  cfg.stim.pretest.recog.test_preTarg = 0.2;
+  cfg.stim.pretest.recog.test_preStim = 0.2;
   cfg.stim.pretest.recog.test_stim = 1.5;
   % TODO: do we need response?
   cfg.stim.pretest.recog.response = 1.5;
@@ -563,8 +564,9 @@ if expParam.sessionNum == 1
   % durations, in seconds
   cfg.stim.posttest.recog.study_isi = 0.8;
   cfg.stim.posttest.recog.study_preTarg = 0.2;
+  cfg.stim.posttest.recog.study_targ = 2.0;
   cfg.stim.posttest.recog.test_isi = 0.8;
-  cfg.stim.posttest.recog.test_preTarg = 0.2;
+  cfg.stim.posttest.recog.test_preStim = 0.2;
   cfg.stim.posttest.recog.test_stim = 1.5;
   % TODO: do we need response?
   cfg.stim.posttest.recog.response = 1.5;
@@ -609,8 +611,9 @@ if expParam.sessionNum == 1
   % durations, in seconds
   cfg.stim.posttest_delay.recog.study_isi = 0.8;
   cfg.stim.posttest_delay.recog.study_preTarg = 0.2;
+  cfg.stim.posttest_delay.recog.study_targ = 2.0;
   cfg.stim.posttest_delay.recog.test_isi = 0.8;
-  cfg.stim.posttest_delay.recog.test_preTarg = 0.2;
+  cfg.stim.posttest_delay.recog.test_preStim = 0.2;
   cfg.stim.posttest_delay.recog.test_stim = 1.5;
   % TODO: do we need response?
   cfg.stim.posttest_delay.recog.response = 1.5;
