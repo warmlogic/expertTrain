@@ -65,6 +65,8 @@ phaseCfg = cfg.stim.(sesName).(phase);
 %   error('Not enough lure stimuli per test block!');
 % end
 
+% only check these keys
+RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
 
 for b = 1:phaseCfg.nBlocks
   % Run study task
@@ -83,7 +85,6 @@ for b = 1:phaseCfg.nBlocks
   % Clear screen to background color (our 'gray' as set at the
   % beginning):
   Screen('Flip', w);
-  Screen('Close');
   
   % Wait a second before starting trial
   WaitSecs(1.000);
@@ -155,7 +156,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('Flip', w);
     
     % Flush out screens before next trial
-    %Screen('Close');
+    Screen('Close', blockStims{i});
     
   end % for stimuli
   
@@ -236,12 +237,35 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(0.001);
     end
     
+    % change + to ?
+    Screen('DrawTexture', w, blockStims{i});
+    DrawFormattedText(w,'?','center',(cfg.screen.xy(2)/2) + (cfg.screen.xy(2)*0.1),BlackIndex(w));
+    Screen('Flip', w);
+    
+    % Flush out keyboard so they can't hold down a key
+    FlushEvents('keyDown');
+    
+    % initialize the keyboard check
+    keyIsDown = 0;
     % poll for a resp
-    while keyCode(cfg.keys.recogDefUn) == 0 && keyCode(cfg.keys.recogMayUn) == 0 && keyCode(cfg.keys.recogMayF) == 0 && keyCode(cfg.keys.recogDefF) == 0 && keyCode(cfg.keys.recogRecoll) == 0
+    %while keyCode(cfg.keys.recogDefUn) == 0 && keyCode(cfg.keys.recogMayUn) == 0 && keyCode(cfg.keys.recogMayF) == 0 && keyCode(cfg.keys.recogDefF) == 0 && keyCode(cfg.keys.recogRecoll) == 0
+    while ~keyIsDown
       [keyIsDown, endRT, keyCode] = KbCheck;
+      % if they push more than one key, don't accept it;
+      % TODO: this is not a good way to do this
+      if sum(keyCode) == 1
+        if keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1 || keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1
+          break
+        else
+          keyIsDown = 0;
+        end
+      elseif sum(keyCode) > 1
+        warning('Multiple keys pushed at once!');
+        keyIsDown = 0;
+      end
       WaitSecs(0.001);
     end
-    %if keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1 || keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1
+    %
     %  break
     %end
     %[KeyIsDown, endRT, keyCode] = KbCheck;
@@ -250,9 +274,9 @@ for b = 1:phaseCfg.nBlocks
     % or after subjects response (on test phase)
     Screen('Flip', w);
     
-    % Flush out screens before next trial
-    FlushEvents('keyDown');
-    Screen('Close');
+    
+    % Close this stimulus before next trial
+    Screen('Close', blockStims{i});
     
     % compute response time
     rt = round(1000 * (endRT - startRT));
@@ -287,5 +311,8 @@ for b = 1:phaseCfg.nBlocks
   end % for stimuli
   
 end % for nBlocks
+
+% reset the KbCheck
+RestrictKeysForKbCheck([]);
 
 end % function
