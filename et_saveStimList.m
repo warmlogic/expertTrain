@@ -111,12 +111,12 @@ else
   fam2_specNum = 1:length(fam2_specStr);
 end
 % store the indices for later
-cfg.stim.specNum = nan(cfg.stim.nFamilies,cfg.stim.nSpecies);
+cfg.stim.specNum = nan(length(cfg.stim.familyNames),length(fam1_specStr));
 cfg.stim.specNum(1,:) = fam1_specNum;
 cfg.stim.specNum(2,:) = fam2_specNum;
 %cfg.stim.fam1_specNum = fam1_specNum;
 %cfg.stim.fam2_specNum = fam2_specNum;
-cfg.stim.specStr = cell(cfg.stim.nFamilies,cfg.stim.nSpecies);
+cfg.stim.specStr = cell(length(cfg.stim.familyNames),length(fam2_specStr));
 cfg.stim.specStr(1,:) = fam1_specStr;
 cfg.stim.specStr(2,:) = fam1_specStr;
 
