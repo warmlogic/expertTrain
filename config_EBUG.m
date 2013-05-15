@@ -41,11 +41,15 @@ if expParam.sessionNum == 1
   %% Subject parameters
   
   % for counterbalancing
+  
+  % odd or even subject number
   if mod(str2double(expParam.subject(end)),2) == 0
     expParam.isEven = true;
   else
     expParam.isEven = false;
   end
+  
+  % subject number ends in 1-5 or 6-0
   if str2double(expParam.subject(end)) >= 1 && str2double(expParam.subject(end)) <= 5
     expParam.is15 = true;
   else
@@ -63,9 +67,13 @@ if expParam.sessionNum == 1
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
   
-  cfg.files.stimDir = fullfile(cfg.files.expDir,'images','Creatures');
+  cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
+  cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
   % save an individual stimulus list for each subject
   cfg.stim.file = fullfile(cfg.files.subSaveDir,'stimList.txt');
+  
+  % set the resources directory
+  cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
   
   % create the stimulus list if it doesn't exist
   shuffleSpecies = true;
@@ -101,13 +109,13 @@ if expParam.sessionNum == 1
   cfg.keys.otherKeyNames = {'space'};
   for i = 1:length(cfg.keys.otherKeyNames)
     cfg.keys.(sprintf('s%.2d',i-1)) = KbName(cfg.keys.otherKeyNames{i});
+    %cfg.keys.s00 = KbName(cfg.keys.otherKeyNames{i});
   end
   
   % keys for naming particular species (subordinate-level naming)
   
-  % % NB: I can't get PTB to use the semicolon
-  %cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l','semicolon'};
-  cfg.keys.speciesKeyNames = {'a','s','d','f','v','b','h','j','k','l'};
+  cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
+  %cfg.keys.speciesKeyNames = {'a','s','d','f','v','b','h','j','k','l'};
   
   % set the species keys
   for i = 1:length(cfg.keys.speciesKeyNames)
@@ -117,7 +125,8 @@ if expParam.sessionNum == 1
   end
   
   % subordinate matching keys (counterbalanced based on subNum 1-5, 6-0)
-  cfg.keys.matchKeyNames = {'f','h'};
+  %cfg.keys.matchKeyNames = {'f','h'};
+  cfg.keys.matchKeyNames = {'f','j'};
   if expParam.is15
     cfg.keys.matchSame = KbName(cfg.keys.matchKeyNames{1});
     cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{2});
@@ -126,23 +135,28 @@ if expParam.sessionNum == 1
     cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{1});
   end
   
-  % recognition keys (not counterbalanced)
-  cfg.keys.recogKeyNames = {'a','s','d','f','h'};
-  cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{1});
-  cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{2});
-  cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
-  cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{4});
-  cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{5});
+  % recognition keys
+  %cfg.keys.recogKeyNames = {{'a','s','d','f','h'},{'f','h','j','k','l'}};
+  cfg.keys.recogKeyNames = {{'a','s','d','f','h'},{'f','j','k','l',';:'}};
   
-  % % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
-  % cfg.keys.recogKeyNames = {'f','h'};
-  % if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
-  %   cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{1});
-  %   cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{2});
-  % elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
-  %   cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{2});
-  %   cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{1});
-  % end
+  % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
+  if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
+    cfg.keys.recogKeySet = 1;
+    cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
+    cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{1});
+    cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{2});
+    cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
+    cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{4});
+    cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{5});
+  elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
+    cfg.keys.recogKeySet = 2;
+    cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
+    cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{5});
+    cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{4});
+    cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
+    cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{2});
+    cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
+  end
   
   %% Session/phase configuration
   
@@ -172,11 +186,11 @@ if expParam.sessionNum == 1
   cfg.stim.pretest.match.isi = 0.5;
   cfg.stim.pretest.match.stim1 = 0.8;
   cfg.stim.pretest.match.stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.pretest.match.preStim1 = 0.5 to 0.7;
-  %cfg.stim.pretest.match.preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.pretest.match.response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.pretest.match.preStim1 = 0.5 to 0.7;
+  % cfg.stim.pretest.match.preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.pretest.match.response = 1.0;
   
   % Recognition
   
@@ -201,8 +215,8 @@ if expParam.sessionNum == 1
   cfg.stim.pretest.recog.test_isi = 0.8;
   cfg.stim.pretest.recog.test_preStim = 0.2;
   cfg.stim.pretest.recog.test_stim = 1.5;
-  % TODO: do we need response?
-  cfg.stim.pretest.recog.response = 1.5;
+  % % % Not setting a response time limit
+  % cfg.stim.pretest.recog.response = 1.5;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 1 configuration
@@ -268,11 +282,11 @@ if expParam.sessionNum == 1
   cfg.stim.train1.match.isi = 0.5;
   cfg.stim.train1.match.stim1 = 0.8;
   cfg.stim.train1.match.stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train1.match.preStim1 = 0.5 to 0.7;
-  %cfg.stim.train1.match.preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train1.match.response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train1.match.preStim1 = 0.5 to 0.7;
+  % cfg.stim.train1.match.preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train1.match.response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 2 configuration
@@ -289,11 +303,11 @@ if expParam.sessionNum == 1
   cfg.stim.train2.match(matchNum).isi = 0.5;
   cfg.stim.train2.match(matchNum).stim1 = 0.8;
   cfg.stim.train2.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train2.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train2.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train2.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train2.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train2.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train2.match(matchNum).response = 1.0;
   
   % Naming
   
@@ -318,11 +332,11 @@ if expParam.sessionNum == 1
   cfg.stim.train2.match(matchNum).isi = 0.5;
   cfg.stim.train2.match(matchNum).stim1 = 0.8;
   cfg.stim.train2.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train2.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train2.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train2.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train2.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train2.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train2.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 3 configuration
@@ -339,11 +353,11 @@ if expParam.sessionNum == 1
   cfg.stim.train3.match(matchNum).isi = 0.5;
   cfg.stim.train3.match(matchNum).stim1 = 0.8;
   cfg.stim.train3.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train3.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train3.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train3.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train3.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train3.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train3.match(matchNum).response = 1.0;
   
   % Naming
   
@@ -368,11 +382,11 @@ if expParam.sessionNum == 1
   cfg.stim.train3.match(matchNum).isi = 0.5;
   cfg.stim.train3.match(matchNum).stim1 = 0.8;
   cfg.stim.train3.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train3.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train3.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train3.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train3.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train3.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train3.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 4 configuration
@@ -389,11 +403,11 @@ if expParam.sessionNum == 1
   cfg.stim.train4.match(matchNum).isi = 0.5;
   cfg.stim.train4.match(matchNum).stim1 = 0.8;
   cfg.stim.train4.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train4.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train4.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train4.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train4.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train4.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train4.match(matchNum).response = 1.0;
   
   % Naming
   
@@ -418,11 +432,11 @@ if expParam.sessionNum == 1
   cfg.stim.train4.match(matchNum).isi = 0.5;
   cfg.stim.train4.match(matchNum).stim1 = 0.8;
   cfg.stim.train4.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train4.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train4.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train4.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train4.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train4.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train4.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 5 configuration
@@ -439,11 +453,11 @@ if expParam.sessionNum == 1
   cfg.stim.train5.match(matchNum).isi = 0.5;
   cfg.stim.train5.match(matchNum).stim1 = 0.8;
   cfg.stim.train5.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train5.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train5.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train5.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train5.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train5.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train5.match(matchNum).response = 1.0;
   
   % Naming
   
@@ -468,11 +482,11 @@ if expParam.sessionNum == 1
   cfg.stim.train5.match(matchNum).isi = 0.5;
   cfg.stim.train5.match(matchNum).stim1 = 0.8;
   cfg.stim.train5.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train5.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train5.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train5.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train5.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train5.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % % Not setting a response time limit
+  % cfg.stim.train5.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 6 configuration
@@ -489,11 +503,11 @@ if expParam.sessionNum == 1
   cfg.stim.train6.match(matchNum).isi = 0.5;
   cfg.stim.train6.match(matchNum).stim1 = 0.8;
   cfg.stim.train6.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train6.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train6.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train6.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train6.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train6.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % Not setting a response time limit
+  % cfg.stim.train6.match(matchNum).response = 1.0;
   
   % Naming
   
@@ -518,11 +532,11 @@ if expParam.sessionNum == 1
   cfg.stim.train6.match(matchNum).isi = 0.5;
   cfg.stim.train6.match(matchNum).stim1 = 0.8;
   cfg.stim.train6.match(matchNum).stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.train6.match(matchNum).preStim1 = 0.5 to 0.7;
-  %cfg.stim.train6.match(matchNum).preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.train6.match(matchNum).response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.train6.match(matchNum).preStim1 = 0.5 to 0.7;
+  % cfg.stim.train6.match(matchNum).preStim2 = 1.0 to 1.2;
+  % % Not setting a response time limit
+  % cfg.stim.train6.match(matchNum).response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Posttest configuration
@@ -539,11 +553,11 @@ if expParam.sessionNum == 1
   cfg.stim.posttest.match.isi = 0.5;
   cfg.stim.posttest.match.stim1 = 0.8;
   cfg.stim.posttest.match.stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.posttest.match.preStim1 = 0.5 to 0.7;
-  %cfg.stim.posttest.match.preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.posttest.match.response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.posttest.match.preStim1 = 0.5 to 0.7;
+  % cfg.stim.posttest.match.preStim2 = 1.0 to 1.2;
+  % % Not setting a response time limit
+  % cfg.stim.posttest.match.response = 1.0;
   
   % Recognition
   
@@ -568,8 +582,8 @@ if expParam.sessionNum == 1
   cfg.stim.posttest.recog.test_isi = 0.8;
   cfg.stim.posttest.recog.test_preStim = 0.2;
   cfg.stim.posttest.recog.test_stim = 1.5;
-  % TODO: do we need response?
-  cfg.stim.posttest.recog.response = 1.5;
+  % % Not setting a response time limit
+  % cfg.stim.posttest.recog.response = 1.5;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Posttest Delayed configuration
@@ -586,11 +600,11 @@ if expParam.sessionNum == 1
   cfg.stim.posttest_delay.match.isi = 0.5;
   cfg.stim.posttest_delay.match.stim1 = 0.8;
   cfg.stim.posttest_delay.match.stim2 = 0.8;
-  % random intervals are generated on the fly
-  %cfg.stim.posttest_delay.match.preStim1 = 0.5 to 0.7;
-  %cfg.stim.posttest_delay.match.preStim2 = 1.0 to 1.2;
-  % TODO: do we need response?
-  cfg.stim.posttest_delay.match.response = 1.0;
+  % % random intervals are generated on the fly
+  % cfg.stim.posttest_delay.match.preStim1 = 0.5 to 0.7;
+  % cfg.stim.posttest_delay.match.preStim2 = 1.0 to 1.2;
+  % % Not setting a response time limit
+  % cfg.stim.posttest_delay.match.response = 1.0;
   
   % Recognition
   
@@ -615,8 +629,8 @@ if expParam.sessionNum == 1
   cfg.stim.posttest_delay.recog.test_isi = 0.8;
   cfg.stim.posttest_delay.recog.test_preStim = 0.2;
   cfg.stim.posttest_delay.recog.test_stim = 1.5;
-  % TODO: do we need response?
-  cfg.stim.posttest_delay.recog.response = 1.5;
+  % % Not setting a response time limit
+  % cfg.stim.posttest_delay.recog.response = 1.5;
   
   %% process the stimuli for the entire experiment
   
