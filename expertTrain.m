@@ -167,10 +167,6 @@ try
   % Hide the mouse cursor:
   HideCursor;
   
-  % get screen dimensions
-  %cfg.screen.xy = get(screenNumber,'ScreenSize');
-  %cfg.screen.xy = cfg.screen.xy(3:4); % e.g., [1440 900]
-  
   % Set up the gray color value to be used
   cfg.screen.gray = 181;
   %cfg.screen.gray = GrayIndex(screenNumber);
@@ -182,15 +178,13 @@ try
   % See "help PsychRects" for help on such rectangles and useful helper
   % functions:
   [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray);
-  %[w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray, [0, 0, cfg.screen.xy(1), cfg.screen.xy(2)], 32, 2);
-  disp('wRect');
-  disp(wRect);
-  % do we need this?
-  cfg.screen.xy = wRect([2,4]);
+  % store the screen dimensions
+  cfg.screen.wRect = wRect;
   
   % midWidth=round(RectWidth(wRect)/2);    % get center coordinates
   % midLength=round(RectHeight(wRect)/2);
-  Screen('FillRect', w, cfg.screen.gray);  % put on a grey screen
+  Screen('FillRect', w, cfg.screen.gray);
+  % put on a grey screen
   Screen('Flip',w);
   
   % basic text size
