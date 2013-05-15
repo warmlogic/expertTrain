@@ -21,6 +21,10 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
 %  Once agian, study targets and test targets+lures must already be sorted
 %  in presentation order!
 %
+% NB:
+%  Test response time is measured from when response key image appears on
+%  screen.
+%
 
 fprintf('Running recognition task for %s %s...\n',sesName,phase);
 
@@ -43,10 +47,6 @@ fprintf('Running recognition task for %s %s...\n',sesName,phase);
 % cfg.stim.(sesName).(phase).test_preStim = 0.2;
 % cfg.stim.(sesName).(phase).test_stim = 1.5;
 
-% % debug
-% sesName = 'pretest';
-% phase = 'recog';
-
 phaseCfg = cfg.stim.(sesName).(phase);
 
 % read the proper response key image
@@ -55,6 +55,10 @@ testRespImg = imread(testRespImgFile);
 testRespImgHeight = size(testRespImg,1);
 testRespImgWidth = size(testRespImg,2);
 testRespImg = Screen('MakeTexture',w,testRespImg);
+
+% set some text color
+instructColor = WhiteIndex(w);
+fixationColor = WhiteIndex(w);
 
 for b = 1:phaseCfg.nBlocks
   
@@ -67,7 +71,7 @@ for b = 1:phaseCfg.nBlocks
   % TODO: instructions
   instructions = sprintf('Press ''%s'' to begin Recognition study task.',KbName(cfg.keys.s00));
   % put the instructions on the screen
-  DrawFormattedText(w, instructions, 'center', 'center', WhiteIndex(w));
+  DrawFormattedText(w, instructions, 'center', 'center', instructColor);
   % Update the display to show the instruction text:
   Screen('Flip', w);
   % wait until spacebar is pressed
@@ -109,7 +113,7 @@ for b = 1:phaseCfg.nBlocks
   % set the fixation size
   Screen('TextSize', w, cfg.text.fixsize);
   % draw fixation
-  DrawFormattedText(w,'+','center','center',WhiteIndex(w));
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   Screen('Flip',w);
   
   for i = 1:length(blockStims)
@@ -124,7 +128,7 @@ for b = 1:phaseCfg.nBlocks
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
-    [imgOnSCreen, dispTime] = Screen('Flip', w);
+    [imgOnScreen, dispTime] = Screen('Flip', w);
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
@@ -136,7 +140,7 @@ for b = 1:phaseCfg.nBlocks
     
     % Write presentation to file:
     fprintf(logFile,'%f %s %i %i %s %s %s %i %i\n',...
-      imgOnSCreen,...
+      imgOnScreen,...
       recogphase,...
       b,...
       i,...
@@ -147,7 +151,7 @@ for b = 1:phaseCfg.nBlocks
       expParam.session.(sesName).(phase).targStims{b}(i).targ);
     
     % Clear screen to background color after fixed 'duration' and draw fixation
-    DrawFormattedText(w,'+','center','center',WhiteIndex(w));
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     Screen('Flip', w);
     
     % Flush out screens before next trial
@@ -164,7 +168,7 @@ for b = 1:phaseCfg.nBlocks
   % TODO: instructions
   instructions = sprintf('Press ''%s'' to begin Recognition test task.',KbName(cfg.keys.s00));
   % put the instructions on the screen
-  DrawFormattedText(w, instructions, 'center', 'center', WhiteIndex(w));
+  DrawFormattedText(w, instructions, 'center', 'center', instructColor);
   % Update the display to show the instruction text:
   Screen('Flip', w);
   % wait until spacebar is pressed
@@ -213,7 +217,7 @@ for b = 1:phaseCfg.nBlocks
   % set the fixation size
   Screen('TextSize', w, cfg.text.fixsize);
   % draw fixation
-  DrawFormattedText(w,'+','center','center',WhiteIndex(w));
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   Screen('Flip',w);
   
   for i = 1:length(blockStims)
@@ -228,11 +232,11 @@ for b = 1:phaseCfg.nBlocks
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startRT':
-    [imgOnSCreen, startRT] = Screen('Flip', w);
+    [imgOnScreen, stimOnset] = Screen('Flip', w);
     
     % Write presentation to file:
     fprintf(logFile,'%f %s %i %i %s %s %s %i %i\n',...
-      imgOnSCreen,...
+      imgOnScreen,...
       recogphase,...
       b,...
       i,...
@@ -244,7 +248,7 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
-    while (GetSecs - startRT) <= cfg.stim.(sesName).(phase).test_stim
+    while (GetSecs - stimOnset) <= cfg.stim.(sesName).(phase).test_stim
       % Wait 1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.001);
@@ -254,36 +258,35 @@ for b = 1:phaseCfg.nBlocks
     Screen('DrawTexture', w, blockStims(i), [], stimImgRect);
     % draw the response key image
     Screen('DrawTexture', w, testRespImg, [], respKeyImgRect);
-    % put them on the screen
-    Screen('Flip', w);
+    % put them on the screen; measure RT from when response key img appears
+    [respOnScreen, startRT] = Screen('Flip', w);
     
-    % initialize the keyboard check
-    keyIsDown = 0;
     % poll for a resp
-    %while keyCode(cfg.keys.recogDefUn) == 0 && keyCode(cfg.keys.recogMayUn) == 0 && keyCode(cfg.keys.recogMayF) == 0 && keyCode(cfg.keys.recogDefF) == 0 && keyCode(cfg.keys.recogRecoll) == 0
-    while ~keyIsDown
+    while 1
       [keyIsDown, endRT, keyCode] = KbCheck;
-      % if they push more than one key, don't accept it;
-      % TODO: this doesn't seem like a good way to do this
-      if sum(keyCode) == 1
-        if keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1 || keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1
-          break
-        else
-          keyIsDown = 0;
+      % if they push more than one key, don't accept it
+      if keyIsDown && sum(keyCode) == 1
+        % wait for key to be released
+        while KbCheck(-1)
+          WaitSecs(.0001);
         end
-      elseif sum(keyCode) > 1
-        warning('Multiple keys pushed at once!');
-        keyIsDown = 0;
+        % % debug
+        % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+        if (keyCode(cfg.keys.recogDefUn) == 1 && all(keyCode(~cfg.keys.recogDefUn) == 0)) ||...
+            (keyCode(cfg.keys.recogMayUn) == 1 && all(keyCode(~cfg.keys.recogMayUn) == 0)) ||...
+            (keyCode(cfg.keys.recogMayF) == 1 && all(keyCode(~cfg.keys.recogMayF) == 0)) ||...
+            (keyCode(cfg.keys.recogDefF) == 1 && all(keyCode(~cfg.keys.recogDefF) == 0)) ||...
+            (keyCode(cfg.keys.recogRecoll) == 1 && all(keyCode(~cfg.keys.recogRecoll) == 0))
+          break
+        end
       end
-      WaitSecs(0.001);
+      % wait so we don't overload the system
+      WaitSecs(.0001);
     end
     
     % Clear screen to background color after response and draw fixation
-    DrawFormattedText(w,'+','center','center',WhiteIndex(w));
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     Screen('Flip', w);
-    
-    % Flush out keyboard so they can't hold down a key (TODO: not working!)
-    FlushEvents('keyDown');
     
     % Close this stimulus before next trial
     Screen('Close', blockStims(i));
