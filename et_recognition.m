@@ -453,8 +453,8 @@ for b = 1:phaseCfg.nBlocks
     % get key pressed by subject
     respKey = KbName(keyCode);
     
-    % % debug
-    % fprintf('response: %s (key: %s) (acc = %d)\n',resp,respKey,acc);
+    % debug
+    fprintf('targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',expParam.session.(sesName).(phaseName).allStims{b}(i).targ,resp,respKey,acc);
     
     % Write test stimulus presentation to file:
     fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %i\n',...

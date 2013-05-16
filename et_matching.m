@@ -342,8 +342,8 @@ for i = 1:length(stim2Tex)
   % get key pressed by subject
   respKey = KbName(keyCode);
   
-  % % debug
-  % fprintf('response: %s (key: %s) (acc = %d)\n',resp,respKey,acc);
+  % debug
+  fprintf('same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',stim1(i).same,resp,respKey,acc);
   
   % Write stim1 presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i\n',...

@@ -92,9 +92,9 @@ if expParam.sessionNum == 1
   if ~exist(cfg.stim.file,'file')
     [cfg] = et_saveStimList(cfg,shuffleSpecies);
   else
-    % debug = warning instead of error
-    warning('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
-    %error('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
+    % % debug = warning instead of error
+    % warning('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
+    error('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)

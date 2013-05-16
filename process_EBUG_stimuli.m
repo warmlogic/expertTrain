@@ -219,9 +219,6 @@ for b = 1:length(cfg.stim.(sesName).viewname.blockSpeciesOrder)
     sInd_f1 = find([f1Trained.speciesNum] == speciesOrder_f1(cfg.stim.(sesName).viewname.blockSpeciesOrder{b}(s)));
     % shuffle the stimulus index
     randind_f1 = randperm(length(sInd_f1));
-    % % debug
-    % randind_f1 = 1:length(sInd_f1);
-    % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
     
     % shuffle the exemplars
     thisSpecies_f1 = f1Trained(sInd_f1(randind_f1));
@@ -245,9 +242,6 @@ for b = 1:length(cfg.stim.(sesName).viewname.blockSpeciesOrder)
     sInd_f2 = find([f1Trained.speciesNum] == speciesOrder_f2(cfg.stim.(sesName).viewname.blockSpeciesOrder{b}(s)));
     % shuffle the stimulus index
     randind_f2 = randperm(length(sInd_f2));
-    % % debug
-    % randind_f2 = 1:length(sInd_f2);
-    % fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
     
     % shuffle the exemplars
     thisSpecies_f2 = f2Trained(sInd_f2(randind_f2));

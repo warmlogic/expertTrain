@@ -339,8 +339,8 @@ for i = 1:length(stimTex)
     resp = 'none';
   end
   
-  % % debug
-  % fprintf('response: %s (key: %s) (acc = %d)\n',resp,respKey,acc);
+  % debug
+  fprintf('species num: %d. response: %s (key: %s) (acc = %d)\n',sNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...
