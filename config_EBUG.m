@@ -19,10 +19,11 @@ expParam.nSessions = 9;
 expParam.useNS = false;
 
 % % debug
-% %expParam.sesTypes = {'pretest'};
+% expParam.sesTypes = {'pretest'};
 % % set up a field for each session type
 % %expParam.session.pretest.phases = {'match'};
-% %expParam.session.pretest.phases = {'recog'};
+% expParam.session.pretest.phases = {'recog'};
+
 % % debug
 % expParam.sesTypes = {'train1'};
 % expParam.session.train1.phases = {'viewname'};
@@ -198,7 +199,11 @@ if expParam.sessionNum == 1
   % minimum number of trials needed between exact repeats of a given
   % stimulus as stim2
   cfg.stim.pretest.match.stim2MinRepeatSpacing = 2;
-  
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.pretest.match.promptWithResp = true;
+  cfg.stim.pretest.match.sameText = 'Same';
+  cfg.stim.pretest.match.diffText = 'Diff';
+
   % durations, in seconds
   cfg.stim.pretest.match.isi = 0.5;
   cfg.stim.pretest.match.stim1 = 0.8;
@@ -309,6 +314,10 @@ if expParam.sessionNum == 1
   % minimum number of trials needed between exact repeats of a given
   % stimulus as stim2
   cfg.stim.train1.match.stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train1.match.promptWithResp = true;
+  cfg.stim.train1.match.sameText = 'Same';
+  cfg.stim.train1.match.diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train1.match.isi = 0.5;
@@ -330,6 +339,10 @@ if expParam.sessionNum == 1
   cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train2.match(matchNum).promptWithResp = true;
+  cfg.stim.train2.match(matchNum).sameText = 'Same';
+  cfg.stim.train2.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train2.match(matchNum).isi = 0.5;
@@ -364,6 +377,10 @@ if expParam.sessionNum == 1
   cfg.stim.train2.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train2.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train2.match(matchNum).promptWithResp = true;
+  cfg.stim.train2.match(matchNum).sameText = 'Same';
+  cfg.stim.train2.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train2.match(matchNum).isi = 0.5;
@@ -385,6 +402,10 @@ if expParam.sessionNum == 1
   cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train3.match(matchNum).promptWithResp = true;
+  cfg.stim.train3.match(matchNum).sameText = 'Same';
+  cfg.stim.train3.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train3.match(matchNum).isi = 0.5;
@@ -419,6 +440,10 @@ if expParam.sessionNum == 1
   cfg.stim.train3.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train3.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train3.match(matchNum).promptWithResp = true;
+  cfg.stim.train3.match(matchNum).sameText = 'Same';
+  cfg.stim.train3.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train3.match(matchNum).isi = 0.5;
@@ -440,6 +465,10 @@ if expParam.sessionNum == 1
   cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train4.match(matchNum).promptWithResp = true;
+  cfg.stim.train4.match(matchNum).sameText = 'Same';
+  cfg.stim.train4.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train4.match(matchNum).isi = 0.5;
@@ -474,6 +503,10 @@ if expParam.sessionNum == 1
   cfg.stim.train4.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train4.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train4.match(matchNum).promptWithResp = true;
+  cfg.stim.train4.match(matchNum).sameText = 'Same';
+  cfg.stim.train4.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train4.match(matchNum).isi = 0.5;
@@ -495,6 +528,10 @@ if expParam.sessionNum == 1
   cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train5.match(matchNum).promptWithResp = true;
+  cfg.stim.train5.match(matchNum).sameText = 'Same';
+  cfg.stim.train5.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train5.match(matchNum).isi = 0.5;
@@ -529,6 +566,10 @@ if expParam.sessionNum == 1
   cfg.stim.train5.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train5.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train5.match(matchNum).promptWithResp = true;
+  cfg.stim.train5.match(matchNum).sameText = 'Same';
+  cfg.stim.train5.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train5.match(matchNum).isi = 0.5;
@@ -550,6 +591,10 @@ if expParam.sessionNum == 1
   cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train6.match(matchNum).promptWithResp = true;
+  cfg.stim.train6.match(matchNum).sameText = 'Same';
+  cfg.stim.train6.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train6.match(matchNum).isi = 0.5;
@@ -584,6 +629,10 @@ if expParam.sessionNum == 1
   cfg.stim.train6.match(matchNum).nSame = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).nDiff = cfg.stim.nTrained / 2;
   cfg.stim.train6.match(matchNum).stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.train6.match(matchNum).promptWithResp = true;
+  cfg.stim.train6.match(matchNum).sameText = 'Same';
+  cfg.stim.train6.match(matchNum).diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.train6.match(matchNum).isi = 0.5;
@@ -605,6 +654,10 @@ if expParam.sessionNum == 1
   cfg.stim.posttest.match.nSame = cfg.stim.nTrained;
   cfg.stim.posttest.match.nDiff = cfg.stim.nTrained;
   cfg.stim.posttest.match.stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.posttest.match.promptWithResp = true;
+  cfg.stim.posttest.match.sameText = 'Same';
+  cfg.stim.posttest.match.diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.posttest.match.isi = 0.5;
@@ -652,6 +705,10 @@ if expParam.sessionNum == 1
   cfg.stim.posttest_delay.match.nSame = cfg.stim.nTrained;
   cfg.stim.posttest_delay.match.nDiff = cfg.stim.nTrained;
   cfg.stim.posttest_delay.match.stim2MinRepeatSpacing = 2;
+  % whether to have "same" and "diff" text with the response prompt
+  cfg.stim.posttest_delay.match.promptWithResp = true;
+  cfg.stim.posttest_delay.match.sameText = 'Same';
+  cfg.stim.posttest_delay.match.diffText = 'Diff';
   
   % durations, in seconds
   cfg.stim.posttest_delay.match.isi = 0.5;
