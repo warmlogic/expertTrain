@@ -50,9 +50,13 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName)
 
 fprintf('Running recognition task for %s %s...\n',sesName,phaseName);
 
-%% preparation
+%% general preparation for recognition study and test
 
 phaseCfg = cfg.stim.(sesName).(phaseName);
+
+% set some text color
+instructColor = WhiteIndex(w);
+fixationColor = WhiteIndex(w);
 
 % read the proper response key image
 testRespImgFile = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
@@ -61,17 +65,58 @@ testRespImgHeight = size(testRespImg,1);
 testRespImgWidth = size(testRespImg,2);
 testRespImg = Screen('MakeTexture',w,testRespImg);
 
-% set some text color
-instructColor = WhiteIndex(w);
-fixationColor = WhiteIndex(w);
+%% start NS recording, if desired
+
+% NEW put a message on the screen as experiment phase begins
+message = 'Starting experiment...';
+if expParam.useNS
+  % start recording
+  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  % synchronize
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  message = 'Starting data acquisition...';
+end
+DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+% draw message to screen
+Screen('Flip', w);
+% Wait before starting trial
+WaitSecs(5.000);
+% Clear screen to background color (our 'gray' as set at the
+% beginning):
+Screen('Flip', w);
+
+%% Run recognition study and test
 
 for b = 1:phaseCfg.nBlocks
   
-  %% Run the recognition study task
+  %% prepare the recognition study task
   
   recogphase = 'recog_study';
   
-  % TODO: instructions
+  % load up the stimuli for this block
+  blockStimTex = nan(1,length(expParam.session.(sesName).(phaseName).targStims{b}));
+  for i = 1:length(expParam.session.(sesName).(phaseName).targStims{b})
+    % this image
+    stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phaseName).targStims{b}(i).familyStr,expParam.session.(sesName).(phaseName).targStims{b}(i).fileName);
+    if exist(stimImgFile,'file')
+      stimImg = imread(stimImgFile);
+      blockStimTex(i) = Screen('MakeTexture',w,stimImg);
+      % TODO: optimized?
+      %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
+    else
+      error('Study stimulus %s does not exist!',stimImgFile);
+    end
+  end
+  
+  % get the width and height of the final stimulus image
+  stimImgHeight = size(stimImg,1);
+  stimImgWidth = size(stimImg,2);
+  % set the stimulus image rectangle
+  stimImgRect = [0 0 stimImgWidth stimImgHeight];
+  stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
+  
+  %% show the study instructions
+  
   instructions = sprintf('Press ''%s'' to begin Recognition study task.','space');
   % put the instructions on the screen
   DrawFormattedText(w, instructions, 'center', 'center', instructColor);
@@ -88,32 +133,52 @@ for b = 1:phaseCfg.nBlocks
   % Wait a second before starting trial
   WaitSecs(1.000);
   
-  % load up the stimuli for this block
-  blockStims = nan(1,length(expParam.session.(sesName).(phaseName).targStims{b}));
-  for i = 1:length(expParam.session.(sesName).(phaseName).targStims{b})
-    % this image
-    stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phaseName).targStims{b}(i).familyStr,expParam.session.(sesName).(phaseName).targStims{b}(i).fileName);
-    if exist(stimImgFile,'file')
-      stimImg = imread(stimImgFile);
-      blockStims(i) = Screen('MakeTexture',w,stimImg);
-      % TODO: optimized?
-      %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
-    else
-      error('Study stimulus %s does not exist!',stimImgFile);
-    end
-  end
-  
-  % get the width and height of the final stimulus image
-  stimImgHeight = size(stimImg,1);
-  stimImgWidth = size(stimImg,2);
-  % set the stimulus image rectangle
-  stimImgRect = [0 0 stimImgWidth stimImgHeight];
-  stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
+  %% run the recognition study task
   
   % set the fixation size
   Screen('TextSize', w, cfg.text.fixsize);
   
-  for i = 1:length(blockStims)
+  % NEW start the blink break timer
+  if expParam.useNS
+    blinkTimerStart = GetSecs;
+  end
+
+  for i = 1:length(blockStimTex)
+    % NEW Do a blink break if recording EEG and specified time has passed
+    if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
+      Screen('TextSize', w, 32);
+      pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
+      % just draw straight into the main window since we don't need speed here
+      DrawFormattedText(w, pauseMsg, 'center', 'center');
+      Screen('Flip', w);
+      
+      % wait for kb release in case subject is holding down keys
+      KbReleaseWait;
+      KbWait(-1); % listen for keypress on either keyboard
+      
+      Screen('TextSize', w, cfg.text.fixsize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+      Screen('Flip',w);
+      WaitSecs(0.5);
+      % reset the timer
+      blinkTimerStart = GetSecs;
+    end
+    
+    % Is this a subordinate (1) or basic (0) family/species? If subordinate,
+    % get the species number.
+    if expParam.session.(sesName).(phaseName).targStims{b}(i).familyNum == cfg.stim.famNumSubord
+      subord = 1;
+      sNum = expParam.session.(sesName).(phaseName).targStims{b}(i).speciesNum;
+    else
+      subord = 0;
+      sNum = 0;
+    end
+    
+    % NEW resynchronize netstation before the start of drawing
+    if expParam.useNS
+      [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+    end
+    
     % draw fixation
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     [preStimFixOn] = Screen('Flip',w);
@@ -125,7 +190,7 @@ for b = 1:phaseCfg.nBlocks
     WaitSecs(phaseCfg.study_preTarg);
     
     % draw the stimulus
-    Screen('DrawTexture', w, blockStims(i), [], stimImgRect);
+    Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
@@ -145,10 +210,10 @@ for b = 1:phaseCfg.nBlocks
     Screen('Flip', w);
     
     % close this stimulus before next trial
-    Screen('Close', blockStims(i));
+    Screen('Close', blockStimTex(i));
     
     % Write study stimulus presentation to file:
-    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i %i %i\n',...
       imgStudyOn,...
       expParam.subject,...
       'RECOGSTUDY_TARG',...
@@ -160,39 +225,58 @@ for b = 1:phaseCfg.nBlocks
       expParam.session.(sesName).(phaseName).targStims{b}(i).familyStr,...
       expParam.session.(sesName).(phaseName).targStims{b}(i).speciesStr,...
       expParam.session.(sesName).(phaseName).targStims{b}(i).exemplarName,...
+      subord,...
+      sNum,...
       expParam.session.(sesName).(phaseName).targStims{b}(i).targ);
+    
+    
+    % NEW Write netstation logs
+    if expParam.useNS
+      % Write trial info to NetStation
+      % mark every event with the following key code/value pairs
+      % 'subn', subject number
+      % 'sess', session type
+      % 'phase', session phase name
+      % 'bloc', block number (training day 1 only)
+      % 'trln', trial number
+      % 'stmn', stimulus name (family, species, exemplar)
+      % 'spcn', species number (corresponds to keyboard)
+      % 'sord', whether this is a subordinate (1) or basic (0) level family
+      % 'targ', whether this is a target (always 1 for study)
+      
+      % write out the stimulus name
+      stimName = sprintf('%s%s%d',...
+        expParam.session.(sesName).(phaseName).targStims{b}(i).familyStr,...
+        expParam.session.(sesName).(phaseName).targStims{b}(i).speciesStr,...
+        expParam.session.(sesName).(phaseName).targStims{b}(i).exemplarName);
+      
+      % pretrial fixation
+      [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+        'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord,...
+        'targ', expParam.session.(sesName).(phaseName).targStims{b}(i).targ);
+      
+      % img presentation
+      [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+        'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord,...
+        'targ', expParam.session.(sesName).(phaseName).targStims{b}(i).targ);
+    end % useNS
     
   end % for stimuli
   
-  %% Run the recognition test task
+  %% Prepare the recognition test task
   
   recogphase = 'recog_test';
   
-  % TODO: instructions
-  instructions = sprintf('Press ''%s'' to begin Recognition test task.','space');
-  % put the instructions on the screen
-  DrawFormattedText(w, instructions, 'center', 'center', instructColor);
-  % Update the display to show the instruction text:
-  Screen('Flip', w);
-  % wait until spacebar is pressed
-  RestrictKeysForKbCheck(KbName('space'));
-  KbWait(-1,2);
-  RestrictKeysForKbCheck([]);
-  % Clear screen to background color (our 'gray' as set at the
-  % beginning):
-  Screen('Flip', w);
-  
-  % Wait a second before starting trial
-  WaitSecs(1.000);
-  
   % load up the stimuli for this block
-  blockStims = nan(1,length(expParam.session.(sesName).(phaseName).allStims{b}));
+  blockStimTex = nan(1,length(expParam.session.(sesName).(phaseName).allStims{b}));
   for i = 1:length(expParam.session.(sesName).(phaseName).allStims{b})
     % this image
     stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,expParam.session.(sesName).(phaseName).allStims{b}(i).fileName);
     if exist(stimImgFile,'file')
       stimImg = imread(stimImgFile);
-      blockStims(i) = Screen('MakeTexture',w,stimImg);
+      blockStimTex(i) = Screen('MakeTexture',w,stimImg);
       % TODO: optimized?
       %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
     else
@@ -211,13 +295,73 @@ for b = 1:phaseCfg.nBlocks
   respKeyImgRect = CenterRect([0 0 testRespImgWidth testRespImgHeight],stimImgRect);
   respKeyImgRect = AdjoinRect(respKeyImgRect,stimImgRect,RectBottom);
   
-  % only check these keys
-  RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
+  %% show the test instructions
+  
+  instructions = sprintf('Press ''%s'' to begin Recognition test task.','space');
+  % put the instructions on the screen
+  DrawFormattedText(w, instructions, 'center', 'center', instructColor);
+  % Update the display to show the instruction text:
+  Screen('Flip', w);
+  % wait until spacebar is pressed
+  RestrictKeysForKbCheck(KbName('space'));
+  KbWait(-1,2);
+  RestrictKeysForKbCheck([]);
+  % Clear screen to background color (our 'gray' as set at the
+  % beginning):
+  Screen('Flip', w);
+  
+  % Wait a second before starting trial
+  WaitSecs(1.000);
+  
+  %% Run the recognition test task
   
   % set the fixation size
   Screen('TextSize', w, cfg.text.fixsize);
   
-  for i = 1:length(blockStims)
+  % only check these keys
+  RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
+  
+  % NEW start the blink break timer
+  if expParam.useNS
+    blinkTimerStart = GetSecs;
+  end
+
+  for i = 1:length(blockStimTex)
+    % NEW Do a blink break if recording EEG and specified time has passed
+    if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
+      Screen('TextSize', w, 32);
+      pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
+      % just draw straight into the main window since we don't need speed here
+      DrawFormattedText(w, pauseMsg, 'center', 'center');
+      Screen('Flip', w);
+      
+      % wait for kb release in case subject is holding down keys
+      KbReleaseWait;
+      KbWait(-1); % listen for keypress on either keyboard
+      
+      Screen('TextSize', w, cfg.text.fixsize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+      Screen('Flip',w);
+      WaitSecs(0.5);
+      % reset the timer
+      blinkTimerStart = GetSecs;
+    end
+    
+    % Is this a subordinate (1) or basic (0) family/species? If subordinate,
+    % get the species number.
+    if expParam.session.(sesName).(phaseName).allStims{b}(i).familyNum == cfg.stim.famNumSubord
+      subord = 1;
+      sNum = expParam.session.(sesName).(phaseName).allStims{b}(i).speciesNum;
+    else
+      subord = 0;
+      sNum = 0;
+    end
+    
+    % NEW resynchronize netstation before the start of drawing
+    if expParam.useNS
+      [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+    end
+    
     % draw fixation
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     [preStimFixOn] = Screen('Flip',w);
@@ -229,7 +373,7 @@ for b = 1:phaseCfg.nBlocks
     WaitSecs(phaseCfg.test_preStim);
     
     % draw the stimulus
-    Screen('DrawTexture', w, blockStims(i), [], stimImgRect);
+    Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'stimOnset':
@@ -244,7 +388,7 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % draw the stimulus
-    Screen('DrawTexture', w, blockStims(i), [], stimImgRect);
+    Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
     % draw the response key image
     Screen('DrawTexture', w, testRespImg, [], respKeyImgRect);
     % put them on the screen; measure RT from when response key img appears
@@ -279,7 +423,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('Flip', w);
     
     % Close this stimulus before next trial
-    Screen('Close', blockStims(i));
+    Screen('Close', blockStimTex(i));
     
     % compute response time
     rt = round(1000 * (endRT - startRT));
@@ -297,10 +441,10 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % get key pressed by subject
-    resp = KbName(keyCode);
+    respKey = KbName(keyCode);
     
     % Write test stimulus presentation to file:
-    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i %i %i\n',...
       imgTestOn,...
       expParam.subject,...
       'RECOGTEST_STIM',...
@@ -312,10 +456,12 @@ for b = 1:phaseCfg.nBlocks
       expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,...
       expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
       expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName,...
+      subord,...
+      sNum,...
       expParam.session.(sesName).(phaseName).allStims{b}(i).targ);
     
     % Write trial result to file:
-    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %i %i %i %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %i %i %i %i %i %s %i %i\n',...
       endRT,...
       expParam.subject,...
       'RECOGTEST_RESP',...
@@ -328,9 +474,62 @@ for b = 1:phaseCfg.nBlocks
       expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
       expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName,...
       expParam.session.(sesName).(phaseName).allStims{b}(i).targ,...
-      resp,...
+      subord,...
+      sNum,...
+      respKey,...
       acc,...
       rt);
+    
+    % NEW Write netstation logs
+    if expParam.useNS
+      % Write trial info to NetStation
+      % mark every event with the following key code/value pairs
+      % 'subn', subject number
+      % 'sess', session type
+      % 'phase', session phase name
+      % 'bloc', block number (training day 1 only)
+      % 'trln', trial number
+      % 'stmn', stimulus name (family, species, exemplar)
+      % 'spcn', species number (corresponds to keyboard)
+      % 'sord', whether this is a subordinate (1) or basic (0) level family
+      % 'targ', whether this is a target (1) or not (0)
+      % 'resk', the name of the key pressed
+      % 'corr', accuracy code (1=correct, 0=incorrect)
+      % 'keyp', key pressed?(1=yes, 0=no)
+      
+      % write out the stimulus name
+      stimName = sprintf('%s%s%d',...
+        expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,...
+        expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
+        expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName);
+      
+      % pretrial fixation
+      [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+        'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', expParam.session.(sesName).(phaseName).allStims{b}(i).targ,...
+        'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      
+      % img presentation
+      [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+        'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', expParam.session.(sesName).(phaseName).allStims{b}(i).targ,...
+        'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      
+      % response prompt
+      [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+        'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', expParam.session.(sesName).(phaseName).allStims{b}(i).targ,...
+        'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      
+      % did they make a response?
+      if keyIsDown
+        % button push
+        [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
+          'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+          'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', expParam.session.(sesName).(phaseName).allStims{b}(i).targ,...
+          'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      end
+    end % useNS
     
   end % for stimuli
   
@@ -338,5 +537,13 @@ for b = 1:phaseCfg.nBlocks
   RestrictKeysForKbCheck([]);
   
 end % for nBlocks
+
+%% cleanup
+
+% NEW stop recording
+if expParam.useNS
+  WaitSecs(5.0);
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
+end
 
 end % function

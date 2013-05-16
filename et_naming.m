@@ -98,13 +98,13 @@ end
 % % y-coordinate for stimulus number
 % sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
 
-%% run the task
-
 if runInBlocks
   nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
 else
   nSpecies = cfg.stim.nSpecies;
 end
+
+%% show the instructions
 
 instructions = sprintf([...
   'Naming task: block %d.\n',...
@@ -129,6 +129,8 @@ RestrictKeysForKbCheck(KbName('space'));
 KbWait(-1,2);
 RestrictKeysForKbCheck([]);
 
+%% start NS recording, if desired
+
 % NEW put a message on the screen as experiment phase begins
 message = 'Starting experiment...';
 if expParam.useNS
@@ -146,6 +148,8 @@ WaitSecs(5.000);
 % Clear screen to background color (our 'gray' as set at the
 % beginning):
 Screen('Flip', w);
+
+%% run the naming task
 
 % set the fixation size
 Screen('TextSize', w, cfg.text.fixsize);
@@ -185,18 +189,14 @@ for i = 1:length(stimTex)
     [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   end
   
-  % set the species number
-  if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
-    sNum = expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesNum;
-  else
-    sNum = 0;
-  end
-  
-  % NEW Is this a subordinate (1) or basic (0) family/species?
-  if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
+  % Is this a subordinate (1) or basic (0) family/species? If subordinate,
+  % get the species number.
+  if expParam.session.(sesName).(phaseName).viewStims{b}(i).familyNum == cfg.stim.famNumSubord
     subord = 1;
+    sNum = expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesNum;
   else
     subord = 0;
+    sNum = 0;
   end
   
   % ISI between trials
@@ -308,9 +308,9 @@ for i = 1:length(stimTex)
   end
   
   % get key pressed by subject
-  resp = KbName(keyCode);
-  if isempty(resp)
-    resp = 'none';
+  respKey = KbName(keyCode);
+  if isempty(respKey)
+    respKey = 'none';
   end
   
   % Write stimulus presentation to file:
@@ -342,7 +342,7 @@ for i = 1:length(stimTex)
     expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName,...
     subord,...
     sNum,...
-    resp,...
+    respKey,...
     acc,...
     rt);
   
@@ -351,10 +351,16 @@ for i = 1:length(stimTex)
     % Write trial info to NetStation
     % mark every event with the following key code/value pairs
     % 'subn', subject number
+    % 'sess', session type
+    % 'phase', session phase name
+    % 'bloc', block number (training day 1 only)
     % 'trln', trial number
-    % 'cond', cond code (1=target, 0=non-target)
-    % 'imgt', type of image (0=scene, 1=face)
-    % 'corr', accuracy code (-2=miss, -1=FA, 0=CR, 1=hit)
+    % 'stmn', stimulus name (family, species, exemplar)
+    % 'famn', family number
+    % 'spcn', species number (corresponds to keyboard)
+    % 'sord', whether this is a subordinate (1) or basic (0) level family
+    % 'resk', the name of the key pressed
+    % 'corr', accuracy code (1=correct, 0=incorrect)
     % 'keyp', key pressed?(1=yes, 0=no)
     
     % write out the stimulus name
@@ -362,36 +368,40 @@ for i = 1:length(stimTex)
       expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
       expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
       expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName);
+    
+    fNum = expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum;
   
     % pretrial fixation
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % img presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % response prompt
     [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % did they make a response?
     if keyIsDown
       % button push
       [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     end
   end % useNS
   
 end
+
+%% cleanup
 
 % NEW stop recording
 if expParam.useNS

@@ -104,7 +104,7 @@ stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 % y-coordinate for stimulus number
 sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
 
-%% run the task
+%% show the instructions
 
 if runInBlocks
   nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
@@ -134,35 +134,75 @@ Screen('Flip', w);
 RestrictKeysForKbCheck(KbName('space'));
 KbWait(-1,2);
 RestrictKeysForKbCheck([]);
+
+%% start NS recording, if desired
+
+% NEW put a message on the screen as experiment phase begins
+message = 'Starting experiment...';
+if expParam.useNS
+  % start recording
+  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  % synchronize
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  message = 'Starting data acquisition...';
+end
+DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+% draw message to screen
+Screen('Flip', w);
+% Wait before starting trial
+WaitSecs(5.000);
 % Clear screen to background color (our 'gray' as set at the
 % beginning):
 Screen('Flip', w);
 
-% Wait a second before starting trial
-WaitSecs(1.000);
+%% run the viewing task
 
 % set the fixation size
 Screen('TextSize', w, cfg.text.fixsize);
-% % draw fixation
-% DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
-% Screen('Flip',w);
 
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
 
+% NEW start the blink break timer
+if expParam.useNS
+  blinkTimerStart = GetSecs;
+end
+
 for i = 1:length(stimTex)
-  if expParam.session.(sesName).(phaseName).viewStims{b}(i).familyNum == cfg.stim.famNumSubord
-    sNum = expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesNum;
-  else
-    sNum = 0;
+  % NEW Do a blink break if recording EEG and specified time has passed
+  if expParam.useNS && i ~= 1 && i ~= length(stimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
+    Screen('TextSize', w, 32);
+    pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
+    % just draw straight into the main window since we don't need speed here
+    DrawFormattedText(w, pauseMsg, 'center', 'center');
+    Screen('Flip', w);
+    
+    % wait for kb release in case subject is holding down keys
+    KbReleaseWait;
+    KbWait(-1); % listen for keypress on either keyboard
+    
+    Screen('TextSize', w, cfg.text.fixsize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    Screen('Flip',w);
+    WaitSecs(0.5);
+    % reset the timer
+    blinkTimerStart = GetSecs;
   end
   
-  % NEW Is this a subordinate (1) or basic (0) family/species?
-  if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
+  % NEW resynchronize netstation before the start of drawing
+  if expParam.useNS
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  end
+  
+  % Is this a subordinate (1) or basic (0) family/species? If subordinate,
+  % get the species number.
+  if expParam.session.(sesName).(phaseName).viewStims{b}(i).familyNum == cfg.stim.famNumSubord
     subord = 1;
+    sNum = expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesNum;
   else
     subord = 0;
+    sNum = 0;
   end
   
   % ISI between trials
@@ -288,9 +328,9 @@ for i = 1:length(stimTex)
   end
   
   % get key pressed by subject
-  resp = KbName(keyCode);
-  if isempty(resp)
-    resp = 'none';
+  respKey = KbName(keyCode);
+  if isempty(respKey)
+    respKey = 'none';
   end
   
   % Write stimulus presentation to file:
@@ -322,9 +362,65 @@ for i = 1:length(stimTex)
     expParam.session.(sesName).(phaseName).viewStims{b}(i).exemplarName,...
     subord,...
     sNum,...
-    resp,...
+    respKey,...
     acc,...
     rt);
+  
+  % NEW Write netstation logs
+  if expParam.useNS
+    % Write trial info to NetStation
+    % mark every event with the following key code/value pairs
+    % 'subn', subject number
+    % 'sess', session type
+    % 'phase', session phase name
+    % 'bloc', block number (training day 1 only)
+    % 'trln', trial number
+    % 'stmn', stimulus name (family, species, exemplar)
+    % 'famn', family number
+    % 'spcn', species number (corresponds to keyboard)
+    % 'sord', whether this is a subordinate (1) or basic (0) level family
+    % 'resk', the name of the key pressed
+    % 'corr', accuracy code (1=correct, 0=incorrect)
+    % 'keyp', key pressed?(1=yes, 0=no)
+    
+    % write out the stimulus name
+    stimName = sprintf('%s%s%d',...
+      expParam.session.(sesName).(phaseName).viewStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phaseName).viewStims{b}(i).exemplarName);
+  
+    fNum = expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum;
+    
+    % pretrial fixation
+    [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+    
+    % img presentation
+    [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+    
+    % did they make a response?
+    if keyIsDown
+      % button push
+      [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+    end
+  end % useNS
+  
+end
+
+%% cleanup
+
+% NEW stop recording
+if expParam.useNS
+  WaitSecs(5.0);
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
 end
 
 % reset the KbCheck
