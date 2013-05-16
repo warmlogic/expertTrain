@@ -19,10 +19,6 @@ function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b)
 %  Once agian, stimuli must already be sorted in presentation order!
 %
 
-% % debug
-% sesName = 'train1';
-% phaseName = 'name';
-
 % % durations, in seconds
 % cfg.stim.(sesName).(phaseName).name_isi = 0.5;
 % % cfg.stim.(sesName).(phaseName).name_preStim = 0.5 to 0.7;
@@ -34,10 +30,6 @@ function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b)
 % cfg.keys.sXX, where XX is an integer, buffered with a zero if i <= 9
 
 % TODO: make instruction files. read in during config?
-
-% TODO: blink breaks
-
-% TODO: NS logging
 
 fprintf('Running naming task for %s %s...\n',sesName,phaseName);
 
@@ -53,16 +45,14 @@ initial_sNumColor = BlackIndex(w);
 correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
 incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
 
-playSound = true;
-if playSound
-  correctSound = 'high';
-  incorrectSound = 'low';
-  % initialize beep player
+% initialize beep player if needed
+if phaseCfg.playSound
   Beeper(1,0);
 end
 
-otherFamStr = 'Other';
-
+% Small hack. Because training day 1 uses blocks, those are stored in
+% cells. However, all other training days do not use blocks, and do not use
+% cells, but we need to put them in a cell to access the stimuli correctly.
 if ~iscell(expParam.session.(sesName).(phaseName).nameStims)
   runInBlocks = false;
   expParam.session.(sesName).(phaseName).nameStims = {expParam.session.(sesName).(phaseName).nameStims};
@@ -108,7 +98,6 @@ end
 % % y-coordinate for stimulus number
 % sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
 
-
 %% run the task
 
 if runInBlocks
@@ -126,10 +115,10 @@ instructions = sprintf([...
   '''%s'' is the key for the ''%s'' family species members.\n',...
   '\nPress ''%s'' to begin naming task.'],...
   b,...
-  cfg.stim.nFamilies,nSpecies,otherFamStr,...
+  cfg.stim.nFamilies,nSpecies,cfg.stim.basicFamStr,...
   KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-  KbName(cfg.keys.s00),otherFamStr,...
+  KbName(cfg.keys.s00),cfg.stim.basicFamStr,...
   'space');
 % put the instructions on the screen
 DrawFormattedText(w, instructions, 'center', 'center', instructColor);
@@ -139,12 +128,24 @@ Screen('Flip', w);
 RestrictKeysForKbCheck(KbName('space'));
 KbWait(-1,2);
 RestrictKeysForKbCheck([]);
+
+% NEW put a message on the screen as experiment phase begins
+message = 'Starting experiment...';
+if expParam.useNS
+  % start recording
+  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  % synchronize
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  message = 'Starting data acquisition...';
+end
+DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+% draw message to screen
+Screen('Flip', w);
+% Wait before starting trial
+WaitSecs(5.000);
 % Clear screen to background color (our 'gray' as set at the
 % beginning):
 Screen('Flip', w);
-
-% Wait a second before starting trial
-WaitSecs(1.000);
 
 % set the fixation size
 Screen('TextSize', w, cfg.text.fixsize);
@@ -153,14 +154,49 @@ Screen('TextSize', w, cfg.text.fixsize);
 RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
 
-fprintf('starting stims\n');
+% NEW start the blink break timer
+if expParam.useNS
+  blinkTimerStart = GetSecs;
+end
+
 for i = 1:length(stimTex)
-  fprintf('stim %d\n',i);
+  % NEW Do a blink break if recording EEG and specified time has passed
+  if expParam.useNS && i ~= 1 && i ~= length(stimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
+    Screen('TextSize', w, 32);
+    pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
+    % just draw straight into the main window since we don't need speed here
+    DrawFormattedText(w, pauseMsg, 'center', 'center');
+    Screen('Flip', w);
+    
+    % wait for kb release in case subject is holding down keys
+    KbReleaseWait;
+    KbWait(-1); % listen for keypress on either keyboard
+    
+    Screen('TextSize', w, cfg.text.fixsize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    Screen('Flip',w);
+    WaitSecs(0.5);
+    % reset the timer
+    blinkTimerStart = GetSecs;
+  end
   
+  % NEW resynchronize netstation before the start of drawing
+  if expParam.useNS
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  end
+  
+  % set the species number
   if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
     sNum = expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesNum;
   else
     sNum = 0;
+  end
+  
+  % NEW Is this a subordinate (1) or basic (0) family/species?
+  if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
+    subord = 1;
+  else
+    subord = 0;
   end
   
   % ISI between trials
@@ -168,7 +204,7 @@ for i = 1:length(stimTex)
   
   % draw fixation
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
-  Screen('Flip',w);
+  [preStimFixOn] = Screen('Flip',w);
   % generate random display times for fixation cross
   name_preStim = 0.5 + ((0.7 - 0.5).*rand(1,1));
   % fixation on screen before stim
@@ -179,21 +215,7 @@ for i = 1:length(stimTex)
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
-  [imgOnScreen, stimOnset] = Screen('Flip', w);
-  
-  % Write presentation to file:
-  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i\n',...
-    imgOnScreen,...
-    expParam.subject,...
-    'VIEW_STIM',...
-    sesName,...
-    phaseName,...
-    b,...
-    i,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName,...
-    sNum);
+  [imgOn, stimOnset] = Screen('Flip', w);
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
@@ -205,7 +227,7 @@ for i = 1:length(stimTex)
   
   % draw response prompt
   DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor);
-  [textOnScreen, startRT] = Screen('Flip',w);
+  [respPromptOn, startRT] = Screen('Flip',w);
   
   % poll for a resp
   while 1
@@ -218,32 +240,32 @@ for i = 1:length(stimTex)
     if keyIsDown && sum(keyCode) == 1
       % wait for key to be released
       while KbCheck(-1)
-        WaitSecs(.0001);
+        WaitSecs(0.0001);
       end
       % % debug
       % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
       if keyIsDown
-        % give feedback
+        % give immediate feedback
         if keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
           sNumColor = correct_sNumColor;
-          if playSound
-            respSound = correctSound;
+          if phaseCfg.playSound
+            respSound = phaseCfg.correctSound;
           end
         elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
           sNumColor = incorrect_sNumColor;
-          if playSound
-            respSound = incorrectSound;
+          if phaseCfg.playSound
+            respSound = phaseCfg.incorrectSound;
           end
         end
         % draw species number in the appropriate color
         if sNum > 0
           DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
         else
-          DrawFormattedText(w,otherFamStr,'center','center',sNumColor);
+          DrawFormattedText(w,cfg.stim.basicFamStr,'center','center',sNumColor);
         end
         Screen('Flip', w);
         
-        if playSound
+        if phaseCfg.playSound
           Beeper(respSound);
         end
   
@@ -251,7 +273,7 @@ for i = 1:length(stimTex)
       end
     end
     % wait so we don't overload the system
-    WaitSecs(.0001);
+    WaitSecs(0.0001);
   end
   
   % wait out any remaining time
@@ -260,29 +282,6 @@ for i = 1:length(stimTex)
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);
   end
-  
-%   % give feedback
-%   if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
-%     sNumColor = correct_sNumColor;
-%     if playSound
-%       respSound = correctSound;
-%     end
-%   elseif (keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0) || ~keyIsDown
-%     sNumColor = incorrect_sNumColor;
-%     if playSound
-%       respSound = incorrectSound;
-%     end
-%   end
-%   % draw species number in the appropriate color
-%   if sNum > 0
-%     DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
-%   else
-%     DrawFormattedText(w,otherFamStr,'center','center',sNumColor);
-%   end
-%   Screen('Flip', w);
-%   if playSound
-%     Beeper(respSound);
-%   end
   
   % wait to let them view the feedback
   WaitSecs(phaseCfg.name_feedback);
@@ -314,8 +313,23 @@ for i = 1:length(stimTex)
     resp = 'none';
   end
   
+  % Write stimulus presentation to file:
+  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...
+    imgOn,...
+    expParam.subject,...
+    'NAME_STIM',...
+    sesName,...
+    phaseName,...
+    b,...
+    i,...
+    expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
+    expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
+    expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName,...
+    subord,...
+    sNum);
+  
   % Write response to file:
-  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %s %i %i\n',...
+  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %s %i %i\n',...
     endRT,...
     expParam.subject,...
     'NAME_RESP',...
@@ -326,9 +340,63 @@ for i = 1:length(stimTex)
     expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
     expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
     expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName,...
+    subord,...
+    sNum,...
     resp,...
     acc,...
     rt);
+  
+  % NEW Write netstation logs
+  if expParam.useNS
+    % Write trial info to NetStation
+    % mark every event with the following key code/value pairs
+    % 'subn', subject number
+    % 'trln', trial number
+    % 'cond', cond code (1=target, 0=non-target)
+    % 'imgt', type of image (0=scene, 1=face)
+    % 'corr', accuracy code (-2=miss, -1=FA, 0=CR, 1=hit)
+    % 'keyp', key pressed?(1=yes, 0=no)
+    
+    % write out the stimulus name
+    stimName = sprintf('%s%s%d',...
+      expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName);
+  
+    % pretrial fixation
+    [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
+      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+    
+    % img presentation
+    [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
+      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+    
+    % response prompt
+    [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
+      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+    
+    % did they make a response?
+    if keyIsDown
+      % button push
+      [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
+      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
+      'trln', i, 'stim', stimName, 'spcn', sNum, 'sord', subord,...
+      'resp', resp, 'corr', acc, 'keyp', keyIsDown);
+    end
+  end % useNS
+  
+end
+
+% NEW stop recording
+if expParam.useNS
+  WaitSecs(5.0);
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
 end
 
 % reset the KbCheck
