@@ -22,8 +22,8 @@ expParam.nSessions = 9;
 
 % debug
 expParam.sesTypes = {'train1'};
-%expParam.session.train1.phases = {'viewname'};
-expParam.session.train1.phases = {'name'};
+expParam.session.train1.phases = {'viewname'};
+%expParam.session.train1.phases = {'name'};
 
 % % Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
 % expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
@@ -264,6 +264,11 @@ if expParam.sessionNum == 1
   cfg.stim.train1.viewname.view_isi = 0.8;
   cfg.stim.train1.viewname.view_preStim = 0.2;
   cfg.stim.train1.viewname.view_stim = 4.0;
+  cfg.stim.train1.viewname.name_isi = 0.5;
+  % cfg.stim.train1.viewname.name_preStim = 0.5 to 0.7;
+  cfg.stim.train1.viewname.name_stim = 1.0;
+  cfg.stim.train1.viewname.name_response = 2.0;
+  cfg.stim.train1.viewname.name_feedback = 1.0;
   
   % Naming
   
