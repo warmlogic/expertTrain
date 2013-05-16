@@ -15,11 +15,13 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 
 expParam.nSessions = 9;
 
+% do we want to record EEG using Net Station?
+expParam.useNS = true;
+
 % debug
 %expParam.sesTypes = {'pretest'};
 % set up a field for each session type
 %expParam.session.pretest.phases = {'recog'};
-
 % debug
 expParam.sesTypes = {'train1'};
 expParam.session.train1.phases = {'viewname'};
@@ -61,6 +63,9 @@ if expParam.sessionNum == 1
     expParam.is15 = false;
   end
   
+  % timer for when to take a blink break (only when useNS=true)
+  cfg.stim.secUntilBlinkBreak = 45.000;
+  
   %% Stimulus parameters
   
   cfg.files.stimFileExt = '.bmp';
@@ -98,6 +103,8 @@ if expParam.sessionNum == 1
     cfg.stim.famNumBasic = 2;
     cfg.stim.famNumSubord = 1;
   end
+  % what to call the basic-level family in viewing and naming tasks
+  cfg.stim.basicFamStr = 'Other';
   
   % Number of trained and untrained per species per family
   cfg.stim.nTrained = 6;
@@ -172,9 +179,9 @@ if expParam.sessionNum == 1
   cfg.text.fixSymbol = '+';
   cfg.text.respSymbol = '?';
   
-  % Define text size (TODO: fix for this experiment)
-  cfg.text.txtsize_instruct = 35;
-  cfg.text.txtsize_break = 28;
+  % % Define text size (TODO: fix for this experiment)
+  % cfg.text.txtsize_instruct = 35;
+  % cfg.text.txtsize_break = 28;
   
   %% Session/phase configuration
   
@@ -270,6 +277,11 @@ if expParam.sessionNum == 1
   cfg.stim.train1.viewname.name_response = 2.0;
   cfg.stim.train1.viewname.name_feedback = 1.0;
   
+  % do we want to play feedback beeps?
+  cfg.stim.train1.viewname.playSound = true;
+  cfg.stim.train1.viewname.correctSound = 'high';
+  cfg.stim.train1.viewname.incorrectSound = 'low';
+  
   % Naming
   
   % maximum number of repeated exemplars from each family in naming
@@ -281,6 +293,11 @@ if expParam.sessionNum == 1
   cfg.stim.train1.name.name_stim = 1.0;
   cfg.stim.train1.name.name_response = 2.0;
   cfg.stim.train1.name.name_feedback = 1.0;
+  
+  % do we want to play feedback beeps?
+  cfg.stim.train1.name.playSound = true;
+  cfg.stim.train1.name.correctSound = 'high';
+  cfg.stim.train1.name.incorrectSound = 'low';
   
   % Matching
   
@@ -335,6 +352,11 @@ if expParam.sessionNum == 1
   cfg.stim.train2.name.name_response = 2.0;
   cfg.stim.train2.name.name_feedback = 1.0;
   
+  % do we want to play feedback beeps?
+  cfg.stim.train2.name.playSound = true;
+  cfg.stim.train2.name.correctSound = 'high';
+  cfg.stim.train2.name.incorrectSound = 'low';
+  
   % Matching 2
   
   matchNum = 2;
@@ -384,6 +406,11 @@ if expParam.sessionNum == 1
   cfg.stim.train3.name.name_stim = 1.0;
   cfg.stim.train3.name.name_response = 2.0;
   cfg.stim.train3.name.name_feedback = 1.0;
+  
+  % do we want to play feedback beeps?
+  cfg.stim.train3.name.playSound = true;
+  cfg.stim.train3.name.correctSound = 'high';
+  cfg.stim.train3.name.incorrectSound = 'low';
   
   % Matching 2
   
@@ -435,6 +462,11 @@ if expParam.sessionNum == 1
   cfg.stim.train4.name.name_response = 2.0;
   cfg.stim.train4.name.name_feedback = 1.0;
   
+  % do we want to play feedback beeps?
+  cfg.stim.train4.name.playSound = true;
+  cfg.stim.train4.name.correctSound = 'high';
+  cfg.stim.train4.name.incorrectSound = 'low';
+  
   % Matching 2
   
   matchNum = 2;
@@ -475,6 +507,9 @@ if expParam.sessionNum == 1
   
   % Naming
   
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train5.name.nameMaxConsecFamily = 3;
+  
   % durations, in seconds
   cfg.stim.train5.name.name_isi = 0.5;
   % cfg.stim.train5.name.name_preStim = 0.5 to 0.7;
@@ -482,8 +517,10 @@ if expParam.sessionNum == 1
   cfg.stim.train5.name.name_response = 2.0;
   cfg.stim.train5.name.name_feedback = 1.0;
   
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.train5.name.nameMaxConsecFamily = 3;
+  % do we want to play feedback beeps?
+  cfg.stim.train5.name.playSound = true;
+  cfg.stim.train5.name.correctSound = 'high';
+  cfg.stim.train5.name.incorrectSound = 'low';
   
   % Matching 2
   
@@ -524,7 +561,10 @@ if expParam.sessionNum == 1
   % cfg.stim.train6.match(matchNum).response = 1.0;
   
   % Naming
-  
+   
+  % maximum number of repeated exemplars from each family in naming
+  cfg.stim.train6.name.nameMaxConsecFamily = 3;
+ 
   % durations, in seconds
   cfg.stim.train6.name.name_isi = 0.5;
   % cfg.stim.train6.name.name_preStim = 0.5 to 0.7;
@@ -532,8 +572,10 @@ if expParam.sessionNum == 1
   cfg.stim.train6.name.name_response = 2.0;
   cfg.stim.train6.name.name_feedback = 1.0;
   
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.train6.name.nameMaxConsecFamily = 3;
+  % do we want to play feedback beeps?
+  cfg.stim.train6.name.playSound = true;
+  cfg.stim.train6.name.correctSound = 'high';
+  cfg.stim.train6.name.incorrectSound = 'low';
   
   % Matching 2
   
