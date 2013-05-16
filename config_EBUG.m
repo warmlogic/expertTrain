@@ -16,30 +16,31 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 expParam.nSessions = 9;
 
 % do we want to record EEG using Net Station?
-expParam.useNS = true;
+expParam.useNS = false;
 
-% debug
-%expParam.sesTypes = {'pretest'};
-% set up a field for each session type
-%expParam.session.pretest.phases = {'recog'};
-% debug
-expParam.sesTypes = {'train1'};
-expParam.session.train1.phases = {'viewname'};
-%expParam.session.train1.phases = {'name'};
-
-% % Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
-% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
-% 
+% % debug
+% %expParam.sesTypes = {'pretest'};
 % % set up a field for each session type
-% expParam.session.pretest.phases = {'match','recog'};
-% expParam.session.train1.phases = {'viewname','name','match'};
-% expParam.session.train2.phases = {'match','name','match'};
-% expParam.session.train3.phases = {'match','name','match'};
-% expParam.session.train4.phases = {'match','name','match'};
-% expParam.session.train5.phases = {'match','name','match'};
-% expParam.session.train6.phases = {'match','name','match'};
-% expParam.session.posttest.phases = {'match','recog'};
-% expParam.session.posttest_delay.phases = {'match','recog'};
+% %expParam.session.pretest.phases = {'match'};
+% %expParam.session.pretest.phases = {'recog'};
+% % debug
+% expParam.sesTypes = {'train1'};
+% expParam.session.train1.phases = {'viewname'};
+% %expParam.session.train1.phases = {'name'};
+
+% Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
+expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
+
+% set up a field for each session type
+expParam.session.pretest.phases = {'match','recog'};
+expParam.session.train1.phases = {'viewname','name','match'};
+expParam.session.train2.phases = {'match','name','match'};
+expParam.session.train3.phases = {'match','name','match'};
+expParam.session.train4.phases = {'match','name','match'};
+expParam.session.train5.phases = {'match','name','match'};
+expParam.session.train6.phases = {'match','name','match'};
+expParam.session.posttest.phases = {'match','recog'};
+expParam.session.posttest_delay.phases = {'match','recog'};
 
 %% If this is session 1, setup the experiment
 
