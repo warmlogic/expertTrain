@@ -119,6 +119,9 @@ if expParam.sessionNum == 1
   
   %% Define the response keys
   
+  % the experimenter's secret key to continue the experiment
+  cfg.keys.expContinue = 'g';
+  
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.otherKeyNames = {'space'};
   for i = 1:length(cfg.keys.otherKeyNames)
