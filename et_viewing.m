@@ -328,6 +328,7 @@ for i = 1:length(stimTex)
     rt);
 end
 
+% reset the KbCheck
 RestrictKeysForKbCheck([]);
 
 end % function
