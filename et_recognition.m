@@ -47,6 +47,8 @@ fprintf('Running recognition task for %s %s...\n',sesName,phase);
 % cfg.stim.(sesName).(phase).test_preStim = 0.2;
 % cfg.stim.(sesName).(phase).test_stim = 1.5;
 
+%% preparation
+
 phaseCfg = cfg.stim.(sesName).(phase);
 
 % read the proper response key image
@@ -62,14 +64,12 @@ fixationColor = WhiteIndex(w);
 
 for b = 1:phaseCfg.nBlocks
   
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Run the recognition study task
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% Run the recognition study task
   
   recogphase = 'recog_study';
   
   % TODO: instructions
-  instructions = sprintf('Press ''%s'' to begin Recognition study task.',KbName(cfg.keys.s00));
+  instructions = sprintf('Press ''%s'' to begin Recognition study task.','space');
   % put the instructions on the screen
   DrawFormattedText(w, instructions, 'center', 'center', instructColor);
   % Update the display to show the instruction text:
@@ -97,7 +97,7 @@ for b = 1:phaseCfg.nBlocks
       stimImg = imread(stimImgFile);
       blockStims(i) = Screen('MakeTexture',w,stimImg);
       % TODO: optimized?
-      %blockStims(i) = Screen('MakeTexture',w,stimimg,[],1);
+      %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
     else
       error('Study stimulus %s does not exist!',stimImgFile);
     end
@@ -118,10 +118,10 @@ for b = 1:phaseCfg.nBlocks
   
   for i = 1:length(blockStims)
     % ISI between trials
-    WaitSecs(cfg.stim.(sesName).(phase).study_isi);
+    WaitSecs(phaseCfg.study_isi);
     
     % fixation on screen before starting trial
-    WaitSecs(cfg.stim.(sesName).(phase).study_preTarg);
+    WaitSecs(phaseCfg.study_preTarg);
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStims(i), [], stimImgRect);
@@ -132,15 +132,18 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
-    while (GetSecs - dispTime) <= cfg.stim.(sesName).(phase).study_targ
+    while (GetSecs - dispTime) <= phaseCfg.study_targ
       % Wait 1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.001);
     end
     
     % Write presentation to file:
-    fprintf(logFile,'%f %s %i %i %s %s %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %i %i %s %s %s %i %i\n',...
       imgOnScreen,...
+      expParam.subject,...
+      sesName,...
+      phase,...
       recogphase,...
       b,...
       i,...
@@ -159,14 +162,12 @@ for b = 1:phaseCfg.nBlocks
     
   end % for stimuli
   
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Run the recognition test task
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% Run the recognition test task
   
   recogphase = 'recog_test';
   
   % TODO: instructions
-  instructions = sprintf('Press ''%s'' to begin Recognition test task.',KbName(cfg.keys.s00));
+  instructions = sprintf('Press ''%s'' to begin Recognition test task.','space');
   % put the instructions on the screen
   DrawFormattedText(w, instructions, 'center', 'center', instructColor);
   % Update the display to show the instruction text:
@@ -194,7 +195,7 @@ for b = 1:phaseCfg.nBlocks
       stimImg = imread(stimImgFile);
       blockStims(i) = Screen('MakeTexture',w,stimImg);
       % TODO: optimized?
-      %blockStims(i) = Screen('MakeTexture',w,stimimg,[],1);
+      %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
     else
       error('Test stimulus %s does not exist!',stimImgFile);
     end
@@ -222,21 +223,24 @@ for b = 1:phaseCfg.nBlocks
   
   for i = 1:length(blockStims)
     % ISI between trials
-    WaitSecs(cfg.stim.(sesName).(phase).test_isi);
+    WaitSecs(phaseCfg.test_isi);
     
     % fixation on screen before starting trial
-    WaitSecs(cfg.stim.(sesName).(phase).test_preStim);
+    WaitSecs(phaseCfg.test_preStim);
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStims(i), [], stimImgRect);
     
     % Show stimulus on screen at next possible display refresh cycle,
-    % and record stimulus onset time in 'startRT':
+    % and record stimulus onset time in 'stimOnset':
     [imgOnScreen, stimOnset] = Screen('Flip', w);
     
     % Write presentation to file:
-    fprintf(logFile,'%f %s %i %i %s %s %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %i %i %s %s %s %i %i\n',...
       imgOnScreen,...
+      expParam.subject,...
+      sesName,...
+      phase,...
       recogphase,...
       b,...
       i,...
@@ -248,7 +252,7 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
-    while (GetSecs - stimOnset) <= cfg.stim.(sesName).(phase).test_stim
+    while (GetSecs - stimOnset) <= phaseCfg.test_stim
       % Wait 1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.001);
@@ -310,8 +314,11 @@ for b = 1:phaseCfg.nBlocks
     resp = KbName(keyCode);
     
     % Write trial result to file:
-    fprintf(logFile,'%f %s %i %i %s %s %i %i %i %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %s %i %i\n',...
       endRT,...
+      expParam.subject,...
+      sesName,...
+      phase,...
       recogphase,...
       b,...
       i,...
