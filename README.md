@@ -9,7 +9,7 @@ expertTrain is an expertise training experiment written in Matlab using Psychtoo
 Installation
 ----
 
-- Download and install Psychtoolbox version 3
+- Download and install Psychtoolbox (PTB) version 3
    - http://psychtoolbox.org/PsychtoolboxDownload
    - Make sure to add it to your Matlab path
 - Download expertTrain from GitHub (clone with git or download the zip)
@@ -34,6 +34,18 @@ Running the experiment
 - In Matlab, cd to the expertTrain directory
 - Run the experiment: expertTrain('EXPNAME',subNum);
    - e.g., expertTrain('EBUG',1);
+- To break out of the experiment, press control-c
+   - If you're running multiple monitors and you have turned on 'dbstop if error', you can type 'db up' and then 'ME' to see the error stack trace.
+   - PTB seems really awful at showing actual error messages, so using multiple monitors is one good way to debug.
+   - To get back to the Matlab command window, type control-c again and then type 'sca' (blindly if you have to) and press return to remove any remaining PTB windows.
+
+
+TODO
+====
+
+- Read external instruction files
+- Practice mode
+- Breaks during long phases (i.e., matching) when EEG is not being recorded
 
 Links
 ====
