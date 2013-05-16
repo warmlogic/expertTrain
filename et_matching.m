@@ -48,10 +48,6 @@ function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName)
 
 % TODO: make instruction files. read in during config?
 
-% TODO: blink breaks
-
-% TODO: NS logging
-
 fprintf('Running matching task for %s %s...\n',sesName,phaseName);
 
 %% preparation
@@ -63,15 +59,14 @@ allStims = expParam.session.(sesName).(phaseName).allStims;
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
 
-promptWithResp = true;
 % if we're using promptWithResp
-if promptWithResp
+if phaseCfg.promptWithResp
   if strcmp(KbName(cfg.keys.matchSame),'f')
-    leftKey = 'Same';
-    rightKey = 'Diff';
+    leftKey = phaseCfg.sameText;
+    rightKey = phaseCfg.diffText;
   elseif strcmp(KbName(cfg.keys.matchSame),'j')
-    leftKey = 'Diff';
-    rightKey = 'Same';
+    leftKey = phaseCfg.diffText;
+    rightKey = phaseCfg.sameText;
   end
 end
 
@@ -90,6 +85,7 @@ stim1Tex = nan(1,length(stim2));
 stim2Tex = nan(1,length(stim2));
 
 message = sprintf('Preparing images, please wait...');
+Screen('TextSize', w, cfg.text.basic);
 % put the instructions on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
@@ -140,12 +136,35 @@ for i = 1:length(stim2)
   end
 end
 
+%% start NS recording, if desired
+
+% put a message on the screen as experiment phase begins
+message = 'Starting experiment...';
+if expParam.useNS
+  % start recording
+  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  % synchronize
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  message = 'Starting data acquisition...';
+end
+Screen('TextSize', w, cfg.text.basic);
+% draw message to screen
+DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+% put it on
+Screen('Flip', w);
+% Wait before starting trial
+WaitSecs(5.000);
+% Clear screen to background color (our 'gray' as set at the
+% beginning):
+Screen('Flip', w);
+
 %% show the instructions
 
 instructions = sprintf(['Press ''%s'' if the creatures are from the same species.\n',...
   'Press ''%s'' if the creatures are from different species.\n',...
   '\nPress ''%s'' to begin matching task.'],...
   KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),'space');
+Screen('TextSize', w, cfg.text.basic);
 % put the instructions on the screen
 DrawFormattedText(w, instructions, 'center', 'center', instructColor);
 % Update the display to show the instruction text:
@@ -155,26 +174,6 @@ RestrictKeysForKbCheck(KbName('space'));
 KbWait(-1,2);
 RestrictKeysForKbCheck([]);
 
-%% start NS recording, if desired
-
-% NEW put a message on the screen as experiment phase begins
-message = 'Starting experiment...';
-if expParam.useNS
-  % start recording
-  [NSStopStatus, NSStopError] = NetStation('StartRecording');
-  % synchronize
-  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
-  message = 'Starting data acquisition...';
-end
-DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
-% draw message to screen
-Screen('Flip', w);
-% Wait before starting trial
-WaitSecs(5.000);
-% Clear screen to background color (our 'gray' as set at the
-% beginning):
-Screen('Flip', w);
-
 %% run the matching task
 
 % set the fixation size
@@ -183,15 +182,15 @@ Screen('TextSize', w, cfg.text.fixsize);
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.matchSame, cfg.keys.matchDiff]);
 
-% NEW start the blink break timer
+% start the blink break timer
 if expParam.useNS
   blinkTimerStart = GetSecs;
 end
 
 for i = 1:length(stim2Tex)
-  % NEW Do a blink break if recording EEG and specified time has passed
+  % Do a blink break if recording EEG and specified time has passed
   if expParam.useNS && i ~= 1 && i ~= length(stim2Tex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-    Screen('TextSize', w, 32);
+    Screen('TextSize', w, cfg.text.basic);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stim2Tex));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -221,7 +220,7 @@ for i = 1:length(stim2Tex)
     sNum2 = 0;
   end
   
-  % NEW resynchronize netstation before the start of drawing
+  % resynchronize netstation before the start of drawing
   if expParam.useNS
     [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   end
@@ -234,6 +233,7 @@ for i = 1:length(stim2Tex)
   WaitSecs(phaseCfg.isi);
   
   % draw fixation
+  Screen('TextSize', w, cfg.text.fixsize);
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   [preStim1FixOn] = Screen('Flip',w);
   
@@ -256,6 +256,7 @@ for i = 1:length(stim2Tex)
   end
   
   % draw fixation
+  Screen('TextSize', w, cfg.text.fixsize);
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   [preStim2FixOn] = Screen('Flip',w);
   
@@ -278,7 +279,8 @@ for i = 1:length(stim2Tex)
   end
   
   % draw response prompt
-  if promptWithResp
+  Screen('TextSize', w, cfg.text.basic);
+  if phaseCfg.promptWithResp
     promptWithRespTxt = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
     DrawFormattedText(w,promptWithRespTxt,'center','center',fixationColor);
   else
@@ -307,8 +309,6 @@ for i = 1:length(stim2Tex)
   end
   
   % Clear screen to background color after response
-  % % and draw fixation
-  % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   Screen('Flip', w);
   
   % Close this stimulus before next trial
@@ -318,28 +318,40 @@ for i = 1:length(stim2Tex)
   % compute response time
   rt = round(1000 * (endRT - startRT));
   
-  % compute accuracy
-  if stim1(i).same && keyCode(cfg.keys.matchSame) == 1
-    % same
-    acc = 1;
-  elseif ~stim1(i).same && keyCode(cfg.keys.matchDiff) == 1
-    % different
-    acc = 1;
+  % determine response and compute accuracy
+  if keyCode(cfg.keys.matchSame) == 1
+    resp = 'same';
+    if stim1(i).same
+      acc = 1;
+    else
+      acc = 0;
+    end
+  elseif keyCode(cfg.keys.matchDiff) == 1
+    resp = 'diff';
+    if ~stim1(i).same
+      acc = 1;
+    else
+      acc = 0;
+    end
   else
-    % incorrect
-    acc = 0;
+    % debug
+    fprintf('Key other than same/diff was pressed. This should not happen\n');
+    resp = 'ERROR';
   end
   
   % get key pressed by subject
-  respKep = KbName(keyCode);
+  respKey = KbName(keyCode);
+  
+  % % debug
+  % fprintf('response: %s (key: %s) (acc = %d)\n',resp,respKey,acc);
   
   % Write stim1 presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i\n',...
     img1On,...
     expParam.subject,...
-    'MATCH_STIM1',...
     sesName,...
     phaseName,...
+    'MATCH_STIM1',...
     i,...
     stim1(i).same,...
     stim1(i).familyStr,...
@@ -350,9 +362,9 @@ for i = 1:length(stim2Tex)
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i\n',...
     img2On,...
     expParam.subject,...
-    'MATCH_STIM2',...
     sesName,...
     phaseName,...
+    'MATCH_STIM2',...
     i,...
     stim2(i).same,...
     stim2(i).familyStr,...
@@ -360,19 +372,20 @@ for i = 1:length(stim2Tex)
     stim2(i).exemplarName);
   
   % Write trial result to file:
-  fprintf(logFile,'%f %s %s %s %s %i %i %s %i %i\n',...
+  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i\n',...
     endRT,...
     expParam.subject,...
-    'MATCH_RESP',...
     sesName,...
     phaseName,...
+    'MATCH_RESP',...
     i,...
     stim1(i).same,...
-    respKep,...
+    resp,...
+    respKey,...
     acc,...
     rt);
   
-  % NEW Write netstation logs
+  % Write netstation logs
   if expParam.useNS
     % Write trial info to NetStation
     % mark every event with the following key code/value pairs
@@ -380,14 +393,22 @@ for i = 1:length(stim2Tex)
     % 'sess', session type
     % 'phase', session phase name
     % 'trln', trial number
-    % 'stm1', stimulus 1 name (family, species, exemplar)
-    % 'stm2', stimulus 2 name (family, species, exemplar)
+    % 'stmn', stimulus name (family, species, exemplar)
     % 'famn', family number
     % 'spcn', species number (corresponds to keyboard)
     % 'sord', whether this is a subordinate (1) or basic (0) level family
+    % 'resp', response string
     % 'resk', the name of the key pressed
     % 'corr', accuracy code (1=correct, 0=incorrect)
     % 'keyp', key pressed?(1=yes, 0=no)
+    
+    % only for response prompt and response events
+    % 'stm1', stimulus 1 name (family, species, exemplar)
+    % 'stm2', stimulus 2 name (family, species, exemplar)
+    % 'fam1', stimulus 1 family
+    % 'fam2', stimulus 2 family
+    % 'spc1', stimulus 1 species
+    % 'spc2', stimulus 2 species
     
     % write out the stimulus name
     stim1Name = sprintf('%s%s%d',...
@@ -406,25 +427,25 @@ for i = 1:length(stim2Tex)
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStim1FixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim1Name, 'famn', fNum1, 'spcn', sNum1, 'sord', subord,...
-      'resk', respKep, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % stim1 presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', img1On, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim1Name, 'famn', fNum1, 'spcn', sNum1, 'sord', subord,...
-      'resk', respKep, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % pre-stim2 fixation
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStim2FixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim2Name, 'famn', fNum2, 'spcn', sNum2, 'sord', subord,...
-      'resk', respKep, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % stim2 presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', img2On, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim2Name, 'famn', fNum2, 'spcn', sNum2, 'sord', subord,...
-      'resk', respKep, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % response prompt
     [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
@@ -432,7 +453,7 @@ for i = 1:length(stim2Tex)
       'trln', i,...
       'stm1', stim1Name, 'fam1', fNum1, 'spc1', sNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', sNum2,...
       'sord', subord,...
-      'resk', respKep, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     
     % did they make a response?
     if keyIsDown
@@ -442,7 +463,7 @@ for i = 1:length(stim2Tex)
       'trln', i,...
       'stm1', stim1Name, 'fam1', fNum1, 'spc1', sNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', sNum2,...
       'sord', subord,...
-      'resk', respKep, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
     end
   end % useNS
   
@@ -450,7 +471,7 @@ end
 
 %% cleanup
 
-% NEW stop recording
+% stop recording
 if expParam.useNS
   WaitSecs(5.0);
   [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
