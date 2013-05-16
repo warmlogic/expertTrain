@@ -167,9 +167,12 @@ try
   % Hide the mouse cursor:
   HideCursor;
   
+  % don't display keyboard output
+  ListenChar(2);
+  
   % Set up the gray color value to be used
-  cfg.screen.gray = 181;
-  %cfg.screen.gray = GrayIndex(screenNumber);
+  cfg.screen.gray = GrayIndex(screenNumber);
+  %cfg.screen.gray = 181;
   
   % Open a double buffered fullscreen window on the stimulation screen
   % 'screenNumber' and choose/draw a gray background. 'w' is the handle
@@ -270,58 +273,33 @@ try
   % save the experiment data
   save(cfg.files.expParamFile,'cfg','expParam');
   
-  %   %% Practice Block (see corresponding m.file)
-  %   blockPractice(practicefilename, w, spaceBar, sameresp, diffresp, ...
-  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, practise_img,  ...
-  %     timeout_img, txtsize_test, Res);
-  %   %% Test Block 1 (see corresponding m.file)
-  %   blockTest(testfilenameSetA1, w, spaceBar, sameresp, diffresp, ...
-  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
-  %     subNum, cbNum, test_img1, timeout_img, txtsize_test, ...
-  %     corr_rt, Res, txtsize_takebreak);
-  %   %% Test Block 2 (see corresponding m.file)
-  %   blockTest(testfilenameSetA2, w, spaceBar, sameresp, diffresp, ...
-  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
-  %     subNum, cbNum, test_img2, timeout_img, txtsize_test, ...
-  %     corr_rt, Res, txtsize_takebreak);
-  %   %% Test Block 3 (see corresponding m.file)
-  %   blockTest(testfilenameSetA3, w, spaceBar, sameresp, diffresp, ...
-  %     fixdur, catdur, duration, nxt_trial_dur, blankdur, dataFile, sdate, ...
-  %     subNum, cbNum, test_img3, timeout_img, txtsize_test, ...
-  %     corr_rt, Res, txtsize_takebreak);
+  % close out the log file
+  fclose(logFile);
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%  Finish Message  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  Screen('PutImage', w, final_img, [1, 1, cfg.screen.xy(1), cfg.screen.xy(2)]);
+  message = sprintf('Thank you, this session is complete.\n\nPlease wait for the experimenter.');
+  Screen('TextSize', w, cfg.text.basic);
+  % put the instructions on the screen
+  DrawFormattedText(w, message, 'center', 'center', instructColor);
+  % Update the display to show the message:
   Screen('Flip', w);
   
-  touch = 0; % Detect spacebar press to continue
-  while ~touch
-    [touch,tpress,keycode] = KbCheck;
-    % if it's the spacebar
-    if keycode(cfg.keys.s00)
-      break
-    else
-      touch = 0;
-    end
-  end
-  while KbCheck; end
-  
-  FlushEvents('keyDown');
-  touch = 0;
-  Screen('Close');
+  % wait til g key is held for ~1 seconds
+  KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+  Screen('Flip', w);
+  WaitSecs(1.000);
   
   % Cleanup at end of experiment - Close window, show mouse cursor, close
   % result file, switch Matlab/Octave back to priority 0 -- normal
   % priority:
   Screen('CloseAll');
-  ShowCursor;
   fclose('all');
+  ShowCursor;
+  ListenChar;
   Priority(0);
-  
-  fprintf('\n');
   
   % End of experiment:
   return
@@ -332,13 +310,15 @@ catch ME
   
   save(cfg.files.expParamFile,'cfg','expParam');
   
+  % close out the log file
+  fclose(logFile);
+  
   % Do same cleanup as at the end of a regular session...
   Screen('CloseAll');
-  ShowCursor;
   fclose('all');
+  ShowCursor;
+  ListenChar;
   Priority(0);
-  
-  fprintf('\n');
   
   % Output the error message that describes the error:
   psychrethrow(psychlasterror);
