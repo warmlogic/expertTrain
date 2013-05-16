@@ -118,13 +118,13 @@ else
 end
 
 instructions = sprintf([...
-  'This is block %d\n',...
+  'Naming task: block %d.\n',...
   'You will see creatures from %d families.\n In this block, there are %d different species in each family.\n',...
-  'You will learn to identify the species of one family, and you will chunk the other family together as ''%s''.\n',...
-  '\nYour job: Learn the family and species members by pressing the species key that\ncorresponds to the species number you see below each creature.\n',...
+  'You will identify the different species of one family, and you will chunk the other family together as ''%s''.\n',...
+  '\nYour job: Press the correct species key for the creatures that you learned previously.\n',...
   'key=species: %s=1, %s=2, %s=3, %s=4, %s=5, %s=6, %s=7, %s=8, %s=9, %s=10\n',...
   '''%s'' is the key for the ''%s'' family species members.\n',...
-  'Press ''%s'' to begin naming task.'],...
+  '\nPress ''%s'' to begin naming task.'],...
   b,...
   cfg.stim.nFamilies,nSpecies,otherFamStr,...
   KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
@@ -169,10 +169,8 @@ for i = 1:length(stimTex)
   % draw fixation
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   Screen('Flip',w);
-  
   % generate random display times for fixation cross
   name_preStim = 0.5 + ((0.7 - 0.5).*rand(1,1));
-  
   % fixation on screen before stim
   WaitSecs(name_preStim);
   
@@ -206,7 +204,7 @@ for i = 1:length(stimTex)
   end
   
   % draw response prompt
-  DrawFormattedText(w,cfg.text.respSymbol,'center','center',fixationColor);
+  DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor);
   [textOnScreen, startRT] = Screen('Flip',w);
   
   % poll for a resp
@@ -225,6 +223,30 @@ for i = 1:length(stimTex)
       % % debug
       % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
       if keyIsDown
+        % give feedback
+        if keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
+          sNumColor = correct_sNumColor;
+          if playSound
+            respSound = correctSound;
+          end
+        elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
+          sNumColor = incorrect_sNumColor;
+          if playSound
+            respSound = incorrectSound;
+          end
+        end
+        % draw species number in the appropriate color
+        if sNum > 0
+          DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
+        else
+          DrawFormattedText(w,otherFamStr,'center','center',sNumColor);
+        end
+        Screen('Flip', w);
+        
+        if playSound
+          Beeper(respSound);
+        end
+  
         break
       end
     end
@@ -239,30 +261,30 @@ for i = 1:length(stimTex)
     WaitSecs(0.0001);
   end
   
-  % give feedback
-  if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
-    sNumColor = correct_sNumColor;
-    if playSound
-      respSound = correctSound;
-    end
-  elseif (keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0) || ~keyIsDown
-    sNumColor = incorrect_sNumColor;
-    if playSound
-      respSound = incorrectSound;
-    end
-  end
-  % draw species number in the appropriate color
-  if sNum > 0
-    DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
-  else
-    DrawFormattedText(w,otherFamStr,'center','center',sNumColor);
-  end
-  Screen('Flip', w);
+%   % give feedback
+%   if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
+%     sNumColor = correct_sNumColor;
+%     if playSound
+%       respSound = correctSound;
+%     end
+%   elseif (keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0) || ~keyIsDown
+%     sNumColor = incorrect_sNumColor;
+%     if playSound
+%       respSound = incorrectSound;
+%     end
+%   end
+%   % draw species number in the appropriate color
+%   if sNum > 0
+%     DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
+%   else
+%     DrawFormattedText(w,otherFamStr,'center','center',sNumColor);
+%   end
+%   Screen('Flip', w);
+%   if playSound
+%     Beeper(respSound);
+%   end
   
-  if playSound
-    Beeper(respSound);
-  end
-  
+  % wait to let them view the feedback
   WaitSecs(phaseCfg.name_feedback);
   
   % Clear screen to background color after response
