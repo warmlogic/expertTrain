@@ -16,10 +16,14 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 expParam.nSessions = 9;
 
 % debug
-expParam.sesTypes = {'pretest'};
+%expParam.sesTypes = {'pretest'};
 % set up a field for each session type
 %expParam.session.pretest.phases = {'recog'};
-expParam.session.pretest.phases = {'match'};
+
+% debug
+expParam.sesTypes = {'train1'};
+%expParam.session.train1.phases = {'viewname'};
+expParam.session.train1.phases = {'name'};
 
 % % Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
 % expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
