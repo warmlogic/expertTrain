@@ -1,12 +1,12 @@
-function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
-% function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
+function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName)
+% function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName)
 %
 % Description:
 %  This function runs the recognition study and test tasks.
 %
-%  Study targets are stored in expParam.session.(sesName).(phase).targStims
+%  Study targets are stored in expParam.session.(sesName).(phaseName).targStims
 %  and intermixed test targets and lures are stored in
-%  expParam.session.(sesName).(phase).allStims as structs. Both study
+%  expParam.session.(sesName).(phaseName).allStims as structs. Both study
 %  targets and target+lure test stimuli must already be sorted in
 %  presentation order.
 %
@@ -26,12 +26,7 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phase)
 %  screen.
 %
 
-fprintf('Running recognition task for %s %s...\n',sesName,phase);
-
-% TODO:
-%  make instruction files. read in during config?
-
-% % using these
+% % keys
 % cfg.keys.recogKeyNames
 % cfg.keys.recogDefUn
 % cfg.keys.recogMayUn
@@ -40,16 +35,24 @@ fprintf('Running recognition task for %s %s...\n',sesName,phase);
 % cfg.keys.recogRecoll
 
 % % durations, in seconds
-% cfg.stim.(sesName).(phase).study_isi = 0.8;
-% cfg.stim.(sesName).(phase).study_preTarg = 0.2;
-% cfg.stim.(sesName).(phase).study_targ = 2.0;
-% cfg.stim.(sesName).(phase).test_isi = 0.8;
-% cfg.stim.(sesName).(phase).test_preStim = 0.2;
-% cfg.stim.(sesName).(phase).test_stim = 1.5;
+% cfg.stim.(sesName).(phaseName).study_isi = 0.8;
+% cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
+% cfg.stim.(sesName).(phaseName).study_targ = 2.0;
+% cfg.stim.(sesName).(phaseName).test_isi = 0.8;
+% cfg.stim.(sesName).(phaseName).test_preStim = 0.2;
+% cfg.stim.(sesName).(phaseName).test_stim = 1.5;
+
+% TODO: make instruction files. read in during config?
+
+% TODO: blink breaks
+
+% TODO: NS logging
+
+fprintf('Running recognition task for %s %s...\n',sesName,phaseName);
 
 %% preparation
 
-phaseCfg = cfg.stim.(sesName).(phase);
+phaseCfg = cfg.stim.(sesName).(phaseName);
 
 % read the proper response key image
 testRespImgFile = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
@@ -89,10 +92,10 @@ for b = 1:phaseCfg.nBlocks
   fprintf('study block %d\n',b);
   
   % load up the stimuli for this block
-  blockStims = nan(1,length(expParam.session.(sesName).(phase).targStims{b}));
-  for i = 1:length(expParam.session.(sesName).(phase).targStims{b})
+  blockStims = nan(1,length(expParam.session.(sesName).(phaseName).targStims{b}));
+  for i = 1:length(expParam.session.(sesName).(phaseName).targStims{b})
     % this image
-    stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phase).targStims{b}(i).familyStr,expParam.session.(sesName).(phase).targStims{b}(i).fileName);
+    stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phaseName).targStims{b}(i).familyStr,expParam.session.(sesName).(phaseName).targStims{b}(i).fileName);
     if exist(stimImgFile,'file')
       stimImg = imread(stimImgFile);
       blockStims(i) = Screen('MakeTexture',w,stimImg);
@@ -133,25 +136,25 @@ for b = 1:phaseCfg.nBlocks
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
     while (GetSecs - dispTime) <= phaseCfg.study_targ
-      % Wait 1 ms before checking the keyboard again to prevent
+      % Wait <1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
-      WaitSecs(0.001);
+      WaitSecs(0.0001);
     end
     
     % Write presentation to file:
-    fprintf(logFile,'%f %s %s %s %s %i %i %s %s %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
       imgOnScreen,...
       expParam.subject,...
+      'RECOGSTUDY_TARG',...
       sesName,...
-      phase,...
+      phaseName,...
       recogphase,...
       b,...
       i,...
-      'RECOGSTUDY_TARG',...
-      expParam.session.(sesName).(phase).targStims{b}(i).familyStr,...
-      expParam.session.(sesName).(phase).targStims{b}(i).speciesStr,...
-      expParam.session.(sesName).(phase).targStims{b}(i).exemplarName,...
-      expParam.session.(sesName).(phase).targStims{b}(i).targ);
+      expParam.session.(sesName).(phaseName).targStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phaseName).targStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phaseName).targStims{b}(i).exemplarName,...
+      expParam.session.(sesName).(phaseName).targStims{b}(i).targ);
     
     % Clear screen to background color after fixed 'duration' and draw fixation
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
@@ -187,10 +190,10 @@ for b = 1:phaseCfg.nBlocks
   fprintf('test block %d\n',b);
   
   % load up the stimuli for this block
-  blockStims = nan(1,length(expParam.session.(sesName).(phase).allStims{b}));
-  for i = 1:length(expParam.session.(sesName).(phase).allStims{b})
+  blockStims = nan(1,length(expParam.session.(sesName).(phaseName).allStims{b}));
+  for i = 1:length(expParam.session.(sesName).(phaseName).allStims{b})
     % this image
-    stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phase).allStims{b}(i).familyStr,expParam.session.(sesName).(phase).allStims{b}(i).fileName);
+    stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,expParam.session.(sesName).(phaseName).allStims{b}(i).fileName);
     if exist(stimImgFile,'file')
       stimImg = imread(stimImgFile);
       blockStims(i) = Screen('MakeTexture',w,stimImg);
@@ -236,26 +239,26 @@ for b = 1:phaseCfg.nBlocks
     [imgOnScreen, stimOnset] = Screen('Flip', w);
     
     % Write presentation to file:
-    fprintf(logFile,'%f %s %s %s %s %i %i %s %s %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
       imgOnScreen,...
       expParam.subject,...
+      'RECOGTEST_STIM',...
       sesName,...
-      phase,...
+      phaseName,...
       recogphase,...
       b,...
       i,...
-      'RECOGTEST_STIM',...
-      expParam.session.(sesName).(phase).allStims{b}(i).familyStr,...
-      expParam.session.(sesName).(phase).allStims{b}(i).speciesStr,...
-      expParam.session.(sesName).(phase).allStims{b}(i).exemplarName,...
-      expParam.session.(sesName).(phase).allStims{b}(i).targ);
+      expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).targ);
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
     while (GetSecs - stimOnset) <= phaseCfg.test_stim
-      % Wait 1 ms before checking the keyboard again to prevent
+      % Wait <1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
-      WaitSecs(0.001);
+      WaitSecs(0.0001);
     end
     
     % draw the stimulus
@@ -299,10 +302,10 @@ for b = 1:phaseCfg.nBlocks
     rt = round(1000 * (endRT - startRT));
     
     % compute accuracy
-    if expParam.session.(sesName).(phase).allStims{b}(i).targ && (keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1)
+    if expParam.session.(sesName).(phaseName).allStims{b}(i).targ && (keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1)
       % target (hit)
       acc = 1;
-    elseif ~expParam.session.(sesName).(phase).allStims{b}(i).targ && (keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1)
+    elseif ~expParam.session.(sesName).(phaseName).allStims{b}(i).targ && (keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1)
       % lure (correct rejection)
       acc = 1;
     else
@@ -314,19 +317,19 @@ for b = 1:phaseCfg.nBlocks
     resp = KbName(keyCode);
     
     % Write trial result to file:
-    fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %s %i %i\n',...
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %i %i %i %s %i %i\n',...
       endRT,...
       expParam.subject,...
+      'RECOGTEST_RESP',...
       sesName,...
-      phase,...
+      phaseName,...
       recogphase,...
       b,...
       i,...
-      'RECOGTEST_RESP',...
-      expParam.session.(sesName).(phase).allStims{b}(i).familyStr,...
-      expParam.session.(sesName).(phase).allStims{b}(i).speciesStr,...
-      expParam.session.(sesName).(phase).allStims{b}(i).exemplarName,...
-      expParam.session.(sesName).(phase).allStims{b}(i).targ,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).targ,...
       resp,...
       acc,...
       rt);

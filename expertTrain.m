@@ -214,7 +214,9 @@ try
   % for each phase in this session, run the correct function
   for p = 1:length(expParam.session.(sesName).phases)
     
-    switch expParam.session.(sesName).phases{p}
+    phaseName = expParam.session.(sesName).phases{p};
+    
+    switch phaseName
       
       case {'practice'}
         % Practice session
@@ -227,34 +229,34 @@ try
         % (Active) Naming task
         
         % for each view/name block
-        for b = 1:length(cfg.stim.train1.viewname.blockSpeciesOrder)
+        for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           % run the viewing task
-          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,b);
           
           % then run the naming task
-          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b);
         end
         
         % old
-        %[cfg,logFile] = et_viewingNaming(cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        %[cfg,logFile] = et_viewingNaming(cfg,expParam,logFile,sesName,phaseName);
         
       case {'name'}
         % (Active) Naming task
         
-        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName);
         
       case{'match'}
         % Subordinate Matching task (same/different)
         
-        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName);
         
       case {'recog'}
         % Recognition (old/new) task
         
-        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,expParam.session.(sesName).phases{p});
+        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName);
 
       otherwise
-        warning('%s is not a configured phase in this session (%s)!\n',expParam.session.(sesName).phases{p},sesName);
+        warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);
     end
   end
   
