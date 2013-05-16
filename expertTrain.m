@@ -262,6 +262,8 @@ try
   
   %% Session is done
   
+  fprintf('Done with session %d.\n',expParam.sessionNum);
+  
   % increment the session number for next time
   expParam.sessionNum = expParam.sessionNum + 1;
   
