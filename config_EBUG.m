@@ -18,7 +18,8 @@ expParam.nSessions = 9;
 % debug
 expParam.sesTypes = {'pretest'};
 % set up a field for each session type
-expParam.session.pretest.phases = {'recog'};
+%expParam.session.pretest.phases = {'recog'};
+expParam.session.pretest.phases = {'match'};
 
 % % Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
 % expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
@@ -158,16 +159,20 @@ if expParam.sessionNum == 1
     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
   end
   
-  %% Session/phase configuration
+  %% Text configuration
   
   % TODO: add text size informaiton for instructions and on-screen text
   
   cfg.text.basic = 32;
   cfg.text.fixsize = 32;
+  cfg.text.fixSymbol = '+';
+  cfg.text.respSymbol = '?';
   
   % Define text size (TODO: fix for this experiment)
   cfg.text.txtsize_instruct = 35;
   cfg.text.txtsize_break = 28;
+  
+  %% Session/phase configuration
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % pretest configuration
