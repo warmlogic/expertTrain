@@ -22,11 +22,6 @@ function [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,b)
 %  Once agian, stimuli must already be sorted in presentation order!
 %
 
-% % debug
-% sesName = 'train1';
-% phaseName = 'view';
-% %phaseName = 'viewname';
-
 % % durations, in seconds
 % cfg.stim.(sesName).(phaseName).view_isi = 0.8;
 % cfg.stim.(sesName).(phaseName).view_preStim = 0.2;
@@ -56,16 +51,14 @@ initial_sNumColor = BlackIndex(w);
 correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
 incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
 
-playSound = true;
-if playSound
-  correctSound = 'high';
-  incorrectSound = 'low';
-  % initialize beep player
+% initialize beep player if needed
+if phaseCfg.playSound
   Beeper(1,0);
 end
 
-otherFamStr = 'Other';
-
+% Small hack. Because training day 1 uses blocks, those are stored in
+% cells. However, all other training days do not use blocks, and do not use
+% cells, but we need to put them in a cell to access the stimuli correctly.
 if ~iscell(expParam.session.(sesName).(phaseName).viewStims)
   runInBlocks = false;
   expParam.session.(sesName).(phaseName).viewStims = {expParam.session.(sesName).(phaseName).viewStims};
@@ -128,10 +121,10 @@ instructions = sprintf([...
   '''%s'' is the key for the ''%s'' family species members.\n',...
   '\nPress ''%s'' to begin viewing task.'],...
   b,...
-  cfg.stim.nFamilies,nSpecies,otherFamStr,...
+  cfg.stim.nFamilies,nSpecies,cfg.stim.basicFamStr,...
   KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-  KbName(cfg.keys.s00),otherFamStr,...
+  KbName(cfg.keys.s00),cfg.stim.basicFamStr,...
   'space');
 % put the instructions on the screen
 DrawFormattedText(w, instructions, 'center', 'center', instructColor);
@@ -165,12 +158,19 @@ for i = 1:length(stimTex)
     sNum = 0;
   end
   
+  % NEW Is this a subordinate (1) or basic (0) family/species?
+  if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
+    subord = 1;
+  else
+    subord = 0;
+  end
+  
   % ISI between trials
   WaitSecs(phaseCfg.view_isi);
   
   % draw fixation
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
-  Screen('Flip',w);
+  [preStimFixOn] = Screen('Flip',w);
   
   % fixation on screen before stim
   WaitSecs(phaseCfg.view_preStim);
@@ -181,31 +181,16 @@ for i = 1:length(stimTex)
   if sNum > 0
     DrawFormattedText(w,num2str(sNum),'center',sNumY,initial_sNumColor);
   else
-    DrawFormattedText(w,otherFamStr,'center',sNumY,initial_sNumColor);
+    DrawFormattedText(w,cfg.stim.basicFamStr,'center',sNumY,initial_sNumColor);
   end
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
-  [imgOnScreen, stimOnset] = Screen('Flip', w);
+  [imgOn, stimOnset] = Screen('Flip', w);
   
-  % Write presentation to file:
-  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i\n',...
-    imgOnScreen,...
-    expParam.subject,...
-    'VIEW_STIM',...
-    sesName,...
-    phaseName,...
-    b,...
-    i,...
-    expParam.session.(sesName).(phaseName).viewStims{b}(i).familyStr,...
-    expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesStr,...
-    expParam.session.(sesName).(phaseName).viewStims{b}(i).exemplarName,...
-    sNum);
-  
-  % while loop to show stimulus until subjects response or until
-  % "duration" seconds elapsed.
-  
-  %while (GetSecs - stimOnset) <= phaseCfg.view_stim
+  % while loop to show stimulus until subject response or until
+  % "duration" seconds elapse.
+  %
   % if we get a keyhit, change the color of the species number
   while 1
     if (GetSecs - stimOnset) > phaseCfg.view_stim
@@ -222,13 +207,13 @@ for i = 1:length(stimTex)
       % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - stimOnset);
       if keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
         sNumColor = correct_sNumColor;
-        if playSound
-          respSound = correctSound;
+        if phaseCfg.playSound
+          respSound = phaseCfg.correctSound;
         end
       elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
         sNumColor = incorrect_sNumColor;
-        if playSound
-          respSound = incorrectSound;
+        if phaseCfg.playSound
+          respSound = phaseCfg.incorrectSound;
         end
       end
       % draw the stimulus
@@ -237,25 +222,22 @@ for i = 1:length(stimTex)
       if sNum > 0
         DrawFormattedText(w,num2str(sNum),'center',sNumY,sNumColor);
       else
-        DrawFormattedText(w,otherFamStr,'center',sNumY,sNumColor);
+        DrawFormattedText(w,cfg.stim.basicFamStr,'center',sNumY,sNumColor);
       end
       Screen('Flip', w);
       
-      if playSound
+      if phaseCfg.playSound
         Beeper(respSound);
       end
       
       break
     end
-    % wait so we don't overload the system
-    WaitSecs(.0001);
+    % Wait <1 ms before checking the keyboard again to prevent
+    % overload of the machine at elevated Priority():
+    WaitSecs(0.0001);
   end
   
-  % Wait <1 ms before checking the keyboard again to prevent
-  % overload of the machine at elevated Priority():
-  %WaitSecs(0.0001);
-  %end
-  
+  % wait out any remaining time
   while (GetSecs - stimOnset) <= phaseCfg.view_stim
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
@@ -263,18 +245,18 @@ for i = 1:length(stimTex)
   end
   
   % if they didn't make a response, give incorrect feedback
-  if keyIsDown == 0
+  if ~keyIsDown
     % draw the stimulus
     Screen('DrawTexture', w, stimTex(i));
     % and species number in the appropriate color
     if sNum > 0
       DrawFormattedText(w,num2str(sNum),'center',sNumY,incorrect_sNumColor);
     else
-      DrawFormattedText(w,otherFamStr,'center',sNumY,incorrect_sNumColor);
+      DrawFormattedText(w,cfg.stim.basicFamStr,'center',sNumY,incorrect_sNumColor);
     end
     Screen('Flip', w);
-    if playSound
-      Beeper(incorrectSound);
+    if phaseCfg.playSound
+      Beeper(phaseCfg.incorrectSound);
     end
     
     % need a new endRT
@@ -311,8 +293,23 @@ for i = 1:length(stimTex)
     resp = 'none';
   end
   
+  % Write stimulus presentation to file:
+  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...
+    imgOn,...
+    expParam.subject,...
+    'VIEW_STIM',...
+    sesName,...
+    phaseName,...
+    b,...
+    i,...
+    expParam.session.(sesName).(phaseName).viewStims{b}(i).familyStr,...
+    expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesStr,...
+    expParam.session.(sesName).(phaseName).viewStims{b}(i).exemplarName,...
+    subord,...
+    sNum);
+  
   % Write response to file:
-  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %s %i %i\n',...
+  fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %s %i %i\n',...
     endRT,...
     expParam.subject,...
     'VIEW_RESP',...
@@ -323,6 +320,8 @@ for i = 1:length(stimTex)
     expParam.session.(sesName).(phaseName).viewStims{b}(i).familyStr,...
     expParam.session.(sesName).(phaseName).viewStims{b}(i).speciesStr,...
     expParam.session.(sesName).(phaseName).viewStims{b}(i).exemplarName,...
+    subord,...
+    sNum,...
     resp,...
     acc,...
     rt);

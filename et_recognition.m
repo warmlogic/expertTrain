@@ -87,9 +87,6 @@ for b = 1:phaseCfg.nBlocks
   
   % Wait a second before starting trial
   WaitSecs(1.000);
-
-  % debug
-  fprintf('study block %d\n',b);
   
   % load up the stimuli for this block
   blockStims = nan(1,length(expParam.session.(sesName).(phaseName).targStims{b}));
@@ -115,11 +112,12 @@ for b = 1:phaseCfg.nBlocks
   
   % set the fixation size
   Screen('TextSize', w, cfg.text.fixsize);
-  % draw fixation
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
-  Screen('Flip',w);
   
   for i = 1:length(blockStims)
+    % draw fixation
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    [preStimFixOn] = Screen('Flip',w);
+    
     % ISI between trials
     WaitSecs(phaseCfg.study_isi);
     
@@ -131,19 +129,27 @@ for b = 1:phaseCfg.nBlocks
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
-    [imgOnScreen, dispTime] = Screen('Flip', w);
+    [imgStudyOn, stimOnset] = Screen('Flip', w);
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
-    while (GetSecs - dispTime) <= phaseCfg.study_targ
+    while (GetSecs - stimOnset) <= phaseCfg.study_targ
       % Wait <1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.0001);
     end
     
-    % Write presentation to file:
+    % Clear screen to background color after fixed 'duration'
+    % % and draw fixation
+    % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    Screen('Flip', w);
+    
+    % close this stimulus before next trial
+    Screen('Close', blockStims(i));
+    
+    % Write study stimulus presentation to file:
     fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
-      imgOnScreen,...
+      imgStudyOn,...
       expParam.subject,...
       'RECOGSTUDY_TARG',...
       sesName,...
@@ -155,13 +161,6 @@ for b = 1:phaseCfg.nBlocks
       expParam.session.(sesName).(phaseName).targStims{b}(i).speciesStr,...
       expParam.session.(sesName).(phaseName).targStims{b}(i).exemplarName,...
       expParam.session.(sesName).(phaseName).targStims{b}(i).targ);
-    
-    % Clear screen to background color after fixed 'duration' and draw fixation
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
-    Screen('Flip', w);
-    
-    % Flush out screens before next trial
-    Screen('Close', blockStims(i));
     
   end % for stimuli
   
@@ -186,9 +185,6 @@ for b = 1:phaseCfg.nBlocks
   % Wait a second before starting trial
   WaitSecs(1.000);
   
-  % debug
-  fprintf('test block %d\n',b);
-  
   % load up the stimuli for this block
   blockStims = nan(1,length(expParam.session.(sesName).(phaseName).allStims{b}));
   for i = 1:length(expParam.session.(sesName).(phaseName).allStims{b})
@@ -211,7 +207,7 @@ for b = 1:phaseCfg.nBlocks
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
   
-  % set the response key rectangle
+  % set the response key image rectangle
   respKeyImgRect = CenterRect([0 0 testRespImgWidth testRespImgHeight],stimImgRect);
   respKeyImgRect = AdjoinRect(respKeyImgRect,stimImgRect,RectBottom);
   
@@ -220,11 +216,12 @@ for b = 1:phaseCfg.nBlocks
   
   % set the fixation size
   Screen('TextSize', w, cfg.text.fixsize);
-  % draw fixation
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
-  Screen('Flip',w);
   
   for i = 1:length(blockStims)
+    % draw fixation
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    [preStimFixOn] = Screen('Flip',w);
+    
     % ISI between trials
     WaitSecs(phaseCfg.test_isi);
     
@@ -236,22 +233,7 @@ for b = 1:phaseCfg.nBlocks
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'stimOnset':
-    [imgOnScreen, stimOnset] = Screen('Flip', w);
-    
-    % Write presentation to file:
-    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
-      imgOnScreen,...
-      expParam.subject,...
-      'RECOGTEST_STIM',...
-      sesName,...
-      phaseName,...
-      recogphase,...
-      b,...
-      i,...
-      expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,...
-      expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
-      expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName,...
-      expParam.session.(sesName).(phaseName).allStims{b}(i).targ);
+    [imgTestOn, stimOnset] = Screen('Flip', w);
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
@@ -266,7 +248,7 @@ for b = 1:phaseCfg.nBlocks
     % draw the response key image
     Screen('DrawTexture', w, testRespImg, [], respKeyImgRect);
     % put them on the screen; measure RT from when response key img appears
-    [respOnScreen, startRT] = Screen('Flip', w);
+    [respKeyImgOn, startRT] = Screen('Flip', w);
     
     % poll for a resp
     while 1
@@ -275,7 +257,7 @@ for b = 1:phaseCfg.nBlocks
       if keyIsDown && sum(keyCode) == 1
         % wait for key to be released
         while KbCheck(-1)
-          WaitSecs(.0001);
+          WaitSecs(0.0001);
         end
         % % debug
         % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
@@ -288,11 +270,12 @@ for b = 1:phaseCfg.nBlocks
         end
       end
       % wait so we don't overload the system
-      WaitSecs(.0001);
+      WaitSecs(0.0001);
     end
     
-    % Clear screen to background color after response and draw fixation
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    % Clear screen to background color after response
+    % % and draw fixation
+    % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     Screen('Flip', w);
     
     % Close this stimulus before next trial
@@ -315,6 +298,21 @@ for b = 1:phaseCfg.nBlocks
     
     % get key pressed by subject
     resp = KbName(keyCode);
+    
+    % Write test stimulus presentation to file:
+    fprintf(logFile,'%f %s %s %s %s %s %i %i %s %s %i %i\n',...
+      imgTestOn,...
+      expParam.subject,...
+      'RECOGTEST_STIM',...
+      sesName,...
+      phaseName,...
+      recogphase,...
+      b,...
+      i,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).familyStr,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).speciesStr,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).exemplarName,...
+      expParam.session.(sesName).(phaseName).allStims{b}(i).targ);
     
     % Write trial result to file:
     fprintf(logFile,'%f %s %s %s %s %s %i %i %s %i %i %i %s %i %i\n',...
