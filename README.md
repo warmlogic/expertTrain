@@ -29,18 +29,20 @@ Installation
    - I recommend that you *do not* add it to your Matlab path
 - Acquire a stimulus image set (e.g., creatures/shinebugs or birds)
    - Stimulus images should be named using this pattern:
-      - ab1.bmp (family a, species b, exemplar 1)
+      - ab1.bmp (family a, species b, exemplar 1); sc2.bmp (family s, species c, exemplar 2)
    - All species exemplar images should be stored flat in a single family directory, within expertTrain/images/STIM_SET_NAME/FAMILY_NAME/
-      - e.g., expertTrain/images/Creatures/a/ (for family "a" images )
-   - Creatures are located on curran-lab: /Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip
+      - e.g., expertTrain/images/Creatures/a/ (for family "a" images)
+   - There is a creature set located on curran-lab: /Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip
       - NB: need to rename the family 1 directory to "a" and the family 2 directory to "s"
 
 Preparing the experiment
 ----
 
-- Set up a config file for your experiment, as well as any supporting functions or files
-   - See expertTrain/config_EBUG.m for an example (apologies for being such a long/extensive config file, but it is well organized)
-   - NB: This config file should also run et_saveStimList() and process_EXPNAME_stimuli()
+- Set up a config function file for your experiment (config_EXPNAME.m), as well as any supporting functions or files.
+   - Supporting files: the config function runs the functions et_saveStimList() and process_EXPNAME_stimuli()
+   - See expertTrain/config_EBUG.m for an example.
+      - Note how it runs et_saveStimList() and process_EBUGstimuli()
+      - Apologies for being such a long/extensive config file, but it is well organized.
 
 Running the experiment
 ----
@@ -63,6 +65,7 @@ TODO
 
 - Read external instruction files
 - Practice mode
+- Set stimulis presentation size
 - Impedance breaks (with "g" key breakout)
    - During session phases (see Grit's powerpoint)?
 - Breaks during long phases when EEG is not being recorded (specifically, the matching and full naming tasks)
