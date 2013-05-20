@@ -68,12 +68,13 @@ TODO
 - Set stimulis presentation size
 - Impedance breaks (with "g" key breakout)
    - During session phases (see Grit's powerpoint)?
-- Breaks during long phases when EEG is not being recorded (specifically, the matching and full naming tasks)
+- Breaks during long phases for blinks and for when EEG is not recorded (specifically, the matching and full naming tasks)
    - Matching: rest after every 10 trials (~48 seconds, based on powerpoint)
    - Naming: rest after every 10 trials (~51 seconds, based on powerpoint)
    - Recognition: alredy presented in blocks, but they're not short. Study (2 min) should have two breaks (every ~40 seconds) and test (~3 min) should have three breaks (every ~40 seconds).
    - Viewing: already presented in blocks, and only on training day 1, so probably don't need breaks
 - Finalize recognition task response key images
+- Eyelink eye-tracker support: http://psychtoolbox.org/EyelinkToolbox
 
 Links
 ====
