@@ -74,7 +74,8 @@ TODO
    - Recognition: alredy presented in blocks, but they're not short. Study (2 min) should have two breaks (every ~40 seconds) and test (~3 min) should have three breaks (every ~40 seconds).
    - Viewing: already presented in blocks, and only on training day 1, so probably don't need breaks
 - Finalize recognition task response key images
-- Eyelink eye-tracker support: http://psychtoolbox.org/EyelinkToolbox
+- Finalize Net Station support (including host setup and 'Connect' command): http://docs.psychtoolbox.org/NetStation
+- Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
 
 Links
 ====
