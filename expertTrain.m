@@ -198,6 +198,77 @@ try
   priorityLevel = MaxPriority(w);
   Priority(priorityLevel);
   
+  %% Verify that Net Station will run
+  
+  if expParam.useNS
+    Screen('TextSize', w, cfg.text.basic);
+    % put wait for experimenter instructions on screen
+    message = 'Experimenter:\nApply EEG cap and start the Net Station application...\n';
+    DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+    Screen('Flip', w);
+    
+    KbCheckHold(1000, {cfg.keys.expContinue}, -1);  % wait til g key is held for ~1 seconds
+    
+    % connect
+    [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost);
+    % synchronize
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+    % start recording
+    [NSStartStatus, NSStartError] = NetStation('StartRecording');
+    
+    if NSConnectStatus || NSSyncStatus || NSStartStatus
+      error('!!! ERROR: Problem with Netstation connect/sync/start. Check error messages for more information !!!');
+    else
+      fprintf('\nConnected to Netstation @ %s\n', expParam.NSHost);
+      % stop recording
+      [NSStopStatus, NSStopError] = NetStation('StopRecording');
+    end
+  end
+  
+  %% EEG baseline recording
+  
+  if expParam.useNS && expParam.baselineRecordSecs > 0
+    Screen('TextSize', w, cfg.text.basic);
+    %display instructions
+    baselineMsg = sprintf('The experimenter will now record baseline activity\nPlease remain still...');
+    DrawFormattedText(w, baselineMsg, 'center', 'center');
+    Screen('Flip', w);
+    
+    % listen for keypress
+    KbCheckHold(1000, {cfg.keys.expContinue}, -1);  % wait till g key is held for ~1 seconds
+    
+    % start recording
+    Screen('TextSize', w, cfg.text.basic);
+    [NSStartStatus, NSStartError] = NetStation('StartRecording');
+    DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
+    Screen('Flip', w);
+    WaitSecs(5);
+    
+    [NSEventStatus NSEventError] = NetStation('Event', 'REST', GetSecs, .001); % tag the start of the rest period
+    
+    % draw a countdown -- no need for super accurate timing here
+    Screen('TextSize', w, cfg.text.basic);
+    for sec = baselineRecordSecs:-1:1
+      DrawFormattedText(w, num2str(sec), 'center', 'center');
+      Screen('Flip', w);
+      fprintf('%s ', num2str(sec));
+      WaitSecs(1.0);
+    end
+    % stop recording
+    [NSStopStatus, NSStopError] = NetStation('StopRecording');
+  end
+  
+  %% Start Net Station recording for the experiment
+  
+  if expParam.useNS
+    Screen('TextSize', w, cfg.text.basic);
+    % start recording
+    [NSStartStatus, NSStartError] = NetStation('StartRecording');
+    DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
+    Screen('Flip', w);
+    WaitSecs(5);
+  end
+  
   %% Run through the experiment
   
   % find out what session this will be
@@ -270,6 +341,14 @@ try
   % close out the log file
   fclose(logFile);
   
+  % end of EEG recording, hang up with netstation
+  if expParam.useNS
+    % stop recording
+    [NSStopStatus, NSStopError] = NetStation('StopRecording');
+    fprintf('\nDisconnecting from Netstation @ %s\n', NSHost);
+    [NSDisconnectStatus NSDisconnectError] = NetStation('Disconnect');
+  end
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%  Finish Message  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -306,6 +385,14 @@ catch ME
   
   % close out the log file
   fclose(logFile);
+  
+  % end of EEG recording, hang up with netstation
+  if expParam.useNS
+    % stop recording
+    [NSStopStatus, NSStopError] = NetStation('StopRecording');
+    fprintf('\nDisconnecting from Netstation @ %s\n', NSHost);
+    [NSDisconnectStatus NSDisconnectError] = NetStation('Disconnect');
+  end
   
   % Do same cleanup as at the end of a regular session...
   Screen('CloseAll');

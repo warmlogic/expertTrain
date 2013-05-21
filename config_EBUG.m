@@ -17,6 +17,11 @@ expParam.nSessions = 9;
 
 % do we want to record EEG using Net Station?
 expParam.useNS = false;
+% what host is netstation running on?
+if expParam.useNS
+  expParam.NSHost = '128.138.223.251';
+  expParam.baselineRecordSecs = 10;
+end
 
 % % debug
 % expParam.sesTypes = {'pretest'};
@@ -92,9 +97,9 @@ if expParam.sessionNum == 1
   if ~exist(cfg.stim.file,'file')
     [cfg] = et_saveStimList(cfg,shuffleSpecies);
   else
-    % % debug = warning instead of error
-    % warning('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
-    error('Stimulus list should not exist at the beginning of Session %d: %s',cfg.stim.file,expParam.sessionNum);
+    % debug = warning instead of error
+    warning('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.file);
+    % error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.file);
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
