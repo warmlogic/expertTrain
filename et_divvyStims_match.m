@@ -54,7 +54,7 @@ if ~exist('shuffleFirst','var') || isempty(shuffleFirst)
 end
 
 if nSame == length(sameStims)
-  fprintf('Setting rmStims_orig to false because nSame == length(sameStims).\n');
+  warning('Setting rmStims_orig to false because nSame == length(sameStims). Otherwise you will run out of stimuli to divvy out.\n');
   rmStims_orig = false;
 end
 

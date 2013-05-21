@@ -41,6 +41,10 @@ if ~exist('newValue','var') || isempty(newValue)
   newValue = {};
 end
 
+if isempty(origStims)
+  error('There are no stimuli in origStims to divvy out!');
+end
+
 if ~isempty(newField)
   if length(newField) ~= length(newValue)
     error('newField and newValue are not the same length');
