@@ -80,7 +80,7 @@ stim1_diff = theseSameStims;
 
 % same condition
 
-% find stim1s for "same" cond (same species, stims from diff cond)
+% find stim1s for "same" cond (same species, stims from "diff" cond)
 pairCount = 1;
 for s = 1:length(theseSpecies)
   % get the stim2 for this species
