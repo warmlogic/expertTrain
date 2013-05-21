@@ -274,10 +274,12 @@ try
   % find out what session this will be
   sesName = expParam.sesTypes{expParam.sessionNum};
   
-  % make sure this session type has been configured
-  if ~isfield(expParam.session,sesName)
-    error('%s is not a configured session type',sesName);
-  end
+  % counting the phases, in case any sessions have the same phase type
+  % multiple times
+  viewnameCount = 0;
+  nameCount = 0;
+  matchCount = 0;
+  recogCount = 0;
   
   % for each phase in this session, run the correct function
   for p = 1:length(expParam.session.(sesName).phases)
@@ -290,11 +292,12 @@ try
         % Practice session
         
         % TODO: not sure what they'll do for practice
-        fprintf('Not sure what to do for practice\n');
+        warning('Not sure what to do for practice\n');
         
       case {'viewname'}
-        % (Passive) Viewing task, with category response; intermixed with
-        % (Active) Naming task
+        % Viewing task, with category response; intermixed with
+        % Naming task
+        viewnameCount = viewnameCount + 1;
         
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
@@ -305,21 +308,21 @@ try
           [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b);
         end
         
-        % old
-        %[cfg,logFile] = et_viewingNaming(cfg,expParam,logFile,sesName,phaseName);
-        
       case {'name'}
-        % (Active) Naming task
+        % Naming task
+        nameCount = nameCount + 1;
         
         [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName);
         
       case{'match'}
         % Subordinate Matching task (same/different)
+        matchCount = matchCount + 1;
         
         [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName);
         
       case {'recog'}
         % Recognition (old/new) task
+        recogCount = recogCount + 1;
         
         [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName);
 
