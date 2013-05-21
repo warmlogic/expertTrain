@@ -210,7 +210,7 @@ try
     KbCheckHold(1000, {cfg.keys.expContinue}, -1);  % wait til g key is held for ~1 seconds
     
     % connect
-    [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost);
+    [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost, expParam.NSPort);
     % synchronize
     [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
     % start recording

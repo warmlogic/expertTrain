@@ -19,8 +19,15 @@ expParam.nSessions = 9;
 expParam.useNS = false;
 % what host is netstation running on?
 if expParam.useNS
+  expParam.NSPort = 55513;
+  
+  % % D458
   expParam.NSHost = '128.138.223.251';
-  expParam.baselineRecordSecs = 10;
+  
+  % % D464
+  % expParam.NSHost = '128.138.223.26'
+  
+  expParam.baselineRecordSecs = 10.0;
 end
 
 % % debug

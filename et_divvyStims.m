@@ -42,7 +42,7 @@ if ~exist('newValue','var') || isempty(newValue)
 end
 
 if isempty(origStims)
-  error('There are no stimuli in origStims to divvy out!');
+  error('There are no stimuli in origStims to divvy out! You might have run out of stimuli because rmStims=true and they all got divvied out for other phases.');
 end
 
 if ~isempty(newField)
