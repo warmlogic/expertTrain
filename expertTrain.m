@@ -244,7 +244,7 @@ try
     Screen('Flip', w);
     WaitSecs(5);
     
-    [NSEventStatus NSEventError] = NetStation('Event', 'REST', GetSecs, .001); % tag the start of the rest period
+    [NSEventStatus, NSEventError] = NetStation('Event', 'REST', GetSecs, .001); % tag the start of the rest period
     
     % draw a countdown -- no need for super accurate timing here
     Screen('TextSize', w, cfg.text.basic);
@@ -346,7 +346,7 @@ try
     % stop recording
     [NSStopStatus, NSStopError] = NetStation('StopRecording');
     fprintf('\nDisconnecting from Netstation @ %s\n', NSHost);
-    [NSDisconnectStatus NSDisconnectError] = NetStation('Disconnect');
+    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect');
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -356,7 +356,7 @@ try
   message = sprintf('Thank you, this session is complete.\n\nPlease wait for the experimenter.');
   Screen('TextSize', w, cfg.text.basic);
   % put the instructions on the screen
-  DrawFormattedText(w, message, 'center', 'center', instructColor);
+  DrawFormattedText(w, message, 'center', 'center');
   % Update the display to show the message:
   Screen('Flip', w);
   
@@ -391,7 +391,7 @@ catch ME
     % stop recording
     [NSStopStatus, NSStopError] = NetStation('StopRecording');
     fprintf('\nDisconnecting from Netstation @ %s\n', NSHost);
-    [NSDisconnectStatus NSDisconnectError] = NetStation('Disconnect');
+    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect');
   end
   
   % Do same cleanup as at the end of a regular session...
