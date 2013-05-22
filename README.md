@@ -79,6 +79,8 @@ TODO
 - Finalize recognition task response key images
 - Finalize Net Station support: http://docs.psychtoolbox.org/NetStation
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
+- Image manipulation conditions
+- Family, species, exemplar (and manipulation?) tokenization using tokenize() (e.g., a_a_1_hi, a_a_1_lo)
 
 Links
 ====
