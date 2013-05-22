@@ -1,5 +1,5 @@
-function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b)
-% function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b)
+function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
+% function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
 %
 % Description:
 %  This function runs the naming task.
@@ -31,24 +31,9 @@ function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b)
 
 % TODO: make instruction files. read in during config?
 
-fprintf('Running naming task for %s %s...\n',sesName,phaseName);
+fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 %% preparation
-
-phaseCfg = cfg.stim.(sesName).(phaseName);
-
-% set some text color
-instructColor = WhiteIndex(w);
-fixationColor = WhiteIndex(w);
-
-initial_sNumColor = BlackIndex(w);
-correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
-incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
-
-% initialize beep player if needed
-if phaseCfg.playSound
-  Beeper(1,0);
-end
 
 % Small hack. Because training day 1 uses blocks, those stims are stored in
 % cells. However, all other training days do not use blocks, and do not use
@@ -65,6 +50,22 @@ else
   runInBlocks = true;
 end
 
+phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+nameStims = expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b};
+
+% set some text color
+instructColor = WhiteIndex(w);
+fixationColor = WhiteIndex(w);
+
+initial_sNumColor = BlackIndex(w);
+correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
+incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
+
+% initialize beep player if needed
+if phaseCfg.playSound
+  Beeper(1,0);
+end
+
 %% preload all stimuli for presentation
 
 message = sprintf('Preparing images, please wait...');
@@ -75,11 +76,11 @@ DrawFormattedText(w, message, 'center', 'center', instructColor);
 Screen('Flip', w);
 
 % initialize
-stimTex = nan(1,length(expParam.session.(sesName).(phaseName).nameStims{b}));
+stimTex = nan(1,length(nameStims));
 
-for i = 1:length(expParam.session.(sesName).(phaseName).nameStims{b})
+for i = 1:length(nameStims)
   % load up this stim's texture
-  stimImgFile = fullfile(cfg.files.stimDir,expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,expParam.session.(sesName).(phaseName).nameStims{b}(i).fileName);
+  stimImgFile = fullfile(cfg.files.stimDir,nameStims(i).familyStr,nameStims(i).fileName);
   if exist(stimImgFile,'file')
     stimImg = imread(stimImgFile);
     stimTex(i) = Screen('MakeTexture',w,stimImg);
@@ -108,13 +109,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting experiment...';
+message = 'Starting naming phase...';
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = NetStation('StartRecording');
   % synchronize
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
-  message = 'Starting data acquisition...';
+  message = 'Starting data acquisition for naming phase...';
 end
 Screen('TextSize', w, cfg.text.basic);
 % draw message to screen
@@ -138,10 +139,10 @@ instructions = sprintf([...
   '''%s'' is the key for the ''%s'' family species members.\n',...
   '\nPress ''%s'' to begin naming task.'],...
   b,...
-  cfg.stim.nFamilies,nSpecies,cfg.stim.basicFamStr,...
+  cfg.stim.nFamilies,nSpecies,cfg.text.basicFamStr,...
   KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-  KbName(cfg.keys.s00),cfg.stim.basicFamStr,...
+  KbName(cfg.keys.s00),cfg.text.basicFamStr,...
   'space');
 Screen('TextSize', w, cfg.text.basic);
 % put the instructions on the screen
@@ -195,9 +196,9 @@ for i = 1:length(stimTex)
   
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum == cfg.stim.famNumSubord
+  if nameStims(i).familyNum == cfg.stim.famNumSubord
     subord = 1;
-    sNum = expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesNum;
+    sNum = nameStims(i).speciesNum;
   else
     subord = 0;
     sNum = 0;
@@ -268,7 +269,7 @@ for i = 1:length(stimTex)
         if sNum > 0
           DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
         else
-          DrawFormattedText(w,cfg.stim.basicFamStr,'center','center',sNumColor);
+          DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor);
         end
         Screen('Flip', w);
         
@@ -340,7 +341,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('species num: %d. response: %s (key: %s) (acc = %d)\n',sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),sNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...
@@ -351,9 +352,9 @@ for i = 1:length(stimTex)
     'NAME_STIM',...
     b,...
     i,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName,...
+    nameStims(i).familyStr,...
+    nameStims(i).speciesStr,...
+    nameStims(i).exemplarName,...
     subord,...
     sNum);
   
@@ -366,9 +367,9 @@ for i = 1:length(stimTex)
     'NAME_RESP',...
     b,...
     i,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
-    expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName,...
+    nameStims(i).familyStr,...
+    nameStims(i).speciesStr,...
+    nameStims(i).exemplarName,...
     subord,...
     sNum,...
     resp,...
@@ -396,11 +397,11 @@ for i = 1:length(stimTex)
     
     % write out the stimulus name
     stimName = sprintf('%s%s%d',...
-      expParam.session.(sesName).(phaseName).nameStims{b}(i).familyStr,...
-      expParam.session.(sesName).(phaseName).nameStims{b}(i).speciesStr,...
-      expParam.session.(sesName).(phaseName).nameStims{b}(i).exemplarName);
+      nameStims(i).familyStr,...
+      nameStims(i).speciesStr,...
+      nameStims(i).exemplarName);
     
-    fNum = expParam.session.(sesName).(phaseName).nameStims{b}(i).familyNum;
+    fNum = nameStims(i).familyNum;
   
     % pretrial fixation
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...

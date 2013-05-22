@@ -14,7 +14,7 @@ function expertTrain(expName,subNum)
 % Controlled by a cfg struct
 %
 %
-% see also: et_saveStimList, config_EBUG, process_EBUG_stimuli,
+% see also: et_saveStimList, config_EBUG, et_processStims_EBUG,
 % et_matching, et_viewing, et_naming, et_recognition
 %
 
@@ -302,29 +302,29 @@ try
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           % run the viewing task
-          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,b);
+          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
           
           % then run the naming task
-          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,b);
+          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
         end
         
       case {'name'}
         % Naming task
         nameCount = nameCount + 1;
         
-        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName);
+        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
         
       case{'match'}
         % Subordinate Matching task (same/different)
         matchCount = matchCount + 1;
         
-        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName);
+        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
         
       case {'recog'}
         % Recognition (old/new) task
         recogCount = recogCount + 1;
         
-        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName);
+        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
 
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);

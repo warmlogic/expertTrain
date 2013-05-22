@@ -1,5 +1,5 @@
-function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName)
-% function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName)
+function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+% function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 %
 % Description:
 %  This function runs the matching task. There are no blocks, only short
@@ -48,32 +48,32 @@ function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName)
 
 % TODO: make instruction files. read in during config?
 
-fprintf('Running matching task for %s %s...\n',sesName,phaseName);
+fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 %% preparation
 
-phaseCfg = cfg.stim.(sesName).(phaseName);
-allStims = expParam.session.(sesName).(phaseName).allStims;
+phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
 
 % set some text color
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
 
-% if we're using promptWithResp
-if phaseCfg.promptWithResp
+% if we're using matchTextPrompt
+if phaseCfg.matchTextPrompt
   if strcmp(KbName(cfg.keys.matchSame),'f')
-    leftKey = phaseCfg.sameText;
-    rightKey = phaseCfg.diffText;
+    leftKey = cfg.text.matchSame;
+    rightKey = cfg.text.matchDiff;
   elseif strcmp(KbName(cfg.keys.matchSame),'j')
-    leftKey = phaseCfg.diffText;
-    rightKey = phaseCfg.sameText;
+    leftKey = cfg.text.matchDiff;
+    rightKey = cfg.text.matchSame;
   end
 end
 
 %% preload all stimuli for presentation
 
 % get the stimulus 2s
-stim2 = expParam.session.(sesName).(phaseName).allStims([expParam.session.(sesName).(phaseName).allStims.matchStimNum] == 2);
+stim2 = allStims([allStims.matchStimNum] == 2);
 % initialize for storing stimulus 1s
 stim1 = struct([]);
 fn = fieldnames(stim2);
@@ -96,7 +96,7 @@ for i = 1:length(stim2)
   % or diff stimulus
   if stim2(i).same
     % same (same species)
-    stim1(i) = expParam.session.(sesName).(phaseName).allStims(...
+    stim1(i) = allStims(...
       ([allStims.familyNum] == stim2(i).familyNum) &...
       ([allStims.speciesNum] == stim2(i).speciesNum) &...
       ([allStims.trained] == stim2(i).trained) &...
@@ -105,7 +105,7 @@ for i = 1:length(stim2)
     
   else
     % diff (different species)
-    stim1(i) = expParam.session.(sesName).(phaseName).allStims(...
+    stim1(i) = allStims(...
       ([allStims.familyNum] == stim2(i).familyNum) &...
       ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
       ([allStims.trained] == stim2(i).trained) &...
@@ -139,13 +139,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting experiment...';
+message = 'Starting matching phase...';
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = NetStation('StartRecording');
   % synchronize
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
-  message = 'Starting data acquisition...';
+  message = 'Starting data acquisition for matching phase...';
 end
 Screen('TextSize', w, cfg.text.basic);
 % draw message to screen
@@ -280,7 +280,7 @@ for i = 1:length(stim2Tex)
   
   % draw response prompt
   Screen('TextSize', w, cfg.text.basic);
-  if phaseCfg.promptWithResp
+  if phaseCfg.matchTextPrompt
     promptWithRespTxt = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
     DrawFormattedText(w,promptWithRespTxt,'center','center',fixationColor);
   else
@@ -343,7 +343,7 @@ for i = 1:length(stim2Tex)
   respKey = KbName(keyCode);
   
   % debug
-  fprintf('same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',stim1(i).same,resp,respKey,acc);
+  fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc);
   
   % Write stim1 presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i\n',...
