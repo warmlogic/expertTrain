@@ -16,8 +16,6 @@ fprintf('Loading stimulus list: %s...',cfg.stim.file);
 fid = fopen(cfg.stim.file);
 stim_fieldnames = regexp(fgetl(fid),'\t','split');
 stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t');
-% % old method
-% stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t','Headerlines',1);
 fclose(fid);
 fprintf('Done.\n');
 
@@ -25,8 +23,16 @@ fprintf('Done.\n');
 
 % familyNum is field 3
 familyNumFieldNum = 3;
+% speciesNum is field 5
+speciesNumFieldNum = 5;
 
-f1Ind = stimuli{familyNumFieldNum} == 1;
+% find the indices for each family and select only cfg.stim.nSpecies
+fprintf('Selecting %d of %d possible species for each family.\n',cfg.stim.nSpecies,length(unique(stimuli{speciesNumFieldNum})));
+
+fNum = 1;
+sNumInit = 1;
+f1Ind = eval([sprintf('stimuli{%d} == %d & (stimuli{%d} == %d',familyNumFieldNum,fNum,speciesNumFieldNum,sNumInit),...
+  sprintf(repmat([' | ',sprintf('stimuli{%d}',speciesNumFieldNum),' == %d'],1,(cfg.stim.nSpecies - 1)),2:cfg.stim.nSpecies), ')']);
 f1Stim = struct(...
   stim_fieldnames{1},stimuli{1}(f1Ind),...
   stim_fieldnames{2},stimuli{2}(f1Ind),...
@@ -37,7 +43,10 @@ f1Stim = struct(...
   stim_fieldnames{7},num2cell(stimuli{7}(f1Ind)),...
   stim_fieldnames{8},num2cell(stimuli{8}(f1Ind)));
 
-f2Ind = stimuli{familyNumFieldNum} == 2;
+fNum = 2;
+sNumInit = 1;
+f2Ind = eval([sprintf('stimuli{%d} == %d & (stimuli{%d} == %d',familyNumFieldNum,fNum,speciesNumFieldNum,sNumInit),...
+  sprintf(repmat([' | ',sprintf('stimuli{%d}',speciesNumFieldNum),' == %d'],1,(cfg.stim.nSpecies - 1)),2:cfg.stim.nSpecies), ')']);
 f2Stim = struct(...
   stim_fieldnames{1},stimuli{1}(f2Ind),...
   stim_fieldnames{2},stimuli{2}(f2Ind),...
@@ -95,6 +104,8 @@ for s = 1:expParam.nSessions
     switch phaseName
       
       case {'practice'}
+        % TODO: not sure what they'll do for practice
+        warning('Not sure what to do for practice\n');
         
       case {'viewname'}
         viewnameCount = viewnameCount + 1;
