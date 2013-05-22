@@ -133,6 +133,8 @@ if expParam.sessionNum == 1
   % cfg.stim.nSpecies = 3;
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
+  % whether to use the same species order across families
+  cfg.stim.yokeSpeciesAcrossFamilies = false;
   
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');

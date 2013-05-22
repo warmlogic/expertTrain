@@ -105,7 +105,17 @@ fam2_eNum = fam2_eNum(filled_cells);
 % assigned to each number
 if shuffleSpecies
   fam1_specNum = randperm(length(fam1_specStr));
-  fam2_specNum = randperm(length(fam2_specStr));
+  if cfg.stim.yokeSpeciesAcrossFamilies
+    if length(fam2_specStr) == length(fam1_specStr)
+      fam2_specNum = fam1_specNum;
+    else
+      warning('Different number of species in family 1 (%d) and 2 (%d), cannot yoke species numbers across families.',length(fam1_specStr),length(fam2_specStr));
+      cfg.stim.yokeSpeciesAcrossFamilies = false;
+      fam2_specNum = randperm(length(fam2_specStr));
+    end
+  else
+    fam2_specNum = randperm(length(fam2_specStr));
+  end
 else
   fam1_specNum = 1:length(fam1_specStr);
   fam2_specNum = 1:length(fam2_specStr);
