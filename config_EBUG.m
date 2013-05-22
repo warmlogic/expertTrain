@@ -36,26 +36,6 @@ incorrectSound = 'low';
 % matching task defaults
 matchTextPrompt = true;
 
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'pretest'};
-% % set up a field for each session type
-% expParam.session.pretest.phases = {'match'};
-% % expParam.session.pretest.phases = {'recog'};
-
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'train1'};
-% %expParam.session.train1.phases = {'viewname'};
-% %expParam.session.train1.phases = {'name'};
-
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'train2'};
-% % expParam.session.train2.phases = {'match'};
-% %expParam.session.train2.phases = {'name'};
-% expParam.session.train2.phases = {'match','name','match'};
-
 % Set the number of sessions
 expParam.nSessions = 9;
 
@@ -72,6 +52,27 @@ expParam.session.train5.phases = {'match','name','match'};
 expParam.session.train6.phases = {'match','name','match'};
 expParam.session.posttest.phases = {'match','recog'};
 expParam.session.posttest_delay.phases = {'match','recog'};
+
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'pretest'};
+% % set up a field for each session type
+% expParam.session.pretest.phases = {'match'};
+% % expParam.session.pretest.phases = {'recog'};
+
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'train1'};
+% %expParam.session.train1.phases = {'viewname'};
+% %expParam.session.train1.phases = {'name'};
+% expParam.session.train1.phases = {'viewname','name','match'};
+
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'train2'};
+% % expParam.session.train2.phases = {'match'};
+% %expParam.session.train2.phases = {'name'};
+% expParam.session.train2.phases = {'match','name','match'};
 
 %% do some error checking
 
@@ -128,8 +129,8 @@ if expParam.sessionNum == 1
   cfg.stim.familyNames = {'a','s'};
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
-%   % debug
-%   cfg.stim.nSpecies = 3;
+  % % debug
+  % cfg.stim.nSpecies = 3;
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
   
@@ -166,9 +167,9 @@ if expParam.sessionNum == 1
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
   
-%   % debug
-%   cfg.stim.nTrained = 2;
-%   cfg.stim.nUntrained = 2;
+  % % debug
+  % cfg.stim.nTrained = 2;
+  % cfg.stim.nUntrained = 2;
   
   % whether to remove the trained/untrained stims from the stimulus pool
   % after they are chosen
@@ -392,10 +393,10 @@ if expParam.sessionNum == 1
   % maximum number of repeated exemplars from each family in viewname/name
   cfg.stim.(sesName).viewname.nameMaxConsecFamily = 3;
   
-%   % debug
-%   cfg.stim.(sesName).viewname.blockSpeciesOrder = {[1, 2],[1, 2, 3]};
-%   cfg.stim.(sesName).viewname.viewIndices = {{1, 1}, {2, 2, 2}};
-%   cfg.stim.(sesName).viewname.nameIndices = {{2, 2}, {1, 1, 1}};
+  % % debug
+  % cfg.stim.(sesName).viewname.blockSpeciesOrder = {[1, 2],[1, 2, 3]};
+  % cfg.stim.(sesName).viewname.viewIndices = {{[1], [1]}, {[2], [2], [2]}};
+  % cfg.stim.(sesName).viewname.nameIndices = {{[2], [2]}, {[1], [1], [1]}};
   
   % durations, in seconds
   cfg.stim.(sesName).viewname.view_isi = 0.8;
