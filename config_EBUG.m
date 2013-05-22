@@ -6,14 +6,13 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 %  file should be edited for your particular experiment. This function runs
 %  process_EBUG_stimuli to prepare the stimuli for experiment presentation.
 %
-% see also: et_saveStimList, process_EBUG_stimuli
+% see also: et_saveStimList, et_processStims_EBUG, et_processStims_name,
+% et_processStims_viewname, et_processStims_recog, et_processStims_match
 
 %% Experiment session information
 
 % set up configuration structures to keep track of what day and phase we're
 % on.
-
-expParam.nSessions = 9;
 
 % do we want to record EEG using Net Station?
 expParam.useNS = false;
@@ -30,18 +29,37 @@ if expParam.useNS
   expParam.baselineRecordSecs = 10.0;
 end
 
+% sound defaults
+playSound = true;
+correctSound = 'high';
+incorrectSound = 'low';
+% matching task defaults
+matchTextPrompt = true;
+
 % % debug
+% expParam.nSessions = 1;
 % expParam.sesTypes = {'pretest'};
 % % set up a field for each session type
-% %expParam.session.pretest.phases = {'match'};
-% expParam.session.pretest.phases = {'recog'};
+% expParam.session.pretest.phases = {'match'};
+% % expParam.session.pretest.phases = {'recog'};
 
 % % debug
+% expParam.nSessions = 1;
 % expParam.sesTypes = {'train1'};
-% expParam.session.train1.phases = {'viewname'};
+% %expParam.session.train1.phases = {'viewname'};
 % %expParam.session.train1.phases = {'name'};
 
-% Pre-test, training day 1, training days 2-6, post-test, post-test delayed.
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'train2'};
+% % expParam.session.train2.phases = {'match'};
+% %expParam.session.train2.phases = {'name'};
+% expParam.session.train2.phases = {'match','name','match'};
+
+% Set the number of sessions
+expParam.nSessions = 9;
+
+% Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
 expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
 
 % set up a field for each session type
@@ -110,6 +128,8 @@ if expParam.sessionNum == 1
   cfg.stim.familyNames = {'a','s'};
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
+  % % debug
+  % cfg.stim.nSpecies = 3;
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
   
@@ -140,11 +160,15 @@ if expParam.sessionNum == 1
     cfg.stim.famNumSubord = 1;
   end
   % what to call the basic-level family in viewing and naming tasks
-  cfg.stim.basicFamStr = 'Other';
+  cfg.text.basicFamStr = 'Other';
   
   % Number of trained and untrained per species per family
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
+  
+  % % debug
+  % cfg.stim.nTrained = 2;
+  % cfg.stim.nUntrained = 2;
   
   % whether to remove the trained/untrained stims from the stimulus pool
   % after they are chosen
@@ -164,10 +188,10 @@ if expParam.sessionNum == 1
   
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.otherKeyNames = {'space'};
-  for i = 1:length(cfg.keys.otherKeyNames)
-    cfg.keys.(sprintf('s%.2d',i-1)) = KbName(cfg.keys.otherKeyNames{i});
-    %cfg.keys.s00 = KbName(cfg.keys.otherKeyNames{i});
-  end
+  cfg.keys.s00 = KbName(cfg.keys.otherKeyNames{1});
+  % for i = 1:length(cfg.keys.otherKeyNames)
+  %   cfg.keys.(sprintf('s%.2d',i-1)) = KbName(cfg.keys.otherKeyNames{i});
+  % end
   
   % keys for naming particular species (subordinate-level naming)
   
@@ -222,6 +246,11 @@ if expParam.sessionNum == 1
   cfg.text.fixSymbol = '+';
   cfg.text.respSymbol = '?';
   
+  if matchTextPrompt
+    cfg.text.matchSame = 'Same';
+    cfg.text.matchDiff = 'Diff   ';
+  end
+
   %% Session/phase configuration
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -239,9 +268,7 @@ if expParam.sessionNum == 1
   % stimulus as stim2
   cfg.stim.(sesName).match.stim2MinRepeatSpacing = 2;
   % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match.promptWithResp = true;
-  cfg.stim.(sesName).match.sameText = 'Same';
-  cfg.stim.(sesName).match.diffText = 'Diff';
+  cfg.stim.(sesName).match.matchTextPrompt = matchTextPrompt;
 
   % rmStims_orig is false because all stimuli are used in both 'same' and
   % 'diff' conditions
@@ -304,12 +331,18 @@ if expParam.sessionNum == 1
     [1, 2],[1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4, 5],[3, 4, 5, 6],...
     [4, 5, 6, 7],[5, 6, 7, 8],[6, 7, 8, 9],[7, 8, 9, 10],...
     [8, 9, 10, 1],[9, 10, 2, 3],[10, 4, 5, 6],[7, 8, 9, 10]};
+  
+  % % debug
+  % cfg.stim.(sesName).viewname.blockSpeciesOrder = {...
+  %   [1, 2],[1, 2, 3]};
+  
   % hard coded stimulus indices for viewing and naming block presentation
   % (counterbalanced)
   cfg.stim.(sesName).viewname.viewIndices = {...
     [1, 1], [4, 4, 1], [2, 2, 4, 1], [5, 5, 2, 4, 1],[5, 2, 4, 1],...
     [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1], [5, 2, 4, 1],...
     [5, 2, 4, 3], [5, 2, 3, 3], [5, 2, 3, 3], [3, 3, 3, 3]};
+  
   cfg.stim.(sesName).viewname.nameIndices = {...
     [2, 3, 2, 3], [5, 6, 5, 6, 2, 3], [3, 4, 3, 4, 5, 6, 2, 3], [1, 6, 1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
     [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3], [1, 6, 3, 4, 5, 6, 2, 3],...
@@ -336,9 +369,9 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).viewname.name_feedback = 1.0;
   
   % do we want to play feedback beeps?
-  cfg.stim.(sesName).viewname.playSound = true;
-  cfg.stim.(sesName).viewname.correctSound = 'high';
-  cfg.stim.(sesName).viewname.incorrectSound = 'low';
+  cfg.stim.(sesName).viewname.playSound = playSound;
+  cfg.stim.(sesName).viewname.correctSound = correctSound;
+  cfg.stim.(sesName).viewname.incorrectSound = incorrectSound;
   
   % Naming
   
@@ -353,9 +386,9 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).name.name_feedback = 1.0;
   
   % do we want to play feedback beeps?
-  cfg.stim.(sesName).name.playSound = true;
-  cfg.stim.(sesName).name.correctSound = 'high';
-  cfg.stim.(sesName).name.incorrectSound = 'low';
+  cfg.stim.(sesName).name.playSound = playSound;
+  cfg.stim.(sesName).name.correctSound = correctSound;
+  cfg.stim.(sesName).name.incorrectSound = incorrectSound;
   
   % Matching
   
@@ -367,9 +400,7 @@ if expParam.sessionNum == 1
   % stimulus as stim2
   cfg.stim.(sesName).match.stim2MinRepeatSpacing = 2;
   % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match.promptWithResp = true;
-  cfg.stim.(sesName).match.sameText = 'Same';
-  cfg.stim.(sesName).match.diffText = 'Diff';
+  cfg.stim.(sesName).match.matchTextPrompt = matchTextPrompt;
   
   % rmStims_orig is true because we're using half of stimuli in each cond
   cfg.stim.(sesName).match.rmStims_orig = true;
@@ -388,389 +419,81 @@ if expParam.sessionNum == 1
   % cfg.stim.(sesName).match.response = 1.0;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Training Day 2 configuration
+  % Training Day 2-6 configuration (all these days are the same)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  sesName = 'train2';
-  
-  % Matching 1
-  
-  matchNum = 1;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  % Naming
-  
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).name.name_isi = 0.5;
-  % cfg.stim.(sesName).name.name_preStim = 0.5 to 0.7;
-  cfg.stim.(sesName).name.name_stim = 1.0;
-  cfg.stim.(sesName).name.name_response = 2.0;
-  cfg.stim.(sesName).name.name_feedback = 1.0;
-  
-  % do we want to play feedback beeps?
-  cfg.stim.(sesName).name.playSound = true;
-  cfg.stim.(sesName).name.correctSound = 'high';
-  cfg.stim.(sesName).name.incorrectSound = 'low';
-  
-  % Matching 2
-  
-  matchNum = 2;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Training Day 3 configuration
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  sesName = 'train3';
-  
-  % Matching 1
-  
-  matchNum = 1;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  % Naming
-  
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).name.name_isi = 0.5;
-  % cfg.stim.(sesName).name.name_preStim = 0.5 to 0.7;
-  cfg.stim.(sesName).name.name_stim = 1.0;
-  cfg.stim.(sesName).name.name_response = 2.0;
-  cfg.stim.(sesName).name.name_feedback = 1.0;
-  
-  % do we want to play feedback beeps?
-  cfg.stim.(sesName).name.playSound = true;
-  cfg.stim.(sesName).name.correctSound = 'high';
-  cfg.stim.(sesName).name.incorrectSound = 'low';
-  
-  % Matching 2
-  
-  matchNum = 2;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Training Day 4 configuration
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  sesName = 'train4';
-  
-  % Matching 1
-  
-  matchNum = 1;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  % Naming
-  
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).name.name_isi = 0.5;
-  % cfg.stim.(sesName).name.name_preStim = 0.5 to 0.7;
-  cfg.stim.(sesName).name.name_stim = 1.0;
-  cfg.stim.(sesName).name.name_response = 2.0;
-  cfg.stim.(sesName).name.name_feedback = 1.0;
-  
-  % do we want to play feedback beeps?
-  cfg.stim.(sesName).name.playSound = true;
-  cfg.stim.(sesName).name.correctSound = 'high';
-  cfg.stim.(sesName).name.incorrectSound = 'low';
-  
-  % Matching 2
-  
-  matchNum = 2;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Training Day 5 configuration
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  sesName = 'train5';
-  
-  % Matching 1
-  
-  matchNum = 1;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  % Naming
-  
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).name.name_isi = 0.5;
-  % cfg.stim.(sesName).name.name_preStim = 0.5 to 0.7;
-  cfg.stim.(sesName).name.name_stim = 1.0;
-  cfg.stim.(sesName).name.name_response = 2.0;
-  cfg.stim.(sesName).name.name_feedback = 1.0;
-  
-  % do we want to play feedback beeps?
-  cfg.stim.(sesName).name.playSound = true;
-  cfg.stim.(sesName).name.correctSound = 'high';
-  cfg.stim.(sesName).name.incorrectSound = 'low';
-  
-  % Matching 2
-  
-  matchNum = 2;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Training Day 6 configuration
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  sesName = 'train6';
-  
-  % Matching 1
-  
-  matchNum = 1;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
-  
-  % Naming
-   
-  % maximum number of repeated exemplars from each family in naming
-  cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
- 
-  % durations, in seconds
-  cfg.stim.(sesName).name.name_isi = 0.5;
-  % cfg.stim.(sesName).name.name_preStim = 0.5 to 0.7;
-  cfg.stim.(sesName).name.name_stim = 1.0;
-  cfg.stim.(sesName).name.name_response = 2.0;
-  cfg.stim.(sesName).name.name_feedback = 1.0;
-  
-  % do we want to play feedback beeps?
-  cfg.stim.(sesName).name.playSound = true;
-  cfg.stim.(sesName).name.correctSound = 'high';
-  cfg.stim.(sesName).name.incorrectSound = 'low';
-  
-  % Matching 2
-  
-  matchNum = 2;
-  cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
-  cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
-  % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match(matchNum).promptWithResp = true;
-  cfg.stim.(sesName).match(matchNum).sameText = 'Same';
-  cfg.stim.(sesName).match(matchNum).diffText = 'Diff';
-  
-  % rmStims_orig is true because we're using half of stimuli in each cond
-  cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
-  % rmStims_pair is true because pairs are removed after they're added
-  cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
-  cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
-  
-  % durations, in seconds
-  cfg.stim.(sesName).match(matchNum).isi = 0.5;
-  cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
-  cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
-  % % random intervals are generated on the fly
-  % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
-  % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
-  % % Not setting a response time limit
-  % cfg.stim.(sesName).match(matchNum).response = 1.0;
+  sesNames = {'train2','train3','train4','train5','train6'};
+  
+  for s = 1:length(sesNames)
+    sesName = sesNames{s};
+    
+    % Matching 1
+    
+    matchNum = 1;
+    cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
+    cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
+    % whether to have "same" and "diff" text with the response prompt
+    cfg.stim.(sesName).match(matchNum).matchTextPrompt = matchTextPrompt;
+    
+    % rmStims_orig is true because we're using half of stimuli in each cond
+    cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
+    % rmStims_pair is true because pairs are removed after they're added
+    cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
+    cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
+    
+    % durations, in seconds
+    cfg.stim.(sesName).match(matchNum).isi = 0.5;
+    cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
+    cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
+    % % random intervals are generated on the fly
+    % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
+    % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
+    % % % Not setting a response time limit
+    % cfg.stim.(sesName).match(matchNum).response = 1.0;
+    
+    % Naming
+    
+    % maximum number of repeated exemplars from each family in naming
+    cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
+    
+    % durations, in seconds
+    cfg.stim.(sesName).name.name_isi = 0.5;
+    % cfg.stim.(sesName).name.name_preStim = 0.5 to 0.7;
+    cfg.stim.(sesName).name.name_stim = 1.0;
+    cfg.stim.(sesName).name.name_response = 2.0;
+    cfg.stim.(sesName).name.name_feedback = 1.0;
+    
+    % do we want to play feedback beeps?
+    cfg.stim.(sesName).name.playSound = playSound;
+    cfg.stim.(sesName).name.correctSound = correctSound;
+    cfg.stim.(sesName).name.incorrectSound = incorrectSound;
+    
+    % Matching 2
+    
+    matchNum = 2;
+    cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
+    cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
+    cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
+    % whether to have "same" and "diff" text with the response prompt
+    cfg.stim.(sesName).match(matchNum).matchTextPrompt = matchTextPrompt;
+    
+    % rmStims_orig is true because we're using half of stimuli in each cond
+    cfg.stim.(sesName).match(matchNum).rmStims_orig = true;
+    % rmStims_pair is true because pairs are removed after they're added
+    cfg.stim.(sesName).match(matchNum).rmStims_pair = true;
+    cfg.stim.(sesName).match(matchNum).shuffleFirst = true;
+    
+    % durations, in seconds
+    cfg.stim.(sesName).match(matchNum).isi = 0.5;
+    cfg.stim.(sesName).match(matchNum).stim1 = 0.8;
+    cfg.stim.(sesName).match(matchNum).stim2 = 0.8;
+    % % random intervals are generated on the fly
+    % cfg.stim.(sesName).match(matchNum).preStim1 = 0.5 to 0.7;
+    % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
+    % % % Not setting a response time limit
+    % cfg.stim.(sesName).match(matchNum).response = 1.0;
+  end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Posttest configuration
@@ -785,9 +508,7 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).match.nDiff = cfg.stim.nTrained;
   cfg.stim.(sesName).match.stim2MinRepeatSpacing = 2;
   % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match.promptWithResp = true;
-  cfg.stim.(sesName).match.sameText = 'Same';
-  cfg.stim.(sesName).match.diffText = 'Diff';
+  cfg.stim.(sesName).match.matchTextPrompt = matchTextPrompt;
   
   % rmStims_orig is false because all stimuli are used in both 'same' and
   % 'diff' conditions
@@ -849,9 +570,7 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).match.nDiff = cfg.stim.nTrained;
   cfg.stim.(sesName).match.stim2MinRepeatSpacing = 2;
   % whether to have "same" and "diff" text with the response prompt
-  cfg.stim.(sesName).match.promptWithResp = true;
-  cfg.stim.(sesName).match.sameText = 'Same';
-  cfg.stim.(sesName).match.diffText = 'Diff';
+  cfg.stim.(sesName).match.matchTextPrompt = matchTextPrompt;
   
   % rmStims_orig is false because all stimuli are used in both 'same' and
   % 'diff' conditions
@@ -902,8 +621,7 @@ if expParam.sessionNum == 1
   
   %% process the stimuli for the entire experiment
   
-  [expParam] = et_processStims(cfg,expParam);
-  %[expParam] = process_EBUG_stimuli(cfg,expParam);
+  [expParam] = et_processStims_EBUG(cfg,expParam);
   
   %% save the parameters
   
