@@ -247,6 +247,9 @@ for i = 1:length(stim2Tex)
   % and record stimulus onset time in 'stimOnset':
   [img1On, stim1Onset] = Screen('Flip', w);
   
+  % debug
+  fprintf('Trial %d of %d: stim1: family %d (%s), species %d (%s). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim1(i).familyNum,stim1(i).familyStr,stim1(i).speciesNum,stim1(i).speciesStr,stim1(i).same);
+  
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
   while (GetSecs - stim1Onset) <= phaseCfg.stim1
@@ -270,6 +273,9 @@ for i = 1:length(stim2Tex)
   % and record stimulus onset time in 'stimOnset':
   [img2On, stim2Onset] = Screen('Flip', w);
   
+  % debug
+  fprintf('Trial %d of %d: stim2: family %d (%s), species %d (%s). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim2(i).familyNum,stim2(i).familyStr,stim2(i).speciesNum,stim2(i).speciesStr,stim2(i).same);
+  
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
   while (GetSecs - stim2Onset) <= phaseCfg.stim2
@@ -281,8 +287,8 @@ for i = 1:length(stim2Tex)
   % draw response prompt
   Screen('TextSize', w, cfg.text.basic);
   if phaseCfg.matchTextPrompt
-    promptWithRespTxt = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
-    DrawFormattedText(w,promptWithRespTxt,'center','center',fixationColor);
+    responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
+    DrawFormattedText(w,responsePromptText,'center','center',fixationColor);
   else
     DrawFormattedText(w,cfg.text.respSymbol,'center','center',fixationColor);
   end

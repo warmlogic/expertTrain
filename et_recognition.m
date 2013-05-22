@@ -386,6 +386,10 @@ for b = 1:phaseCfg.nBlocks
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+    
+    % debug
+    fprintf('Trial %d of %d: targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).targ);
+    
     % draw the response key image
     Screen('DrawTexture', w, testRespImg, [], respKeyImgRect);
     % put them on the screen; measure RT from when response key img appears

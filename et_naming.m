@@ -223,6 +223,9 @@ for i = 1:length(stimTex)
   % and record stimulus onset time in 'stimOnset':
   [imgOn, stimOnset] = Screen('Flip', w);
   
+  % debug
+  fprintf('Trial %d of %d: species num: %d.\n',i,length(stimTex),sNum);
+  
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
   while (GetSecs - stimOnset) <= phaseCfg.name_stim
