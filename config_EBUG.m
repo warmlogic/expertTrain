@@ -125,7 +125,6 @@ if expParam.sessionNum == 1
   %% Stimulus parameters
   
   cfg.files.stimFileExt = '.bmp';
-  cfg.stim.nFamilies = 2;
   % family names correspond to the directories in which stimuli reside
   cfg.stim.familyNames = {'a','s'};
   % assumes that each family has the same number of species
@@ -133,7 +132,7 @@ if expParam.sessionNum == 1
   % % debug
   % cfg.stim.nSpecies = 3;
   % initialize to store the number of exemplars for each species
-  cfg.stim.nExemplars = zeros(cfg.stim.nFamilies,cfg.stim.nSpecies);
+  cfg.stim.nExemplars = zeros(length(cfg.stim.familyNames),cfg.stim.nSpecies);
   % whether to use the same species order across families
   cfg.stim.yokeSpeciesAcrossFamilies = false;
   
