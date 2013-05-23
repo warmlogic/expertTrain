@@ -8,13 +8,10 @@ f1Trained = expParam.session.f1Trained;
 f2Trained = expParam.session.f2Trained;
 
 % add the species in order from 1 to nSpecies; this is ok because, for each
-% subject, each species number corresonds to a random species letter
+% subject, each species number corresonds to a random species letter, as
+% determined in et_saveStimList()
 speciesOrder_f1 = (1:cfg.stim.nSpecies);
 speciesOrder_f2 = (1:cfg.stim.nSpecies);
-% % randomize the order in which species are added; order is different
-% % for each family
-% speciesOrder_f1 = randperm(cfg.stim.nSpecies);
-% speciesOrder_f2 = randperm(cfg.stim.nSpecies);
 
 % initialize viewing and naming cells, one for each block
 expParam.session.(sesName).(phaseName)(phaseCount).viewStims = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
