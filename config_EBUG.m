@@ -61,11 +61,11 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.session.pretest.phases = {'match'};
 % % expParam.session.pretest.phases = {'recog'};
 
-% debug
-expParam.nSessions = 1;
-expParam.sesTypes = {'train1'};
-expParam.session.train1.phases = {'nametrain'};
-%expParam.session.train1.phases = {'name'};
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'train1'};
+% % expParam.session.train1.phases = {'nametrain'};
+% % expParam.session.train1.phases = {'name'};
 % expParam.session.train1.phases = {'nametrain','name','match'};
 
 % % debug
