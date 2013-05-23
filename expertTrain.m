@@ -18,8 +18,6 @@ function expertTrain(expName,subNum)
 % et_matching, et_viewing, et_naming, et_recognition
 %
 
-% TODO: Net Station integration http://docs.psychtoolbox.org/NetStation
-
 %% any preliminary stuff
 
 % bring the command window to the front
@@ -146,9 +144,6 @@ try
   
   % Open data file and write column headers
   logFile = fopen(cfg.files.sesLogFile,'w');
-  
-  % TODO: set up logging for expertise experiment
-  %fprintf(logFile,'\nDate\tSubjno\tTrial\tCategory_Label\tBird_image\tCondition\tResp\tAccuray\tRT\tAnswer\tObj_ID_Number\tLabel_img_match\tBird_Family\tStimuli_Set\tBlock\tCounterbalance\tCorr_RT\tCount_Hit\tCount_FA\tCount_CR\tCount_Miss');
   
   %% Begin PTB display setup
   
