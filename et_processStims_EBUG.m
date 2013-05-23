@@ -6,8 +6,9 @@ function [expParam] = et_processStims_EBUG(cfg,expParam)
 %  function is run by config_EBUG.
 %
 % see also: config_EBUG, et_divvyStims, et_divvyStims_match,
-% et_shuffleStims, et_shuffleStims_match, et_processStims_name,
-% et_processStims_viewname, et_processStims_recog, et_processStims_match
+% et_shuffleStims, et_shuffleStims_match, et_processStims_match,
+% et_processStims_recog, et_processStims_viewname,
+% et_processStims_nametrain, et_processStims_name
 
 %% Initial processing of the stimuli
 
@@ -92,6 +93,7 @@ for s = 1:expParam.nSessions
   % counting the phases, in case any sessions have the same phase type
   % multiple times
   viewnameCount = 0;
+  nametrainCount = 0;
   nameCount = 0;
   matchCount = 0;
   recogCount = 0;
@@ -111,6 +113,11 @@ for s = 1:expParam.nSessions
         viewnameCount = viewnameCount + 1;
         
         [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,viewnameCount);
+        
+      case {'nametrain'}
+        nametrainCount = nametrainCount + 1;
+        
+        [cfg,expParam] = et_processStims_nametrain(cfg,expParam,sesName,phaseName,nametrainCount);
         
       case {'name'}
         nameCount = nameCount + 1;
