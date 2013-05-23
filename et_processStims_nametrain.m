@@ -52,7 +52,7 @@ for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
   % to do this but it works.
   
   % naming
-  fprintf('Shuffling %s naming (%d) task stimuli.\n',sesName,phaseCount);
+  fprintf('Shuffling %s name training (%d) task stimuli.\n',sesName,phaseCount);
   [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
     expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily);
   

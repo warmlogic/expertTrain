@@ -277,6 +277,7 @@ try
   % counting the phases, in case any sessions have the same phase type
   % multiple times
   viewnameCount = 0;
+  nametrainCount = 0;
   nameCount = 0;
   matchCount = 0;
   recogCount = 0;
@@ -307,6 +308,12 @@ try
           % then run the naming task
           [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
         end
+        
+      case {'nametrain'}
+        % Name training task
+        nametrainCount = nametrainCount + 1;
+        
+        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount);
         
       case {'name'}
         % Naming task
