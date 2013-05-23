@@ -294,6 +294,24 @@ for i = 1:length(stimTex)
     WaitSecs(0.0001);
   end
   
+  % if they didn't response, show correct response
+  if ~keyIsDown
+    sNumColor = incorrect_sNumColor;
+    if phaseCfg.playSound
+      respSound = phaseCfg.incorrectSound;
+    end
+    if sNum > 0
+      DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
+    else
+      DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor);
+    end
+    Screen('Flip', w);
+    
+    if phaseCfg.playSound
+      Beeper(respSound);
+    end
+  end
+  
   % wait to let them view the feedback
   WaitSecs(phaseCfg.name_feedback);
   
