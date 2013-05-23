@@ -1,5 +1,5 @@
-function [origStims,chosenStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
-% [origStims,selectedStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
+function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
+% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
 %
 % Description:
 %  Shuffle a stimulus set (origStims) and slice out a subset (nStims) of
@@ -23,10 +23,10 @@ function [origStims,chosenStims] = et_divvyStims(origStims,chosenStims,nStims,rm
 %                for the new field(s). Optional (default = {}).
 %
 % Output:
-%  origStims:   Original stimulus structure with the chosen stimuli removed
-%               if rmStims = true.
 %  chosenStims: Struct containing the chosen stimuli from each available
 %               species. New fields and values are added to these stims.
+%  origStims:   Original stimulus structure with the chosen stimuli removed
+%               if rmStims = true.
 %
 
 if ~exist('rmStims','var') || isempty(rmStims)
