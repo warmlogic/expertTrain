@@ -61,11 +61,11 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.session.pretest.phases = {'match'};
 % % expParam.session.pretest.phases = {'recog'};
 
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'train1'};
-% %expParam.session.train1.phases = {'nametrain'};
-% %expParam.session.train1.phases = {'name'};
+% debug
+expParam.nSessions = 1;
+expParam.sesTypes = {'train1'};
+expParam.session.train1.phases = {'nametrain'};
+%expParam.session.train1.phases = {'name'};
 % expParam.session.train1.phases = {'nametrain','name','match'};
 
 % % debug
@@ -420,7 +420,7 @@ if expParam.sessionNum == 1
   
   % hard coded order of which species are presented in each block
   % (counterbalanced). Blocks are denoted by vectors.
-  cfg.stim.(sesName).viewname.blockSpeciesOrder = {...
+  cfg.stim.(sesName).nametrain.blockSpeciesOrder = {...
     [1, 2],...
     [1, 2, 3],...
     [1, 2, 3, 4],...

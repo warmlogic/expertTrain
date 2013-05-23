@@ -313,7 +313,10 @@ try
         % Name training task
         nametrainCount = nametrainCount + 1;
         
-        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount);
+        % for each view/name block
+        for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
+          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+        end
         
       case {'name'}
         % Naming task
