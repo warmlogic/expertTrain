@@ -210,7 +210,7 @@ for i = 1:length(stim2Tex)
   
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if stim2(i).familyNum == cfg.stim.famNumSubord
+  if any(stim2(i).familyNum == cfg.stim.famNumSubord)
     subord = 1;
     sNum1 = stim1(i).speciesNum;
     sNum2 = stim2(i).speciesNum;

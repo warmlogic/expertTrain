@@ -127,6 +127,7 @@ if expParam.sessionNum == 1
   cfg.files.stimFileExt = '.bmp';
   % family names correspond to the directories in which stimuli reside
   cfg.stim.familyNames = {'a','s'};
+  %cfg.stim.familyNames = {'fc','fi','fg','fhi8','flo8','wc','wi','wg','whi8','wlo8'};
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
   % % debug
@@ -135,6 +136,10 @@ if expParam.sessionNum == 1
   cfg.stim.nExemplars = zeros(length(cfg.stim.familyNames),cfg.stim.nSpecies);
   % whether to use the same species order across families
   cfg.stim.yokeSpeciesAcrossFamilies = false;
+  if cfg.stim.yokeSpeciesAcrossFamilies
+    cfg.stim.yokeTogether = [1 1];
+    %cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
+  end
   
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
@@ -158,9 +163,13 @@ if expParam.sessionNum == 1
   if expParam.isEven
     cfg.stim.famNumBasic = 1;
     cfg.stim.famNumSubord = 2;
+    %cfg.stim.famNumBasic = [1 2 3 4 5];
+    %cfg.stim.famNumSubord = [6 7 8 9 10];
   else
     cfg.stim.famNumBasic = 2;
     cfg.stim.famNumSubord = 1;
+    %cfg.stim.famNumSubord = [1 2 3 4 5];
+    %cfg.stim.famNumBasic = [6 7 8 9 10];
   end
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';

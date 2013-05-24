@@ -198,7 +198,7 @@ for i = 1:length(stimTex)
   
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if viewStims(i).familyNum == cfg.stim.famNumSubord
+  if any(viewStims(i).familyNum == cfg.stim.famNumSubord)
     subord = 1;
     sNum = viewStims(i).speciesNum;
   else

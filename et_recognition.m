@@ -165,7 +165,7 @@ for b = 1:phaseCfg.nBlocks
     
     % Is this a subordinate (1) or basic (0) family/species? If subordinate,
     % get the species number.
-    if targStims{b}(i).familyNum == cfg.stim.famNumSubord
+    if any(targStims{b}(i).familyNum == cfg.stim.famNumSubord)
       subord = 1;
       sNum = targStims{b}(i).speciesNum;
     else
@@ -345,7 +345,7 @@ for b = 1:phaseCfg.nBlocks
     
     % Is this a subordinate (1) or basic (0) family/species? If subordinate,
     % get the species number.
-    if allStims{b}(i).familyNum == cfg.stim.famNumSubord
+    if any(allStims{b}(i).familyNum == cfg.stim.famNumSubord)
       subord = 1;
       sNum = allStims{b}(i).speciesNum;
     else
