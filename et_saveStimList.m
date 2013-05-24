@@ -86,7 +86,7 @@ for f = 1:length(cfg.stim.familyNames)
     if ~exist('specNum','var')
       specNum = randperm(length(uniqueSpecStr(f,:)));
     else
-      if cfg.stim.yokeSpeciesAcrossFamilies
+      if cfg.stim.yokeSpecies
         % assumes that all families have the same number of species
         if length(uniqueSpecStr(f,:)) == length(uniqueSpecStr(f-1,:))
           if cfg.stim.yokeTogether(f) == cfg.stim.yokeTogether(f-1)

@@ -127,7 +127,9 @@ if expParam.sessionNum == 1
   cfg.files.stimFileExt = '.bmp';
   % family names correspond to the directories in which stimuli reside
   cfg.stim.familyNames = {'a','s'};
+  % debug bird
   %cfg.stim.familyNames = {'fc','fi','fg','fhi8','flo8','wc','wi','wg','whi8','wlo8'};
+  % cfg.stim.familyNames = {'ac','ai','ag','ahi8','alo8','sc','si','sg','shi8','slo8'};
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
   % % debug
@@ -135,14 +137,19 @@ if expParam.sessionNum == 1
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(length(cfg.stim.familyNames),cfg.stim.nSpecies);
   % whether to use the same species order across families
-  cfg.stim.yokeSpeciesAcrossFamilies = false;
-  if cfg.stim.yokeSpeciesAcrossFamilies
+  cfg.stim.yokeSpecies = false;
+  % debug bird
+  %cfg.stim.yokeSpecies = true;
+  if cfg.stim.yokeSpecies
     cfg.stim.yokeTogether = [1 1];
+    % debug bird
     %cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
   end
   
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
+  % debug bird
+  %cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
   % save an individual stimulus list for each subject
   cfg.stim.file = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
@@ -163,11 +170,13 @@ if expParam.sessionNum == 1
   if expParam.isEven
     cfg.stim.famNumBasic = 1;
     cfg.stim.famNumSubord = 2;
+    % debug bird
     %cfg.stim.famNumBasic = [1 2 3 4 5];
     %cfg.stim.famNumSubord = [6 7 8 9 10];
   else
     cfg.stim.famNumBasic = 2;
     cfg.stim.famNumSubord = 1;
+    % debug bird
     %cfg.stim.famNumSubord = [1 2 3 4 5];
     %cfg.stim.famNumBasic = [6 7 8 9 10];
   end
