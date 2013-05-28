@@ -15,7 +15,7 @@ About
    1. Subordinate matching (`match`): decide whether two stimuli are from the same species.
    1. Naming (`name`): must press corresponding species key, and the species number is not displayed on screen.
    1. Viewing (`view`): must press corresponding species key, displayed on screen with each stimulus. **This phase is not being used.**
-- There are twp additional augmented introductory training tasks:
+- There are two additional augmented introductory training tasks (to be used on Training Day 1):
    1. Nametrain (`nametrain`): Just like the `name` phase, but species are introduced a one or two at a time (as defined in config_EXPNAME.m) and subjects have to name the species even if no exposure has occurred. The idea is that this will force subjects to learn the species labels quickly.
    1. Viewname (`viewname`): intermixed viewing and naming blocks (described above) for introducing the subject to different species. **This phase is not being used.**
 - expertTrain has been developed tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3.
