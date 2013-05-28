@@ -97,6 +97,21 @@ for s = 1:length(expParam.sesTypes)
   end
 end
 
+
+% %% instructions (debug)
+% 
+% instruct = {};
+% tline = nan;
+% fid = fopen('./text/instructions/instruct_recog1_intro.txt');
+% lineCount = 1;
+% while tline ~= -1
+%   tline = fgets(fid);
+%   if tline ~= -1
+%     instruct{lineCount} = tline;
+%     lineCount = lineCount + 1;
+%   end
+% end
+
 %% If this is session 1, setup the experiment
 
 if expParam.sessionNum == 1
