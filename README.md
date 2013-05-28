@@ -10,12 +10,14 @@ About
 ----
 
 - The experiment supports running multiple sessions, and each session is be divided into phases.
-- There are four possible phases in each session, and a fifth augmented view+name task:
-   1. Old/New recognition (study a list of targets, tested on recognizing targets and lures)
-   1. Subordinate matching (decide whether two stimuli are from the same species)
-   1. Viewing (must press corresponding species key, displayed on screen with each stimulus)
-   1. Naming (must press corresponding species key, not displayed on screen)
-   1. Viewname (intermixed viewing and naming blocks for introducing the subject to different species)
+- There are four main phases for each session:
+   1. Old/New recognition (`recog`): study a list of targets, tested on recognizing targets and lures.
+   1. Subordinate matching (`match`): decide whether two stimuli are from the same species.
+   1. Naming (`name`): must press corresponding species key, and the species number is not displayed on screen.
+   1. Viewing (`view`): must press corresponding species key, displayed on screen with each stimulus. **This phase is not being used.**
+- There are twp additional augmented introductory training tasks:
+   1. Nametrain (`nametrain`): Just like the `name` phase, but species are introduced a one or two at a time (as defined in config_EXPNAME.m) and subjects have to name the species even if no exposure has occurred. The idea is that this will force subjects to learn the species labels quickly.
+   1. Viewname (`viewname`): intermixed viewing and naming blocks (described above) for introducing the subject to different species. **This phase is not being used.**
 - expertTrain has been developed tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3.
 
 Installation
