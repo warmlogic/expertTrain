@@ -89,12 +89,38 @@ for s = 1:length(theseSpecies)
   sInd_stim1 = [stim1_same.speciesNum] == theseSpecies(s);
   % pull out these possible stim1s
   stim1_spec = stim1_same(sInd_stim1);
+  
+  not_good = true;
+  while not_good
+    % permute until each exemplar has a pair that is not the same number
+    exemplarPair = randperm(length(sInd_stim2));
+    if ~any([stim1_spec(exemplarPair).exemplarNum] == [theseSameStims(sInd_stim2).exemplarNum])
+      not_good = false;
+    end
+  end
+  % put them in the new order
+  stim1_spec = stim1_spec(exemplarPair);
+  
   for e = 1:length(sInd_stim2)
     theseSameStims(sInd_stim2(e)).matchPairNum = pairCount;
-    % choose 1 stim1 for each stim2, setting the same pair number
+    % choose 1 stim1 for each stim2, setting the same pair number; don't
+    % shuffleFirst so that we keep the new order
     [theseSameStims,stim1_spec] = et_divvyStims(...
-      stim1_spec,theseSameStims,1,rmStims_pair,shuffleFirst,...
+      stim1_spec,theseSameStims,1,rmStims_pair,false,...
       {'same', 'matchStimNum', 'matchPairNum'},{1, 1, pairCount});
+    
+%     % choose 1 stim1 for each stim2 that's not the same exact exemplar,
+%     % setting the same pair number
+%     [theseSameStims] = et_divvyStims(...
+%       stim1_spec([stim1_spec.exemplarNum] ~= theseSameStims(sInd_stim2(e)).exemplarNum),theseSameStims,...
+%       1,rmStims_pair,false,...
+%       {'same', 'matchStimNum', 'matchPairNum'},{1, 1, pairCount});
+%     % remove the stimulus we just chose from the stim1_spec pool; have to
+%     % do this because we are not passing in the full stim1_spec to
+%     % et_divvyStims because we can't choose the same exemplar
+%     if rmStims_pair
+%       stim1_spec = stim1_spec([stim1_spec.exemplarNum] ~= theseSameStims(end).exemplarNum);
+%     end
     pairCount = pairCount + 1;
   end
 end
