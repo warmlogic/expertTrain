@@ -108,19 +108,6 @@ for s = 1:length(theseSpecies)
     [theseSameStims,stim1_spec] = et_divvyStims(...
       stim1_spec,theseSameStims,1,rmStims_pair,false,...
       {'same', 'matchStimNum', 'matchPairNum'},{1, 1, pairCount});
-    
-%     % choose 1 stim1 for each stim2 that's not the same exact exemplar,
-%     % setting the same pair number
-%     [theseSameStims] = et_divvyStims(...
-%       stim1_spec([stim1_spec.exemplarNum] ~= theseSameStims(sInd_stim2(e)).exemplarNum),theseSameStims,...
-%       1,rmStims_pair,false,...
-%       {'same', 'matchStimNum', 'matchPairNum'},{1, 1, pairCount});
-%     % remove the stimulus we just chose from the stim1_spec pool; have to
-%     % do this because we are not passing in the full stim1_spec to
-%     % et_divvyStims because we can't choose the same exemplar
-%     if rmStims_pair
-%       stim1_spec = stim1_spec([stim1_spec.exemplarNum] ~= theseSameStims(end).exemplarNum);
-%     end
     pairCount = pairCount + 1;
   end
 end
