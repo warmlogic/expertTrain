@@ -1,7 +1,8 @@
 function [cfg,expParam,varargout] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount,varargin)
 % function [cfg,expParam,varargout] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount,varargin)
 %
-% e.g., [cfg,expParam,f1Stim,f2Stim] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount,f1Stim,f2Stim);
+% e.g., [cfg,expParam,stimStruct.fStims] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount,stimStruct.fStims);
+%       where stimStruct(f).fStims is a struct for each family
 %
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
