@@ -248,7 +248,7 @@ for i = 1:length(stim2Tex)
   [img1On, stim1Onset] = Screen('Flip', w);
   
   % debug
-  fprintf('Trial %d of %d: stim1: family %d (%s), species %d (%s). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim1(i).familyNum,stim1(i).familyStr,stim1(i).speciesNum,stim1(i).speciesStr,stim1(i).same);
+  fprintf('Trial %d of %d: stim1 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim1(i).fileName,stim1(i).familyNum,stim1(i).familyStr,stim1(i).speciesNum,stim1(i).speciesStr,stim1(i).exemplarNum,stim1(i).exemplarName,stim1(i).same);
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
@@ -274,7 +274,7 @@ for i = 1:length(stim2Tex)
   [img2On, stim2Onset] = Screen('Flip', w);
   
   % debug
-  fprintf('Trial %d of %d: stim2: family %d (%s), species %d (%s). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim2(i).familyNum,stim2(i).familyStr,stim2(i).speciesNum,stim2(i).speciesStr,stim2(i).same);
+  fprintf('Trial %d of %d: stim2 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim2(i).fileName,stim2(i).familyNum,stim2(i).familyStr,stim2(i).speciesNum,stim2(i).speciesStr,stim2(i).exemplarNum,stim2(i).exemplarName,stim2(i).same);
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.

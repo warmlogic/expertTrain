@@ -358,7 +358,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('Trial %d of %d: species num: %d. response: %s (key: %s) (acc = %d)\n',1,length(stimTex),sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',1,length(stimTex),viewStims(i).filenName,sNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...

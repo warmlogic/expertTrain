@@ -224,7 +224,7 @@ for i = 1:length(stimTex)
   [imgOn, stimOnset] = Screen('Flip', w);
   
   % debug
-  fprintf('Trial %d of %d: species num: %d.\n',i,length(stimTex),sNum);
+  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),nameStims(i).filenName,sNum);
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
@@ -362,7 +362,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('Trial %d of %d: species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),nameStims(i).filenName,sNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...

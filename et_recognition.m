@@ -388,7 +388,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
     
     % debug
-    fprintf('Trial %d of %d: targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).targ);
+    fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ);
     
     % draw the response key image
     Screen('DrawTexture', w, testRespImg, [], respKeyImgRect);
@@ -460,7 +460,7 @@ for b = 1:phaseCfg.nBlocks
     respKey = KbName(keyCode);
     
     % debug
-    fprintf('Trial %d of %d: targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(blockStimTex),allStims{b}(i).targ,resp,respKey,acc);
+    fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ,resp,respKey,acc);
     
     % Write test stimulus presentation to file:
     fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %i\n',...
