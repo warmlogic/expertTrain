@@ -76,16 +76,16 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.nSessions = 1;
 % expParam.sesTypes = {'pretest'};
 % % set up a field for each session type
-% expParam.session.pretest.phases = {'match'};
-% % expParam.session.pretest.phases = {'recog'};
+% % expParam.session.pretest.phases = {'match'};
+% expParam.session.pretest.phases = {'recog'};
 % % expParam.session.pretest.phases = {'prac_recog','recog'};
 
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'train1'};
-% % expParam.session.train1.phases = {'nametrain'};
-% % expParam.session.train1.phases = {'name'};
-% % expParam.session.train1.phases = {'nametrain','name','match'};
+% debug
+expParam.nSessions = 1;
+expParam.sesTypes = {'train1'};
+% expParam.session.train1.phases = {'nametrain'};
+expParam.session.train1.phases = {'name'};
+% expParam.session.train1.phases = {'nametrain','name','match'};
 % expParam.session.train1.phases = {'viewname'};
 
 % % debug
