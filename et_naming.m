@@ -70,7 +70,7 @@ end
 
 message = sprintf('Preparing images, please wait...');
 Screen('TextSize', w, cfg.text.instructSize);
-% put the instructions on the screen
+% put the "preparing" message on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
 Screen('Flip', w);
@@ -130,29 +130,12 @@ Screen('Flip', w);
 
 %% show the instructions
 
-instructions = sprintf([...
-  'Naming task: block %d.\n',...
-  'You will see creatures from %d families.\n In this block, there are %d different species in each family.\n',...
-  'You will identify the different species of one family,\nand you will chunk the other family together as ''%s''.\n',...
-  '\nYour job is to press the correct species key for the creatures that you learned previously.\n',...
-  'key=species: %s=1, %s=2, %s=3, %s=4, %s=5, %s=6, %s=7, %s=8, %s=9, %s=10\n',...
-  '''%s'' is the key for the ''%s'' family species members.\n',...
-  '\nPress ''%s'' to begin naming task.'],...
-  b,...
-  length(cfg.stim.familyNames),nSpecies,cfg.text.basicFamStr,...
-  KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-  KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-  KbName(cfg.keys.s00),cfg.text.basicFamStr,...
-  'space');
-Screen('TextSize', w, cfg.text.instructSize);
-% put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', instructColor);
-% Update the display to show the instruction text:
-Screen('Flip', w);
-% wait until spacebar is pressed
-RestrictKeysForKbCheck(KbName('space'));
-KbWait(-1,2);
-RestrictKeysForKbCheck([]);
+WaitSecs(1.000);
+et_showTextInstruct(w,phaseCfg.instruct_name,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_name_img,...
+  {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
+
+% Wait a second before starting trial
+WaitSecs(1.000);
 
 %% run the naming task
 
@@ -224,7 +207,7 @@ for i = 1:length(stimTex)
   [imgOn, stimOnset] = Screen('Flip', w);
   
   % debug
-  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),nameStims(i).filenName,sNum);
+  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),nameStims(i).fileName,sNum);
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
@@ -362,7 +345,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),nameStims(i).filenName,sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),nameStims(i).fileName,sNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...

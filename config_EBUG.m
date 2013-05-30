@@ -76,16 +76,17 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.nSessions = 1;
 % expParam.sesTypes = {'pretest'};
 % % set up a field for each session type
-% % expParam.session.pretest.phases = {'match'};
+% expParam.session.pretest.phases = {'match'};
 % % expParam.session.pretest.phases = {'recog'};
-% expParam.session.pretest.phases = {'prac_recog','recog'};
+% % expParam.session.pretest.phases = {'prac_recog','recog'};
 
 % % debug
 % expParam.nSessions = 1;
 % expParam.sesTypes = {'train1'};
 % % expParam.session.train1.phases = {'nametrain'};
 % % expParam.session.train1.phases = {'name'};
-% expParam.session.train1.phases = {'nametrain','name','match'};
+% % expParam.session.train1.phases = {'nametrain','name','match'};
+% expParam.session.train1.phases = {'viewname'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -290,6 +291,7 @@ if expParam.sessionNum == 1
   cfg.text.instructSize = 32;
   % number of characters wide at which the instructions will be shown
   cfg.text.instructWidth = 80;
+  cfg.keys.instructContKey = 'space';
   
   % fixation info
   cfg.text.fixSize = 32;
@@ -310,6 +312,7 @@ if expParam.sessionNum == 1
   sesName = 'pretest';
   
   % Matching
+  cfg.stim.(sesName).match.isExp = true;
   
   % every stimulus is in both the same and the different condition.
   cfg.stim.(sesName).match.nSame = cfg.stim.nTrained;
@@ -337,7 +340,14 @@ if expParam.sessionNum == 1
   % % % Not setting a response time limit
   % cfg.stim.(sesName).match.response = 1.0;
   
+  % instructions
+  [cfg.stim.(sesName).match.instruct_match] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_match1_intro.txt',expParam.expName)),...
+    {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+  cfg.stim.(sesName).match.instruct_match_img = [];
+  
   % Recognition - practice
+  cfg.stim.(sesName).prac_recog.isExp = false;
   
   cfg.stim.(sesName).prac_recog.nBlocks = 1;
   % number of target and lure stimuli for practice across all species and
@@ -364,18 +374,29 @@ if expParam.sessionNum == 1
   % cfg.stim.(sesName).recog.response = 1.5;
   
   % instructions
-  [cfg.stim.(sesName).prac_recog.instruct_intro{1}] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog1_intro.txt',expParam.expName)));
-  cfg.stim.(sesName).prac_recog.instruct_intro_img{1} = [];
-  [cfg.stim.(sesName).prac_recog.instruct_intro{2}] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog2_intro_recoll.txt',expParam.expName)));
-  cfg.stim.(sesName).prac_recog.instruct_intro_img{2} = [];
-  [cfg.stim.(sesName).prac_recog.instruct_intro{3}] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName)));
-  cfg.stim.(sesName).prac_recog.instruct_intro_img{3} = cfg.files.recogTestRespKeyImg;
-  [cfg.stim.(sesName).prac_recog.instruct_study] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName)));
-  cfg.stim.(sesName).prac_recog.instruct_study_img = [];
-  [cfg.stim.(sesName).prac_recog.instruct_test] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName)));
-  cfg.stim.(sesName).prac_recog.instruct_test_img = cfg.files.recogTestRespKeyImg;
+  [cfg.stim.(sesName).prac_recog.instruct_recogIntro{1}] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog1_intro.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).prac_recog.instruct_recogIntro_img{1} = [];
+  [cfg.stim.(sesName).prac_recog.instruct_recogIntro{2}] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog2_intro_recoll.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).prac_recog.instruct_recogIntro_img{2} = [];
+  [cfg.stim.(sesName).prac_recog.instruct_recogIntro{3}] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).prac_recog.instruct_recogIntro_img{3} = cfg.files.recogTestRespKeyImg;
+  [cfg.stim.(sesName).prac_recog.instruct_recogStudy] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).prac_recog.instruct_recogStudy_img = [];
+  [cfg.stim.(sesName).prac_recog.instruct_recogTest] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).prac_recog.instruct_recogTest_img = cfg.files.recogTestRespKeyImg;
   
   % Recognition
+  cfg.stim.(sesName).recog.isExp = true;
   
   cfg.stim.(sesName).recog.nBlocks = 8;
   % number of target and lure stimuli per species per family per study/test
@@ -386,11 +407,6 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).recog.studyMaxConsecFamily = 0;
   % maximum number of targets or lures in a row during test task
   cfg.stim.(sesName).recog.testMaxConsec = 0;
-  
-%   % task parameters
-%   cfg.stim.(sesName).recog.nBlocks = 8;
-%   %cfg.stim.(sesName).recog.nTargPerBlock = 40;
-%   %cfg.stim.(sesName).recog.nLurePerBlock = 20;
   
   % do not reuse recognition stimuli in other parts of the experiment
   cfg.stim.(sesName).recog.rmStims = true;
@@ -407,12 +423,18 @@ if expParam.sessionNum == 1
   % cfg.stim.(sesName).recog.response = 1.5;
   
   % instructions
-  [cfg.stim.(sesName).recog.instruct_intro] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName)));
-  cfg.stim.(sesName).recog.instruct_intro_img = [];
-  [cfg.stim.(sesName).recog.instruct_study] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog7_exp_study.txt',expParam.expName)));
-  cfg.stim.(sesName).recog.instruct_study_img = [];
-  [cfg.stim.(sesName).recog.instruct_test] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName)));
-  cfg.stim.(sesName).recog.instruct_test_img = cfg.files.recogTestRespKeyImg;
+  [cfg.stim.(sesName).recog.instruct_recogIntro] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogIntro_img = [];
+  [cfg.stim.(sesName).recog.instruct_recogStudy] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog7_exp_study.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogStudy_img = [];
+  [cfg.stim.(sesName).recog.instruct_recogTest] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogTest_img = cfg.files.recogTestRespKeyImg;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 1 configuration
@@ -421,6 +443,7 @@ if expParam.sessionNum == 1
   sesName = 'train1';
   
 %   % Viewing+Naming
+%   cfg.stim.(sesName).viewname.isExp = true;
 %   
 %   % hard coded order of which species are presented in each block
 %   % (counterbalanced). Blocks are denoted by vectors.
@@ -508,8 +531,30 @@ if expParam.sessionNum == 1
 %   cfg.stim.(sesName).viewname.playSound = playSound;
 %   cfg.stim.(sesName).viewname.correctSound = correctSound;
 %   cfg.stim.(sesName).viewname.incorrectSound = incorrectSound;
+%   
+%   % instructions (view)
+%   [cfg.stim.(sesName).viewname.instruct_view] = et_processTextInstruct(...
+%     fullfile(cfg.files.instructDir,sprintf('%s_view1_intro.txt',expParam.expName)),...
+%     {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%     {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+%     KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+%   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+%   KbName(cfg.keys.s00),cfg.keys.instructContKey});
+%   cfg.stim.(sesName).viewname.instruct_view_img = [];
+%   
+%   % instructions (name)
+%   [cfg.stim.(sesName).viewname.instruct_name] = et_processTextInstruct(...
+%     fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+%     {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%     {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+%     KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+%   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+%   KbName(cfg.keys.s00),cfg.keys.instructContKey});
+%   cfg.stim.(sesName).viewname.instruct_name_img = [];
+  
   
   % Name training (introduce species in a rolling fashion)
+  cfg.stim.(sesName).nametrain.isExp = true;
   
   % hard coded order of which species are presented in each block
   % (counterbalanced). Blocks are denoted by vectors.
@@ -565,7 +610,18 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).nametrain.correctSound = correctSound;
   cfg.stim.(sesName).nametrain.incorrectSound = incorrectSound;
   
+  % instructions
+  [cfg.stim.(sesName).nametrain.instruct_name] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+    {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+    {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+    KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+  KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+  KbName(cfg.keys.s00),cfg.keys.instructContKey});
+  cfg.stim.(sesName).nametrain.instruct_name_img = [];
+  
   % Naming
+  cfg.stim.(sesName).name.isExp = true;
   
   % maximum number of repeated exemplars from each family in naming
   cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
@@ -582,7 +638,18 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).name.correctSound = correctSound;
   cfg.stim.(sesName).name.incorrectSound = incorrectSound;
   
+  % instructions
+  [cfg.stim.(sesName).name.instruct_name] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+    {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+    {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+    KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+  KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+  KbName(cfg.keys.s00),cfg.keys.instructContKey});
+  cfg.stim.(sesName).name.instruct_name_img = [];
+  
   % Matching
+  cfg.stim.(sesName).match.isExp = true;
   
   % number per species per family (half because each stimulus is only in
   % same or different condition)
@@ -610,6 +677,12 @@ if expParam.sessionNum == 1
   % % % Not setting a response time limit
   % cfg.stim.(sesName).match.response = 1.0;
   
+  % instructions
+  [cfg.stim.(sesName).match.instruct_match] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_match1_intro.txt',expParam.expName)),...
+    {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+  cfg.stim.(sesName).match.instruct_match_img = [];
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 2-6 configuration (all these days are the same)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -620,8 +693,9 @@ if expParam.sessionNum == 1
     sesName = sesNames{s};
     
     % Matching 1
-    
     matchNum = 1;
+    cfg.stim.(sesName).match(matchNum).isExp = true;
+    
     cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
     cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
     cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
@@ -644,7 +718,14 @@ if expParam.sessionNum == 1
     % % % Not setting a response time limit
     % cfg.stim.(sesName).match(matchNum).response = 1.0;
     
+    % instructions
+    [cfg.stim.(sesName).match(matchNum).instruct_match] = et_processTextInstruct(...
+      fullfile(cfg.files.instructDir,sprintf('%s_match1_intro.txt',expParam.expName)),...
+      {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+    cfg.stim.(sesName).match(matchNum).instruct_match_img = [];
+    
     % Naming
+    cfg.stim.(sesName).name.isExp = true;
     
     % maximum number of repeated exemplars from each family in naming
     cfg.stim.(sesName).name.nameMaxConsecFamily = 3;
@@ -661,9 +742,20 @@ if expParam.sessionNum == 1
     cfg.stim.(sesName).name.correctSound = correctSound;
     cfg.stim.(sesName).name.incorrectSound = incorrectSound;
     
-    % Matching 2
+    % instructions
+    [cfg.stim.(sesName).name.instruct_name] = et_processTextInstruct(...
+      fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+      {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+      {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+      KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+      KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+      KbName(cfg.keys.s00),cfg.keys.instructContKey});
+    cfg.stim.(sesName).name.instruct_name_img = [];
     
+    % Matching 2
     matchNum = 2;
+    cfg.stim.(sesName).match(matchNum).isExp = true;
+    
     cfg.stim.(sesName).match(matchNum).nSame = cfg.stim.nTrained / 2;
     cfg.stim.(sesName).match(matchNum).nDiff = cfg.stim.nTrained / 2;
     cfg.stim.(sesName).match(matchNum).stim2MinRepeatSpacing = 2;
@@ -685,6 +777,12 @@ if expParam.sessionNum == 1
     % cfg.stim.(sesName).match(matchNum).preStim2 = 1.0 to 1.2;
     % % % Not setting a response time limit
     % cfg.stim.(sesName).match(matchNum).response = 1.0;
+    
+    % instructions
+    [cfg.stim.(sesName).match(matchNum).instruct_match] = et_processTextInstruct(...
+      fullfile(cfg.files.instructDir,sprintf('%s_match1_intro.txt',expParam.expName)),...
+      {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+    cfg.stim.(sesName).match(matchNum).instruct_match_img = [];
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -694,6 +792,7 @@ if expParam.sessionNum == 1
   sesName = 'posttest';
   
   % Matching
+  cfg.stim.(sesName).match.isExp = true;
   
   % every stimulus is in both the same and the different condition.
   cfg.stim.(sesName).match.nSame = cfg.stim.nTrained;
@@ -719,10 +818,18 @@ if expParam.sessionNum == 1
   % % Not setting a response time limit
   % cfg.stim.(sesName).match.response = 1.0;
   
-  % Recognition
+  % instructions
+  [cfg.stim.(sesName).match.instruct_match] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_match1_intro.txt',expParam.expName)),...
+    {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+  cfg.stim.(sesName).match.instruct_match_img = [];
   
-  % number of target and lure stimuli. Assumes all targets and lures are
-  % tested.
+  % Recognition
+  cfg.stim.(sesName).recog.isExp = true;
+  
+  cfg.stim.(sesName).recog.nBlocks = 8;
+  % number of target and lure stimuli per species per family. Assumes all
+  % targets and lures are tested.
   cfg.stim.(sesName).recog.nStudyTarg = 2;
   cfg.stim.(sesName).recog.nTestLure = 1;
   % maximum number of same family in a row during study task
@@ -734,11 +841,6 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).recog.rmStims = true;
   cfg.stim.(sesName).recog.shuffleFirst = true;
   
-  % task parameters
-  cfg.stim.(sesName).recog.nBlocks = 8;
-  cfg.stim.(sesName).recog.nTargPerBlock = 40;
-  cfg.stim.(sesName).recog.nLurePerBlock = 20;
-  
   % durations, in seconds
   cfg.stim.(sesName).recog.study_isi = 0.8;
   cfg.stim.(sesName).recog.study_preTarg = 0.2;
@@ -748,6 +850,20 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).recog.test_stim = 1.5;
   % % Not setting a response time limit
   % cfg.stim.(sesName).recog.response = 1.5;
+  
+  % instructions
+  [cfg.stim.(sesName).recog.instruct_recogIntro] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog_post_intro.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogIntro_img = [];
+  [cfg.stim.(sesName).recog.instruct_recogStudy] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog_post_study.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogStudy_img = [];
+  [cfg.stim.(sesName).recog.instruct_recogTest] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog_post_test.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogTest_img = cfg.files.recogTestRespKeyImg;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Posttest Delayed configuration
@@ -756,6 +872,7 @@ if expParam.sessionNum == 1
   sesName = 'posttest_delay';
   
   % Matching
+  cfg.stim.(sesName).match.isExp = true;
   
   % every stimulus is in both the same and the different condition.
   cfg.stim.(sesName).match.nSame = cfg.stim.nTrained;
@@ -781,10 +898,18 @@ if expParam.sessionNum == 1
   % % Not setting a response time limit
   % cfg.stim.(sesName).match.response = 1.0;
   
-  % Recognition
+  % instructions
+  [cfg.stim.(sesName).match.instruct_match] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_match1_intro.txt',expParam.expName)),...
+    {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+  cfg.stim.(sesName).match.instruct_match_img = [];
   
-  % number of target and lure stimuli. Assumes all targets and lures are
-  % tested.
+  % Recognition
+  cfg.stim.(sesName).recog.isExp = true;
+  
+  cfg.stim.(sesName).recog.nBlocks = 8;
+  % number of target and lure stimuli per species per family. Assumes all
+  % targets and lures are tested.
   cfg.stim.(sesName).recog.nStudyTarg = 2;
   cfg.stim.(sesName).recog.nTestLure = 1;
   % maximum number of same family in a row during study task
@@ -796,11 +921,6 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).recog.rmStims = true;
   cfg.stim.(sesName).recog.shuffleFirst = true;
   
-  % task parameters
-  cfg.stim.(sesName).recog.nBlocks = 8;
-  cfg.stim.(sesName).recog.nTargPerBlock = 40;
-  cfg.stim.(sesName).recog.nLurePerBlock = 20;
-  
   % durations, in seconds
   cfg.stim.(sesName).recog.study_isi = 0.8;
   cfg.stim.(sesName).recog.study_preTarg = 0.2;
@@ -810,6 +930,20 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).recog.test_stim = 1.5;
   % % Not setting a response time limit
   % cfg.stim.(sesName).recog.response = 1.5;
+  
+  % instructions
+  [cfg.stim.(sesName).recog.instruct_recogIntro] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog_post_intro.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogIntro_img = [];
+  [cfg.stim.(sesName).recog.instruct_recogStudy] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog_post_study.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogStudy_img = [];
+  [cfg.stim.(sesName).recog.instruct_recogTest] = et_processTextInstruct(...
+    fullfile(cfg.files.instructDir,sprintf('%s_recog_post_test.txt',expParam.expName)),...
+    {'contKey'},{cfg.keys.instructContKey});
+  cfg.stim.(sesName).recog.instruct_recogTest_img = cfg.files.recogTestRespKeyImg;
   
   %% process the stimuli for the entire experiment
   

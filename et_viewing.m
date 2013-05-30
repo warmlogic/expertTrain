@@ -102,6 +102,12 @@ stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 % y-coordinate for stimulus number
 sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
 
+if runInBlocks
+  nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
+else
+  nSpecies = cfg.stim.nSpecies;
+end
+
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
@@ -126,35 +132,12 @@ Screen('Flip', w);
 
 %% show the instructions
 
-if runInBlocks
-  nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
-else
-  nSpecies = cfg.stim.nSpecies;
-end
+WaitSecs(1.000);
+et_showTextInstruct(w,phaseCfg.instruct_view,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_view_img,...
+  {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
 
-instructions = sprintf([...
-  'Viewing task: block %d.\n',...
-  'You will see creatures from %d families.\n In this block, there are %d different species in each family.\n',...
-  'You will learn to identify the different species of one family,\nand you will chunk the other family together as ''%s''.\n',...
-  '\nYour job is to learn the family and species members by pressing the species key that\ncorresponds to the species number you see below each creature.\n',...
-  'key=species: %s=1, %s=2, %s=3, %s=4, %s=5, %s=6, %s=7, %s=8, %s=9, %s=10\n',...
-  '''%s'' is the key for the ''%s'' family species members.\n',...
-  '\nPress ''%s'' to begin viewing task.'],...
-  b,...
-  length(cfg.stim.familyNames),nSpecies,cfg.text.basicFamStr,...
-  KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-  KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-  KbName(cfg.keys.s00),cfg.text.basicFamStr,...
-  'space');
-Screen('TextSize', w, cfg.text.instructSize);
-% put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', instructColor);
-% Update the display to show the instruction text:
-Screen('Flip', w);
-% wait until spacebar is pressed
-RestrictKeysForKbCheck(KbName('space'));
-KbWait(-1,2);
-RestrictKeysForKbCheck([]);
+% Wait a second before starting trial
+WaitSecs(1.000);
 
 %% run the viewing task
 
@@ -230,6 +213,9 @@ for i = 1:length(stimTex)
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
   [imgOn, stimOnset] = Screen('Flip', w);
+  
+  % debug
+  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),viewStims(i).fileName,sNum);
   
   % while loop to show stimulus until subject response or until
   % "duration" seconds elapse.
@@ -358,7 +344,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',1,length(stimTex),viewStims(i).filenName,sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),viewStims(i).fileName,sNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...

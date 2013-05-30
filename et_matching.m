@@ -86,7 +86,7 @@ stim2Tex = nan(1,length(stim2));
 
 message = sprintf('Preparing images, please wait...');
 Screen('TextSize', w, cfg.text.instructSize);
-% put the instructions on the screen
+% put the "preparing" message on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
 Screen('Flip', w);
@@ -160,19 +160,11 @@ Screen('Flip', w);
 
 %% show the instructions
 
-instructions = sprintf(['Press ''%s'' if the creatures are from the same species.\n',...
-  'Press ''%s'' if the creatures are from different species.\n',...
-  '\nPress ''%s'' to begin matching task.'],...
-  KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),'space');
-Screen('TextSize', w, cfg.text.instructSize);
-% put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', instructColor);
-% Update the display to show the instruction text:
-Screen('Flip', w);
-% wait until spacebar is pressed
-RestrictKeysForKbCheck(KbName('space'));
-KbWait(-1,2);
-RestrictKeysForKbCheck([]);
+WaitSecs(1.000);
+et_showTextInstruct(w,phaseCfg.instruct_match,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_match_img);
+
+% Wait a second before starting trial
+WaitSecs(1.000);
 
 %% run the matching task
 

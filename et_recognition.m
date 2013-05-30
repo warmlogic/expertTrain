@@ -114,17 +114,20 @@ for b = 1:phaseCfg.nBlocks
   
   %% show the study instructions
   
-  if iscell(phaseCfg.instruct_intro)
-    for i = 1:length(phaseCfg.instruct_intro)
+  if iscell(phaseCfg.instruct_recogIntro)
+    for i = 1:length(phaseCfg.instruct_recogIntro)
       WaitSecs(1.000);
-      et_showTextInstruct(w,phaseCfg.instruct_intro{i},'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_intro_img{i});
+      et_showTextInstruct(w,phaseCfg.instruct_recogIntro{i},cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogIntro_img{i},...
+        {'blockNum'},{num2str(b)});
     end
   else
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct_intro,'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_intro_img);
+    et_showTextInstruct(w,phaseCfg.instruct_recogIntro,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogIntro_img,...
+        {'blockNum'},{num2str(b)});
   end
   WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct_study,'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_study_img);
+  et_showTextInstruct(w,phaseCfg.instruct_recogStudy,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogStudy_img,...
+        {'blockNum'},{num2str(b)});
   
   % Wait a second before starting trial
   WaitSecs(1.000);
@@ -293,8 +296,7 @@ for b = 1:phaseCfg.nBlocks
   %% show the test instructions
   
   WaitSecs(1.000);
-  
-  et_showTextInstruct(w,phaseCfg.instruct_test,'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_test_img);
+  et_showTextInstruct(w,phaseCfg.instruct_recogTest,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogTest_img);
   
   % Wait a second before starting trial
   WaitSecs(1.000);
