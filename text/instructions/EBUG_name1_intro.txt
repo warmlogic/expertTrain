@@ -1,0 +1,16 @@
+Naming task: block blockNum.
+
+You will see creatures from nFamily families.
+In this block, there are nSpecies different species in each family.
+
+You will identify the different species of one family,
+and you will chunk the other family together as "basicFamStr".
+
+Your job is to press the correct species key for each creature. If you don't know the species number, take your best guess.
+
+key=species: s01=1, s02=2, s03=3, s04=4, s05=5, s06=6, s07=7, s08=8, s09=9, s10=10
+"s00" is the key for the "basicFamStr" family species members.
+
+Please place your fingers on the keys now.
+
+Press "contKey" to begin the naming task.
