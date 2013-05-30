@@ -115,19 +115,14 @@ for b = 1:phaseCfg.nBlocks
   
   %% show the study instructions
   
-  instructions = sprintf('Press ''%s'' to begin Recognition study task.','space');
-  Screen('TextSize', w, cfg.text.basic);
-  % put the instructions on the screen
-  DrawFormattedText(w, instructions, 'center', 'center', instructColor);
-  % Update the display to show the instruction text:
-  Screen('Flip', w);
-  % wait until spacebar is pressed
-  RestrictKeysForKbCheck(KbName('space'));
-  KbWait(-1,2);
-  RestrictKeysForKbCheck([]);
-  % Clear screen to background color (our 'gray' as set at the
-  % beginning):
-  Screen('Flip', w);
+  if iscell(phaseCfg.instruct_intro)
+    for i = 1:length(phaseCfg.instruct_intro)
+      et_showTextInstruct(w,phaseCfg.instruct_intro{i},'space',instructColor,cfg.text.basic);
+    end
+  else
+    et_showTextInstruct(w,phaseCfg.instruct_intro,'space',instructColor,cfg.text.basic);
+  end
+  et_showTextInstruct(w,phaseCfg.instruct_study,'space',instructColor,cfg.text.basic);
   
   % Wait a second before starting trial
   WaitSecs(1.000);
@@ -292,19 +287,21 @@ for b = 1:phaseCfg.nBlocks
   
   %% show the test instructions
   
-  instructions = sprintf('Press ''%s'' to begin Recognition test task.','space');
-  Screen('TextSize', w, cfg.text.basic);
-  % put the instructions on the screen
-  DrawFormattedText(w, instructions, 'center', 'center', instructColor);
-  % Update the display to show the instruction text:
-  Screen('Flip', w);
-  % wait until spacebar is pressed
-  RestrictKeysForKbCheck(KbName('space'));
-  KbWait(-1,2);
-  RestrictKeysForKbCheck([]);
-  % Clear screen to background color (our 'gray' as set at the
-  % beginning):
-  Screen('Flip', w);
+  et_showTextInstruct(w,phaseCfg.instruct_test,'space',instructColor,cfg.text.basic);
+  
+%   instructions = sprintf('Press ''%s'' to begin Recognition test task.','space');
+%   Screen('TextSize', w, cfg.text.basic);
+%   % put the instructions on the screen
+%   DrawFormattedText(w, instructions, 'center', 'center', instructColor);
+%   % Update the display to show the instruction text:
+%   Screen('Flip', w);
+%   % wait until spacebar is pressed
+%   RestrictKeysForKbCheck(KbName('space'));
+%   KbWait(-1,2);
+%   RestrictKeysForKbCheck([]);
+%   % Clear screen to background color (our 'gray' as set at the
+%   % beginning):
+%   Screen('Flip', w);
   
   % Wait a second before starting trial
   WaitSecs(1.000);
