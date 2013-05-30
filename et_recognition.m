@@ -57,11 +57,10 @@ instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
 
 % read the proper response key image
-testRespImgFile = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
-testRespImg = imread(testRespImgFile);
-testRespImgHeight = size(testRespImg,1);
-testRespImgWidth = size(testRespImg,2);
-testRespImg = Screen('MakeTexture',w,testRespImg);
+respKeyImg = imread(cfg.files.recogTestRespKeyImg);
+respKeyImgHeight = size(respKeyImg,1);
+respKeyImgWidth = size(respKeyImg,2);
+respKeyImg = Screen('MakeTexture',w,respKeyImg);
 
 %% start NS recording, if desired
 
@@ -74,7 +73,7 @@ if expParam.useNS
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   message = 'Starting data acquisition for recognition phase...';
 end
-Screen('TextSize', w, cfg.text.basic);
+Screen('TextSize', w, cfg.text.instructSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
 % put it on
@@ -111,21 +110,21 @@ for b = 1:phaseCfg.nBlocks
   stimImgWidth = size(stimImg,2);
   % set the stimulus image rectangle
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
-  stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
+  stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
   
   %% show the study instructions
   
   if iscell(phaseCfg.instruct_intro)
     for i = 1:length(phaseCfg.instruct_intro)
       WaitSecs(1.000);
-      et_showTextInstruct(w,phaseCfg.instruct_intro{i},'space',instructColor,cfg.text.basic);
+      et_showTextInstruct(w,phaseCfg.instruct_intro{i},'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_intro_img{i});
     end
   else
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct_intro,'space',instructColor,cfg.text.basic);
+    et_showTextInstruct(w,phaseCfg.instruct_intro,'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_intro_img);
   end
   WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct_study,'space',instructColor,cfg.text.basic);
+  et_showTextInstruct(w,phaseCfg.instruct_study,'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_study_img);
   
   % Wait a second before starting trial
   WaitSecs(1.000);
@@ -133,7 +132,7 @@ for b = 1:phaseCfg.nBlocks
   %% run the recognition study task
   
   % set the fixation size
-  Screen('TextSize', w, cfg.text.fixsize);
+  Screen('TextSize', w, cfg.text.fixSize);
   
   % start the blink break timer
   if expParam.useNS
@@ -143,7 +142,7 @@ for b = 1:phaseCfg.nBlocks
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
     if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-      Screen('TextSize', w, cfg.text.basic);
+      Screen('TextSize', w, cfg.text.instructSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
       DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -153,7 +152,7 @@ for b = 1:phaseCfg.nBlocks
       KbReleaseWait;
       KbWait(-1); % listen for keypress on either keyboard
       
-      Screen('TextSize', w, cfg.text.fixsize);
+      Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
       Screen('Flip',w);
       WaitSecs(0.5);
@@ -177,7 +176,7 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % draw fixation
-    Screen('TextSize', w, cfg.text.fixsize);
+    Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     [preStimFixOn] = Screen('Flip',w);
     
@@ -193,6 +192,9 @@ for b = 1:phaseCfg.nBlocks
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
     [imgStudyOn, stimOnset] = Screen('Flip', w);
+    
+    % debug
+    fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),allStims{b}(i).fileName);
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
@@ -285,14 +287,14 @@ for b = 1:phaseCfg.nBlocks
   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
   
   % set the response key image rectangle
-  respKeyImgRect = CenterRect([0 0 testRespImgWidth testRespImgHeight],stimImgRect);
-  respKeyImgRect = AdjoinRect(respKeyImgRect,stimImgRect,RectBottom);
+  respKeyImgRect = CenterRect([0 0 respKeyImgWidth respKeyImgHeight], stimImgRect);
+  respKeyImgRect = AdjoinRect(respKeyImgRect, stimImgRect, RectBottom);
   
   %% show the test instructions
   
   WaitSecs(1.000);
   
-  et_showTextInstruct(w,phaseCfg.instruct_test,'space',instructColor,cfg.text.basic);
+  et_showTextInstruct(w,phaseCfg.instruct_test,'space',instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_test_img);
   
   % Wait a second before starting trial
   WaitSecs(1.000);
@@ -300,7 +302,7 @@ for b = 1:phaseCfg.nBlocks
   %% Run the recognition test task
   
   % set the fixation size
-  Screen('TextSize', w, cfg.text.fixsize);
+  Screen('TextSize', w, cfg.text.fixSize);
   
   % only check these keys
   RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
@@ -313,7 +315,7 @@ for b = 1:phaseCfg.nBlocks
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
     if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-      Screen('TextSize', w, cfg.text.basic);
+      Screen('TextSize', w, cfg.text.instructSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
       DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -323,7 +325,7 @@ for b = 1:phaseCfg.nBlocks
       KbReleaseWait;
       KbWait(-1); % listen for keypress on either keyboard
       
-      Screen('TextSize', w, cfg.text.fixsize);
+      Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
       Screen('Flip',w);
       WaitSecs(0.5);
@@ -347,7 +349,7 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % draw fixation
-    Screen('TextSize', w, cfg.text.fixsize);
+    Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     [preStimFixOn] = Screen('Flip',w);
     
@@ -364,6 +366,9 @@ for b = 1:phaseCfg.nBlocks
     % and record stimulus onset time in 'stimOnset':
     [imgTestOn, stimOnset] = Screen('Flip', w);
     
+    % debug
+    fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ);
+    
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
     while (GetSecs - stimOnset) <= phaseCfg.test_stim
@@ -372,14 +377,9 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(0.0001);
     end
     
-    % draw the stimulus
+    % draw the stimulus with the response key image
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
-    
-    % debug
-    fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ);
-    
-    % draw the response key image
-    Screen('DrawTexture', w, testRespImg, [], respKeyImgRect);
+    Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
     % put them on the screen; measure RT from when response key img appears
     [respKeyImgOn, startRT] = Screen('Flip', w);
     
@@ -562,6 +562,9 @@ for b = 1:phaseCfg.nBlocks
 end % for nBlocks
 
 %% cleanup
+
+% Close the response key image
+Screen('Close',respKeyImg);
 
 % stop recording
 if expParam.useNS

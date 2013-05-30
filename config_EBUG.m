@@ -176,7 +176,7 @@ if expParam.sessionNum == 1
   cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
   
   % set the instructions directory
-  cfg.file.instructDir = fullfile(cfg.files.expDir,'text','instructions');
+  cfg.files.instructDir = fullfile(cfg.files.expDir,'text','instructions');
   
   % create the stimulus list if it doesn't exist
   shuffleSpecies = true;
@@ -282,10 +282,17 @@ if expParam.sessionNum == 1
     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
   end
   
+  cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
+  
   %% Text size and symbol configuration
   
-  cfg.text.basic = 32;
-  cfg.text.fixsize = 32;
+  % font size for instructsions
+  cfg.text.instructSize = 32;
+  % number of characters wide at which the instructions will be shown
+  cfg.text.instructWidth = 80;
+  
+  % fixation info
+  cfg.text.fixSize = 32;
   cfg.text.fixSymbol = '+';
   cfg.text.respSymbol = '?';
   
@@ -357,11 +364,16 @@ if expParam.sessionNum == 1
   % cfg.stim.(sesName).recog.response = 1.5;
   
   % instructions
-  cfg.stim.(sesName).prac_recog.instruct_intro{1} = fullfile(cfg.file.instructDir,sprintf('%s_recog1_intro.txt',expParam.expName));
-  cfg.stim.(sesName).prac_recog.instruct_intro{2} = fullfile(cfg.file.instructDir,sprintf('%s_recog2_intro_recoll.txt',expParam.expName));
-  cfg.stim.(sesName).prac_recog.instruct_intro{3} = fullfile(cfg.file.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName));
-  cfg.stim.(sesName).prac_recog.instruct_study = fullfile(cfg.file.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName));
-  cfg.stim.(sesName).prac_recog.instruct_test = fullfile(cfg.file.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName));
+  [cfg.stim.(sesName).prac_recog.instruct_intro{1}] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog1_intro.txt',expParam.expName)));
+  cfg.stim.(sesName).prac_recog.instruct_intro_img{1} = [];
+  [cfg.stim.(sesName).prac_recog.instruct_intro{2}] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog2_intro_recoll.txt',expParam.expName)));
+  cfg.stim.(sesName).prac_recog.instruct_intro_img{2} = [];
+  [cfg.stim.(sesName).prac_recog.instruct_intro{3}] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName)));
+  cfg.stim.(sesName).prac_recog.instruct_intro_img{3} = cfg.files.recogTestRespKeyImg;
+  [cfg.stim.(sesName).prac_recog.instruct_study] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName)));
+  cfg.stim.(sesName).prac_recog.instruct_study_img = [];
+  [cfg.stim.(sesName).prac_recog.instruct_test] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName)));
+  cfg.stim.(sesName).prac_recog.instruct_test_img = cfg.files.recogTestRespKeyImg;
   
   % Recognition
   
@@ -395,9 +407,12 @@ if expParam.sessionNum == 1
   % cfg.stim.(sesName).recog.response = 1.5;
   
   % instructions
-  cfg.stim.(sesName).recog.instruct_intro = fullfile(cfg.file.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName));
-  cfg.stim.(sesName).recog.instruct_study = fullfile(cfg.file.instructDir,sprintf('%s_recog7_exp_study.txt',expParam.expName));
-  cfg.stim.(sesName).recog.instruct_test = fullfile(cfg.file.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName));
+  [cfg.stim.(sesName).recog.instruct_intro] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName)));
+  cfg.stim.(sesName).recog.instruct_intro_img = [];
+  [cfg.stim.(sesName).recog.instruct_study] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog7_exp_study.txt',expParam.expName)));
+  cfg.stim.(sesName).recog.instruct_study_img = [];
+  [cfg.stim.(sesName).recog.instruct_test] = et_processTextInstruct(fullfile(cfg.files.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName)));
+  cfg.stim.(sesName).recog.instruct_test_img = cfg.files.recogTestRespKeyImg;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 1 configuration

@@ -1,33 +1,46 @@
-function et_showTextInstruct(w,instructFile,continueKey,instructColor,instructSize)
-% function et_showTextInstruct(w,instructFile,continueKey,instructColor,instructSize)
+function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile)
+% function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile)
 
 if ~exist('continueKey','var') || isempty(continueKey)
   continueKey = 'any';
 end
 
-if ~exist('instructColor','var') || isempty(instructColor)
-  instructColor = WhiteIndex(w);
+if ~exist('instructColor','var') || isempty(instructTextColor)
+  instructTextColor = WhiteIndex(w);
 end
 
-if ~exist('instructSize','var') || isempty(instructSize)
-  instructSize = 32;
+if ~exist('instructSize','var') || isempty(instructTextSize)
+  instructTextSize = 32;
 end
 
-if exist(instructFile,'file')
-  fid = fopen(instructFile, 'rt');
-else
-  error('Instructions file does not exist: %s',instructFile);
+if ~exist('instructTextWidth','var') || isempty(instructTextWidth)
+  instructTextWidth = 80;
 end
-instructions = fread(fid, [1, inf], '*char');
-fclose(fid);
 
-% turn carriage returns into newlines
-instructions = strrep(instructions,sprintf('\r'),sprintf('\n'));
+if ~exist('instructImageFile','var') || isempty(instructImageFile)
+  instructImageFile = [];
+end
 
-%instructions = sprintf('Press ''%s'' to begin Recognition study task.','space');
-Screen('TextSize', w, instructSize);
+% if we want to display an image with the instructions, put it at the
+% bottom of the screen
+if ~isempty(instructImageFile)
+  instructImage = imread(instructImageFile);
+  instructImageHeight = size(instructImage,1);
+  instructImageWidth = size(instructImage,2);
+  instructImage = Screen('MakeTexture',w,instructImage);
+  
+  % put the image at the bottom of the screen
+  wRect = Screen('Rect', w);
+  instructImageRect = CenterRect([0 0 instructImageWidth instructImageHeight], wRect);
+  instructImageRect = AlignRect(instructImageRect, wRect, RectBottom);
+  
+  % draw the response key image
+  Screen('DrawTexture', w, instructImage, [], instructImageRect);
+end
+
+Screen('TextSize', w, instructTextSize);
 % put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', instructColor, 80);
+DrawFormattedText(w, instructions, 'center', 'center', instructTextColor, instructTextWidth);
 % Update the display to show the instruction text:
 Screen('Flip', w);
 
@@ -39,6 +52,11 @@ end
 KbWait(-1,2);
 RestrictKeysForKbCheck([]);
 
-% Clear screen to background color (our 'gray' as set at the
-% beginning):
+% Clear screen to background color (our 'gray' as set at the beginning):
 Screen('Flip', w);
+
+if ~isempty(instructImageFile)
+  Screen('Close', instructImage);
+end
+
+end % function
