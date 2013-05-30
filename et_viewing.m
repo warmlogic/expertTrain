@@ -71,7 +71,7 @@ end
 %% preload all stimuli for presentation
 
 message = sprintf('Preparing images, please wait...');
-Screen('TextSize', w, cfg.text.basic);
+Screen('TextSize', w, cfg.text.instructSize);
 % put the instructions on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
@@ -113,7 +113,7 @@ if expParam.useNS
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   message = 'Starting data acquisition for viewing phase...';
 end
-Screen('TextSize', w, cfg.text.basic);
+Screen('TextSize', w, cfg.text.instructSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
 % put it on
@@ -146,7 +146,7 @@ instructions = sprintf([...
   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
   KbName(cfg.keys.s00),cfg.text.basicFamStr,...
   'space');
-Screen('TextSize', w, cfg.text.basic);
+Screen('TextSize', w, cfg.text.instructSize);
 % put the instructions on the screen
 DrawFormattedText(w, instructions, 'center', 'center', instructColor);
 % Update the display to show the instruction text:
@@ -159,7 +159,7 @@ RestrictKeysForKbCheck([]);
 %% run the viewing task
 
 % set the fixation size
-Screen('TextSize', w, cfg.text.fixsize);
+Screen('TextSize', w, cfg.text.fixSize);
 
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
@@ -173,7 +173,7 @@ end
 for i = 1:length(stimTex)
   % Do a blink break if recording EEG and specified time has passed
   if expParam.useNS && i ~= 1 && i ~= length(stimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-    Screen('TextSize', w, cfg.text.basic);
+    Screen('TextSize', w, cfg.text.instructSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -183,7 +183,7 @@ for i = 1:length(stimTex)
     KbReleaseWait;
     KbWait(-1); % listen for keypress on either keyboard
     
-    Screen('TextSize', w, cfg.text.fixsize);
+    Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
     Screen('Flip',w);
     WaitSecs(0.5);
@@ -210,7 +210,7 @@ for i = 1:length(stimTex)
   WaitSecs(phaseCfg.view_isi);
   
   % draw fixation
-  Screen('TextSize', w, cfg.text.fixsize);
+  Screen('TextSize', w, cfg.text.fixSize);
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
   [preStimFixOn] = Screen('Flip',w);
   
@@ -220,7 +220,7 @@ for i = 1:length(stimTex)
   % draw the stimulus
   Screen('DrawTexture', w, stimTex(i));
   % and species number in black
-  Screen('TextSize', w, cfg.text.basic);
+  Screen('TextSize', w, cfg.text.instructSize);
   if sNum > 0
     DrawFormattedText(w,num2str(sNum),'center',sNumY,initial_sNumColor);
   else
@@ -262,7 +262,7 @@ for i = 1:length(stimTex)
       % draw the stimulus
       Screen('DrawTexture', w, stimTex(i));
       % and species number in the appropriate color
-      Screen('TextSize', w, cfg.text.basic);
+      Screen('TextSize', w, cfg.text.instructSize);
       if sNum > 0
         DrawFormattedText(w,num2str(sNum),'center',sNumY,sNumColor);
       else
@@ -293,7 +293,7 @@ for i = 1:length(stimTex)
     % draw the stimulus
     Screen('DrawTexture', w, stimTex(i));
     % and species number in the appropriate color
-    Screen('TextSize', w, cfg.text.basic);
+    Screen('TextSize', w, cfg.text.instructSize);
     if sNum > 0
       DrawFormattedText(w,num2str(sNum),'center',sNumY,incorrect_sNumColor);
     else

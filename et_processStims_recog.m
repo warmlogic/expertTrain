@@ -19,7 +19,7 @@ varargout = cell(1,nout);
 
 for b = 1:cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks
   
-  if ~isempty(strfind(phaseName,'prac_'))
+  if ~isempty(strfind(phaseName,'prac'))
     % this is the practice session
     while length(expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}) < cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg
       for f = 1:length(cfg.stim.familyNames)
