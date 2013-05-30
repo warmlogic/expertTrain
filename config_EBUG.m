@@ -72,13 +72,13 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.session.train6.phases = {'name'};
 % expParam.session.posttest.phases = {'match'};
 
-% debug
-expParam.nSessions = 1;
-expParam.sesTypes = {'pretest'};
-% set up a field for each session type
-% expParam.session.pretest.phases = {'match'};
-% expParam.session.pretest.phases = {'recog'};
-expParam.session.pretest.phases = {'prac_recog','recog'};
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'pretest'};
+% % set up a field for each session type
+% % expParam.session.pretest.phases = {'match'};
+% % expParam.session.pretest.phases = {'recog'};
+% expParam.session.pretest.phases = {'prac_recog','recog'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -261,7 +261,7 @@ if expParam.sessionNum == 1
   
   % recognition keys
   %cfg.keys.recogKeyNames = {{'a','s','d','f','h'},{'f','h','j','k','l'}};
-  cfg.keys.recogKeyNames = {{'a','s','d','f','h'},{'f','j','k','l',';:'}};
+  cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
   
   % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
   if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15

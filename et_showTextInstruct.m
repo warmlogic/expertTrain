@@ -27,7 +27,7 @@ instructions = strrep(instructions,sprintf('\r'),sprintf('\n'));
 %instructions = sprintf('Press ''%s'' to begin Recognition study task.','space');
 Screen('TextSize', w, instructSize);
 % put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', instructColor, 70);
+DrawFormattedText(w, instructions, 'center', 'center', instructColor, 80);
 % Update the display to show the instruction text:
 Screen('Flip', w);
 
