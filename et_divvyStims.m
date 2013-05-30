@@ -1,5 +1,5 @@
-function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
-% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue)
+function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen)
+% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen)
 %
 % Description:
 %  Shuffle a stimulus set (origStims) and slice out a subset (nStims) of
@@ -21,6 +21,8 @@ function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rm
 %                Optional (default = {}).
 %  newValue:     Cell (same number of elements as newField). The value(s)
 %                for the new field(s). Optional (default = {}).
+%  maxChosen:    Integer. Upper limit for choosing stimuli. Used in case
+%                fewer than nStims x nSpecies are needed.
 %
 % Output:
 %  chosenStims: Struct containing the chosen stimuli from each available
@@ -39,6 +41,10 @@ end
 
 if ~exist('newValue','var') || isempty(newValue)
   newValue = {};
+end
+
+if ~exist('maxChosen','var') || ~isnumeric(maxChosen)
+  maxChosen = [];
 end
 
 if isempty(origStims)
@@ -62,6 +68,7 @@ end
 theseSpecies = unique([origStims.speciesNum]);
 
 % loop through every species
+chosenCount = 0;
 for s = 1:length(theseSpecies)
   % which indices does this species occupy?
   sInd = find([origStims.speciesNum] == theseSpecies(s));
@@ -72,8 +79,19 @@ for s = 1:length(theseSpecies)
   else
     randind = 1:length(sInd);
   end
+  
   % get the indices of the stimuli that we want
   chosenInd = sInd(randind(1:nStims));
+  
+  % need to shorten the list of stimuli to choose if we're going to go over
+  chosenCount = chosenCount + nStims;
+  if ~isempty(maxChosen)
+    if chosenCount > maxChosen && chosenCount - nStims >= maxChosen
+      break
+    elseif chosenCount > maxChosen && chosenCount - nStims < maxChosen
+      chosenInd = chosenInd(1:(chosenCount - maxChosen));
+    end
+  end
   
   if ~isempty(newField)
     % add new fields and values to these stimuli

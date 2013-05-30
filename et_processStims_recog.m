@@ -19,20 +19,51 @@ varargout = cell(1,nout);
 
 for b = 1:cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks
   
-  for f = 1:length(cfg.stim.familyNames)
-    thisFam = varargin{f};
-    
-    % targets
-    [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},thisFam] = et_divvyStims(...
-      thisFam,[],cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg,...
-      cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{1});
-    % lures
-    [expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},thisFam] = et_divvyStims(...
-      thisFam,[],cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure,...
-      cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{0});
-    
-    % store the (altered) family stimuli for output
-    varargout{f} = thisFam;
+  if ~isempty(strfind(phaseName,'prac_'))
+    % this is the practice session
+    while length(expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}) < cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg
+      for f = 1:length(cfg.stim.familyNames)
+        thisFam = varargin{f};
+        
+        % targets
+        [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},thisFam] = et_divvyStims(...
+          thisFam,expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},1,...
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{1},...
+          ceil(cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg / length(cfg.stim.familyNames)));
+        % store the (altered) family stimuli for output
+        varargout{f} = thisFam;
+      end
+    end
+    while length(expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b}) < cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure
+      for f = 1:length(cfg.stim.familyNames)
+        thisFam = varargin{f};
+        % lures
+        [expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},thisFam] = et_divvyStims(...
+          thisFam,expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},1,...
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{0},...
+          ceil(cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure / length(cfg.stim.familyNames)));
+        
+        % store the (altered) family stimuli for output
+        varargout{f} = thisFam;
+      end
+    end
+  else
+    % this is the real deal
+    for f = 1:length(cfg.stim.familyNames)
+      thisFam = varargin{f};
+      
+      % targets
+      [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},thisFam] = et_divvyStims(...
+        thisFam,[],cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg,...
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{1});
+      % lures
+      [expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},thisFam] = et_divvyStims(...
+        thisFam,[],cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure,...
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{0});
+      
+      % store the (altered) family stimuli for output
+      varargout{f} = thisFam;
+    end
   end
   
   % shuffle the study stims so no more than X of the same family appear in

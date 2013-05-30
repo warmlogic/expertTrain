@@ -276,6 +276,7 @@ try
   nameCount = 0;
   matchCount = 0;
   recogCount = 0;
+  prac_recogCount = 0;
   
   % for each phase in this session, run the correct function
   for p = 1:length(expParam.session.(sesName).phases)
@@ -330,6 +331,12 @@ try
         recogCount = recogCount + 1;
         
         [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+
+      case {'prac_recog'}
+        % Recognition (old/new) task
+        prac_recogCount = prac_recogCount + 1;
+        
+        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
 
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);
