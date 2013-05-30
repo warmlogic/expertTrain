@@ -5,7 +5,8 @@ function [instructions] = et_processTextInstruct(instructFile,origText,replaceme
 %  instructFile:    path to instructions file
 %  origText:        cell array of text strings to be replaced
 %                   (all instances will be replaced)
-%  replacementText: cell array of strings with which to replace origText
+%  replacementText: cell array of strings with which to replace origText,
+%                   in the same order as origText
 %
 % Output:
 %  instructions:    string of instructions
