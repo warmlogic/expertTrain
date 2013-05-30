@@ -73,7 +73,7 @@ if expParam.useNS
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   message = 'Starting data acquisition for recognition phase...';
 end
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
 % put it on
@@ -145,7 +145,7 @@ for b = 1:phaseCfg.nBlocks
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
     if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-      Screen('TextSize', w, cfg.text.instructSize);
+      Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
       DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -317,7 +317,7 @@ for b = 1:phaseCfg.nBlocks
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
     if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-      Screen('TextSize', w, cfg.text.instructSize);
+      Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
       DrawFormattedText(w, pauseMsg, 'center', 'center');

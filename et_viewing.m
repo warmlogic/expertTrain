@@ -71,7 +71,7 @@ end
 %% preload all stimuli for presentation
 
 message = sprintf('Preparing images, please wait...');
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % put the instructions on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
@@ -119,7 +119,7 @@ if expParam.useNS
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   message = 'Starting data acquisition for viewing phase...';
 end
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
 % put it on
@@ -156,7 +156,7 @@ end
 for i = 1:length(stimTex)
   % Do a blink break if recording EEG and specified time has passed
   if expParam.useNS && i ~= 1 && i ~= length(stimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -203,7 +203,7 @@ for i = 1:length(stimTex)
   % draw the stimulus
   Screen('DrawTexture', w, stimTex(i));
   % and species number in black
-  Screen('TextSize', w, cfg.text.instructSize);
+  Screen('TextSize', w, cfg.text.basicTextSize);
   if sNum > 0
     DrawFormattedText(w,num2str(sNum),'center',sNumY,initial_sNumColor);
   else
@@ -248,7 +248,7 @@ for i = 1:length(stimTex)
       % draw the stimulus
       Screen('DrawTexture', w, stimTex(i));
       % and species number in the appropriate color
-      Screen('TextSize', w, cfg.text.instructSize);
+      Screen('TextSize', w, cfg.text.basicTextSize);
       if sNum > 0
         DrawFormattedText(w,num2str(sNum),'center',sNumY,sNumColor);
       else
@@ -279,7 +279,7 @@ for i = 1:length(stimTex)
     % draw the stimulus
     Screen('DrawTexture', w, stimTex(i));
     % and species number in the appropriate color
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     if sNum > 0
       DrawFormattedText(w,num2str(sNum),'center',sNumY,incorrect_sNumColor);
     else

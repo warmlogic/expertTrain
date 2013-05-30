@@ -85,7 +85,7 @@ stim1Tex = nan(1,length(stim2));
 stim2Tex = nan(1,length(stim2));
 
 message = sprintf('Preparing images, please wait...');
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % put the "preparing" message on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
@@ -147,7 +147,7 @@ if expParam.useNS
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   message = 'Starting data acquisition for matching phase...';
 end
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
 % put it on
@@ -182,7 +182,7 @@ end
 for i = 1:length(stim2Tex)
   % Do a blink break if recording EEG and specified time has passed
   if expParam.useNS && i ~= 1 && i ~= length(stim2Tex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stim2Tex));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -277,7 +277,7 @@ for i = 1:length(stim2Tex)
   end
   
   % draw response prompt
-  Screen('TextSize', w, cfg.text.instructSize);
+  Screen('TextSize', w, cfg.text.basicTextSize);
   if phaseCfg.matchTextPrompt
     responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
     DrawFormattedText(w,responsePromptText,'center','center',fixationColor);

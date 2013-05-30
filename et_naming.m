@@ -69,7 +69,7 @@ end
 %% preload all stimuli for presentation
 
 message = sprintf('Preparing images, please wait...');
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % put the "preparing" message on the screen
 DrawFormattedText(w, message, 'center', 'center', instructColor);
 % Update the display to show the message:
@@ -117,7 +117,7 @@ if expParam.useNS
   [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   message = 'Starting data acquisition for naming phase...';
 end
-Screen('TextSize', w, cfg.text.instructSize);
+Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
 % put it on
@@ -154,7 +154,7 @@ end
 for i = 1:length(stimTex)
   % Do a blink break if recording EEG and specified time has passed
   if expParam.useNS && i ~= 1 && i ~= length(stimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center');
@@ -218,7 +218,7 @@ for i = 1:length(stimTex)
   end
   
   % draw response prompt
-  Screen('TextSize', w, cfg.text.instructSize);
+  Screen('TextSize', w, cfg.text.basicTextSize);
   DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor);
   [respPromptOn, startRT] = Screen('Flip',w);
   
@@ -251,7 +251,7 @@ for i = 1:length(stimTex)
           end
         end
         % draw species number in the appropriate color
-        Screen('TextSize', w, cfg.text.instructSize);
+        Screen('TextSize', w, cfg.text.basicTextSize);
         if sNum > 0
           DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
         else

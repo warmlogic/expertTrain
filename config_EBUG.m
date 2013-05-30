@@ -287,6 +287,7 @@ if expParam.sessionNum == 1
   
   %% Text size and symbol configuration
   
+  cfg.text.basicTextSize = 32;
   % font size for instructsions
   cfg.text.instructSize = 32;
   % number of characters wide at which the instructions will be shown
