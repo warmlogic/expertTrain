@@ -157,7 +157,7 @@ try
   HideCursor;
   
   % don't display keyboard output
-  ListenChar(2);
+  %ListenChar(2);
   
   % Set up the gray color value to be used
   cfg.screen.gray = GrayIndex(screenNumber);
