@@ -15,6 +15,7 @@ function [expParam] = et_processStims_EBUG(cfg,expParam)
 % read in the stimulus list
 fprintf('Loading stimulus list: %s...',cfg.stim.file);
 fid = fopen(cfg.stim.file);
+% the header line becomes the fieldnames
 stim_fieldnames = regexp(fgetl(fid),'\t','split');
 stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t');
 fclose(fid);
@@ -30,21 +31,13 @@ speciesNumFieldNum = 5;
 % find the indices for each family and select only cfg.stim.nSpecies
 fprintf('Selecting %d of %d possible species for each family.\n',cfg.stim.nSpecies,length(unique(stimuli{speciesNumFieldNum})));
 
+% initialize to store the stimuli
 stimStruct = struct();
+
+% get the indices of each family and only the number of species wanted
 for f = 1:length(cfg.stim.familyNames)
-  % get the indices of this family
   fInd = eval([sprintf('stimuli{%d} == %d & (stimuli{%d} == %d',familyNumFieldNum,f,speciesNumFieldNum,1),...
     sprintf(repmat([' | ',sprintf('stimuli{%d}',speciesNumFieldNum),' == %d'],1,(cfg.stim.nSpecies - 1)),2:cfg.stim.nSpecies), ')']);
-  % store them in the struct
-%   stimStruct.(sprintf('f%dStim',f)) = struct(...
-%     stim_fieldnames{1},stimuli{1}(fInd),...
-%     stim_fieldnames{2},stimuli{2}(fInd),...
-%     stim_fieldnames{3},num2cell(stimuli{3}(fInd)),...
-%     stim_fieldnames{4},stimuli{4}(fInd),...
-%     stim_fieldnames{5},num2cell(stimuli{5}(fInd)),...
-%     stim_fieldnames{6},num2cell(stimuli{6}(fInd)),...
-%     stim_fieldnames{7},num2cell(stimuli{7}(fInd)),...
-%     stim_fieldnames{8},num2cell(stimuli{8}(fInd)));
   stimStruct(f).fStims = struct(...
     stim_fieldnames{1},stimuli{1}(fInd),...
     stim_fieldnames{2},stimuli{2}(fInd),...
@@ -85,6 +78,7 @@ for s = 1:expParam.nSessions
   nameCount = 0;
   matchCount = 0;
   recogCount = 0;
+  prac_recogCount = 0;
   
   % for each phase in this session, run the appropriate config function
   for p = 1:length(expParam.session.(sesName).phases)
@@ -121,6 +115,11 @@ for s = 1:expParam.nSessions
         recogCount = recogCount + 1;
         
         [cfg,expParam,stimStruct.fStims] = et_processStims_recog(cfg,expParam,sesName,phaseName,recogCount,stimStruct.fStims);
+        
+      case {'prac_recog'}
+        prac_recogCount = prac_recogCount + 1;
+        
+        [cfg,expParam,stimStruct.fStims] = et_processStims_recog(cfg,expParam,sesName,phaseName,prac_recogCount,stimStruct.fStims);
         
     end % switch
   end % for p
