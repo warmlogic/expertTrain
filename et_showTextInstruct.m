@@ -1,5 +1,5 @@
-function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile)
-% function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile)
+function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile,origText,replacementText)
+% function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile,origText,replacementText)
 
 if ~exist('continueKey','var') || isempty(continueKey)
   continueKey = 'any';
@@ -19,6 +19,26 @@ end
 
 if ~exist('instructImageFile','var') || isempty(instructImageFile)
   instructImageFile = [];
+end
+
+if ~exist('origText','var') || isempty(origText)
+  origText = {};
+end
+
+if ~exist('replacementText','var') || isempty(replacementText)
+  replacementText = {};
+end
+
+if length(origText) ~= length(replacementText)
+  error('origText and replacementText must be the same length.');
+end
+
+if ~isempty(origText)
+  for i = 1:length(origText)
+    [findOrig] = strfind(instructions,origText{i});
+    fprintf('replacing %d instances of ''%s'' with ''%s''.\n',length(findOrig),origText{i},replacementText{i});
+    instructions = strrep(instructions,origText{i},replacementText{i});
+  end
 end
 
 % if we want to display an image with the instructions, put it at the
