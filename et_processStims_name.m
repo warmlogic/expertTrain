@@ -3,8 +3,13 @@ function [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,ph
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
+% initialize to hold the trained stimuli
+expParam.session.(sesName).(phaseName)(phaseCount).nameStims = [];
 % put all the trained stimuli together
-expParam.session.(sesName).(phaseName)(phaseCount).nameStims = eval(['cat(1',sprintf(repmat(',expParam.session.f%dTrained',1,length(cfg.stim.familyNames)),1:length(cfg.stim.familyNames)),');']);
+for f = 1:length(cfg.stim.familyNames)
+  expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dTrained',f)));
+end
+
 % Reshuffle for the experiment. No more than X conecutive exemplars from
 % the same family.
 fprintf('Shuffling %s naming (%d) task stimuli.\n',sesName,phaseCount);
