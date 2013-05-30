@@ -44,7 +44,7 @@ expParam.nSessions = 9;
 expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
 
 % set up a field for each session type
-expParam.session.pretest.phases = {'match','recog'};
+expParam.session.pretest.phases = {'match','prac_recog','recog'};
 expParam.session.train1.phases = {'nametrain','name','match'};
 expParam.session.train2.phases = {'match','name','match'};
 expParam.session.train3.phases = {'match','name','match'};
@@ -54,12 +54,31 @@ expParam.session.train6.phases = {'match','name','match'};
 expParam.session.posttest.phases = {'match','recog'};
 expParam.session.posttest_delay.phases = {'match','recog'};
 
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'pretest'};
+% % debug bird
+% 
+% % Set the number of sessions
+% expParam.nSessions = 8;
+% 
+% % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
+% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest'};
+% 
 % % set up a field for each session type
 % expParam.session.pretest.phases = {'match'};
-% % expParam.session.pretest.phases = {'recog'};
+% expParam.session.train1.phases = {'nametrain','name'};
+% expParam.session.train2.phases = {'name'};
+% expParam.session.train3.phases = {'name'};
+% expParam.session.train4.phases = {'name'};
+% expParam.session.train5.phases = {'name'};
+% expParam.session.train6.phases = {'name'};
+% expParam.session.posttest.phases = {'match'};
+
+% debug
+expParam.nSessions = 1;
+expParam.sesTypes = {'pretest'};
+% set up a field for each session type
+% expParam.session.pretest.phases = {'match'};
+% expParam.session.pretest.phases = {'recog'};
+expParam.session.pretest.phases = {'prac_recog','recog'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -77,7 +96,7 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 
 %% do some error checking
 
-possible_phases = {'match','recog','viewname','nametrain','name'};
+possible_phases = {'match','recog','viewname','nametrain','name','prac_recog'};
 if length(expParam.sesTypes) ~= expParam.nSessions
   error('There should be %d sessions defined, but expParam.sesTypes contains %d sessions.',expParam.nSessions,length(expParam.sesTypes));
 end
@@ -96,21 +115,6 @@ for s = 1:length(expParam.sesTypes)
     error('expParam.session does not contain a field for session type ''%s''!',expParam.sesTypes{s});
   end
 end
-
-
-% %% instructions (debug)
-% 
-% instruct = {};
-% tline = nan;
-% fid = fopen('./text/instructions/instruct_recog1_intro.txt');
-% lineCount = 1;
-% while tline ~= -1
-%   tline = fgets(fid);
-%   if tline ~= -1
-%     instruct{lineCount} = tline;
-%     lineCount = lineCount + 1;
-%   end
-% end
 
 %% If this is session 1, setup the experiment
 
@@ -144,32 +148,35 @@ if expParam.sessionNum == 1
   cfg.stim.familyNames = {'a','s'};
   % debug bird
   %cfg.stim.familyNames = {'fc','fi','fg','fhi8','flo8','wc','wi','wg','whi8','wlo8'};
-  % cfg.stim.familyNames = {'ac','ai','ag','ahi8','alo8','sc','si','sg','shi8','slo8'};
+%   cfg.stim.familyNames = {'ac','ai','ag','ahi8','alo8','sc','si','sg','shi8','slo8'};
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
-  % % debug
-  % cfg.stim.nSpecies = 3;
+  % % debug bird
+%   cfg.stim.nSpecies = 3;
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(length(cfg.stim.familyNames),cfg.stim.nSpecies);
   % whether to use the same species order across families
   cfg.stim.yokeSpecies = false;
   % debug bird
-  %cfg.stim.yokeSpecies = true;
+%   cfg.stim.yokeSpecies = true;
   if cfg.stim.yokeSpecies
     cfg.stim.yokeTogether = [1 1];
     % debug bird
-    %cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
+%     cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
   end
   
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
   % debug bird
-  %cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
+%   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
   % save an individual stimulus list for each subject
   cfg.stim.file = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
   % set the resources directory
   cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
+  
+  % set the instructions directory
+  cfg.file.instructDir = fullfile(cfg.files.expDir,'text','instructions');
   
   % create the stimulus list if it doesn't exist
   shuffleSpecies = true;
@@ -186,14 +193,14 @@ if expParam.sessionNum == 1
     cfg.stim.famNumBasic = 1;
     cfg.stim.famNumSubord = 2;
     % debug bird
-    %cfg.stim.famNumBasic = [1 2 3 4 5];
-    %cfg.stim.famNumSubord = [6 7 8 9 10];
+%     cfg.stim.famNumBasic = [1 2 3 4 5];
+%     cfg.stim.famNumSubord = [6 7 8 9 10];
   else
     cfg.stim.famNumBasic = 2;
     cfg.stim.famNumSubord = 1;
     % debug bird
-    %cfg.stim.famNumSubord = [1 2 3 4 5];
-    %cfg.stim.famNumBasic = [6 7 8 9 10];
+%     cfg.stim.famNumBasic = [6 7 8 9 10];
+%     cfg.stim.famNumSubord = [1 2 3 4 5];
   end
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';
@@ -323,8 +330,42 @@ if expParam.sessionNum == 1
   % % % Not setting a response time limit
   % cfg.stim.(sesName).match.response = 1.0;
   
+  % Recognition - practice
+  
+  cfg.stim.(sesName).prac_recog.nBlocks = 1;
+  % number of target and lure stimuli for practice across all species and
+  % families.
+  cfg.stim.(sesName).prac_recog.nStudyTarg = 8;
+  cfg.stim.(sesName).prac_recog.nTestLure = 4;
+  % maximum number of same family in a row during study task
+  cfg.stim.(sesName).prac_recog.studyMaxConsecFamily = 0;
+  % maximum number of targets or lures in a row during test task
+  cfg.stim.(sesName).prac_recog.testMaxConsec = 0;
+
+  % do not reuse recognition stimuli in other parts of the experiment
+  cfg.stim.(sesName).prac_recog.rmStims = true;
+  cfg.stim.(sesName).prac_recog.shuffleFirst = true;
+  
+  % durations, in seconds
+  cfg.stim.(sesName).prac_recog.study_isi = 0.8;
+  cfg.stim.(sesName).prac_recog.study_preTarg = 0.2;
+  cfg.stim.(sesName).prac_recog.study_targ = 2.0;
+  cfg.stim.(sesName).prac_recog.test_isi = 0.8;
+  cfg.stim.(sesName).prac_recog.test_preStim = 0.2;
+  cfg.stim.(sesName).prac_recog.test_stim = 1.5;
+  % % % Not setting a response time limit
+  % cfg.stim.(sesName).recog.response = 1.5;
+  
+  % instructions
+  cfg.stim.(sesName).prac_recog.instruct_intro{1} = fullfile(cfg.file.instructDir,sprintf('%s_recog1_intro.txt',expParam.expName));
+  cfg.stim.(sesName).prac_recog.instruct_intro{2} = fullfile(cfg.file.instructDir,sprintf('%s_recog2_intro_recoll.txt',expParam.expName));
+  cfg.stim.(sesName).prac_recog.instruct_intro{3} = fullfile(cfg.file.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName));
+  cfg.stim.(sesName).prac_recog.instruct_study = fullfile(cfg.file.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName));
+  cfg.stim.(sesName).prac_recog.instruct_test = fullfile(cfg.file.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName));
+  
   % Recognition
   
+  cfg.stim.(sesName).recog.nBlocks = 8;
   % number of target and lure stimuli per species per family per study/test
   % block. Assumes all targets and lures are tested in a block.
   cfg.stim.(sesName).recog.nStudyTarg = 2;
@@ -334,10 +375,10 @@ if expParam.sessionNum == 1
   % maximum number of targets or lures in a row during test task
   cfg.stim.(sesName).recog.testMaxConsec = 0;
   
-  % task parameters
-  cfg.stim.(sesName).recog.nBlocks = 8;
-  cfg.stim.(sesName).recog.nTargPerBlock = 40;
-  cfg.stim.(sesName).recog.nLurePerBlock = 20;
+%   % task parameters
+%   cfg.stim.(sesName).recog.nBlocks = 8;
+%   %cfg.stim.(sesName).recog.nTargPerBlock = 40;
+%   %cfg.stim.(sesName).recog.nLurePerBlock = 20;
   
   % do not reuse recognition stimuli in other parts of the experiment
   cfg.stim.(sesName).recog.rmStims = true;
@@ -352,6 +393,11 @@ if expParam.sessionNum == 1
   cfg.stim.(sesName).recog.test_stim = 1.5;
   % % % Not setting a response time limit
   % cfg.stim.(sesName).recog.response = 1.5;
+  
+  % instructions
+  cfg.stim.(sesName).recog.instruct_intro = fullfile(cfg.file.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName));
+  cfg.stim.(sesName).recog.instruct_study = fullfile(cfg.file.instructDir,sprintf('%s_recog7_exp_study.txt',expParam.expName));
+  cfg.stim.(sesName).recog.instruct_test = fullfile(cfg.file.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName));
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Training Day 1 configuration
