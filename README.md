@@ -48,10 +48,15 @@ Preparing the experiment
    - See `expertTrain/config_EBUG.m` for an example.
       - Note how it runs `et_saveStimList()` and `et_processStims_EBUG()`
       - Apologies for being such a long/extensive config file, but it is well organized.
-- Less well organized features:
+   - For the config structures in `config_EBUG.m`, each entry in `expParam.sesTypes` is a separate session (e.g., different days of the experiment). The phases for each session are configured below that in the `expParam.session` field. The requirement is that `expParam.session` has a field for each `expParam.sesTypes` entry.
+- For Net Station integration:
+   1. Connect the behavioral testing computer and the Net Station computer together with an ethernet cable.
+   1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
+   1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.
+- Less well described/organized features (see examples in `config_EBUG.m` for now):
    - Reading external text files containing phase instructions
-   - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up.
-   - Image manipulation conditions are supported, just use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
+   - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up. Currently, practice phases randomly select exemplars from each species, but I'd like it to work differently than it does now (see TODO, below).
+   - Image manipulation conditions are supported. Use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
    - Impedance breaks (every X trials or Y blocks). Use "g" key to end the impedance check.
    - Blink breaks (every X seconds)
 
@@ -63,19 +68,20 @@ Running the experiment
    - e.g., `expertTrain('EBUG',1);`
    - NB: You must have `config_EXPNAME.m` set up ahead of time. See "Preparing the experiment" above.
    - Run each successive session using the same command. The experiment will pick up at the next session.
-- If you just want to try out different sessions or phases of the EBUG experiment without running through the entire thing, you can edit the top of `config_EBUG.m` so that one of the debug code chunks is uncommented (and comment out the `sesType` and `sessions` parts directly below the debug code).
-   - NB: In the experiment's current state, need to delete the subject folder every time you change `config_EBUG.m` in order to apply the changes
-- If you need to break out of the experiment while it's running, press `control-c`
+- If you just want to try out different sessions or phases of the EBUG experiment without running through the entire thing, you can edit the top of `config_EBUG.m` so that one of the debug code chunks is uncommented.
+   - NB: Need to delete the subject folder every time you change `config_EBUG.m` in order to apply the changes.
+- If you need to break out of the experiment while it's running, press `control-c`.
    - NB: If you break out of a session, the experiment currently does not have the capability to resume where you were. If you start it again, it will launch at the beginning of the current session.
-   - To get back to the Matlab command window, type `control-c` again and then type `sca` (blindly if you have to) and press return to remove any remaining PTB windows.
+   - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 - Debugging
-   - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `db up` and then `ME` to see the error stack trace.
    - PTB seems bad at showing actual error messages, so using multiple monitors is a good way to debug.
-   - To get back to the Matlab command window, type `control-c` again and then type `sca` (blindly if you have to) and press return to remove any remaining PTB windows.
+   - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `db up` and then `ME` to see the error stack trace.
+   - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 
 TODO
 ====
 
+- Use a different stimulus set for the practice phases.
 - Test using a previous phase's stimuli in a current phase (initial support has been included)
 - Resize image stimuli
 - Finalize recognition task response key images
