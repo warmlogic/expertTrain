@@ -19,7 +19,7 @@ for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
   for s = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{b})
     for f = 1:length(cfg.stim.familyNames)
       % get the indices for this species
-      sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{b}(s)));
+      sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{b}(s)));
       % shuffle the stimulus index
       randind = randperm(length(sInd));
       
