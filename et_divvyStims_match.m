@@ -1,5 +1,5 @@
-function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst)
-%function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst)
+function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst,maxChosen)
+%function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst,maxChosen)
 %
 % Description:
 %  Divide stimuli for the subordinate matching task.
@@ -35,6 +35,10 @@ function [chosenStimsSame,chosenStimsDiff] = et_divvyStims_match(origStims,sameS
 %  shuffleFirst: True or false. Randomly shuffle stimuli before selecting
 %                nSame and nSiff from each species. False = select first
 %                nSame/nDiff for each species. Optional (default = true).
+%  origStims:    Original stimulus structure with the chosen stimuli
+%                removed if rmStims_orig = true.
+%  maxChosen:    Integer. Upper limit for choosing stimuli. Used in case
+%                fewer than nStims x nSpecies are needed.
 %
 % Output:
 %  chosenStimsSame: stimuli for the "same" condition.
@@ -53,6 +57,10 @@ if ~exist('shuffleFirst','var') || isempty(shuffleFirst)
   shuffleFirst = true;
 end
 
+if ~exist('maxChosen','var') || isempty(maxChosen)
+  maxChosen = [];
+end
+
 if nSame == length(sameStims)
   warning('Setting rmStims_orig to false because nSame == length(sameStims). Otherwise you will run out of stimuli to divvy out.\n');
   rmStims_orig = false;
@@ -65,18 +73,24 @@ theseSpecies = unique([origStims.speciesNum]);
 theseSameStims = [];
 [theseSameStims,origStims] = et_divvyStims(...
   origStims,theseSameStims,nSame,rmStims_orig,shuffleFirst,...
-  {'same', 'matchStimNum', 'matchPairNum'},{1, 2, []});
+  {'same', 'matchStimNum', 'matchPairNum'},{1, 2, []},maxChosen);
 % different: other half are stim2 in "different" condition
 theseDiffStims = [];
 [theseDiffStims,origStims] = et_divvyStims(...
   origStims,theseDiffStims,nDiff,rmStims_orig,shuffleFirst,...
-  {'same', 'matchStimNum', 'matchPairNum'},{0, 2, []});
+  {'same', 'matchStimNum', 'matchPairNum'},{0, 2, []},maxChosen);
 
 % store the stimuli for slicing before modifying
 stim2_same = theseSameStims;
 stim2_diff = theseDiffStims;
 stim1_same = theseDiffStims;
 stim1_diff = theseSameStims;
+
+% if we're doing a pratice session, we're probably using maxChosen, so we
+% need to limit which species we can choose from
+if ~isempty(maxChosen)
+  theseSpecies = unique([theseSameStims.speciesNum]);
+end
 
 % same condition
 
