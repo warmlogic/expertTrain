@@ -149,14 +149,14 @@ RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, 
   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
 
 % start the blink break timer
-if cfg.stim.secUntilBlinkBreak > 0
+if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
 for i = 1:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
-    if b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && phaseCfg.isExp && expParam.useNS
+    if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('The experimenter will now check the EEG cap.');
       % just draw straight into the main window since we don't need speed here
@@ -184,7 +184,7 @@ for i = 1:length(stimTex)
       end
     end
   else
-    if i > 1 && i < length(stimTex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0 && phaseCfg.isExp && expParam.useNS
+    if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stimTex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('The experimenter will now check the EEG cap.');
       % just draw straight into the main window since we don't need speed here
@@ -214,7 +214,7 @@ for i = 1:length(stimTex)
   end
   
   % Do a blink break if recording EEG and specified time has passed
-  if cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && phaseCfg.isExp && i > 3 && i < (length(stimTex) - 3)
+  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(stimTex) - 3)
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
     % just draw straight into the main window since we don't need speed here

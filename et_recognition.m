@@ -89,7 +89,7 @@ Screen('Flip', w);
 for b = 1:phaseCfg.nBlocks
   
   %% do an impedance check before the block begins
-  if b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && phaseCfg.isExp && expParam.useNS
+  if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('The experimenter will now check the EEG cap.');
     % just draw straight into the main window since we don't need speed here
@@ -162,13 +162,13 @@ for b = 1:phaseCfg.nBlocks
   Screen('TextSize', w, cfg.text.fixSize);
   
   % start the blink break timer
-  if cfg.stim.secUntilBlinkBreak > 0
+  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
     blinkTimerStart = GetSecs;
   end
 
   for i = 1:length(blockStimTex)
-    % Do a blink break if recording EEG and specified time has passed
-    if cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && phaseCfg.isExp && i > 3 && i < (length(blockStimTex) - 3)
+    % Do a blink break if specified time has passed
+    if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
@@ -334,11 +334,13 @@ for b = 1:phaseCfg.nBlocks
   RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
   
   % start the blink break timer
-  blinkTimerStart = GetSecs;
+  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
+    blinkTimerStart = GetSecs;
+  end
 
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
-    if (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && phaseCfg.isExp && i > 3 && i < (length(blockStimTex) - 3)
+    if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here

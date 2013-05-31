@@ -175,13 +175,13 @@ Screen('TextSize', w, cfg.text.fixSize);
 RestrictKeysForKbCheck([cfg.keys.matchSame, cfg.keys.matchDiff]);
 
 % start the blink break timer
-if cfg.stim.secUntilBlinkBreak > 0
+if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
 for i = 1:length(stim2Tex)
   % do an impedance check after a certain number of trials
-  if i > 1 && i < length(stim2Tex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0 && phaseCfg.isExp && expParam.useNS
+  if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stim2Tex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('The experimenter will now check the EEG cap.');
     % just draw straight into the main window since we don't need speed here
@@ -210,7 +210,7 @@ for i = 1:length(stim2Tex)
   end
   
   % Do a blink break if recording EEG and specified time has passed
-  if cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && phaseCfg.isExp && i > 3 && i < (length(stim2Tex) - 3)
+  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(stim2Tex) - 3)
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stim2Tex));
     % just draw straight into the main window since we don't need speed here
