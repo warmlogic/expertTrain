@@ -180,7 +180,7 @@ try
   Screen('Flip',w);
   
   % basic text size
-  Screen('TextSize', w, cfg.text.instructSize);
+  Screen('TextSize', w, cfg.text.basicTextSize);
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
   % they are loaded and ready when we need them - without delays
@@ -196,13 +196,14 @@ try
   %% Verify that Net Station will run
   
   if expParam.useNS
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     % put wait for experimenter instructions on screen
-    message = 'Experimenter:\nApply EEG cap and start the Net Station application...\n';
+    message = 'Experimenter:\nStart the Net Station application, apply the EEG cap, and check impedance measures...\n';
     DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
     Screen('Flip', w);
     
-    KbCheckHold(1000, {cfg.keys.expContinue}, -1);  % wait til g key is held for ~1 seconds
+    % wait until g key is held for ~1 seconds
+    KbCheckHold(1000, {cfg.keys.expContinue}, -1);
     
     % connect
     [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost, expParam.NSPort);
@@ -223,17 +224,17 @@ try
   %% EEG baseline recording
   
   if expParam.useNS && expParam.baselineRecordSecs > 0
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     %display instructions
     baselineMsg = sprintf('The experimenter will now record baseline activity\nPlease remain still...');
     DrawFormattedText(w, baselineMsg, 'center', 'center');
     Screen('Flip', w);
     
-    % listen for keypress
-    KbCheckHold(1000, {cfg.keys.expContinue}, -1);  % wait till g key is held for ~1 seconds
+    % wait until g key is held for ~1 seconds
+    KbCheckHold(1000, {cfg.keys.expContinue}, -1);
     
     % start recording
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     [NSStartStatus, NSStartError] = NetStation('StartRecording');
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
     Screen('Flip', w);
@@ -242,7 +243,7 @@ try
     [NSEventStatus, NSEventError] = NetStation('Event', 'REST', GetSecs, .001); % tag the start of the rest period
     
     % draw a countdown -- no need for super accurate timing here
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     for sec = baselineRecordSecs:-1:1
       DrawFormattedText(w, num2str(sec), 'center', 'center');
       Screen('Flip', w);
@@ -256,7 +257,7 @@ try
   %% Start Net Station recording for the experiment
   
   if expParam.useNS
-    Screen('TextSize', w, cfg.text.instructSize);
+    Screen('TextSize', w, cfg.text.basicTextSize);
     % start recording
     [NSStartStatus, NSStartError] = NetStation('StartRecording');
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
@@ -380,13 +381,13 @@ try
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   message = sprintf('Thank you, this session is complete.\n\nPlease wait for the experimenter.');
-  Screen('TextSize', w, cfg.text.instructSize);
+  Screen('TextSize', w, cfg.text.basicTextSize);
   % put the instructions on the screen
   DrawFormattedText(w, message, 'center', 'center');
   % Update the display to show the message:
   Screen('Flip', w);
   
-  % wait til g key is held for ~1 seconds
+  % wait until g key is held for ~1 seconds
   KbCheckHold(1000, {cfg.keys.expContinue}, -1);
   Screen('Flip', w);
   WaitSecs(1.000);
