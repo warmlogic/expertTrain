@@ -276,6 +276,11 @@ try
   nameCount = 0;
   matchCount = 0;
   recogCount = 0;
+  
+  prac_viewnameCount = 0;
+  prac_nametrainCount = 0;
+  prac_nameCount = 0;
+  prac_matchCount = 0;
   prac_recogCount = 0;
   
   % for each phase in this session, run the correct function
@@ -285,11 +290,32 @@ try
     
     switch phaseName
       
-      case {'practice'}
-        % Practice session
+      case{'match'}
+        % Subordinate Matching task (same/different)
+        matchCount = matchCount + 1;
         
-        % TODO: not sure what they'll do for practice
-        warning('Not sure what to do for practice\n');
+        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+        
+      case {'name'}
+        % Naming task
+        nameCount = nameCount + 1;
+        
+        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
+        
+      case {'recog'}
+        % Recognition (old/new) task
+        recogCount = recogCount + 1;
+        
+        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+
+      case {'nametrain'}
+        % Name training task
+        nametrainCount = nametrainCount + 1;
+        
+        % for each view/name block
+        for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
+          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+        end
         
       case {'viewname'}
         % Viewing task, with category response; intermixed with
@@ -305,33 +331,18 @@ try
           [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
         end
         
-      case {'nametrain'}
-        % Name training task
-        nametrainCount = nametrainCount + 1;
-        
-        % for each view/name block
-        for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
-          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
-        end
-        
-      case {'name'}
-        % Naming task
-        nameCount = nameCount + 1;
-        
-        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
-        
-      case{'match'}
+      case{'prac_match'}
         % Subordinate Matching task (same/different)
-        matchCount = matchCount + 1;
+        prac_matchCount = prac_matchCount + 1;
         
-        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
         
-      case {'recog'}
-        % Recognition (old/new) task
-        recogCount = recogCount + 1;
+      case {'prac_name'}
+        % Naming task
+        prac_nameCount = prac_nameCount + 1;
         
-        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
-
+        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
+        
       case {'prac_recog'}
         % Recognition (old/new) task
         prac_recogCount = prac_recogCount + 1;

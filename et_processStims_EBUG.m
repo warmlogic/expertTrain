@@ -78,6 +78,11 @@ for s = 1:expParam.nSessions
   nameCount = 0;
   matchCount = 0;
   recogCount = 0;
+  
+  prac_viewnameCount = 0;
+  prac_nametrainCount = 0;
+  prac_nameCount = 0;
+  prac_matchCount = 0;
   prac_recogCount = 0;
   
   % for each phase in this session, run the appropriate config function
@@ -87,34 +92,40 @@ for s = 1:expParam.nSessions
     
     switch phaseName
       
-      case {'practice'}
-        % TODO: not sure what they'll do for practice
-        warning('Not sure what to do for practice\n');
+      case {'match'}
+        matchCount = matchCount + 1;
         
-      case {'viewname'}
-        viewnameCount = viewnameCount + 1;
-        
-        [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,viewnameCount);
-        
-      case {'nametrain'}
-        nametrainCount = nametrainCount + 1;
-        
-        [cfg,expParam] = et_processStims_nametrain(cfg,expParam,sesName,phaseName,nametrainCount);
+        [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,matchCount);
         
       case {'name'}
         nameCount = nameCount + 1;
         
         [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,nameCount);
         
-      case {'match'}
-        matchCount = matchCount + 1;
-        
-        [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,matchCount);
-        
       case {'recog'}
         recogCount = recogCount + 1;
         
         [cfg,expParam,stimStruct.fStims] = et_processStims_recog(cfg,expParam,sesName,phaseName,recogCount,stimStruct.fStims);
+        
+      case {'nametrain'}
+        nametrainCount = nametrainCount + 1;
+        
+        [cfg,expParam] = et_processStims_nametrain(cfg,expParam,sesName,phaseName,nametrainCount);
+        
+      case {'viewname'}
+        viewnameCount = viewnameCount + 1;
+        
+        [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,viewnameCount);
+        
+      case {'prac_match'}
+        prac_matchCount = prac_matchCount + 1;
+        
+        [cfg,expParam,stimStruct.fStims] = et_processStims_match(cfg,expParam,sesName,phaseName,prac_matchCount,stimStruct.fStims);
+        
+      case {'prac_name'}
+        prac_nameCount = prac_nameCount + 1;
+        
+        [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,prac_nameCount);
         
       case {'prac_recog'}
         prac_recogCount = prac_recogCount + 1;
