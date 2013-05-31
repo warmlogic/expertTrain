@@ -44,8 +44,8 @@ expParam.nSessions = 9;
 expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
 
 % set up a field for each session type
-expParam.session.pretest.phases = {'match','prac_recog','recog'};
-expParam.session.train1.phases = {'nametrain','name','match'};
+expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
+expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
 expParam.session.train2.phases = {'match','name','match'};
 expParam.session.train3.phases = {'match','name','match'};
 expParam.session.train4.phases = {'match','name','match'};
@@ -53,6 +53,13 @@ expParam.session.train5.phases = {'match','name','match'};
 expParam.session.train6.phases = {'match','name','match'};
 expParam.session.posttest.phases = {'match','recog'};
 expParam.session.posttest_delay.phases = {'match','recog'};
+
+% % demo - debug
+% expParam.nSessions = 2;
+% expParam.sesTypes = {'pretest','train1'};
+% % set up a field for each session type
+% expParam.session.pretest.phases = {'prac_match','prac_recog'};
+% expParam.session.train1.phases = {'prac_name','nametrain'};
 
 % % debug bird
 %
@@ -157,27 +164,27 @@ if expParam.sessionNum == 1
   cfg.stim.familyNames = {'a','s'};
   % debug bird
   %cfg.stim.familyNames = {'fc','fi','fg','fhi8','flo8','wc','wi','wg','whi8','wlo8'};
-  %   cfg.stim.familyNames = {'ac','ai','ag','ahi8','alo8','sc','si','sg','shi8','slo8'};
+  % cfg.stim.familyNames = {'ac','ai','ag','ahi8','alo8','sc','si','sg','shi8','slo8'};
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
-  % % debug bird
-  %   cfg.stim.nSpecies = 3;
+  % % debug
+  % cfg.stim.nSpecies = 3;
   % initialize to store the number of exemplars for each species
   cfg.stim.nExemplars = zeros(length(cfg.stim.familyNames),cfg.stim.nSpecies);
   % whether to use the same species order across families
   cfg.stim.yokeSpecies = false;
   % debug bird
-  %   cfg.stim.yokeSpecies = true;
+  % cfg.stim.yokeSpecies = true;
   if cfg.stim.yokeSpecies
     cfg.stim.yokeTogether = [1 1];
     % debug bird
-    %     cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
+    % cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
   end
   
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
   % debug bird
-  %   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
+  % cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
   % save an individual stimulus list for each subject
   cfg.stim.file = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
@@ -202,14 +209,14 @@ if expParam.sessionNum == 1
     cfg.stim.famNumBasic = 1;
     cfg.stim.famNumSubord = 2;
     % debug bird
-    %     cfg.stim.famNumBasic = [1 2 3 4 5];
-    %     cfg.stim.famNumSubord = [6 7 8 9 10];
+    % cfg.stim.famNumBasic = [1 2 3 4 5];
+    % cfg.stim.famNumSubord = [6 7 8 9 10];
   else
     cfg.stim.famNumBasic = 2;
     cfg.stim.famNumSubord = 1;
     % debug bird
-    %     cfg.stim.famNumBasic = [6 7 8 9 10];
-    %     cfg.stim.famNumSubord = [1 2 3 4 5];
+    % cfg.stim.famNumBasic = [6 7 8 9 10];
+    % cfg.stim.famNumSubord = [1 2 3 4 5];
   end
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';
@@ -295,11 +302,12 @@ if expParam.sessionNum == 1
   
   %% Text size and symbol configuration
   
+  % font size for small messages printed to the screen
   cfg.text.basicTextSize = 32;
   % font size for instructsions
-  cfg.text.instructSize = 32;
+  cfg.text.instructSize = 28;
   % number of characters wide at which the instructions will be shown
-  cfg.text.instructWidth = 80;
+  cfg.text.instructWidth = 70;
   cfg.keys.instructContKey = 'space';
   
   % fixation info
@@ -537,7 +545,7 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
-      cfg.stim.(sesName).(phaseName).nTrials = 5;
+      cfg.stim.(sesName).(phaseName).nTrials = 8;
       cfg.stim.(sesName).(phaseName).rmStims = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
@@ -1092,6 +1100,10 @@ if expParam.sessionNum == 1
     % Matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     phaseName = 'match';
+    
+    % do we want to use the stimuli from a previous phase? Set to an empty
+    % cell if not.
+    cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_recog',1};
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;

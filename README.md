@@ -76,6 +76,7 @@ Running the experiment
 TODO
 ====
 
+- Test using a previous phase's stimuli in a current phase (initial support has been included)
 - Resize image stimuli
 - Finalize recognition task response key images
 - Finalize Net Station support: http://docs.psychtoolbox.org/NetStation

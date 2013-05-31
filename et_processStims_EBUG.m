@@ -73,16 +73,14 @@ for s = 1:expParam.nSessions
   
   % counting the phases, in case any sessions have the same phase type
   % multiple times
-  viewnameCount = 0;
-  nametrainCount = 0;
-  nameCount = 0;
   matchCount = 0;
+  nameCount = 0;
   recogCount = 0;
+  nametrainCount = 0;
+  viewnameCount = 0;
   
-  prac_viewnameCount = 0;
-  prac_nametrainCount = 0;
-  prac_nameCount = 0;
   prac_matchCount = 0;
+  prac_nameCount = 0;
   prac_recogCount = 0;
   
   % for each phase in this session, run the appropriate config function
@@ -120,7 +118,11 @@ for s = 1:expParam.nSessions
       case {'prac_match'}
         prac_matchCount = prac_matchCount + 1;
         
-        [cfg,expParam,stimStruct.fStims] = et_processStims_match(cfg,expParam,sesName,phaseName,prac_matchCount,stimStruct.fStims);
+        if isfield(cfg.stim.(sesName).(phaseName)(prac_matchCount),'usePrevPhase') && ~isempty(cfg.stim.(sesName).(phaseName)(prac_matchCount).usePrevPhase)
+          expParam.session.(sesName).(phaseName)(prac_matchCount) = expParam.session.(cfg.stim.(sesName).(phaseName)(prac_matchCount).usePrevPhase{1}).(cfg.stim.(sesName).(phaseName)(prac_matchCount).usePrevPhase{2})(cfg.stim.(sesName).(phaseName)(prac_matchCount).usePrevPhase{3});
+        else
+          [cfg,expParam,stimStruct.fStims] = et_processStims_match(cfg,expParam,sesName,phaseName,prac_matchCount,stimStruct.fStims);
+        end
         
       case {'prac_name'}
         prac_nameCount = prac_nameCount + 1;
@@ -130,7 +132,11 @@ for s = 1:expParam.nSessions
       case {'prac_recog'}
         prac_recogCount = prac_recogCount + 1;
         
-        [cfg,expParam,stimStruct.fStims] = et_processStims_recog(cfg,expParam,sesName,phaseName,prac_recogCount,stimStruct.fStims);
+        if isfield(cfg.stim.(sesName).(phaseName)(prac_recogCount),'usePrevPhase') && ~isempty(cfg.stim.(sesName).(phaseName)(prac_recogCount).usePrevPhase)
+          expParam.session.(sesName).(phaseName)(prac_recogCount) = expParam.session.(cfg.stim.(sesName).(phaseName)(prac_recogCount).usePrevPhase{1}).(cfg.stim.(sesName).(phaseName)(prac_recogCount).usePrevPhase{2})(cfg.stim.(sesName).(phaseName)(prac_recogCount).usePrevPhase{3});
+        else
+          [cfg,expParam,stimStruct.fStims] = et_processStims_recog(cfg,expParam,sesName,phaseName,prac_recogCount,stimStruct.fStims);
+        end
         
     end % switch
   end % for p
