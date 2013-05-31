@@ -3,6 +3,8 @@ function [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseNam
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
+phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+
 % add the species in order from 1 to nSpecies; this is ok because, for each
 % subject, each species number corresonds to a random species letter, as
 % determined in et_saveStimList()
@@ -12,14 +14,14 @@ for f = 1:length(cfg.stim.familyNames)
 end
 
 % initialize viewing and naming cells, one for each block
-expParam.session.(sesName).(phaseName)(phaseCount).viewStims = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
-expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+expParam.session.(sesName).(phaseName)(phaseCount).viewStims = cell(1,length(phaseCfg.blockSpeciesOrder));
+expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cell(1,length(phaseCfg.blockSpeciesOrder));
 
-for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
-  for s = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{b})
+for b = 1:length(phaseCfg.blockSpeciesOrder)
+  for s = 1:length(phaseCfg.blockSpeciesOrder{b})
     for f = 1:length(cfg.stim.familyNames)
       % get the indices for this species
-      sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{b}(s)));
+      sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,phaseCfg.blockSpeciesOrder{b}(s)));
       % shuffle the stimulus index
       randind = randperm(length(sInd));
       
@@ -29,12 +31,12 @@ for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
       % add them to the viewing list
       expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b} = cat(1,...
         expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b},...
-        thisSpecies(cfg.stim.(sesName).(phaseName)(phaseCount).viewIndices{b}{s}));
+        thisSpecies(phaseCfg.viewIndices{b}{s}));
     
       % add them to the naming list
       expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b} = cat(1,...
         expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},...
-        thisSpecies(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{b}{s}));
+        thisSpecies(phaseCfg.nameIndices{b}{s}));
     end % for each family
   end % for each species
   
@@ -45,11 +47,11 @@ for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
   % viewing
   fprintf('Shuffling %s viewing (%d) task stimuli.\n',sesName,phaseCount);
   [expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b}] = et_shuffleStims(...
-    expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b},'familyNum',cfg.stim.(sesName).(phaseName)(phaseCount).viewMaxConsecFamily);
+    expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b},'familyNum',phaseCfg.viewMaxConsecFamily);
   % naming
   fprintf('Shuffling %s naming (%d) task stimuli.\n',sesName,phaseCount);
   [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
-    expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily);
+    expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',phaseCfg.nameMaxConsecFamily);
   
 end % for each block
 

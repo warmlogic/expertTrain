@@ -7,59 +7,59 @@ function [cfg,expParam,varargout] = et_processStims_recog(cfg,expParam,sesName,p
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
+phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+
 % initialize for storing both families together
-expParam.session.(sesName).(phaseName)(phaseCount).targStims = cell(1,cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks);
-expParam.session.(sesName).(phaseName)(phaseCount).lureStims = cell(1,cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks);
-expParam.session.(sesName).(phaseName)(phaseCount).allStims = cell(1,cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks);
+expParam.session.(sesName).(phaseName)(phaseCount).targStims = cell(1,phaseCfg.nBlocks);
+expParam.session.(sesName).(phaseName)(phaseCount).lureStims = cell(1,phaseCfg.nBlocks);
+expParam.session.(sesName).(phaseName)(phaseCount).allStims = cell(1,phaseCfg.nBlocks);
 
 % initialize output for families
 nout = max(nargout,1) - 2;
 varargout = cell(1,nout);
-%varargout = cell(1,length(cfg.stim.familyNames));
 
-for b = 1:cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks
-  
-  if ~isempty(strfind(phaseName,'prac'))
+for b = 1:phaseCfg.nBlocks
+  if ~phaseCfg.isExp
     % this is the practice session
-    while length(expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}) < cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg
+    while length(expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}) < phaseCfg.nStudyTarg
       for f = 1:length(cfg.stim.familyNames)
         thisFam = varargin{f};
         
         % targets
         [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},thisFam] = et_divvyStims(...
           thisFam,expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},1,...
-          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{1},...
-          ceil(cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg / length(cfg.stim.familyNames)));
+          phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{1},...
+          ceil(phaseCfg.nStudyTarg / length(cfg.stim.familyNames)));
         % store the (altered) family stimuli for output
         varargout{f} = thisFam;
       end
     end
-    while length(expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b}) < cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure
+    while length(expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b}) < phaseCfg.nTestLure
       for f = 1:length(cfg.stim.familyNames)
         thisFam = varargin{f};
         % lures
         [expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},thisFam] = et_divvyStims(...
           thisFam,expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},1,...
-          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{0},...
-          ceil(cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure / length(cfg.stim.familyNames)));
+          phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{0},...
+          ceil(phaseCfg.nTestLure / length(cfg.stim.familyNames)));
         
         % store the (altered) family stimuli for output
         varargout{f} = thisFam;
       end
     end
   else
-    % this is the real deal
+    % this is the real experiment
     for f = 1:length(cfg.stim.familyNames)
       thisFam = varargin{f};
       
       % targets
       [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},thisFam] = et_divvyStims(...
-        thisFam,expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg,...
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{1});
+        thisFam,expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},phaseCfg.nStudyTarg,...
+        phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{1});
       % lures
       [expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},thisFam] = et_divvyStims(...
-        thisFam,expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},cfg.stim.(sesName).(phaseName)(phaseCount).nTestLure,...
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims,cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst,{'targ'},{0});
+        thisFam,expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},phaseCfg.nTestLure,...
+        phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{0});
       
       % store the (altered) family stimuli for output
       varargout{f} = thisFam;
@@ -70,7 +70,7 @@ for b = 1:cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks
   % a row, if desired
   fprintf('Shuffling %s recognition study (%d) task stimuli.\n',sesName,phaseCount);
   [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
-    expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecFamily);
+    expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',phaseCfg.studyMaxConsecFamily);
   
   % put the test stims together
   expParam.session.(sesName).(phaseName)(phaseCount).allStims{b} = cat(1,...
@@ -79,7 +79,7 @@ for b = 1:cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks
   % shuffle so there are no more than X targets or lures in a row
   fprintf('Shuffling %s recognition test (%d) task stimuli.\n',sesName,phaseCount);
   [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
-    expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'targ',cfg.stim.(sesName).(phaseName)(phaseCount).testMaxConsec);
+    expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'targ',phaseCfg.testMaxConsec);
 end
 
 fprintf('Done.\n');
