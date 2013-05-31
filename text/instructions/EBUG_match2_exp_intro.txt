@@ -1,3 +1,5 @@
+This is the Matching experiment.
+
 On each trial you will see two creatures, one after the other.
 
 Press "sameKey" if the creatures are from the same species.
