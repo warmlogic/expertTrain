@@ -48,6 +48,12 @@ Preparing the experiment
    - See `expertTrain/config_EBUG.m` for an example.
       - Note how it runs `et_saveStimList()` and `et_processStims_EBUG()`
       - Apologies for being such a long/extensive config file, but it is well organized.
+- Less well organized features:
+   - Reading external text files containing phase instructions
+   - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up.
+   - Image manipulation conditions are supported, just use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
+   - Impedance breaks (every X trials or Y blocks). Use "g" key to end the impedance check.
+   - Blink breaks (every X seconds)
 
 Running the experiment
 ----
@@ -70,21 +76,10 @@ Running the experiment
 TODO
 ====
 
-- Read external instruction files
-- Practice mode
-- Set stimulis presentation size
-- Impedance breaks (with "g" key breakout)
-   - During session phases (see Grit's powerpoint)?
-- Breaks during long phases for blinks and for when EEG is not recorded (specifically, the matching and full naming tasks)
-   - Matching: rest after every 10 trials (~48 seconds, based on powerpoint)
-   - Naming: rest after every 10 trials (~51 seconds, based on powerpoint)
-   - Recognition: alredy presented in blocks, but they're not short. Study (2 min) should have two breaks (every ~40 seconds) and test (~3 min) should have three breaks (every ~40 seconds).
-   - Viewing: already presented in blocks, and only on training day 1, so probably don't need breaks
+- Resize image stimuli
 - Finalize recognition task response key images
 - Finalize Net Station support: http://docs.psychtoolbox.org/NetStation
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
-- Image manipulation conditions
-- Family, species, exemplar (and manipulation?) tokenization using tokenize() (e.g., a_a_1_hi, a_a_1_lo)
 
 Links
 ====
