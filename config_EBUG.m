@@ -80,12 +80,12 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.session.pretest.phases = {'recog'};
 % % expParam.session.pretest.phases = {'prac_recog','recog'};
 
-% debug
-expParam.nSessions = 1;
-expParam.sesTypes = {'train1'};
-% expParam.session.train1.phases = {'nametrain'};
-expParam.session.train1.phases = {'name'};
-% expParam.session.train1.phases = {'nametrain','name','match'};
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'train1'};
+% % expParam.session.train1.phases = {'nametrain'};
+% % expParam.session.train1.phases = {'name'};
+% % expParam.session.train1.phases = {'nametrain','name','match'};
 % expParam.session.train1.phases = {'viewname'};
 
 % % debug
@@ -552,7 +552,6 @@ if expParam.sessionNum == 1
 %   KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
 %   KbName(cfg.keys.s00),cfg.keys.instructContKey});
 %   cfg.stim.(sesName).viewname.instruct_name_img = [];
-  
   
   % Name training (introduce species in a rolling fashion)
   cfg.stim.(sesName).nametrain.isExp = true;
