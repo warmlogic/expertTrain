@@ -105,7 +105,7 @@ sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
 if runInBlocks
   nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
 else
-  nSpecies = cfg.stim.nSpecies;
+  nSpecies = length(unique([viewStims.speciesNum]));
 end
 
 %% start NS recording, if desired

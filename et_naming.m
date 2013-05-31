@@ -103,7 +103,7 @@ end
 if runInBlocks
   nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
 else
-  nSpecies = cfg.stim.nSpecies;
+  nSpecies = length(unique([nameStims.speciesNum]));
 end
 
 %% start NS recording, if desired
