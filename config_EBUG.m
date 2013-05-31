@@ -254,7 +254,11 @@ if expParam.sessionNum == 1
   
   % keys for naming particular species (subordinate-level naming)
   
-  cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
+  if ismac || isunix
+    cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
+  elseif ispc
+    cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';'};
+  end
   %cfg.keys.speciesKeyNames = {'a','s','d','f','v','b','h','j','k','l'};
   
   % set the species keys
@@ -276,8 +280,12 @@ if expParam.sessionNum == 1
   end
   
   % recognition keys
+  if ismac || isunix
+    cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
+  elseif ispc
+    cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
+  end
   %cfg.keys.recogKeyNames = {{'a','s','d','f','h'},{'f','h','j','k','l'}};
-  cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
   
   % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
   if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
