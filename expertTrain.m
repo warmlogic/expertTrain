@@ -272,16 +272,14 @@ try
   
   % counting the phases, in case any sessions have the same phase type
   % multiple times
-  viewnameCount = 0;
-  nametrainCount = 0;
-  nameCount = 0;
   matchCount = 0;
+  nameCount = 0;
   recogCount = 0;
+  nametrainCount = 0;
+  viewnameCount = 0;
   
-  prac_viewnameCount = 0;
-  prac_nametrainCount = 0;
-  prac_nameCount = 0;
   prac_matchCount = 0;
+  prac_nameCount = 0;
   prac_recogCount = 0;
   
   % for each phase in this session, run the correct function
