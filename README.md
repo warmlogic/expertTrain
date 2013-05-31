@@ -50,6 +50,7 @@ Preparing the experiment
       - Apologies for being such a long/extensive config file, but it is well organized.
    - For the config structures in `config_EBUG.m`, each entry in `expParam.sesTypes` is a separate session (e.g., different days of the experiment). The phases for each session are configured below that in the `expParam.session` field. The requirement is that `expParam.session` has a field for each `expParam.sesTypes` entry.
 - For Net Station integration:
+   1. Set `expParam.useNS = true;` in the config file.
    1. Connect the behavioral testing computer and the Net Station computer together with an ethernet cable.
    1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
    1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.

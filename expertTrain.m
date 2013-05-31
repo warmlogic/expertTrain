@@ -157,7 +157,9 @@ try
   HideCursor;
   
   % don't display keyboard output
-  ListenChar(2);
+  if ~ispc
+    ListenChar(2);
+  end
   
   % Set up the gray color value to be used
   cfg.screen.gray = GrayIndex(screenNumber);
@@ -396,7 +398,9 @@ try
   Screen('CloseAll');
   fclose('all');
   ShowCursor;
-  ListenChar;
+  if ~ispc
+    ListenChar;
+  end
   Priority(0);
   
   % End of experiment:
@@ -423,7 +427,9 @@ catch ME
   Screen('CloseAll');
   fclose('all');
   ShowCursor;
-  ListenChar;
+  if ~ispc
+    ListenChar;
+  end
   Priority(0);
   
   % Output the error message that describes the error:
