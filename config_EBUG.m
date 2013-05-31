@@ -141,8 +141,14 @@ if expParam.sessionNum == 1
     expParam.is15 = false;
   end
   
-  % timer for when to take a blink break (only when useNS=true)
-  cfg.stim.secUntilBlinkBreak = 45.000;
+  % blink break (set to 0 if you don't want breaks)
+  if expParam.useNS
+    % timer in secs for when to take a blink break (only when useNS=true)
+    cfg.stim.secUntilBlinkBreak = 45.000;
+  else
+    % timer in secs for when to take a blink break (only when useNS=false)
+    cfg.stim.secUntilBlinkBreak = 90.000;
+  end
   
   %% Stimulus parameters
   
@@ -341,6 +347,9 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
+      % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+      % if rmStims_orig=false). nSpecies = (nSame + nDiff) in practice.
+      
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).isi = 0.5;
       cfg.stim.(sesName).(phaseName).stim1 = 0.8;
@@ -371,7 +380,7 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
       % minimum number of trials needed between exact repeats of a given
       % stimulus as stim2
-      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 1;
+      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
       % whether to have "same" and "diff" text with the response prompt
       cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
       
@@ -381,6 +390,13 @@ if expParam.sessionNum == 1
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+      % if rmStims_orig=false)
+      
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+      end
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).isi = 0.5;
@@ -476,6 +492,10 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).rmStims = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nBlocks = 2;
+      end
+      
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).study_isi = 0.8;
       cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
@@ -547,121 +567,125 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).instruct_name_img = [];
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Viewing+Naming
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'viewname';
-    
-    if ismember(phaseName,expParam.session.(sesName).phases)
-      cfg.stim.(sesName).viewname.isExp = true;
-      
-      % hard coded order of which species are presented in each block
-      % (counterbalanced). Blocks are denoted by vectors.
-      cfg.stim.(sesName).viewname.blockSpeciesOrder = {...
-        [1, 2],...
-        [1, 2, 3],...
-        [1, 2, 3, 4],...
-        [1, 2, 3, 4, 5],...
-        [3, 4, 5, 6],...
-        [4, 5, 6, 7],...
-        [5, 6, 7, 8],...
-        [6, 7, 8, 9],...
-        [7, 8, 9, 10],...
-        [8, 9, 10, 1],...
-        [9, 10, 2, 3],...
-        [10, 4, 5, 6],...
-        [7, 8, 9, 10]};
-      
-      % hard coded stimulus indices for viewing block presentations
-      % (counterbalanced). Blocks are denoted by cells. The vectors within each
-      % block represent the exemplar number(s) for each species, corresponding
-      % to the species numbers listed in blockSpeciesOrder (defined above). The
-      % contents of each vector corresponds to the exemplar numbers for that
-      % species.
-      
-      cfg.stim.(sesName).viewname.viewIndices = {...
-        {[1], [1]},...
-        {[4], [4], [1]},...
-        {[2], [2], [4], [1]},...
-        {[5], [5], [2], [4], [1]},...
-        {[5], [2], [4], [1]},...
-        {[5], [2], [4], [1]},...
-        {[5], [2], [4], [1]},...
-        {[5], [2], [4], [1]},...
-        {[5], [2], [4], [1]},...
-        {[5], [2], [4], [3]},...
-        {[5], [2], [3], [3]},...
-        {[5], [2], [3], [3]},...
-        {[3], [3], [3], [3]}};
-      
-      % hard coded stimulus indices for naming block presentations
-      % (counterbalanced). Blocks are denoted by cells. The vectors within each
-      % block represent the exemplar number(s) for each species, corresponding
-      % to the species numbers listed in blockSpeciesOrder (defined above). The
-      % contents of each vector corresponds to the exemplar numbers for that
-      % species.
-      
-      cfg.stim.(sesName).viewname.nameIndices = {...
-        {[2, 3], [2, 3]},...
-        {[5, 6], [5, 6], [2, 3]},...
-        {[3, 4], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [1, 6], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [3, 4], [5, 6], [2, 3]},...
-        {[1, 6], [3, 4], [5, 6], [4, 5]},...
-        {[1, 6], [3, 4], [5, 6], [5, 6]},...
-        {[1, 6], [5, 6], [5, 6], [5, 6]},...
-        {[5, 6], [5, 6], [5, 6], [5, 6]}};
-      
-      % maximum number of repeated exemplars from each family in viewname/view
-      cfg.stim.(sesName).viewname.viewMaxConsecFamily = 3;
-      
-      % maximum number of repeated exemplars from each family in viewname/name
-      cfg.stim.(sesName).viewname.nameMaxConsecFamily = 3;
-      
-      % % debug
-      % cfg.stim.(sesName).viewname.blockSpeciesOrder = {[1, 2],[1, 2, 3]};
-      % cfg.stim.(sesName).viewname.viewIndices = {{[1], [1]}, {[2], [2], [2]}};
-      % cfg.stim.(sesName).viewname.nameIndices = {{[2], [2]}, {[1], [1], [1]}};
-      
-      % durations, in seconds
-      cfg.stim.(sesName).viewname.view_isi = 0.8;
-      cfg.stim.(sesName).viewname.view_preStim = 0.2;
-      cfg.stim.(sesName).viewname.view_stim = 4.0;
-      cfg.stim.(sesName).viewname.name_isi = 0.5;
-      % cfg.stim.(sesName).viewname.name_preStim = 0.5 to 0.7;
-      cfg.stim.(sesName).viewname.name_stim = 1.0;
-      cfg.stim.(sesName).viewname.name_response = 2.0;
-      cfg.stim.(sesName).viewname.name_feedback = 1.0;
-      
-      % do we want to play feedback beeps?
-      cfg.stim.(sesName).viewname.playSound = playSound;
-      cfg.stim.(sesName).viewname.correctSound = correctSound;
-      cfg.stim.(sesName).viewname.incorrectSound = incorrectSound;
-      
-      % instructions (view)
-      [cfg.stim.(sesName).viewname.instruct_view] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_view1_intro.txt',expParam.expName)),...
-        {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
-        KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-        KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-        KbName(cfg.keys.s00),cfg.keys.instructContKey});
-      cfg.stim.(sesName).viewname.instruct_view_img = [];
-      
-      % instructions (name)
-      [cfg.stim.(sesName).viewname.instruct_name] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
-        {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
-        KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-        KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-        KbName(cfg.keys.s00),cfg.keys.instructContKey});
-      cfg.stim.(sesName).viewname.instruct_name_img = [];
-    end
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % Viewing+Naming (introduce species in a rolling fashion)
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     phaseName = 'viewname';
+%     
+%     if ismember(phaseName,expParam.session.(sesName).phases)
+%       cfg.stim.(sesName).viewname.isExp = true;
+%       
+%       % hard coded order of which species are presented in each block
+%       % (counterbalanced). Blocks are denoted by vectors.
+%       cfg.stim.(sesName).viewname.blockSpeciesOrder = {...
+%         [1, 2],...
+%         [1, 2, 3],...
+%         [1, 2, 3, 4],...
+%         [1, 2, 3, 4, 5],...
+%         [3, 4, 5, 6],...
+%         [4, 5, 6, 7],...
+%         [5, 6, 7, 8],...
+%         [6, 7, 8, 9],...
+%         [7, 8, 9, 10],...
+%         [8, 9, 10, 1],...
+%         [9, 10, 2, 3],...
+%         [10, 4, 5, 6],...
+%         [7, 8, 9, 10]};
+%       
+%       % hard coded stimulus indices for viewing block presentations
+%       % (counterbalanced). Blocks are denoted by cells. The vectors within each
+%       % block represent the exemplar number(s) for each species, corresponding
+%       % to the species numbers listed in blockSpeciesOrder (defined above). The
+%       % contents of each vector corresponds to the exemplar numbers for that
+%       % species.
+%       
+%       cfg.stim.(sesName).viewname.viewIndices = {...
+%         {[1], [1]},...
+%         {[4], [4], [1]},...
+%         {[2], [2], [4], [1]},...
+%         {[5], [5], [2], [4], [1]},...
+%         {[5], [2], [4], [1]},...
+%         {[5], [2], [4], [1]},...
+%         {[5], [2], [4], [1]},...
+%         {[5], [2], [4], [1]},...
+%         {[5], [2], [4], [1]},...
+%         {[5], [2], [4], [3]},...
+%         {[5], [2], [3], [3]},...
+%         {[5], [2], [3], [3]},...
+%         {[3], [3], [3], [3]}};
+%       
+%       % hard coded stimulus indices for naming block presentations
+%       % (counterbalanced). Blocks are denoted by cells. The vectors within each
+%       % block represent the exemplar number(s) for each species, corresponding
+%       % to the species numbers listed in blockSpeciesOrder (defined above). The
+%       % contents of each vector corresponds to the exemplar numbers for that
+%       % species.
+%       
+%       cfg.stim.(sesName).viewname.nameIndices = {...
+%         {[2, 3], [2, 3]},...
+%         {[5, 6], [5, 6], [2, 3]},...
+%         {[3, 4], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [1, 6], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [3, 4], [5, 6], [2, 3]},...
+%         {[1, 6], [3, 4], [5, 6], [4, 5]},...
+%         {[1, 6], [3, 4], [5, 6], [5, 6]},...
+%         {[1, 6], [5, 6], [5, 6], [5, 6]},...
+%         {[5, 6], [5, 6], [5, 6], [5, 6]}};
+%       
+%       % maximum number of repeated exemplars from each family in viewname/view
+%       cfg.stim.(sesName).viewname.viewMaxConsecFamily = 3;
+%       
+%       % maximum number of repeated exemplars from each family in viewname/name
+%       cfg.stim.(sesName).viewname.nameMaxConsecFamily = 3;
+%       
+%       % % debug
+%       % cfg.stim.(sesName).viewname.blockSpeciesOrder = {[1, 2],[1, 2, 3]};
+%       % cfg.stim.(sesName).viewname.viewIndices = {{[1], [1]}, {[2], [2], [2]}};
+%       % cfg.stim.(sesName).viewname.nameIndices = {{[2], [2]}, {[1], [1], [1]}};
+%       
+%       if expParam.useNS
+%         cfg.stim.(sesName).(phaseName).impedanceAfter_nBlocks = 7;
+%       end
+%       
+%       % durations, in seconds
+%       cfg.stim.(sesName).viewname.view_isi = 0.8;
+%       cfg.stim.(sesName).viewname.view_preStim = 0.2;
+%       cfg.stim.(sesName).viewname.view_stim = 4.0;
+%       cfg.stim.(sesName).viewname.name_isi = 0.5;
+%       % cfg.stim.(sesName).viewname.name_preStim = 0.5 to 0.7;
+%       cfg.stim.(sesName).viewname.name_stim = 1.0;
+%       cfg.stim.(sesName).viewname.name_response = 2.0;
+%       cfg.stim.(sesName).viewname.name_feedback = 1.0;
+%       
+%       % do we want to play feedback beeps?
+%       cfg.stim.(sesName).viewname.playSound = playSound;
+%       cfg.stim.(sesName).viewname.correctSound = correctSound;
+%       cfg.stim.(sesName).viewname.incorrectSound = incorrectSound;
+%       
+%       % instructions (view)
+%       [cfg.stim.(sesName).viewname.instruct_view] = et_processTextInstruct(...
+%         fullfile(cfg.files.instructDir,sprintf('%s_view1_intro.txt',expParam.expName)),...
+%         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+%         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+%         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+%         KbName(cfg.keys.s00),cfg.keys.instructContKey});
+%       cfg.stim.(sesName).viewname.instruct_view_img = [];
+%       
+%       % instructions (name)
+%       [cfg.stim.(sesName).viewname.instruct_name] = et_processTextInstruct(...
+%         fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
+%         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+%         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+%         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+%         KbName(cfg.keys.s00),cfg.keys.instructContKey});
+%       cfg.stim.(sesName).viewname.instruct_name_img = [];
+%     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Name training (introduce species in a rolling fashion)
@@ -713,6 +737,10 @@ if expParam.sessionNum == 1
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).nametrain.nameMaxConsecFamily = 3;
       
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nBlocks = 7;
+      end
+      
       % durations, in seconds
       cfg.stim.(sesName).nametrain.name_isi = 0.5;
       % cfg.stim.(sesName).nametrain.name_preStim = 0.5 to 0.7;
@@ -746,6 +774,10 @@ if expParam.sessionNum == 1
       
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
+      
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 60;
+      end
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).name_isi = 0.5;
@@ -793,6 +825,10 @@ if expParam.sessionNum == 1
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+      end
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).isi = 0.5;
@@ -842,6 +878,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(matchNum).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(matchNum).shuffleFirst = true;
         
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+        end
+        
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(matchNum).isi = 0.5;
         cfg.stim.(sesName).(phaseName)(matchNum).stim1 = 0.8;
@@ -869,6 +909,10 @@ if expParam.sessionNum == 1
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
+        
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 60;
+        end
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName).name_isi = 0.5;
@@ -913,6 +957,10 @@ if expParam.sessionNum == 1
         % rmStims_pair is true because pairs are removed after they're added
         cfg.stim.(sesName).(phaseName)(matchNum).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(matchNum).shuffleFirst = true;
+        
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+        end
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(matchNum).isi = 0.5;
@@ -961,6 +1009,10 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+      end
+      
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).isi = 0.5;
       cfg.stim.(sesName).(phaseName).stim1 = 0.8;
@@ -999,6 +1051,10 @@ if expParam.sessionNum == 1
       % do not reuse recognition stimuli in other parts of the experiment
       cfg.stim.(sesName).(phaseName).rmStims = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nBlocks = 2;
+      end
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).study_isi = 0.8;
@@ -1054,6 +1110,10 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+      end
+      
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).isi = 0.5;
       cfg.stim.(sesName).(phaseName).stim1 = 0.8;
@@ -1092,6 +1152,10 @@ if expParam.sessionNum == 1
       % do not reuse recognition stimuli in other parts of the experiment
       cfg.stim.(sesName).(phaseName).rmStims = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nBlocks = 2;
+      end
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).study_isi = 0.8;

@@ -88,6 +88,30 @@ Screen('Flip', w);
 
 for b = 1:phaseCfg.nBlocks
   
+  %% do an impedance check before the block begins
+  if b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && phaseCfg.isExp && expParam.useNS
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    pauseMsg = sprintf('The experimenter will now check the EEG cap.');
+    % just draw straight into the main window since we don't need speed here
+    DrawFormattedText(w, pauseMsg, 'center', 'center');
+    Screen('Flip', w);
+    
+    WaitSecs(5.000);
+    % stop recording
+    [NSStopStatus, NSStopError] = NetStation('StopRecording');
+    
+    % wait until g key is held for ~1 seconds
+    KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+    
+    % start recording
+    [NSStopStatus, NSStopError] = NetStation('StartRecording');
+    
+    message = 'Starting data acquisition...';
+    DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+    Screen('Flip', w);
+    WaitSecs(5.000);
+  end
+  
   %% prepare the recognition study task
   
   % load up the stimuli for this block
@@ -138,13 +162,13 @@ for b = 1:phaseCfg.nBlocks
   Screen('TextSize', w, cfg.text.fixSize);
   
   % start the blink break timer
-  if expParam.useNS
+  if cfg.stim.secUntilBlinkBreak > 0
     blinkTimerStart = GetSecs;
   end
 
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
-    if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
+    if cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && phaseCfg.isExp && i > 3 && i < (length(blockStimTex) - 3)
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
@@ -310,13 +334,11 @@ for b = 1:phaseCfg.nBlocks
   RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
   
   % start the blink break timer
-  if expParam.useNS
-    blinkTimerStart = GetSecs;
-  end
+  blinkTimerStart = GetSecs;
 
   for i = 1:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
-    if expParam.useNS && i ~= 1 && i ~= length(blockStimTex) && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak
+    if (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && phaseCfg.isExp && i > 3 && i < (length(blockStimTex) - 3)
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
