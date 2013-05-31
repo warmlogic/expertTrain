@@ -72,14 +72,14 @@ expParam.session.posttest_delay.phases = {'match','recog'};
 % expParam.session.train6.phases = {'name'};
 % expParam.session.posttest.phases = {'match'};
 
-% debug
-expParam.nSessions = 1;
-expParam.sesTypes = {'pretest'};
-% set up a field for each session type
-% expParam.session.pretest.phases = {'match'};
-% expParam.session.pretest.phases = {'recog'};
-expParam.session.pretest.phases = {'prac_match','match'};
-% expParam.session.pretest.phases = {'prac_recog','recog'};
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'pretest'};
+% % set up a field for each session type
+% % expParam.session.pretest.phases = {'match'};
+% % expParam.session.pretest.phases = {'recog'};
+% % expParam.session.pretest.phases = {'prac_match','match'};
+% % expParam.session.pretest.phases = {'prac_recog','recog'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -88,7 +88,7 @@ expParam.session.pretest.phases = {'prac_match','match'};
 % % expParam.session.train1.phases = {'name'};
 % expParam.session.train1.phases = {'prac_name','name'};
 % % expParam.session.train1.phases = {'nametrain','name','match'};
-% expParam.session.train1.phases = {'viewname'};
+% % expParam.session.train1.phases = {'viewname'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -510,6 +510,44 @@ if expParam.sessionNum == 1
   if ismember(sesName,expParam.sesTypes)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Naming
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_name';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      cfg.stim.(sesName).(phaseName).isExp = false;
+      
+      cfg.stim.(sesName).(phaseName).nTrials = 5;
+      cfg.stim.(sesName).(phaseName).rmStims = true;
+      cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      % maximum number of repeated exemplars from each family in naming
+      cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
+      
+      % durations, in seconds
+      cfg.stim.(sesName).(phaseName).name_isi = 0.5;
+      % cfg.stim.(sesName).(phaseName).name_preStim = 0.5 to 0.7;
+      cfg.stim.(sesName).(phaseName).name_stim = 1.0;
+      cfg.stim.(sesName).(phaseName).name_response = 2.0;
+      cfg.stim.(sesName).(phaseName).name_feedback = 1.0;
+      
+      % do we want to play feedback beeps?
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).correctSound = correctSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
+      
+      % instructions
+      [cfg.stim.(sesName).(phaseName).instruct_name] = et_processTextInstruct(...
+        fullfile(cfg.files.instructDir,sprintf('%s_name1_practice_intro.txt',expParam.expName)),...
+        {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+        KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
+        KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
+        KbName(cfg.keys.s00),cfg.keys.instructContKey});
+      cfg.stim.(sesName).(phaseName).instruct_name_img = [];
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Viewing+Naming
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     phaseName = 'viewname';
@@ -616,7 +654,7 @@ if expParam.sessionNum == 1
       
       % instructions (name)
       [cfg.stim.(sesName).viewname.instruct_name] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+        fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
@@ -689,7 +727,7 @@ if expParam.sessionNum == 1
       
       % instructions
       [cfg.stim.(sesName).nametrain.instruct_name] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+        fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
@@ -723,7 +761,7 @@ if expParam.sessionNum == 1
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct_name] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+        fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
@@ -735,7 +773,7 @@ if expParam.sessionNum == 1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'name';
+    phaseName = 'match';
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
@@ -846,7 +884,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName).instruct_name] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_name1_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
           {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
           {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
           KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...

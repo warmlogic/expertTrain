@@ -125,7 +125,7 @@ for s = 1:expParam.nSessions
       case {'prac_name'}
         prac_nameCount = prac_nameCount + 1;
         
-        [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,prac_nameCount);
+        [cfg,expParam,stimStruct.fStims] = et_processStims_name(cfg,expParam,sesName,phaseName,prac_nameCount,stimStruct.fStims);
         
       case {'prac_recog'}
         prac_recogCount = prac_recogCount + 1;
