@@ -94,13 +94,13 @@ for i = 1:length(viewStims)
 end
 
 % get the width and height of the final stimulus image
-stimImgHeight = size(stimImg,1);
-stimImgWidth = size(stimImg,2);
+stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
+stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 
-% y-coordinate for stimulus number
-sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
+% y-coordinate for stimulus number (below stim by 4% of the screen height)
+sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
 
 if runInBlocks
   nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
@@ -132,9 +132,12 @@ Screen('Flip', w);
 
 %% show the instructions
 
-WaitSecs(1.000);
-et_showTextInstruct(w,phaseCfg.instruct_view,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_view_img,...
-  {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
+for i = 1:length(phaseCfg.instruct.view)
+  WaitSecs(1.000);
+  et_showTextInstruct(w,phaseCfg.instruct.view(i),cfg.keys.instructContKey,...
+    instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+    {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
+end
 
 % Wait a second before starting trial
 WaitSecs(1.000);
@@ -260,7 +263,7 @@ for i = 1:length(stimTex)
   WaitSecs(phaseCfg.view_preStim);
   
   % draw the stimulus
-  Screen('DrawTexture', w, stimTex(i));
+  Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
   % and species number in black
   Screen('TextSize', w, cfg.text.basicTextSize);
   if sNum > 0
@@ -305,7 +308,7 @@ for i = 1:length(stimTex)
         end
       end
       % draw the stimulus
-      Screen('DrawTexture', w, stimTex(i));
+      Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
       % and species number in the appropriate color
       Screen('TextSize', w, cfg.text.basicTextSize);
       if sNum > 0
@@ -336,7 +339,7 @@ for i = 1:length(stimTex)
   % if they didn't make a response, give incorrect feedback
   if ~keyIsDown
     % draw the stimulus
-    Screen('DrawTexture', w, stimTex(i));
+    Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
     % and species number in the appropriate color
     Screen('TextSize', w, cfg.text.basicTextSize);
     if sNum > 0

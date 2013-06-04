@@ -1,5 +1,5 @@
-function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile,origText,replacementText)
-% function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructTextWidth,instructImageFile,origText,replacementText)
+function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructCharWidth,origText,replacementText)
+% function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructCharWidth,origText,replacementText)
 
 if ~exist('continueKey','var') || isempty(continueKey)
   continueKey = 'any';
@@ -9,16 +9,12 @@ if ~exist('instructColor','var') || isempty(instructTextColor)
   instructTextColor = WhiteIndex(w);
 end
 
-if ~exist('instructSize','var') || isempty(instructTextSize)
+if ~exist('instructTextSize','var') || isempty(instructTextSize)
   instructTextSize = 32;
 end
 
-if ~exist('instructTextWidth','var') || isempty(instructTextWidth)
-  instructTextWidth = 80;
-end
-
-if ~exist('instructImageFile','var') || isempty(instructImageFile)
-  instructImageFile = [];
+if ~exist('instructCharWidth','var') || isempty(instructCharWidth)
+  instructCharWidth = 80;
 end
 
 if ~exist('origText','var') || isempty(origText)
@@ -35,18 +31,22 @@ end
 
 if ~isempty(origText)
   for i = 1:length(origText)
-    [findOrig] = strfind(instructions,origText{i});
+    [findOrig] = strfind(instructions.text,origText{i});
     fprintf('replacing %d instances of ''%s'' with ''%s''.\n',length(findOrig),origText{i},replacementText{i});
-    instructions = strrep(instructions,origText{i},replacementText{i});
+    instructions.text = strrep(instructions.text,origText{i},replacementText{i});
   end
 end
 
 % if we want to display an image with the instructions, put it at the
 % bottom of the screen
-if ~isempty(instructImageFile)
-  instructImage = imread(instructImageFile);
-  instructImageHeight = size(instructImage,1);
-  instructImageWidth = size(instructImage,2);
+if isfield(instructions,'image') && ~isempty(instructions.image)
+  if ~isfield(instructions,'imageScale') || isempty(instructions.imageScale)
+    instructions.imageScale = 1;
+  end
+  
+  instructImage = imread(instructions.image);
+  instructImageHeight = size(instructImage,1) * instructions.imageScale;
+  instructImageWidth = size(instructImage,2) * instructions.imageScale;
   instructImage = Screen('MakeTexture',w,instructImage);
   
   % put the image at the bottom of the screen
@@ -60,7 +60,7 @@ end
 
 Screen('TextSize', w, instructTextSize);
 % put the instructions on the screen
-DrawFormattedText(w, instructions, 'center', 'center', instructTextColor, instructTextWidth);
+DrawFormattedText(w, instructions.text, 'center', 'center', instructTextColor, instructCharWidth);
 % Update the display to show the instruction text:
 Screen('Flip', w);
 
@@ -75,7 +75,7 @@ RestrictKeysForKbCheck([]);
 % Clear screen to background color (our 'gray' as set at the beginning):
 Screen('Flip', w);
 
-if ~isempty(instructImageFile)
+if isfield(instructions,'image') && ~isempty(instructions.image)
   Screen('Close', instructImage);
 end
 

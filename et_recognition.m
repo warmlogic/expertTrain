@@ -58,8 +58,8 @@ fixationColor = WhiteIndex(w);
 
 % read the proper response key image
 respKeyImg = imread(cfg.files.recogTestRespKeyImg);
-respKeyImgHeight = size(respKeyImg,1);
-respKeyImgWidth = size(respKeyImg,2);
+respKeyImgHeight = size(respKeyImg,1) * cfg.files.recogTestRespKeyImgScale;
+respKeyImgWidth = size(respKeyImg,2) * cfg.files.recogTestRespKeyImgScale;
 respKeyImg = Screen('MakeTexture',w,respKeyImg);
 
 %% start NS recording, if desired
@@ -130,28 +130,27 @@ for b = 1:phaseCfg.nBlocks
   end
   
   % get the width and height of the final stimulus image
-  stimImgHeight = size(stimImg,1);
-  stimImgWidth = size(stimImg,2);
+  stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
+  stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
   % set the stimulus image rectangle
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
   
   %% show the study instructions
   
-  if iscell(phaseCfg.instruct_recogIntro)
-    for i = 1:length(phaseCfg.instruct_recogIntro)
-      WaitSecs(1.000);
-      et_showTextInstruct(w,phaseCfg.instruct_recogIntro{i},cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogIntro_img{i},...
-        {'blockNum'},{num2str(b)});
-    end
-  else
+  for i = 1:length(phaseCfg.instruct.recogIntro)
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct_recogIntro,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogIntro_img,...
-        {'blockNum'},{num2str(b)});
+    et_showTextInstruct(w,phaseCfg.instruct.recogIntro(i),cfg.keys.instructContKey,...
+      instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+      {'blockNum'},{num2str(b)});
   end
-  WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct_recogStudy,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogStudy_img,...
-        {'blockNum'},{num2str(b)});
+  
+  for i = 1:length(phaseCfg.instruct.recogStudy)
+    WaitSecs(1.000);
+    et_showTextInstruct(w,phaseCfg.instruct.recogStudy(i),cfg.keys.instructContKey,...
+      instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+      {'blockNum'},{num2str(b)});
+  end
   
   % Wait a second before starting trial
   WaitSecs(1.000);
@@ -307,8 +306,8 @@ for b = 1:phaseCfg.nBlocks
   end
   
   % get the width and height of the final stimulus image
-  stimImgHeight = size(stimImg,1);
-  stimImgWidth = size(stimImg,2);
+  stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
+  stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
   % set the stimulus image rectangle
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
@@ -319,8 +318,11 @@ for b = 1:phaseCfg.nBlocks
   
   %% show the test instructions
   
-  WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct_recogTest,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_recogTest_img);
+  for i = 1:length(phaseCfg.instruct.recogTest)
+    WaitSecs(1.000);
+    et_showTextInstruct(w,phaseCfg.instruct.recogTest(i),cfg.keys.instructContKey,...
+      instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  end
   
   % Wait a second before starting trial
   WaitSecs(1.000);

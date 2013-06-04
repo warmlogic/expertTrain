@@ -91,14 +91,14 @@ for i = 1:length(nameStims)
   end
 end
 
-% % get the width and height of the final stimulus image
-% stimImgHeight = size(stimImg,1);
-% stimImgWidth = size(stimImg,2);
-% stimImgRect = [0 0 stimImgWidth stimImgHeight];
-% stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
-% 
-% % y-coordinate for stimulus number
-% sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.05));
+% get the width and height of the final stimulus image
+stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
+stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
+stimImgRect = [0 0 stimImgWidth stimImgHeight];
+stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
+
+% % y-coordinate for stimulus number (below stim by 4% of the screen height)
+% sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
 
 if runInBlocks
   nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
@@ -130,9 +130,12 @@ Screen('Flip', w);
 
 %% show the instructions
 
-WaitSecs(1.000);
-et_showTextInstruct(w,phaseCfg.instruct_name,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_name_img,...
-  {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
+for i = 1:length(phaseCfg.instruct.name)
+  WaitSecs(1.000);
+  et_showTextInstruct(w,phaseCfg.instruct.name(i),cfg.keys.instructContKey,...
+    instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+    {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
+end
 
 % Wait a second before starting trial
 WaitSecs(1.000);
@@ -259,7 +262,7 @@ for i = 1:length(stimTex)
   WaitSecs(name_preStim);
   
   % draw the stimulus
-  Screen('DrawTexture', w, stimTex(i));
+  Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':

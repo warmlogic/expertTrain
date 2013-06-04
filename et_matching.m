@@ -136,6 +136,13 @@ for i = 1:length(stim2)
   end
 end
 
+% get the width and height of the final stimulus image
+stimImgHeight = size(stim1Img,1) * cfg.stim.stimScale;
+stimImgWidth = size(stim1Img,2) * cfg.stim.stimScale;
+% set the stimulus image rectangle
+stimImgRect = [0 0 stimImgWidth stimImgHeight];
+stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
+
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
@@ -160,8 +167,11 @@ Screen('Flip', w);
 
 %% show the instructions
 
-WaitSecs(1.000);
-et_showTextInstruct(w,phaseCfg.instruct_match,cfg.keys.instructContKey,instructColor,cfg.text.instructSize,cfg.text.instructWidth,phaseCfg.instruct_match_img);
+for i = 1:length(phaseCfg.instruct.match)
+  WaitSecs(1.000);
+  et_showTextInstruct(w,phaseCfg.instruct.match(i),cfg.keys.instructContKey,...
+    instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+end
 
 % Wait a second before starting trial
 WaitSecs(1.000);
@@ -262,7 +272,7 @@ for i = 1:length(stim2Tex)
   WaitSecs(preStim1);
   
   % draw the stimulus
-  Screen('DrawTexture', w, stim1Tex(i));
+  Screen('DrawTexture', w, stim1Tex(i), [], stimImgRect);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
@@ -288,7 +298,7 @@ for i = 1:length(stim2Tex)
   WaitSecs(preStim2);
   
   % draw the stimulus
-  Screen('DrawTexture', w, stim2Tex(i));
+  Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
