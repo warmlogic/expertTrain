@@ -281,132 +281,140 @@ for s = 1:expParam.nSessions
       
       case {'match'}
         matchCount = matchCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(matchCount);
+        phaseCount = matchCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(matchCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims] = et_shuffleStims_match(...
               expParam.session.(sesName).(phaseName)(phaseCount).same,...
               expParam.session.(sesName).(phaseName)(phaseCount).diff,...
               cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).stim2MinRepeatSpacing);
           end
-          cfg.stim.(sesName).(phaseName)(matchCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,matchCount);
+          [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'name'}
         nameCount = nameCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(nameCount);
+        phaseCount = nameCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(nameCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims,'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(nameCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,nameCount);
+          [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'recog'}
         recogCount = recogCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(recogCount);
+        phaseCount = recogCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(recogCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(recogCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,recogCount);
+          [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'nametrain'}
         nametrainCount = nametrainCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(nametrainCount);
+        phaseCount = nametrainCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(nametrainCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(nametrainCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_nametrain(cfg,expParam,sesName,phaseName,nametrainCount);
+          [cfg,expParam] = et_processStims_nametrain(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'viewname'}
         viewnameCount = viewnameCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(viewnameCount);
+        phaseCount = viewnameCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(viewnameCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).viewMaxConsecFamily);
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(viewnameCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,viewnameCount);
+          [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'prac_match'}
         prac_matchCount = prac_matchCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(prac_matchCount);
+        phaseCount = prac_matchCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(prac_matchCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims] = et_shuffleStims_match(...
               expParam.session.(sesName).(phaseName)(phaseCount).same,...
               expParam.session.(sesName).(phaseName)(phaseCount).diff,...
               cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).stim2MinRepeatSpacing);
           end
-          cfg.stim.(sesName).(phaseName)(prac_matchCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,prac_matchCount);
+          [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'prac_name'}
         prac_nameCount = prac_nameCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(prac_nameCount);
+        phaseCount = prac_nameCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(prac_nameCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims,'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(prac_nameCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,prac_nameCount);
+          [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'prac_recog'}
         prac_recogCount = prac_recogCount + 1;
-        phaseCfg = cfg.stim.(sesName).(phaseName)(prac_recogCount);
+        phaseCount = prac_recogCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
         
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
-          expParam.session.(sesName).(phaseName)(prac_recogCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
             [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(prac_recogCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
         else
-          [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,prac_recogCount);
+          [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
     end % switch
