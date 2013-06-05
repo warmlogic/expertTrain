@@ -51,8 +51,8 @@ expParam.session.train3.phases = {'match','name','match'};
 expParam.session.train4.phases = {'match','name','match'};
 expParam.session.train5.phases = {'match','name','match'};
 expParam.session.train6.phases = {'match','name','match'};
-expParam.session.posttest.phases = {'match','recog'};
-expParam.session.posttest_delay.phases = {'match','recog'};
+expParam.session.posttest.phases = {'match','prac_recog','recog'};
+expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
 
 % % demo - debug
 % expParam.nSessions = 2;
@@ -164,13 +164,20 @@ if expParam.sessionNum == 1
   % scale stimlus down (< 1) or up (> 1)
   cfg.stim.stimScale = 1;
   
+  % image directory holds the stims and resources
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
+  
+  % set the stimulus directory
   cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
+  
+  % set the image resources directory
+  cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
+  
+  % set the instructions directory
+  cfg.files.instructDir = fullfile(cfg.files.expDir,'text','instructions');
+  
   % debug bird
   % cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
-  % save an individual stimulus list for each subject
-  cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
-  
   % family names correspond to the directories in which stimuli reside
   cfg.stim.familyNames = {'a','s'};
   % debug bird
@@ -182,15 +189,8 @@ if expParam.sessionNum == 1
   % % debug
   % cfg.stim.nSpecies = 3;
   
-  % Number of trained and untrained exemplars per species per family
-  cfg.stim.nTrained = 6;
-  cfg.stim.nUntrained = 6;
-  % % debug
-  % cfg.stim.nTrained = 2;
-  % cfg.stim.nUntrained = 2;
-  
-  % initialize to store the number of exemplars for each species
-  cfg.stim.nExemplars = zeros(length(cfg.stim.familyNames),cfg.stim.nSpecies);
+  % save an individual stimulus list for each subject
+  cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
   % whether to use the same species order across families
   cfg.stim.yokeSpecies = false;
@@ -202,30 +202,65 @@ if expParam.sessionNum == 1
     % cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
   end
   
-  % practice images stored in separate directories
-  cfg.sitm.useSeparatePracStims = false;
-  if cfg.sitm.useSeparatePracStims
-    cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Creatures_prac');
-    cfg.stim.stimListFile_prac = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
-    cfg.stim.familyNames_prac = {'a','s'};
-    cfg.stim.nSpecies_prac = 3;
-    cfg.stim.nPractice = 3;
-  end
-  
-  % set the resources directory
-  cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
-  
-  % set the instructions directory
-  cfg.files.instructDir = fullfile(cfg.files.expDir,'text','instructions');
+  % Number of trained and untrained exemplars per species per family
+  cfg.stim.nTrained = 6;
+  cfg.stim.nUntrained = 6;
+  % % debug
+  % cfg.stim.nTrained = 2;
+  % cfg.stim.nUntrained = 2;
   
   % create the stimulus list if it doesn't exist
   shuffleSpecies = true;
   if ~exist(cfg.stim.stimListFile,'file')
-    [cfg] = et_saveStimList(cfg,cfg.files.stimDir,cfg.stim.stimListFile,shuffleSpecies);
+    [cfg] = et_saveStimList(cfg,cfg.files.stimDir,cfg.stim,shuffleSpecies);
   else
     % % debug = warning instead of error
     % warning('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.stimListFile);
     error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.stimListFile);
+  end
+  
+  % practice images stored in separate directories
+  expParam.runPractice = true;
+  cfg.stim.useSeparatePracStims = false;
+  
+%   if expParam.runPractice
+%     % number of exemplars per species per family to choose for practice
+%     % phases
+%     cfg.stim.practice.nExemplars = 2;
+%     % number of exemplars per species per family per block to choose for
+%     % practice recognition (study targets + test lures)
+%     cfg.stim.practice.nExemplarsRecog = 0;
+%   end
+  
+  if expParam.runPractice
+    % practice exemplars per species per family for all phases except
+    % recognition (recognition stim count is determined by nStudyTarg and
+    % nStudyLure in each prac_recog phase defined below)
+    cfg.stim.practice.nPractice = 2;
+    
+    if cfg.stim.useSeparatePracStims
+      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Creatures_prac');
+      cfg.stim.practice.stimListFile = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
+      cfg.stim.practice.familyNames = {'b','t'};
+      cfg.stim.practice.nSpecies = 2;
+      cfg.stim.practice.yokeSpecies = false;
+      
+      shuffleSpecies = true;
+      if ~exist(cfg.stim.practice.stimListFile,'file')
+        [cfg] = et_saveStimList(cfg,cfg.files.stimDir_prac,cfg.stim.practice,shuffleSpecies);
+      else
+        % % debug = warning instead of error
+        % warning('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
+        error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
+      end
+    else
+      cfg.stim.practice.familyNames = cfg.stim.familyNames;
+      %cfg.stim.practice.nSpecies = cfg.stim.nSpecies;
+      %cfg.stim.practice.yokeSpecies = cfg.stim.yokeSpecies;
+      cfg.stim.practice.nSpecies = 2;
+      cfg.stim.practice.yokeSpecies = false;
+      cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
+    end
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
@@ -368,8 +403,8 @@ if expParam.sessionNum == 1
       % number of pairs of stimuli per family for "same" and "diff" trials.
       % (gets capped at nSame+nDiff pairs of same and diff species per
       % family, so 1 of each is 8 trials total)
-      cfg.stim.(sesName).(phaseName).nSame = 1;
-      cfg.stim.(sesName).(phaseName).nDiff = 1;
+      cfg.stim.(sesName).(phaseName).nSame = cfg.stim.practice.nPractice;
+      cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.practice.nPractice;
       % minimum number of trials needed between exact repeats of a given
       % stimulus as stim2
       cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 0;
@@ -378,7 +413,7 @@ if expParam.sessionNum == 1
       
       % rmStims_orig is false because we don't want the selected stimuli to
       % be used elsewhere
-      cfg.stim.(sesName).(phaseName).rmStims_orig = true;
+      cfg.stim.(sesName).(phaseName).rmStims_orig = false;
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
@@ -458,10 +493,11 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).isExp = false;
       
       cfg.stim.(sesName).(phaseName).nBlocks = 1;
-      % number of target and lure stimuli for practice across all species and
-      % families.
-      cfg.stim.(sesName).(phaseName).nStudyTarg = 8;
-      cfg.stim.(sesName).(phaseName).nTestLure = 4;
+      % number of target and lure stimuli per species per family per study/test
+      % block. Assumes all targets and lures are tested in a block.
+      cfg.stim.(sesName).(phaseName).nStudyTarg = 4;
+      cfg.stim.(sesName).(phaseName).nTestLure = 2;
+      
       % maximum number of same family in a row during study task
       cfg.stim.(sesName).(phaseName).studyMaxConsecFamily = 0;
       % maximum number of targets or lures in a row during test task
@@ -571,9 +607,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
-      cfg.stim.(sesName).(phaseName).nTrials = 8;
-      cfg.stim.(sesName).(phaseName).rmStims = true;
-      cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      %cfg.stim.(sesName).(phaseName).nTrials = 8;
+      %cfg.stim.(sesName).(phaseName).rmStims = true;
+      %cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
@@ -1055,6 +1091,18 @@ if expParam.sessionNum == 1
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Recognition - practice
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_recog';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      % do we want to use the stimuli from a previous phase? Set to an empty
+      % cell if not.
+      cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_recog',1};
+      cfg.stim.(sesName).(phaseName).reshuffleStims = true;
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Recognition
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     phaseName = 'recog';
@@ -1111,14 +1159,23 @@ if expParam.sessionNum == 1
   sesName = 'posttest_delay';
   
   if ismember(sesName,expParam.sesTypes)
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Matching - practice
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_match';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      % do we want to use the stimuli from a previous phase? Set to an empty
+      % cell if not.
+      cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_match',1};
+      cfg.stim.(sesName).(phaseName).reshuffleStims = true;
+    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     phaseName = 'match';
-    
-    % do we want to use the stimuli from a previous phase? Set to an empty
-    % cell if not.
-    cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_recog',1};
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
@@ -1155,6 +1212,18 @@ if expParam.sessionNum == 1
       [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
         {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Recognition - practice
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_recog';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      % do we want to use the stimuli from a previous phase? Set to an empty
+      % cell if not.
+      cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_recog',1};
+      cfg.stim.(sesName).(phaseName).reshuffleStims = true;
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
