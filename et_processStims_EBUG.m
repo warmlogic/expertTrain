@@ -292,7 +292,11 @@ for s = 1:expParam.nSessions
               expParam.session.(sesName).(phaseName)(phaseCount).diff,...
               cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).stim2MinRepeatSpacing);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -308,7 +312,11 @@ for s = 1:expParam.nSessions
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims,'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -326,7 +334,11 @@ for s = 1:expParam.nSessions
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -342,7 +354,11 @@ for s = 1:expParam.nSessions
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_nametrain(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -360,7 +376,11 @@ for s = 1:expParam.nSessions
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -378,7 +398,11 @@ for s = 1:expParam.nSessions
               expParam.session.(sesName).(phaseName)(phaseCount).diff,...
               cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).stim2MinRepeatSpacing);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -394,7 +418,11 @@ for s = 1:expParam.nSessions
             [expParam.session.(sesName).(phaseName)(phaseCount).nameStims] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).nameStims,'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount);
         end
@@ -412,7 +440,11 @@ for s = 1:expParam.nSessions
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
           end
-          cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
         else
           [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount);
         end
