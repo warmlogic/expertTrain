@@ -1,5 +1,5 @@
-function [cfg,expParam,varargout] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount,varargin)
-% function [cfg,expParam,varargout] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount,varargin)
+function [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount)
+% function [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,phaseCount)
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
@@ -8,23 +8,10 @@ phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 % initialize to hold the trained stimuli
 expParam.session.(sesName).(phaseName)(phaseCount).nameStims = [];
 
-% initialize output for families
-nout = max(nargout,1) - 2;
-varargout = cell(1,nout);
-
 if ~phaseCfg.isExp
-  % for the practice, put get stimuli from the remaining pool
+  % for the practice, put all the practice stimuli together
   for f = 1:length(cfg.stim.familyNames)
-    thisFam = varargin{f};
-    
-    % run et_divvyStims
-    [expParam.session.(sesName).(phaseName)(phaseCount).nameStims,thisFam] = et_divvyStims(...
-      thisFam,expParam.session.(sesName).(phaseName)(phaseCount).nameStims,1,...
-      phaseCfg.rmStims,phaseCfg.shuffleFirst,{},{},...
-      phaseCfg.nTrials);
-    
-    % store the (altered) family stimuli for output
-    varargout{f} = thisFam;
+    expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dPractice',f)));
   end
 else
   % for the real experiment, put all the trained stimuli together

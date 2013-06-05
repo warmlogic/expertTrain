@@ -1,5 +1,5 @@
-function [cfg,expParam,varargout] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount,varargin)
-% function [cfg,expParam,varargout] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount,varargin)
+function [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount)
+% function [cfg,expParam] = et_processStims_match(cfg,expParam,sesName,phaseName,phaseCount)
 
 % TODO: don't need to store expParam.session.(sesName).match.same and
 % expParam.session.(sesName).match.diff because allStims gets created and
@@ -13,25 +13,14 @@ phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 expParam.session.(sesName).(phaseName)(phaseCount).same = [];
 expParam.session.(sesName).(phaseName)(phaseCount).diff = [];
 
-% initialize output for families
-nout = max(nargout,1) - 2;
-varargout = cell(1,nout);
-
 if ~phaseCfg.isExp
   % this is the practice session
   for f = 1:length(cfg.stim.familyNames)
-    thisFam = varargin{f};
-    
-    % practice stimuli
     [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff] = et_divvyStims_match(...
-      thisFam,...
+      expParam.session.(sprintf('f%dPractice',f)),...
       expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
       phaseCfg.nSame,phaseCfg.nDiff,...
-      phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst,...
-      (phaseCfg.nSame + phaseCfg.nDiff));
-    
-    % store the (altered) family stimuli for output
-    varargout{f} = thisFam;
+      phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst);
   end
   % add in the 'trained' field because we need it for running the task
   for e = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).same)
