@@ -61,49 +61,6 @@ expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','rec
 % expParam.session.pretest.phases = {'prac_match','prac_recog'};
 % expParam.session.train1.phases = {'prac_name','nametrain'};
 
-% % debug bird
-%
-% % Set the number of sessions
-% expParam.nSessions = 8;
-%
-% % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest'};
-%
-% % set up a field for each session type
-% expParam.session.pretest.phases = {'match'};
-% expParam.session.train1.phases = {'nametrain','name'};
-% expParam.session.train2.phases = {'name'};
-% expParam.session.train3.phases = {'name'};
-% expParam.session.train4.phases = {'name'};
-% expParam.session.train5.phases = {'name'};
-% expParam.session.train6.phases = {'name'};
-% expParam.session.posttest.phases = {'match'};
-
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'pretest'};
-% % set up a field for each session type
-% % expParam.session.pretest.phases = {'match'};
-% % expParam.session.pretest.phases = {'recog'};
-% % expParam.session.pretest.phases = {'prac_match','match'};
-% expParam.session.pretest.phases = {'prac_recog','recog'};
-
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'train1'};
-% % expParam.session.train1.phases = {'nametrain'};
-% % expParam.session.train1.phases = {'name'};
-% expParam.session.train1.phases = {'prac_name','nametrain'};
-% % expParam.session.train1.phases = {'nametrain','name','match'};
-% % expParam.session.train1.phases = {'viewname'};
-
-% % debug
-% expParam.nSessions = 1;
-% expParam.sesTypes = {'train2'};
-% % expParam.session.train2.phases = {'match'};
-% %expParam.session.train2.phases = {'name'};
-% expParam.session.train2.phases = {'match','name','match'};
-
 %% do some error checking
 
 possible_phases = {'match','name','recog','nametrain','viewname','prac_match','prac_name','prac_recog'};
@@ -162,7 +119,7 @@ if expParam.sessionNum == 1
   cfg.files.stimFileExt = '.bmp';
   
   % scale stimlus down (< 1) or up (> 1)
-  cfg.stim.stimScale = 1;
+  cfg.stim.stimScale = 0.75;
   
   % image directory holds the stims and resources
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
@@ -176,38 +133,24 @@ if expParam.sessionNum == 1
   % set the instructions directory
   cfg.files.instructDir = fullfile(cfg.files.expDir,'text','instructions');
   
-  % debug bird
-  % cfg.files.stimDir = fullfile(cfg.files.imgDir,'Birds');
   % family names correspond to the directories in which stimuli reside
   cfg.stim.familyNames = {'a','s'};
-  % debug bird
-  %cfg.stim.familyNames = {'fc','fi','fg','fhi8','flo8','wc','wi','wg','whi8','wlo8'};
-  % cfg.stim.familyNames = {'ac','ai','ag','ahi8','alo8','sc','si','sg','shi8','slo8'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
-  % % debug
-  % cfg.stim.nSpecies = 3;
   
   % save an individual stimulus list for each subject
   cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
   % whether to use the same species order across families
   cfg.stim.yokeSpecies = false;
-  % debug bird
-  % cfg.stim.yokeSpecies = true;
   if cfg.stim.yokeSpecies
     cfg.stim.yokeTogether = [1 1];
-    % debug bird
-    % cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
   end
   
   % Number of trained and untrained exemplars per species per family
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
-  % % debug
-  % cfg.stim.nTrained = 2;
-  % cfg.stim.nUntrained = 2;
   
   % create the stimulus list if it doesn't exist
   shuffleSpecies = true;
@@ -265,15 +208,9 @@ if expParam.sessionNum == 1
   if expParam.isEven
     cfg.stim.famNumBasic = 1;
     cfg.stim.famNumSubord = 2;
-    % debug bird
-    % cfg.stim.famNumBasic = [1 2 3 4 5];
-    % cfg.stim.famNumSubord = [6 7 8 9 10];
   else
     cfg.stim.famNumBasic = 2;
     cfg.stim.famNumSubord = 1;
-    % debug bird
-    % cfg.stim.famNumBasic = [6 7 8 9 10];
-    % cfg.stim.famNumSubord = [1 2 3 4 5];
   end
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';
