@@ -56,7 +56,7 @@ for f = 1:length(stimInfoStruct.familyNames)
       end
       % remove the exemplar numbers (only keep the characters that are in the
       % alphabet letter range)
-      specStr = cellfun(@(x) x(isstrprop(x,'alpha')), specExempStr, 'UniformOutput', false);
+      specStr = cellfun(@(x) x(~isstrprop(x,'digit')), specExempStr, 'UniformOutput', false);
       % get the actual exemplar numbers of this species for sorting
       exempNums = str2double(cellfun(@(x) x(isstrprop(x,'digit')), specExempStr, 'UniformOutput', false));
       
