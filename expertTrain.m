@@ -162,8 +162,9 @@ try
   end
   
   % Set up the gray color value to be used
-  cfg.screen.gray = GrayIndex(screenNumber);
+  %cfg.screen.gray = GrayIndex(screenNumber);
   %cfg.screen.gray = 181;
+  cfg.screen.gray = 210;
   
   % Open a double buffered fullscreen window on the stimulation screen
   % 'screenNumber' and choose/draw a gray background. 'w' is the handle
