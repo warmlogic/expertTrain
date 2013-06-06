@@ -4,7 +4,7 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 % Description:
 %  Configuration function for creature expertise training experiment. This
 %  file should be edited for your particular experiment. This function runs
-%  process_EBUG_stimuli to prepare the stimuli for experiment presentation.
+%  et_processStims_EBUG to prepare the stimuli for experiment presentation.
 %
 % see also: et_saveStimList, et_processStims_EBUG, et_processStims_match,
 % et_processStims_recog, et_processStims_viewname,
@@ -221,7 +221,7 @@ if expParam.sessionNum == 1
   
   % practice images stored in separate directories
   expParam.runPractice = true;
-  cfg.stim.useSeparatePracStims = false;
+  cfg.stim.useSeparatePracStims = true;
   
   if expParam.runPractice
     % practice exemplars per species per family for all phases except
@@ -235,6 +235,9 @@ if expParam.sessionNum == 1
       cfg.stim.practice.familyNames = {'Finch_','Warbler_'};
       cfg.stim.practice.nSpecies = 2;
       cfg.stim.practice.yokeSpecies = false;
+      if cfg.stim.practice.yokeSpecies
+        cfg.stim.practice.yokeTogether = [1 1];
+      end
       
       shuffleSpecies = true;
       if ~exist(cfg.stim.practice.stimListFile,'file')
@@ -251,6 +254,9 @@ if expParam.sessionNum == 1
       %cfg.stim.practice.yokeSpecies = cfg.stim.yokeSpecies;
       cfg.stim.practice.nSpecies = 2;
       cfg.stim.practice.yokeSpecies = false;
+      if cfg.stim.practice.yokeSpecies
+        cfg.stim.practice.yokeTogether = [1 1];
+      end
       cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
     end
   end
