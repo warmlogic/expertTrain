@@ -38,10 +38,10 @@ incorrectSound = 'low';
 matchTextPrompt = true;
 
 % Set the number of sessions
-expParam.nSessions = 8;
+expParam.nSessions = 9;
 
 % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest'};
+expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
 
 % set up a field for each session type
 expParam.session.pretest.phases = {'prac_match','match'};
@@ -51,7 +51,8 @@ expParam.session.train3.phases = {'name'};
 expParam.session.train4.phases = {'name'};
 expParam.session.train5.phases = {'name'};
 expParam.session.train6.phases = {'name'};
-expParam.session.posttest.phases = {'match'};
+expParam.session.posttest.phases = {'prac_match','match'};
+expParam.session.posttest_delay.phases = {'prac_match','match'};
 
 % % demo - debug
 % expParam.nSessions = 2;
@@ -118,7 +119,7 @@ if expParam.sessionNum == 1
   cfg.files.stimFileExt = '.bmp';
   
   % scale stimlus down (< 1) or up (> 1)
-  cfg.stim.stimScale = 1;
+  cfg.stim.stimScale = 0.75;
   
   % image directory holds the stims and resources
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
@@ -633,6 +634,79 @@ if expParam.sessionNum == 1
   sesName = 'posttest';
   
   if ismember(sesName,expParam.sesTypes)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Matching - practice
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_match';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      % do we want to use the stimuli from a previous phase? Set to an empty
+      % cell if not.
+      cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_match',1};
+      cfg.stim.(sesName).(phaseName).reshuffleStims = true;
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Matching
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'match';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % every stimulus is in both the same and the different condition.
+      cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
+      cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
+      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
+      % whether to have "same" and "diff" text with the response prompt
+      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
+      
+      % rmStims_orig is false because all stimuli are used in both 'same' and
+      % 'diff' conditions
+      cfg.stim.(sesName).(phaseName).rmStims_orig = false;
+      % rmStims_pair is true because pairs are removed after they're added
+      cfg.stim.(sesName).(phaseName).rmStims_pair = true;
+      cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      if expParam.useNS
+        cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+      end
+      
+      % durations, in seconds
+      cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
+      % % random intervals are generated on the fly
+      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      cfg.stim.(sesName).(phaseName).match_response = 5.0;
+      
+      % instructions
+      [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
+        fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
+        {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+    end
+  end
+  
+  %% Posttest Delayed configuration
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  sesName = 'posttest_delay';
+  
+  if ismember(sesName,expParam.sesTypes)
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Matching - practice
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_match';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      % do we want to use the stimuli from a previous phase? Set to an empty
+      % cell if not.
+      cfg.stim.(sesName).(phaseName).usePrevPhase = {'pretest','prac_match',1};
+      cfg.stim.(sesName).(phaseName).reshuffleStims = true;
+    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
