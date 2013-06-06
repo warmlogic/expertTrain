@@ -93,7 +93,7 @@ expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','rec
 % expParam.sesTypes = {'train1'};
 % % expParam.session.train1.phases = {'nametrain'};
 % % expParam.session.train1.phases = {'name'};
-% expParam.session.train1.phases = {'prac_name','name'};
+% expParam.session.train1.phases = {'prac_name','nametrain'};
 % % expParam.session.train1.phases = {'nametrain','name','match'};
 % % expParam.session.train1.phases = {'viewname'};
 
@@ -223,15 +223,6 @@ if expParam.sessionNum == 1
   expParam.runPractice = true;
   cfg.stim.useSeparatePracStims = false;
   
-%   if expParam.runPractice
-%     % number of exemplars per species per family to choose for practice
-%     % phases
-%     cfg.stim.practice.nExemplars = 2;
-%     % number of exemplars per species per family per block to choose for
-%     % practice recognition (study targets + test lures)
-%     cfg.stim.practice.nExemplarsRecog = 0;
-%   end
-  
   if expParam.runPractice
     % practice exemplars per species per family for all phases except
     % recognition (recognition stim count is determined by nStudyTarg and
@@ -239,9 +230,9 @@ if expParam.sessionNum == 1
     cfg.stim.practice.nPractice = 2;
     
     if cfg.stim.useSeparatePracStims
-      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Creatures_prac');
+      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Birds');
       cfg.stim.practice.stimListFile = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
-      cfg.stim.practice.familyNames = {'b','t'};
+      cfg.stim.practice.familyNames = {'Finch_','Warbler_'};
       cfg.stim.practice.nSpecies = 2;
       cfg.stim.practice.yokeSpecies = false;
       
@@ -254,6 +245,7 @@ if expParam.sessionNum == 1
         error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
       end
     else
+      cfg.files.stimDir_prac = cfg.files.stimDir;
       cfg.stim.practice.familyNames = cfg.stim.familyNames;
       %cfg.stim.practice.nSpecies = cfg.stim.nSpecies;
       %cfg.stim.practice.yokeSpecies = cfg.stim.yokeSpecies;
@@ -615,10 +607,6 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
-      
-      %cfg.stim.(sesName).(phaseName).nTrials = 8;
-      %cfg.stim.(sesName).(phaseName).rmStims = true;
-      %cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
