@@ -53,6 +53,12 @@ phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 targStims = expParam.session.(sesName).(phaseName)(phaseCount).targStims;
 allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
 
+if phaseCfg.isExp
+  stimDir = cfg.files.stimDir;
+else
+  stimDir = cfg.files.stimDir_prac;
+end
+
 % set some text color
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
@@ -133,7 +139,7 @@ for b = 1:phaseCfg.nBlocks
   blockStimTex = nan(1,length(targStims{b}));
   for i = 1:length(targStims{b})
     % this image
-    stimImgFile = fullfile(cfg.files.stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName);
+    stimImgFile = fullfile(stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName);
     if exist(stimImgFile,'file')
       stimImg = imread(stimImgFile);
       blockStimTex(i) = Screen('MakeTexture',w,stimImg);
@@ -309,7 +315,7 @@ for b = 1:phaseCfg.nBlocks
   blockStimTex = nan(1,length(allStims{b}));
   for i = 1:length(allStims{b})
     % this image
-    stimImgFile = fullfile(cfg.files.stimDir,allStims{b}(i).familyStr,allStims{b}(i).fileName);
+    stimImgFile = fullfile(stimDir,allStims{b}(i).familyStr,allStims{b}(i).fileName);
     if exist(stimImgFile,'file')
       stimImg = imread(stimImgFile);
       blockStimTex(i) = Screen('MakeTexture',w,stimImg);

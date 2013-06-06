@@ -55,6 +55,12 @@ end
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 viewStims = expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b};
 
+if phaseCfg.isExp
+  stimDir = cfg.files.stimDir;
+else
+  stimDir = cfg.files.stimDir_prac;
+end
+
 % set some text color
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
@@ -91,7 +97,7 @@ stimTex = nan(1,length(viewStims));
 
 for i = 1:length(viewStims)
   % load up this stim's texture
-  stimImgFile = fullfile(cfg.files.stimDir,viewStims(i).familyStr,viewStims(i).fileName);
+  stimImgFile = fullfile(stimDir,viewStims(i).familyStr,viewStims(i).fileName);
   if exist(stimImgFile,'file')
     stimImg = imread(stimImgFile);
     stimTex(i) = Screen('MakeTexture',w,stimImg);

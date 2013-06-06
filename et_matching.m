@@ -56,6 +56,12 @@ fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
 
+if phaseCfg.isExp
+  stimDir = cfg.files.stimDir;
+else
+  stimDir = cfg.files.stimDir_prac;
+end
+
 % set some text color
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
@@ -137,7 +143,7 @@ for i = 1:length(stim2)
   end
   
   % load up stim2's texture
-  stim2ImgFile = fullfile(cfg.files.stimDir,stim2(i).familyStr,stim2(i).fileName);
+  stim2ImgFile = fullfile(stimDir,stim2(i).familyStr,stim2(i).fileName);
   if exist(stim2ImgFile,'file')
     stim2Img = imread(stim2ImgFile);
     stim2Tex(i) = Screen('MakeTexture',w,stim2Img);
@@ -148,7 +154,7 @@ for i = 1:length(stim2)
   end
   
   % load up stim1's texture
-  stim1ImgFile = fullfile(cfg.files.stimDir,stim1(i).familyStr,stim1(i).fileName);
+  stim1ImgFile = fullfile(stimDir,stim1(i).familyStr,stim1(i).fileName);
   if exist(stim1ImgFile,'file')
     stim1Img = imread(stim1ImgFile);
     stim1Tex(i) = Screen('MakeTexture',w,stim1Img);
