@@ -74,8 +74,8 @@ respondFasterFeedbackTime = 1.5;
 
 correctFeedback = 'Correct!';
 incorrectFeedback = 'Incorrect!';
-sameFeedback =  'Those were THE SAME species.';
-diffFeedback =  'Those were DIFFERENT species.';
+sameFeedback =  'SAME.';
+diffFeedback =  'DIFFERENT.';
 
 correctColor = uint8((rgb('Green') * 255) + 0.5);
 incorrectColor = uint8((rgb('Red') * 255) + 0.5);
