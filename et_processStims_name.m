@@ -10,7 +10,7 @@ expParam.session.(sesName).(phaseName)(phaseCount).nameStims = [];
 
 if ~phaseCfg.isExp
   % for the practice, put all the practice stimuli together
-  for f = 1:length(cfg.stim.familyNames)
+  for f = 1:length(cfg.stim.practice.familyNames)
     expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dPractice',f)));
   end
 else
