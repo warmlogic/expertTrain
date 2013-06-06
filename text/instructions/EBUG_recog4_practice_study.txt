@@ -1,1 +1,1 @@
-You can now practice making the memory decisions in a short practice run.You will now see 8 creatures in a simulated study block. Please look carefully at them and memorize them. You don't have to make any response on the keyboard.Press "contKey" to begin the practice study block.
+You can now practice making the memory decisions in a short practice run.You will now see nExemplars creatures in a simulated study block. Please look carefully at them and memorize them. You don't have to make any response on the keyboard.Press "contKey" to begin the practice study block.
