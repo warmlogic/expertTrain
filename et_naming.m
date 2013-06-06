@@ -53,6 +53,12 @@ end
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 nameStims = expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b};
 
+if phaseCfg.isExp
+  stimDir = cfg.files.stimDir;
+else
+  stimDir = cfg.files.stimDir_prac;
+end
+
 % set some text color
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
@@ -89,7 +95,7 @@ stimTex = nan(1,length(nameStims));
 
 for i = 1:length(nameStims)
   % load up this stim's texture
-  stimImgFile = fullfile(cfg.files.stimDir,nameStims(i).familyStr,nameStims(i).fileName);
+  stimImgFile = fullfile(stimDir,nameStims(i).familyStr,nameStims(i).fileName);
   if exist(stimImgFile,'file')
     stimImg = imread(stimImgFile);
     stimTex(i) = Screen('MakeTexture',w,stimImg);
@@ -172,6 +178,10 @@ RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, 
 if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
+
+% store accuracy and response time
+trialAcc = false(length(stimTex),1);
+trialRT = zeros(length(stimTex),1);
 
 for i = 1:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
@@ -392,20 +402,20 @@ for i = 1:length(stimTex)
   Screen('Close', stimTex(i));
   
   % compute response time
-  rt = round(1000 * (endRT - startRT));
+  trialRT(i) = round(1000 * (endRT - startRT));
   
   % compute accuracy
   if keyIsDown
     if keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
       % pushed the right key
-      acc = 1;
+      trialAcc(i) = 1;
     elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
       % pushed the wrong key
-      acc = 0;
+      trialAcc(i) = 0;
     end
   else
     % did not push a key
-    acc = 0;
+    trialAcc(i) = 0;
   end
   
   % get key pressed by subject
@@ -434,7 +444,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),nameStims(i).fileName,sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),nameStims(i).fileName,sNum,resp,respKey,trialAcc(i));
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...
@@ -467,8 +477,8 @@ for i = 1:length(stimTex)
     sNum,...
     resp,...
     respKey,...
-    acc,...
-    rt);
+    trialAcc(i),...
+    trialRT(i));
   
   % Write netstation logs
   if expParam.useNS
@@ -525,6 +535,19 @@ for i = 1:length(stimTex)
   end % useNS
   
 end
+
+% print accuracy and correct trial RT
+accRtText = sprintf('You got %d out of %d correct.\nFor the correct trials, on average you responded in %i ms.\n\nPress "%s" to continue.',sum(trialAcc),length(stimTex),round(mean(trialRT(trialAcc))),cfg.keys.instructContKey);
+DrawFormattedText(w,accRtText,'center','center',instructColor);
+Screen('Flip', w);
+
+% wait until the key is pressed
+RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+KbWait(-1,2);
+RestrictKeysForKbCheck([]);
+
+% go back to gray
+Screen('Flip', w);
 
 %% cleanup
 
