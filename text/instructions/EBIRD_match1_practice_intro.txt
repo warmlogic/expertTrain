@@ -1,0 +1,8 @@
+This is the practice for the Matching experiment.
+
+On each trial you will see two creatures, one after the other.
+
+Press "sameKey" if the creatures are from the same species.
+Press "diffKey" if the creatures are from different species.
+
+Press "contKey" to begin the matching task.
