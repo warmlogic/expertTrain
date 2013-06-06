@@ -55,11 +55,14 @@ Preparing the experiment
    1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
    1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
-   - Reading external text files containing phase instructions
-   - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up. Currently, practice phases randomly select exemplars from each species, but I'd like it to work differently than it does now (see TODO, below).
+   - Instructions are read from external text files in `expertTrain/text/instructions`.
+   - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up.
+      - Practice stimuli can either be chosen from a separate directory of images (in the `Set/Family/Species/` directory structure, as with experiment stimuli), or they can be randomly selected from the experimental families/species.
    - Image manipulation conditions are supported. Use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
-   - Impedance breaks (every X trials or Y blocks). Use "g" key to end the impedance check.
+   - Impedance breaks (every X trials [phases: matching, name] or Y blocks [phases: recognition, nametrain, viewname]). Use "g" key to end the impedance check.
    - Blink breaks (every X seconds)
+   - Test using a previous phase's stimuli in a current phase (see the example field `usePrevPhase` in `config_EBUG.m`, as well as the field `reshuffleStims` (which must be `true` or `false`). e.g., `usePrevPhase = {'sesName', 'phaseName', phaseNum};`)
+   - Resize image stimuli using the field `cfg.stim.stimScale` in in `config_EBUG.m`. Set equal to the proportion of image; e.g., 1.0 = full-size image. Instruction images can be scaled as well.
 
 Running the experiment
 ----
@@ -71,7 +74,7 @@ Running the experiment
    - Run each successive session using the same command. The experiment will pick up at the next session.
 - If you just want to try out different sessions or phases of the EBUG experiment without running through the entire thing, you can edit the top of `config_EBUG.m` so that one of the debug code chunks is uncommented.
    - NB: Need to delete the subject folder every time you change `config_EBUG.m` in order to apply the changes.
-- If you need to break out of the experiment while it's running, press `control-c`.
+- If you need to break out of the experiment while it's running, press `control-c` (might need to push it twice).
    - NB: If you break out of a session, the experiment currently does not have the capability to resume where you were. If you start it again, it will launch at the beginning of the current session.
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 - Debugging
@@ -82,9 +85,6 @@ Running the experiment
 TODO
 ====
 
-- Use a different stimulus set for the practice phases.
-- Test using a previous phase's stimuli in a current phase (initial support has been included)
-- Resize image stimuli
 - Finalize recognition task response key images
 - Finalize Net Station support: http://docs.psychtoolbox.org/NetStation
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
