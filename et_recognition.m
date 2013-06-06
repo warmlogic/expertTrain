@@ -35,12 +35,13 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,pha
 % cfg.keys.recogRecoll
 
 % % durations, in seconds
-% cfg.stim.(sesName).(phaseName).study_isi = 0.8;
-% cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
-% cfg.stim.(sesName).(phaseName).study_targ = 2.0;
-% cfg.stim.(sesName).(phaseName).test_isi = 0.8;
-% cfg.stim.(sesName).(phaseName).test_preStim = 0.2;
-% cfg.stim.(sesName).(phaseName).test_stim = 1.5;
+% cfg.stim.(sesName).(phaseName).recog_study_isi = 0.8;
+% cfg.stim.(sesName).(phaseName).recog_study_preTarg = 0.2;
+% cfg.stim.(sesName).(phaseName).recog_study_targ = 2.0;
+% cfg.stim.(sesName).(phaseName).recog_test_isi = 0.8;
+% cfg.stim.(sesName).(phaseName).recog_test_preStim = 0.2;
+% cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
+% cfg.stim.(sesName).(phaseName).recog_response = 10.0;
 
 % TODO: make instruction files. read in during config?
 
@@ -56,11 +57,25 @@ allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
 
+% for "respond faster" text
+respFasterColor = uint8((rgb('Red') * 255) + 0.5);
+%[respondFasterX,respondFasterY] = RectCenter(cfg.screen.wRect);
+%respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
+respondFasterFeedbackTime = 1.5;
+
 % read the proper response key image
 respKeyImg = imread(cfg.files.recogTestRespKeyImg);
 respKeyImgHeight = size(respKeyImg,1) * cfg.files.recogTestRespKeyImgScale;
 respKeyImgWidth = size(respKeyImg,2) * cfg.files.recogTestRespKeyImgScale;
 respKeyImg = Screen('MakeTexture',w,respKeyImg);
+
+if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
+  phaseCfg.playSound = false;
+end
+% initialize beep player if needed
+if phaseCfg.playSound
+  Beeper(1,0);
+end
 
 %% start NS recording, if desired
 
@@ -207,10 +222,10 @@ for b = 1:phaseCfg.nBlocks
     [preStimFixOn] = Screen('Flip',w);
     
     % ISI between trials
-    WaitSecs(phaseCfg.study_isi);
+    WaitSecs(phaseCfg.recog_study_isi);
     
     % fixation on screen before starting trial
-    WaitSecs(phaseCfg.study_preTarg);
+    WaitSecs(phaseCfg.recog_study_preTarg);
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
@@ -224,7 +239,7 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
-    while (GetSecs - stimOnset) <= phaseCfg.study_targ
+    while (GetSecs - stimOnset) <= phaseCfg.recog_study_targ
       % Wait <1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.0001);
@@ -382,10 +397,10 @@ for b = 1:phaseCfg.nBlocks
     [preStimFixOn] = Screen('Flip',w);
     
     % ISI between trials
-    WaitSecs(phaseCfg.test_isi);
+    WaitSecs(phaseCfg.recog_test_isi);
     
     % fixation on screen before starting trial
-    WaitSecs(phaseCfg.test_preStim);
+    WaitSecs(phaseCfg.recog_test_preStim);
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
@@ -399,7 +414,7 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
-    while (GetSecs - stimOnset) <= phaseCfg.test_stim
+    while (GetSecs - stimOnset) <= phaseCfg.recog_test_stim
       % Wait <1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.0001);
@@ -413,6 +428,10 @@ for b = 1:phaseCfg.nBlocks
     
     % poll for a resp
     while 1
+      if (GetSecs - startRT) > phaseCfg.recog_response
+        break
+      end
+      
       [keyIsDown, endRT, keyCode] = KbCheck;
       % if they push more than one key, don't accept it
       if keyIsDown && sum(keyCode) == 1
@@ -434,6 +453,23 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(0.0001);
     end
     
+    if ~keyIsDown
+      if phaseCfg.playSound
+        Beeper(phaseCfg.incorrectSound);
+      end
+      
+      % "need to respond faster"
+      DrawFormattedText(w,cfg.text.respondFaster,'center','center',respFasterColor);
+      
+      Screen('Flip', w);
+      
+      % need a new endRT
+      endRT = GetSecs;
+      
+      % wait to let them view the feedback
+      WaitSecs(respondFasterFeedbackTime);
+    end
+    
     % Clear screen to background color after response
     Screen('Flip', w);
     
@@ -444,36 +480,48 @@ for b = 1:phaseCfg.nBlocks
     rt = round(1000 * (endRT - startRT));
     
     % compute accuracy
-    if allStims{b}(i).targ && (keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1)
-      % target (hit)
-      acc = 1;
-    elseif ~allStims{b}(i).targ && (keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1)
-      % lure (correct rejection)
-      acc = 1;
+    if keyIsDown
+      if allStims{b}(i).targ && (keyCode(cfg.keys.recogMayF) == 1 || keyCode(cfg.keys.recogDefF) == 1 || keyCode(cfg.keys.recogRecoll) == 1)
+        % target (hit)
+        acc = 1;
+      elseif ~allStims{b}(i).targ && (keyCode(cfg.keys.recogDefUn) == 1 || keyCode(cfg.keys.recogMayUn) == 1)
+        % lure (correct rejection)
+        acc = 1;
+      else
+        % miss or false alarm
+        acc = 0;
+      end
     else
-      % miss or false alarm
+      % did not push a key
       acc = 0;
     end
     
     % get the response
-    if keyCode(cfg.keys.recogRecoll) == 1
-      resp = 'recollect';
-    elseif keyCode(cfg.keys.recogDefF) == 1
-      resp = 'definitelyFam';
-    elseif keyCode(cfg.keys.recogMayF) == 1
-      resp = 'maybeFam';
-    elseif keyCode(cfg.keys.recogMayUn) == 1
-      resp = 'maybeUnfam';
-    elseif keyCode(cfg.keys.recogDefUn) == 1
-      resp = 'definitelyUnfam';
-    else
-      % debug
-      fprintf('Key other than a recognition response key was pressed. This should not happen\n');
-      resp = 'ERROR';
+    if keyIsDown
+      if keyCode(cfg.keys.recogRecoll) == 1
+        resp = 'recollect';
+      elseif keyCode(cfg.keys.recogDefF) == 1
+        resp = 'definitelyFam';
+      elseif keyCode(cfg.keys.recogMayF) == 1
+        resp = 'maybeFam';
+      elseif keyCode(cfg.keys.recogMayUn) == 1
+        resp = 'maybeUnfam';
+      elseif keyCode(cfg.keys.recogDefUn) == 1
+        resp = 'definitelyUnfam';
+      else
+        % debug
+        fprintf('Key other than a recognition response key was pressed. This should not happen.\n');
+        resp = 'ERROR';
+      end
+    elseif ~keyIsDown
+      resp = 'none';
     end
     
     % get key pressed by subject
     respKey = KbName(keyCode);
+    if isempty(respKey)
+      respKey = 'none';
+    end
     
     % debug
     fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ,resp,respKey,acc);

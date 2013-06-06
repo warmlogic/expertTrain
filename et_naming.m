@@ -61,6 +61,15 @@ initial_sNumColor = BlackIndex(w);
 correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
 incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
 
+% for "respond faster" text
+respFasterColor = uint8((rgb('Red') * 255) + 0.5);
+[respondFasterX,respondFasterY] = RectCenter(cfg.screen.wRect);
+respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
+%respondFasterFeedbackTime = 1.0;
+
+if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
+  phaseCfg.playSound = false;
+end
 % initialize beep player if needed
 if phaseCfg.playSound
   Beeper(1,0);
@@ -101,9 +110,19 @@ stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 % sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
 
 if runInBlocks
-  nSpecies = length(unique(phaseCfg.blockSpeciesOrder{b}));
+  theseSpecies = unique(phaseCfg.blockSpeciesOrder{b});
 else
-  nSpecies = length(unique([nameStims.speciesNum]));
+  theseSpecies = unique([nameStims.speciesNum]);
+end
+nSpecies = length(theseSpecies);
+
+theseSpeciesStr = sprintf('%d',theseSpecies(1));
+if nSpecies > 1
+  theseSpeciesStr = sprintf('%s%s',theseSpeciesStr,sprintf(repmat(', %d',1,length(theseSpecies) - 1),theseSpecies(2:end)));
+  theseSpeciesStr = strrep(theseSpeciesStr,num2str(theseSpecies(end)),sprintf('and %d',theseSpecies(end)));
+end
+if nSpecies < 3
+  theseSpeciesStr = strrep(theseSpeciesStr,',','');
 end
 
 %% start NS recording, if desired
@@ -134,7 +153,7 @@ for i = 1:length(phaseCfg.instruct.name)
   WaitSecs(1.000);
   et_showTextInstruct(w,phaseCfg.instruct.name(i),cfg.keys.instructContKey,...
     instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
-    {'blockNum','nSpecies'},{num2str(b),num2str(nSpecies)});
+    {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
 end
 
 % Wait a second before starting trial
@@ -339,7 +358,7 @@ for i = 1:length(stimTex)
     WaitSecs(0.0001);
   end
   
-  % if they didn't response, show correct response
+  % if they didn't respond, show correct response
   if ~keyIsDown
     sNumColor = incorrect_sNumColor;
     if phaseCfg.playSound
@@ -350,11 +369,17 @@ for i = 1:length(stimTex)
     else
       DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor);
     end
+    % "need to respond faster"
+    DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,respFasterColor);
+    
     Screen('Flip', w);
     
     if phaseCfg.playSound
       Beeper(respSound);
     end
+    
+    % need a new endRT
+    endRT = GetSecs;
   end
   
   % wait to let them view the feedback
@@ -370,13 +395,15 @@ for i = 1:length(stimTex)
   rt = round(1000 * (endRT - startRT));
   
   % compute accuracy
-  if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
-    % pushed the right key
-    acc = 1;
-  elseif keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
-    % pushed the wrong key
-    acc = 0;
-  elseif ~keyIsDown
+  if keyIsDown
+    if keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
+      % pushed the right key
+      acc = 1;
+    elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
+      % pushed the wrong key
+      acc = 0;
+    end
+  else
     % did not push a key
     acc = 0;
   end

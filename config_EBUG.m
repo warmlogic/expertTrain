@@ -381,7 +381,7 @@ if expParam.sessionNum == 1
     cfg.text.matchDiff = 'Diff   ';
   end
   
-  cfg.text.respondFaster = 'Respond faster!';
+  cfg.text.respondFaster = 'No response recorded!\nRespond faster next time!';
   
   %% Session/phase configuration
   
@@ -422,14 +422,18 @@ if expParam.sessionNum == 1
       % if rmStims_orig=false). nSpecies = (nSame + nDiff) in practice.
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).isi = 0.5;
-      cfg.stim.(sesName).(phaseName).stim1 = 0.8;
-      cfg.stim.(sesName).(phaseName).stim2 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
       % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).preStim2 = 1.0 to 1.2;
-      % % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.0;
+      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      cfg.stim.(sesName).(phaseName).match_response = 5.0;
+      
+      % do we want to play feedback beeps?
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).correctSound = correctSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
@@ -469,14 +473,13 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).isi = 0.5;
-      cfg.stim.(sesName).(phaseName).stim1 = 0.8;
-      cfg.stim.(sesName).(phaseName).stim2 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
       % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).preStim2 = 1.0 to 1.2;
-      % % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.0;
+      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
@@ -508,14 +511,17 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).study_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
-      cfg.stim.(sesName).(phaseName).study_targ = 2.0;
-      cfg.stim.(sesName).(phaseName).test_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).test_preStim = 0.2;
-      cfg.stim.(sesName).(phaseName).test_stim = 1.5;
-      % % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_study_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_study_preTarg = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_study_targ = 2.0;
+      cfg.stim.(sesName).(phaseName).recog_test_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_test_preStim = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_response = 10.0;
+      
+      % do we want to play feedback beeps for no response?
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.recogIntro(1).text] = et_processTextInstruct(...
@@ -568,14 +574,17 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).study_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
-      cfg.stim.(sesName).(phaseName).study_targ = 2.0;
-      cfg.stim.(sesName).(phaseName).test_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).test_preStim = 0.2;
-      cfg.stim.(sesName).(phaseName).test_stim = 1.5;
-      % % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_study_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_study_preTarg = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_study_targ = 2.0;
+      cfg.stim.(sesName).(phaseName).recog_test_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_test_preStim = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_response = 10.0;
+      
+      % do we want to play feedback beeps for no response?
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.recogIntro.text] = et_processTextInstruct(...
@@ -896,14 +905,13 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).isi = 0.5;
-      cfg.stim.(sesName).(phaseName).stim1 = 0.8;
-      cfg.stim.(sesName).(phaseName).stim2 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
       % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).preStim2 = 1.0 to 1.2;
-      % % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.0;
+      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
@@ -947,14 +955,13 @@ if expParam.sessionNum == 1
         end
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(matchNum).isi = 0.5;
-        cfg.stim.(sesName).(phaseName)(matchNum).stim1 = 0.8;
-        cfg.stim.(sesName).(phaseName)(matchNum).stim2 = 0.8;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_isi = 0.5;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_stim1 = 0.8;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_stim2 = 0.8;
         % % random intervals are generated on the fly
-        % cfg.stim.(sesName).(phaseName)(matchNum).preStim1 = 0.5 to 0.7;
-        % cfg.stim.(sesName).(phaseName)(matchNum).preStim2 = 1.0 to 1.2;
-        % % % Not setting a response time limit
-        % cfg.stim.(sesName).(phaseName)(matchNum).response = 1.0;
+        % cfg.stim.(sesName).(phaseName)(matchNum).match_preStim1 = 0.5 to 0.7;
+        % cfg.stim.(sesName).(phaseName)(matchNum).match_preStim2 = 1.0 to 1.2;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_response = 5.0;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(matchNum).instruct.match.text] = et_processTextInstruct(...
@@ -1025,14 +1032,13 @@ if expParam.sessionNum == 1
         end
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(matchNum).isi = 0.5;
-        cfg.stim.(sesName).(phaseName)(matchNum).stim1 = 0.8;
-        cfg.stim.(sesName).(phaseName)(matchNum).stim2 = 0.8;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_isi = 0.5;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_stim1 = 0.8;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_stim2 = 0.8;
         % % random intervals are generated on the fly
-        % cfg.stim.(sesName).(phaseName)(matchNum).preStim1 = 0.5 to 0.7;
-        % cfg.stim.(sesName).(phaseName)(matchNum).preStim2 = 1.0 to 1.2;
-        % % % Not setting a response time limit
-        % cfg.stim.(sesName).(phaseName)(matchNum).response = 1.0;
+        % cfg.stim.(sesName).(phaseName)(matchNum).match_preStim1 = 0.5 to 0.7;
+        % cfg.stim.(sesName).(phaseName)(matchNum).match_preStim2 = 1.0 to 1.2;
+        cfg.stim.(sesName).(phaseName)(matchNum).match_response = 5.0;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(matchNum).instruct.match.text] = et_processTextInstruct(...
@@ -1075,14 +1081,13 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).isi = 0.5;
-      cfg.stim.(sesName).(phaseName).stim1 = 0.8;
-      cfg.stim.(sesName).(phaseName).stim2 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
       % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).preStim2 = 1.0 to 1.2;
-      % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.0;
+      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
@@ -1129,14 +1134,17 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).study_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
-      cfg.stim.(sesName).(phaseName).study_targ = 2.0;
-      cfg.stim.(sesName).(phaseName).test_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).test_preStim = 0.2;
-      cfg.stim.(sesName).(phaseName).test_stim = 1.5;
-      % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_study_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_study_preTarg = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_study_targ = 2.0;
+      cfg.stim.(sesName).(phaseName).recog_test_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_test_preStim = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_response = 10.0;
+      
+      % do we want to play feedback beeps for no response?
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.recogIntro.text] = et_processTextInstruct(...
@@ -1199,14 +1207,13 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).isi = 0.5;
-      cfg.stim.(sesName).(phaseName).stim1 = 0.8;
-      cfg.stim.(sesName).(phaseName).stim2 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+      cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
       % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).preStim2 = 1.0 to 1.2;
-      % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.0;
+      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.match.text] = et_processTextInstruct(...
@@ -1253,14 +1260,17 @@ if expParam.sessionNum == 1
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName).study_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).study_preTarg = 0.2;
-      cfg.stim.(sesName).(phaseName).study_targ = 2.0;
-      cfg.stim.(sesName).(phaseName).test_isi = 0.8;
-      cfg.stim.(sesName).(phaseName).test_preStim = 0.2;
-      cfg.stim.(sesName).(phaseName).test_stim = 1.5;
-      % % Not setting a response time limit
-      % cfg.stim.(sesName).(phaseName).response = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_study_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_study_preTarg = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_study_targ = 2.0;
+      cfg.stim.(sesName).(phaseName).recog_test_isi = 0.8;
+      cfg.stim.(sesName).(phaseName).recog_test_preStim = 0.2;
+      cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
+      cfg.stim.(sesName).(phaseName).recog_response = 10.0;
+      
+      % do we want to play feedback beeps for no response?
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.recogIntro.text] = et_processTextInstruct(...

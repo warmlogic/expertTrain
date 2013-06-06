@@ -35,12 +35,13 @@ function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseC
 %  matchStimNum (1 or 2).
 
 % % durations, in seconds
-% cfg.stim.(sesName).(phaseName).isi = 0.5;
-% cfg.stim.(sesName).(phaseName).stim1 = 0.8;
-% cfg.stim.(sesName).(phaseName).stim2 = 0.8;
+% cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+% cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
+% cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
 % % % random intervals are generated on the fly
-% % cfg.stim.(sesName).(phaseName).preStim1 = 0.5 to 0.7;
-% % cfg.stim.(sesName).(phaseName).preStim2 = 1.0 to 1.2;
+% % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
+% % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+% cfg.stim.(sesName).(phaseName).match_response = 5.0;
 
 % % keys
 % cfg.keys.matchSame
@@ -59,6 +60,20 @@ allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
 instructColor = WhiteIndex(w);
 fixationColor = WhiteIndex(w);
 
+% for "respond faster" text
+respFasterColor = uint8((rgb('Red') * 255) + 0.5);
+%[respondFasterX,respondFasterY] = RectCenter(cfg.screen.wRect);
+%respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
+respondFasterFeedbackTime = 1.5;
+
+correctFeedback = 'Correct!';
+incorrectFeedback = 'Incorrect!';
+sameFeedback =  'Those were THE SAME species.';
+diffFeedback =  'Those were DIFFERENT species.';
+
+correctColor = uint8((rgb('Green') * 255) + 0.5);
+incorrectColor = uint8((rgb('Red') * 255) + 0.5);
+
 % if we're using matchTextPrompt
 if phaseCfg.matchTextPrompt
   if strcmp(KbName(cfg.keys.matchSame),'f')
@@ -68,6 +83,14 @@ if phaseCfg.matchTextPrompt
     leftKey = cfg.text.matchDiff;
     rightKey = cfg.text.matchSame;
   end
+end
+
+if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
+  phaseCfg.playSound = false;
+end
+% initialize beep player if needed
+if phaseCfg.playSound
+  Beeper(1,0);
 end
 
 %% preload all stimuli for presentation
@@ -257,11 +280,11 @@ for i = 1:length(stim2Tex)
   end
   
   % generate random durations for fixation crosses
-  preStim1 = 0.5 + ((0.7 - 0.5).*rand(1,1));
-  preStim2 = 1.0 + ((1.2 - 1.0).*rand(1,1));
+  match_preStim1 = 0.5 + ((0.7 - 0.5).*rand(1,1));
+  match_preStim2 = 1.0 + ((1.2 - 1.0).*rand(1,1));
   
   % ISI between trials
-  WaitSecs(phaseCfg.isi);
+  WaitSecs(phaseCfg.match_isi);
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
@@ -269,7 +292,7 @@ for i = 1:length(stim2Tex)
   [preStim1FixOn] = Screen('Flip',w);
   
   % fixation on screen before stim1
-  WaitSecs(preStim1);
+  WaitSecs(match_preStim1);
   
   % draw the stimulus
   Screen('DrawTexture', w, stim1Tex(i), [], stimImgRect);
@@ -283,7 +306,7 @@ for i = 1:length(stim2Tex)
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
-  while (GetSecs - stim1Onset) <= phaseCfg.stim1
+  while (GetSecs - stim1Onset) <= phaseCfg.match_stim1
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);
@@ -295,7 +318,7 @@ for i = 1:length(stim2Tex)
   [preStim2FixOn] = Screen('Flip',w);
   
   % fixation on screen before stim2
-  WaitSecs(preStim2);
+  WaitSecs(match_preStim2);
   
   % draw the stimulus
   Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
@@ -309,7 +332,7 @@ for i = 1:length(stim2Tex)
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
-  while (GetSecs - stim2Onset) <= phaseCfg.stim2
+  while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);
@@ -327,6 +350,10 @@ for i = 1:length(stim2Tex)
   
   % poll for a resp
   while 1
+    if (GetSecs - startRT) > phaseCfg.match_response
+      break
+    end
+    
     [keyIsDown, endRT, keyCode] = KbCheck;
     % if they push more than one key, don't accept it
     if keyIsDown && sum(keyCode) == 1
@@ -345,6 +372,102 @@ for i = 1:length(stim2Tex)
     WaitSecs(0.0001);
   end
   
+  % determine response and compute accuracy
+  if keyIsDown
+    if keyCode(cfg.keys.matchSame) == 1
+      resp = 'same';
+      if stim1(i).same
+        acc = 1;
+        if ~phaseCfg.isExp
+          message = sprintf('%s\n%s',correctFeedback,sameFeedback);
+          feedbackTime = respondFasterFeedbackTime;
+          if phaseCfg.playSound
+            respSound = phaseCfg.correctSound;
+          end
+        else
+          message = '';
+          feedbackTime = 0.001;
+        end
+        feedbackColor = correctColor;
+      else
+        acc = 0;
+        if ~phaseCfg.isExp
+          message = sprintf('%s\n%s',incorrectFeedback,diffFeedback);
+          feedbackTime = respondFasterFeedbackTime;
+          if phaseCfg.playSound
+            respSound = phaseCfg.incorrectSound;
+          end
+        else
+          message = '';
+          feedbackTime = 0.001;
+        end
+        feedbackColor = incorrectColor;
+      end
+    elseif keyCode(cfg.keys.matchDiff) == 1
+      resp = 'diff';
+      if ~stim1(i).same
+        acc = 1;
+        if ~phaseCfg.isExp
+          message = sprintf('%s\n%s',correctFeedback,diffFeedback);
+          feedbackTime = respondFasterFeedbackTime;
+          if phaseCfg.playSound
+            respSound = phaseCfg.correctSound;
+          end
+        else
+          message = '';
+          feedbackTime = 0.001;
+        end
+        feedbackColor = correctColor;
+      else
+        acc = 0;
+        if ~phaseCfg.isExp
+          message = sprintf('%s\n%s',incorrectFeedback,sameFeedback);
+          feedbackTime = respondFasterFeedbackTime;
+          if phaseCfg.playSound
+            respSound = phaseCfg.incorrectSound;
+          end
+        else
+          message = '';
+          feedbackTime = 0.001;
+        end
+        feedbackColor = incorrectColor;
+      end
+    else
+      % debug
+      fprintf('Key other than same/diff was pressed. This should not happen.\n');
+      resp = 'ERROR';
+    end
+  else
+    resp = 'none';
+    % did not push a key
+    acc = 0;
+    
+    % need a new endRT
+    endRT = GetSecs;
+    
+    % "need to respond faster"
+    message = cfg.text.respondFaster;
+    feedbackColor = respFasterColor;
+    feedbackTime = respondFasterFeedbackTime;
+    if phaseCfg.playSound
+      respSound = phaseCfg.incorrectSound;
+    end
+  end
+  
+  if phaseCfg.playSound && ~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown)
+    Beeper(respSound);
+  end
+  DrawFormattedText(w,message,'center','center',feedbackColor);
+  Screen('Flip', w);
+  % wait to let them view the feedback
+  WaitSecs(feedbackTime);
+  
+  % get key pressed by subject
+  respKey = KbName(keyCode);
+  if isempty(respKey)
+    respKey = 'none';
+  end
+  
   % Clear screen to background color after response
   Screen('Flip', w);
   
@@ -354,30 +477,6 @@ for i = 1:length(stim2Tex)
   
   % compute response time
   rt = round(1000 * (endRT - startRT));
-  
-  % determine response and compute accuracy
-  if keyCode(cfg.keys.matchSame) == 1
-    resp = 'same';
-    if stim1(i).same
-      acc = 1;
-    else
-      acc = 0;
-    end
-  elseif keyCode(cfg.keys.matchDiff) == 1
-    resp = 'diff';
-    if ~stim1(i).same
-      acc = 1;
-    else
-      acc = 0;
-    end
-  else
-    % debug
-    fprintf('Key other than same/diff was pressed. This should not happen\n');
-    resp = 'ERROR';
-  end
-  
-  % get key pressed by subject
-  respKey = KbName(keyCode);
   
   % debug
   fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc);
