@@ -174,9 +174,6 @@ for b = 1:phaseCfg.nBlocks
   
   %% run the recognition study task
   
-  % set the fixation size
-  Screen('TextSize', w, cfg.text.fixSize);
-  
   % start the blink break timer
   if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
     blinkTimerStart = GetSecs;
@@ -231,6 +228,9 @@ for b = 1:phaseCfg.nBlocks
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+    % and fixation on top of it
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
@@ -246,6 +246,10 @@ for b = 1:phaseCfg.nBlocks
       % overload of the machine at elevated Priority():
       WaitSecs(0.0001);
     end
+    
+    % draw fixation
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     
     % Clear screen to background color after fixed 'duration'
     Screen('Flip', w);
@@ -268,7 +272,6 @@ for b = 1:phaseCfg.nBlocks
       subord,...
       sNum,...
       targStims{b}(i).targ);
-    
     
     % Write netstation logs
     if expParam.useNS
@@ -346,9 +349,6 @@ for b = 1:phaseCfg.nBlocks
   
   %% Run the recognition test task
   
-  % set the fixation size
-  Screen('TextSize', w, cfg.text.fixSize);
-  
   % only check these keys
   RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
   
@@ -425,7 +425,10 @@ for b = 1:phaseCfg.nBlocks
         % if they press a key too early, tell them they responded too fast
         if keyIsDown
           Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+          Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+          Screen('TextSize', w, cfg.text.fixSize);
+          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
           Screen('Flip', w);
         end
       end
@@ -435,9 +438,13 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(0.0001);
     end
     
-    % draw the stimulus with the response key image
+    % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+    % with the response key image
     Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
+    % and fixation on top of it
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     % put them on the screen; measure RT from when response key img appears
     [respKeyImgOn, startRT] = Screen('Flip', w);
     
@@ -474,6 +481,7 @@ for b = 1:phaseCfg.nBlocks
       end
       
       % "need to respond faster"
+      Screen('TextSize', w, cfg.text.instructTextSize);
       DrawFormattedText(w,cfg.text.respondFaster,'center','center',cfg.text.respondFasterColor);
       
       Screen('Flip', w);
@@ -484,6 +492,10 @@ for b = 1:phaseCfg.nBlocks
       % wait to let them view the feedback
       WaitSecs(cfg.text.respondFasterFeedbackTime);
     end
+    
+    % draw fixation
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     
     % Clear screen to background color after response
     Screen('Flip', w);

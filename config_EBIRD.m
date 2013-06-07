@@ -342,7 +342,7 @@ if expParam.sessionNum == 1
   cfg.text.respondFasterColor = uint8((rgb('Red') * 255) + 0.5);
   cfg.text.respondFasterFeedbackTime = 1.5;
   % "too fast" text
-  cfg.text.tooFast = 'Too fast!\nWait to respond!';
+  cfg.text.tooFast = 'Too fast!';
   cfg.text.tooFastColor = uint8((rgb('Red') * 255) + 0.5);
   
   %% Session/phase configuration
@@ -387,9 +387,9 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).match_isi = 0.5;
       cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
       cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
-      % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      % random intervals are generated on the fly
+      cfg.stim.(sesName).(phaseName).match_preStim1 = [0.5 0.7];
+      cfg.stim.(sesName).(phaseName).match_preStim2 = [1.0 1.2];
       cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % do we want to play feedback beeps?
@@ -438,9 +438,9 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).match_isi = 0.5;
       cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
       cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
-      % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      % random intervals are generated on the fly
+      cfg.stim.(sesName).(phaseName).match_preStim1 = [0.5 0.7];
+      cfg.stim.(sesName).(phaseName).match_preStim2 = [1.0 1.2];
       cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions
@@ -469,7 +469,7 @@ if expParam.sessionNum == 1
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).name_isi = 0.5;
-      % cfg.stim.(sesName).(phaseName).name_preStim = 0.5 to 0.7;
+      cfg.stim.(sesName).(phaseName).name_preStim = [0.5 0.7];
       cfg.stim.(sesName).(phaseName).name_stim = 1.0;
       cfg.stim.(sesName).(phaseName).name_response = 2.0;
       cfg.stim.(sesName).(phaseName).name_feedback = 1.0;
@@ -582,7 +582,7 @@ if expParam.sessionNum == 1
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).name_isi = 0.5;
-      % cfg.stim.(sesName).(phaseName).name_preStim = 0.5 to 0.7;
+      cfg.stim.(sesName).(phaseName).name_preStim = [0.5 0.7];
       cfg.stim.(sesName).(phaseName).name_stim = 1.0;
       cfg.stim.(sesName).(phaseName).name_response = 2.0;
       cfg.stim.(sesName).(phaseName).name_feedback = 1.0;
@@ -629,7 +629,7 @@ if expParam.sessionNum == 1
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName).name_isi = 0.5;
-        % cfg.stim.(sesName).(phaseName).name_preStim = 0.5 to 0.7;
+        cfg.stim.(sesName).(phaseName).name_preStim = [0.5 0.7];
         cfg.stim.(sesName).(phaseName).name_stim = 1.0;
         cfg.stim.(sesName).(phaseName).name_response = 2.0;
         cfg.stim.(sesName).(phaseName).name_feedback = 1.0;
@@ -699,9 +699,9 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).match_isi = 0.5;
       cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
       cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
-      % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      % random intervals are generated on the fly
+      cfg.stim.(sesName).(phaseName).match_preStim1 = [0.5 0.7];
+      cfg.stim.(sesName).(phaseName).match_preStim2 = [1.0 1.2];
       cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions
@@ -760,9 +760,9 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).match_isi = 0.5;
       cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
       cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
-      % % random intervals are generated on the fly
-      % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
-      % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+      % random intervals are generated on the fly
+      cfg.stim.(sesName).(phaseName).match_preStim1 = [0.5 0.7];
+      cfg.stim.(sesName).(phaseName).match_preStim2 = [1.0 1.2];
       cfg.stim.(sesName).(phaseName).match_response = 5.0;
       
       % instructions

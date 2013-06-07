@@ -38,9 +38,9 @@ function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseC
 % cfg.stim.(sesName).(phaseName).match_isi = 0.5;
 % cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
 % cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
-% % % random intervals are generated on the fly
-% % cfg.stim.(sesName).(phaseName).match_preStim1 = 0.5 to 0.7;
-% % cfg.stim.(sesName).(phaseName).match_preStim2 = 1.0 to 1.2;
+% % random intervals are generated on the fly
+% cfg.stim.(sesName).(phaseName).match_preStim1 = [0.5 0.7];
+% cfg.stim.(sesName).(phaseName).match_preStim2 = [1.0 1.2];
 % cfg.stim.(sesName).(phaseName).match_response = 5.0;
 
 % % keys
@@ -199,9 +199,6 @@ WaitSecs(1.000);
 
 %% run the matching task
 
-% set the fixation size
-Screen('TextSize', w, cfg.text.fixSize);
-
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.matchSame, cfg.keys.matchDiff]);
 
@@ -277,10 +274,6 @@ for i = 1:length(stim2Tex)
     [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
   end
   
-  % generate random durations for fixation crosses
-  match_preStim1 = 0.5 + ((0.7 - 0.5).*rand(1,1));
-  match_preStim2 = 1.0 + ((1.2 - 1.0).*rand(1,1));
-  
   % ISI between trials
   WaitSecs(phaseCfg.match_isi);
   
@@ -289,11 +282,14 @@ for i = 1:length(stim2Tex)
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStim1FixOn] = Screen('Flip',w);
   
-  % fixation on screen before stim1
-  WaitSecs(match_preStim1);
+  % fixation on screen before stim1 for a random amount of time
+  WaitSecs(phaseCfg.match_preStim1(1) + ((phaseCfg.match_preStim1(2) - phaseCfg.match_preStim1(1)).*rand(1,1)));
   
   % draw the stimulus
   Screen('DrawTexture', w, stim1Tex(i), [], stimImgRect);
+  % and fixation on top of it
+  Screen('TextSize', w, cfg.text.fixSize);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
@@ -314,11 +310,14 @@ for i = 1:length(stim2Tex)
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStim2FixOn] = Screen('Flip',w);
   
-  % fixation on screen before stim2
-  WaitSecs(match_preStim2);
+  % fixation on screen before stim2 for a random amount of time
+  WaitSecs(phaseCfg.match_preStim2(1) + ((phaseCfg.match_preStim2(2) - phaseCfg.match_preStim2(1)).*rand(1,1)));
   
   % draw the stimulus
   Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
+  % and fixation on top of it
+  Screen('TextSize', w, cfg.text.fixSize);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
@@ -336,7 +335,10 @@ for i = 1:length(stim2Tex)
       % if they press a key too early, tell them they responded too fast
       if keyIsDown
         Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
+        Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
         Screen('Flip', w);
       end
     end
@@ -347,7 +349,7 @@ for i = 1:length(stim2Tex)
   end
   
   % draw response prompt
-  Screen('TextSize', w, cfg.text.basicTextSize);
+  Screen('TextSize', w, cfg.text.fixSize);
   if phaseCfg.matchTextPrompt
     responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
     DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor);
@@ -455,6 +457,7 @@ for i = 1:length(stim2Tex)
   if phaseCfg.playSound && ~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown)
     Beeper(respSound);
   end
+  Screen('TextSize', w, cfg.text.instructTextSize);
   DrawFormattedText(w,message,'center','center',feedbackColor);
   Screen('Flip', w);
   % wait to let them view the feedback

@@ -164,9 +164,6 @@ WaitSecs(1.000);
 
 %% run the viewing task
 
-% set the fixation size
-Screen('TextSize', w, cfg.text.fixSize);
-
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
@@ -284,7 +281,10 @@ for i = 1:length(stimTex)
   
   % draw the stimulus
   Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
-  % and species number in black
+  % and fixation on top of it
+  Screen('TextSize', w, cfg.text.fixSize);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  % and species number below it
   Screen('TextSize', w, cfg.text.basicTextSize);
   if sNum > 0
     DrawFormattedText(w,num2str(sNum),'center',sNumY,initial_sNumColor);
@@ -329,7 +329,10 @@ for i = 1:length(stimTex)
       end
       % draw the stimulus
       Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
-      % and species number in the appropriate color
+      % and fixation on top of it
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+      % and species number below it in the appropriate color
       Screen('TextSize', w, cfg.text.basicTextSize);
       if sNum > 0
         DrawFormattedText(w,num2str(sNum),'center',sNumY,sNumColor);
@@ -360,7 +363,10 @@ for i = 1:length(stimTex)
   if ~keyIsDown
     % draw the stimulus
     Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
-    % and species number in the appropriate color
+    % and fixation on top of it
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    % and species number below it in the appropriate color
     Screen('TextSize', w, cfg.text.basicTextSize);
     if sNum > 0
       DrawFormattedText(w,num2str(sNum),'center',sNumY,incorrect_sNumColor);
@@ -368,6 +374,7 @@ for i = 1:length(stimTex)
       DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,incorrect_sNumColor);
     end
     % "need to respond faster"
+    Screen('TextSize', w, cfg.text.instructTextSize);
     DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor);
     Screen('Flip', w);
     if phaseCfg.playSound

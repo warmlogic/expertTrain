@@ -168,9 +168,6 @@ WaitSecs(1.000);
 
 %% run the naming task
 
-% set the fixation size
-Screen('TextSize', w, cfg.text.fixSize);
-
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
@@ -286,13 +283,14 @@ for i = 1:length(stimTex)
   Screen('TextSize', w, cfg.text.fixSize);
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStimFixOn] = Screen('Flip',w);
-  % generate random display times for fixation cross
-  name_preStim = 0.5 + ((0.7 - 0.5).*rand(1,1));
-  % fixation on screen before stim
-  WaitSecs(name_preStim);
+  % fixation on screen before stim for a random amount of time
+  WaitSecs(phaseCfg.name.name_preStim(1) + ((phaseCfg.name.name_preStim(2) - phaseCfg.name.name_preStim(1)).*rand(1,1)));
   
   % draw the stimulus
   Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
+  % and fixation on top of it
+  Screen('TextSize', w, cfg.text.fixSize);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
@@ -309,7 +307,10 @@ for i = 1:length(stimTex)
       % if they press a key too early, tell them they responded too fast
       if keyIsDown
         Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
+        Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
         Screen('Flip', w);
       end
     end
@@ -385,12 +386,14 @@ for i = 1:length(stimTex)
     if phaseCfg.playSound
       respSound = phaseCfg.incorrectSound;
     end
+    Screen('TextSize', w, cfg.text.basicTextSize);
     if sNum > 0
       DrawFormattedText(w,num2str(sNum),'center','center',sNumColor);
     else
       DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor);
     end
     % "need to respond faster"
+    Screen('TextSize', w, cfg.text.instructTextSize);
     DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor);
     
     Screen('Flip', w);
@@ -405,6 +408,10 @@ for i = 1:length(stimTex)
   
   % wait to let them view the feedback
   WaitSecs(phaseCfg.name_feedback);
+  
+  % draw fixation
+  Screen('TextSize', w, cfg.text.fixSize);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   
   % Clear screen to background color after response
   Screen('Flip', w);
@@ -549,6 +556,7 @@ end
 
 % print accuracy and correct trial RT
 accRtText = sprintf('You got %d out of %d correct.\nFor the correct trials, on average you responded in %i ms.\n\nPress "%s" to continue.',sum(trialAcc),length(stimTex),round(mean(trialRT(trialAcc))),cfg.keys.instructContKey);
+Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,accRtText,'center','center',cfg.text.instructColor);
 Screen('Flip', w);
 
