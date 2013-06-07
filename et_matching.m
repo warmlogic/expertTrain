@@ -302,8 +302,7 @@ for i = 1:length(stim2Tex)
   % debug
   fprintf('Trial %d of %d: stim1 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim1(i).fileName,stim1(i).familyNum,stim1(i).familyStr,stim1(i).speciesNum,stim1(i).speciesStr,stim1(i).exemplarNum,stim1(i).exemplarName,stim1(i).same);
   
-  % while loop to show stimulus until subjects response or until
-  % "duration" seconds elapsed.
+  % while loop to show stimulus until "duration" seconds elapsed.
   while (GetSecs - stim1Onset) <= phaseCfg.match_stim1
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
@@ -331,6 +330,17 @@ for i = 1:length(stim2Tex)
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
   while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
+    % check for too-fast response in practice only
+    if ~phaseCfg.isExp
+      [keyIsDown] = KbCheck;
+      % if they press a key too early, tell them they responded too fast
+      if keyIsDown
+        Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
+        DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+        Screen('Flip', w);
+      end
+    end
+    
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);

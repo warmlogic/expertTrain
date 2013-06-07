@@ -107,6 +107,12 @@ stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 
+% text location for "too fast" text
+if ~phaseCfg.isExp
+  [~,tooFastY] = RectCenter(cfg.screen.wRect);
+  tooFastY = tooFastY + (stimImgHeight / 2);
+end
+
 % % y-coordinate for stimulus number (below stim by 4% of the screen height)
 % sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
 
@@ -295,9 +301,19 @@ for i = 1:length(stimTex)
   % debug
   fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),nameStims(i).fileName,sNum);
   
-  % while loop to show stimulus until subjects response or until
-  % "duration" seconds elapsed.
-  while (GetSecs - stimOnset) <= phaseCfg.name_stim
+  % while loop to show stimulus until "duration" seconds elapsed.
+  while (GetSecs - stimOnset) <= phaseCfg.recog_test_stim
+    % check for too-fast response in practice only
+    if ~phaseCfg.isExp
+      [keyIsDown] = KbCheck;
+      % if they press a key too early, tell them they responded too fast
+      if keyIsDown
+        Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
+        DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+        Screen('Flip', w);
+      end
+    end
+    
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);

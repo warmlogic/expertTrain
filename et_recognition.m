@@ -147,8 +147,11 @@ for b = 1:phaseCfg.nBlocks
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
   
-  [~,tooFastY] = RectCenter(cfg.screen.wRect);
-  tooFastY = tooFastY + (stimImgHeight / 2);
+  % text location for "too fast" text
+  if ~phaseCfg.isExp
+    [~,tooFastY] = RectCenter(cfg.screen.wRect);
+    tooFastY = tooFastY + (stimImgHeight / 2);
+  end
   
   %% show the study instructions
   
@@ -403,6 +406,9 @@ for b = 1:phaseCfg.nBlocks
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+    % and fixation on top of it
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'stimOnset':
@@ -413,7 +419,7 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until "duration" seconds elapsed.
     while (GetSecs - stimOnset) <= phaseCfg.recog_test_stim
-      
+      % check for too-fast response in practice only
       if ~phaseCfg.isExp
         [keyIsDown] = KbCheck;
         % if they press a key too early, tell them they responded too fast
