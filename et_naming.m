@@ -284,7 +284,7 @@ for i = 1:length(stimTex)
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStimFixOn] = Screen('Flip',w);
   % fixation on screen before stim for a random amount of time
-  WaitSecs(phaseCfg.name.name_preStim(1) + ((phaseCfg.name.name_preStim(2) - phaseCfg.name.name_preStim(1)).*rand(1,1)));
+  WaitSecs(phaseCfg.name_preStim(1) + ((phaseCfg.name_preStim(2) - phaseCfg.name_preStim(1)).*rand(1,1)));
   
   % draw the stimulus
   Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
@@ -300,7 +300,7 @@ for i = 1:length(stimTex)
   fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),nameStims(i).fileName,sNum);
   
   % while loop to show stimulus until "duration" seconds elapsed.
-  while (GetSecs - stimOnset) <= phaseCfg.recog_test_stim
+  while (GetSecs - stimOnset) <= phaseCfg.name_stim
     % check for too-fast response in practice only
     if ~phaseCfg.isExp
       [keyIsDown] = KbCheck;

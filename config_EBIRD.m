@@ -495,11 +495,11 @@ if expParam.sessionNum == 1
     phaseName = 'nametrain';
     
     if ismember(phaseName,expParam.session.(sesName).phases)
-      cfg.stim.(sesName).nametrain.isExp = true;
+      cfg.stim.(sesName).(phaseName).isExp = true;
       
       % hard coded order of which species are presented in each block
       % (counterbalanced). Blocks are denoted by vectors.
-      cfg.stim.(sesName).nametrain.blockSpeciesOrder = {...
+      cfg.stim.(sesName).(phaseName).blockSpeciesOrder = {...
         [1, 2],...
         [1, 2, 3],...
         [1, 2, 3, 4],...
@@ -521,7 +521,7 @@ if expParam.sessionNum == 1
       % contents of each vector corresponds to the exemplar numbers for that
       % species.
       
-      cfg.stim.(sesName).nametrain.nameIndices = {...
+      cfg.stim.(sesName).(phaseName).nameIndices = {...
         {[1, 2, 3], [1, 2, 3]},...
         {[4, 5, 6], [4, 5, 6], [1, 2, 3]},...
         {[2, 3, 4], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
@@ -537,26 +537,26 @@ if expParam.sessionNum == 1
         {[3, 5, 6], [3, 5, 6], [3, 5, 6], [3, 5, 6]}};
       
       % maximum number of repeated exemplars from each family in naming
-      cfg.stim.(sesName).nametrain.nameMaxConsecFamily = 3;
+      cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
       
       if expParam.useNS
         cfg.stim.(sesName).(phaseName).impedanceAfter_nBlocks = 7;
       end
       
       % durations, in seconds
-      cfg.stim.(sesName).nametrain.name_isi = 0.5;
-      % cfg.stim.(sesName).nametrain.name_preStim = 0.5 to 0.7;
-      cfg.stim.(sesName).nametrain.name_stim = 1.0;
-      cfg.stim.(sesName).nametrain.name_response = 2.0;
-      cfg.stim.(sesName).nametrain.name_feedback = 1.0;
+      cfg.stim.(sesName).(phaseName).name_isi = 0.5;
+      cfg.stim.(sesName).(phaseName).name_preStim = [0.5 0.7];
+      cfg.stim.(sesName).(phaseName).name_stim = 1.0;
+      cfg.stim.(sesName).(phaseName).name_response = 2.0;
+      cfg.stim.(sesName).(phaseName).name_feedback = 1.0;
       
       % do we want to play feedback beeps?
-      cfg.stim.(sesName).nametrain.playSound = playSound;
-      cfg.stim.(sesName).nametrain.correctSound = correctSound;
-      cfg.stim.(sesName).nametrain.incorrectSound = incorrectSound;
+      cfg.stim.(sesName).(phaseName).playSound = playSound;
+      cfg.stim.(sesName).(phaseName).correctSound = correctSound;
+      cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
-      [cfg.stim.(sesName).nametrain.instruct.name.text] = et_processTextInstruct(...
+      [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
         {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
         {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
