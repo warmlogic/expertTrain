@@ -1,5 +1,5 @@
-function [expParam] = et_processStims_EBUG(cfg,expParam)
-% function [expParam] = et_processStims_EBUG(cfg,expParam)
+function [cfg,expParam] = et_processStims_EBUG(cfg,expParam)
+% function [cfg,expParam] = et_processStims_EBUG(cfg,expParam)
 %
 % Description:
 %  Prepares the stimuli, mostly in experiment presentation order. This
