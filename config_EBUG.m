@@ -241,12 +241,14 @@ if expParam.sessionNum == 1
   
   % keys for naming particular species (subordinate-level naming)
   
-  if ismac || isunix
-    cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
-  elseif ispc
-    cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';'};
-  end
-  %cfg.keys.speciesKeyNames = {'a','s','d','f','v','b','h','j','k','l'};
+  % upper row
+  cfg.keys.speciesKeyNames = {'q','w','e','r','v','n','u','i','o','p'};
+  % % middle row
+  % if ismac || isunix
+  %   cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
+  % elseif ispc
+  %   cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';'};
+  % end
   
   % set the species keys
   for i = 1:length(cfg.keys.speciesKeyNames)
@@ -256,8 +258,11 @@ if expParam.sessionNum == 1
   end
   
   % subordinate matching keys (counterbalanced based on subNum 1-5, 6-0)
-  %cfg.keys.matchKeyNames = {'f','h'};
-  cfg.keys.matchKeyNames = {'f','j'};
+  
+  % upper row
+  cfg.keys.matchKeyNames = {'r','u'};
+  % % middle row
+  % cfg.keys.matchKeyNames = {'f','j'};
   if expParam.is15
     cfg.keys.matchSame = KbName(cfg.keys.matchKeyNames{1});
     cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{2});
@@ -267,12 +272,15 @@ if expParam.sessionNum == 1
   end
   
   % recognition keys
-  if ismac || isunix
-    cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
-  elseif ispc
-    cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
-  end
-  %cfg.keys.recogKeyNames = {{'a','s','d','f','h'},{'f','h','j','k','l'}};
+  
+  % upper row
+  cfg.keys.recogKeyNames = {{'q','w','e','r','u'},{'r','u','i','o','p'}};
+  % % middle row
+  % if ismac || isunix
+  %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
+  % elseif ispc
+  %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
+  % end
   
   % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
   if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
@@ -695,18 +703,18 @@ if expParam.sessionNum == 1
 %       
 %       % instructions (view)
 %       [cfg.stim.(sesName).(phaseName).instruct.view.text] = et_processTextInstruct(...
-%         fullfile(cfg.files.instructDir,sprintf('%s_view1_intro.txt',expParam.expName)),...
-%         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-%         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+%         fullfile(cfg.files.instructDir,sprintf('%s_viewname1_intro.txt',expParam.expName)),...
+%         {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%         {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
 %         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
 %         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
 %         KbName(cfg.keys.s00),cfg.keys.instructContKey});
 %       
 %       % instructions (name)
 %       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
-%         fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
-%         {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-%         {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+%         fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
+%         {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%         {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
 %         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
 %         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
 %         KbName(cfg.keys.s00),cfg.keys.instructContKey});
@@ -780,9 +788,9 @@ if expParam.sessionNum == 1
       
       % instructions
       [cfg.stim.(sesName).nametrain.instruct.name.text] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
-        {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+        fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
+        {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+        {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
         KbName(cfg.keys.s00),cfg.keys.instructContKey});
