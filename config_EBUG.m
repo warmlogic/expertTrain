@@ -16,7 +16,7 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 % on.
 
 % do we want to record EEG using Net Station?
-expParam.useNS = false;
+expParam.useNS = true;
 % what host is netstation running on?
 if expParam.useNS
   expParam.NSPort = 55513;
@@ -907,7 +907,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(matchNum).shuffleFirst = true;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+          cfg.stim.(sesName).(phaseName)(matchNum).impedanceAfter_nTrials = 120;
         end
         
         % durations, in seconds
@@ -984,7 +984,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(matchNum).shuffleFirst = true;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
+          cfg.stim.(sesName).(phaseName)(matchNum).impedanceAfter_nTrials = 120;
         end
         
         % durations, in seconds
@@ -1246,12 +1246,21 @@ if expParam.sessionNum == 1
   
   %% process the stimuli for the entire experiment
   
-  [expParam] = et_processStims_EBUG(cfg,expParam);
+  [cfg,expParam] = et_processStims_EBUG(cfg,expParam);
   
   %% save the parameters
   
   fprintf('Saving experiment parameters: %s...',cfg.files.expParamFile);
   save(cfg.files.expParamFile,'cfg','expParam');
   fprintf('Done.\n');
+  
+  %% print out the experiment length
+  
+  % maximum duration
+  et_calcExpDuration(cfg,expParam,'max');
+  % medium duration
+  et_calcExpDuration(cfg,expParam,'med');
+  % minimum duration
+  et_calcExpDuration(cfg,expParam,'min');
   
 end

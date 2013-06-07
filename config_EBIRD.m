@@ -774,12 +774,21 @@ if expParam.sessionNum == 1
   
   %% process the stimuli for the entire experiment
   
-  [expParam] = et_processStims_EBUG(cfg,expParam);
+  [cfg,expParam] = et_processStims_EBUG(cfg,expParam);
   
   %% save the parameters
   
   fprintf('Saving experiment parameters: %s...',cfg.files.expParamFile);
   save(cfg.files.expParamFile,'cfg','expParam');
   fprintf('Done.\n');
+  
+  %% print out the experiment length
+  
+  % maximum duration
+  et_calcExpDuration(cfg,expParam,'max');
+  % medium duration
+  et_calcExpDuration(cfg,expParam,'med');
+  % minimum duration
+  et_calcExpDuration(cfg,expParam,'min');
   
 end
