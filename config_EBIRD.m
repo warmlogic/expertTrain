@@ -300,27 +300,42 @@ if expParam.sessionNum == 1
   % scale image down (< 1) or up (> 1)
   cfg.files.recogTestRespKeyImgScale = 1;
   
-  %% Text size and symbol configuration
+  %% Screen, text, and symbol configuration for size and color
   
+  % Choose a gray color value to be used as experiment backdrop
+  %cfg.screen.gray = 181;
+  cfg.screen.gray = 210;
+
   % font size for small messages printed to the screen
   cfg.text.basicTextSize = 32;
+  cfg.text.basicTextColor = uint8((rgb('Black') * 255) + 0.5);
   % font size for instructsions
   cfg.text.instructTextSize = 28;
+  cfg.text.instructColor = uint8((rgb('Black') * 255) + 0.5);
+  
   % number of characters wide at which the instructions will be shown
   cfg.text.instructCharWidth = 70;
+  % key to push to dismiss instruction screen
   cfg.keys.instructContKey = 'space';
   
   % fixation info
   cfg.text.fixSize = 32;
   cfg.text.fixSymbol = '+';
   cfg.text.respSymbol = '?';
+  cfg.text.fixationColor = uint8((rgb('Black') * 255) + 0.5);
   
   if matchTextPrompt
     cfg.text.matchSame = 'Same';
     cfg.text.matchDiff = 'Diff   ';
   end
   
-  cfg.text.respondFaster = 'No response recorded!\nRespond faster next time!';
+  % "respond faster" text
+  cfg.text.respondFaster = 'No response recorded!\nRespond faster!';
+  cfg.text.respondFasterColor = uint8((rgb('Red') * 255) + 0.5);
+  cfg.text.respondFasterFeedbackTime = 1.5;
+  % "too fast" text
+  cfg.text.tooFast = 'Too fast!\nWait to respond!';
+  cfg.text.tooFastColor = uint8((rgb('Red') * 255) + 0.5);
   
   %% Session/phase configuration
   

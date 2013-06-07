@@ -6,7 +6,7 @@ if ~exist('continueKey','var') || isempty(continueKey)
 end
 
 if ~exist('instructColor','var') || isempty(instructTextColor)
-  instructTextColor = WhiteIndex(w);
+  instructTextColor = uint8((rgb('Black') * 255) + 0.5);
 end
 
 if ~exist('instructTextSize','var') || isempty(instructTextSize)

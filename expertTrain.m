@@ -161,10 +161,11 @@ try
     ListenChar(2);
   end
   
-  % Set up the gray color value to be used
-  %cfg.screen.gray = GrayIndex(screenNumber);
-  %cfg.screen.gray = 181;
-  cfg.screen.gray = 210;
+  % Set up the gray color value to be used as experiment backdrop
+  if ~isfield(cfg.screen,'gray')
+    fprintf('You did not set a value for cfg.screen.gray! Setting experiment backdrop to the GrayIndex of this screen.\n');
+    cfg.screen.gray = GrayIndex(screenNumber);
+  end
   
   % Open a double buffered fullscreen window on the stimulation screen
   % 'screenNumber' and choose/draw a gray background. 'w' is the handle
@@ -202,7 +203,7 @@ try
     Screen('TextSize', w, cfg.text.basicTextSize);
     % put wait for experimenter instructions on screen
     message = 'Experimenter:\nStart the Net Station application, apply the EEG cap, and check impedance measures...\n';
-    DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
     % wait until g key is held for ~1 seconds

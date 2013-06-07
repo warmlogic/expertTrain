@@ -61,19 +61,14 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
-% set some text color
-instructColor = WhiteIndex(w);
-fixationColor = WhiteIndex(w);
-
-initial_sNumColor = BlackIndex(w);
+% set text color for species numbers
+initial_sNumColor = uint8((rgb('Black') * 255) + 0.5);
 correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
 incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
 
 % for "respond faster" text
-respFasterColor = uint8((rgb('Red') * 255) + 0.5);
-[respondFasterX,respondFasterY] = RectCenter(cfg.screen.wRect);
+[~,respondFasterY] = RectCenter(cfg.screen.wRect);
 respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
-respondFasterFeedbackTime = 1.5;
 
 if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
   phaseCfg.playSound = false;
@@ -88,7 +83,7 @@ end
 message = sprintf('Preparing images, please wait...');
 Screen('TextSize', w, cfg.text.basicTextSize);
 % put the instructions on the screen
-DrawFormattedText(w, message, 'center', 'center', instructColor);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor);
 % Update the display to show the message:
 Screen('Flip', w);
 
@@ -146,7 +141,7 @@ if expParam.useNS
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
-DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
 % put it on
 Screen('Flip', w);
 % Wait before starting trial
@@ -160,7 +155,7 @@ Screen('Flip', w);
 for i = 1:length(phaseCfg.instruct.view)
   WaitSecs(1.000);
   et_showTextInstruct(w,phaseCfg.instruct.view(i),cfg.keys.instructContKey,...
-    instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
     {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
 end
 
@@ -202,7 +197,7 @@ for i = 1:length(stimTex)
       [NSStopStatus, NSStopError] = NetStation('StartRecording');
       
       message = 'Starting data acquisition...';
-      DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+      DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
       Screen('Flip', w);
       WaitSecs(5.000);
       
@@ -230,7 +225,7 @@ for i = 1:length(stimTex)
       [NSStopStatus, NSStopError] = NetStation('StartRecording');
       
       message = 'Starting data acquisition...';
-      DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+      DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
       Screen('Flip', w);
       WaitSecs(5.000);
       
@@ -254,7 +249,7 @@ for i = 1:length(stimTex)
     KbWait(-1); % listen for keypress on either keyboard
     
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     Screen('Flip',w);
     WaitSecs(0.5);
     % reset the timer
@@ -281,7 +276,7 @@ for i = 1:length(stimTex)
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStimFixOn] = Screen('Flip',w);
   
   % fixation on screen before stim
@@ -373,7 +368,7 @@ for i = 1:length(stimTex)
       DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,incorrect_sNumColor);
     end
     % "need to respond faster"
-    DrawFormattedText(w,cfg.text.respondFaster,respondFasterX,respondFasterY,respFasterColor);
+    DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor);
     Screen('Flip', w);
     if phaseCfg.playSound
       Beeper(phaseCfg.incorrectSound);
@@ -383,7 +378,7 @@ for i = 1:length(stimTex)
     endRT = GetSecs;
     
     % give an extra bit of time to see the number
-    WaitSecs(respondFasterFeedbackTime);
+    WaitSecs(cfg.text.respondFasterFeedbackTime);
   end
   
   % Clear screen to background color after response

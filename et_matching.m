@@ -62,21 +62,13 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
-% set some text color
-instructColor = WhiteIndex(w);
-fixationColor = WhiteIndex(w);
-
-% for "respond faster" text
-respFasterColor = uint8((rgb('Red') * 255) + 0.5);
-%[respondFasterX,respondFasterY] = RectCenter(cfg.screen.wRect);
-%respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
-respondFasterFeedbackTime = 1.5;
-
+% set feedback text
 correctFeedback = 'Correct!';
 incorrectFeedback = 'Incorrect!';
 sameFeedback =  'SAME.';
 diffFeedback =  'DIFFERENT.';
 
+% set feedback colors
 correctColor = uint8((rgb('Green') * 255) + 0.5);
 incorrectColor = uint8((rgb('Red') * 255) + 0.5);
 
@@ -116,7 +108,7 @@ stim2Tex = nan(1,length(stim2));
 message = sprintf('Preparing images, please wait...');
 Screen('TextSize', w, cfg.text.basicTextSize);
 % put the "preparing" message on the screen
-DrawFormattedText(w, message, 'center', 'center', instructColor);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor);
 % Update the display to show the message:
 Screen('Flip', w);
 
@@ -185,7 +177,7 @@ if expParam.useNS
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
-DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
 % put it on
 Screen('Flip', w);
 % Wait before starting trial
@@ -199,7 +191,7 @@ Screen('Flip', w);
 for i = 1:length(phaseCfg.instruct.match)
   WaitSecs(1.000);
   et_showTextInstruct(w,phaseCfg.instruct.match(i),cfg.keys.instructContKey,...
-    instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 end
 
 % Wait a second before starting trial
@@ -238,7 +230,7 @@ for i = 1:length(stim2Tex)
     [NSStopStatus, NSStopError] = NetStation('StartRecording');
     
     message = 'Starting data acquisition...';
-    DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     WaitSecs(5.000);
     
@@ -261,7 +253,7 @@ for i = 1:length(stim2Tex)
     KbWait(-1); % listen for keypress on either keyboard
     
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     Screen('Flip',w);
     WaitSecs(0.5);
     % reset the timer
@@ -294,7 +286,7 @@ for i = 1:length(stim2Tex)
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStim1FixOn] = Screen('Flip',w);
   
   % fixation on screen before stim1
@@ -320,7 +312,7 @@ for i = 1:length(stim2Tex)
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   [preStim2FixOn] = Screen('Flip',w);
   
   % fixation on screen before stim2
@@ -348,9 +340,9 @@ for i = 1:length(stim2Tex)
   Screen('TextSize', w, cfg.text.basicTextSize);
   if phaseCfg.matchTextPrompt
     responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
-    DrawFormattedText(w,responsePromptText,'center','center',fixationColor);
+    DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor);
   else
-    DrawFormattedText(w,cfg.text.respSymbol,'center','center',fixationColor);
+    DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor);
   end
   [respPromptOn, startRT] = Screen('Flip',w);
   
@@ -386,26 +378,18 @@ for i = 1:length(stim2Tex)
         acc = 1;
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',correctFeedback,sameFeedback);
-          feedbackTime = respondFasterFeedbackTime;
           if phaseCfg.playSound
             respSound = phaseCfg.correctSound;
           end
-        else
-          message = '';
-          feedbackTime = 0.001;
         end
         feedbackColor = correctColor;
       else
         acc = 0;
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',incorrectFeedback,diffFeedback);
-          feedbackTime = respondFasterFeedbackTime;
           if phaseCfg.playSound
             respSound = phaseCfg.incorrectSound;
           end
-        else
-          message = '';
-          feedbackTime = 0.001;
         end
         feedbackColor = incorrectColor;
       end
@@ -415,26 +399,18 @@ for i = 1:length(stim2Tex)
         acc = 1;
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',correctFeedback,diffFeedback);
-          feedbackTime = respondFasterFeedbackTime;
           if phaseCfg.playSound
             respSound = phaseCfg.correctSound;
           end
-        else
-          message = '';
-          feedbackTime = 0.001;
         end
         feedbackColor = correctColor;
       else
         acc = 0;
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',incorrectFeedback,sameFeedback);
-          feedbackTime = respondFasterFeedbackTime;
           if phaseCfg.playSound
             respSound = phaseCfg.incorrectSound;
           end
-        else
-          message = '';
-          feedbackTime = 0.001;
         end
         feedbackColor = incorrectColor;
       end
@@ -442,6 +418,12 @@ for i = 1:length(stim2Tex)
       % debug
       fprintf('Key other than same/diff was pressed. This should not happen.\n');
       resp = 'ERROR';
+    end
+    if ~phaseCfg.isExp
+      feedbackTime = cfg.text.respondFasterFeedbackTime;
+    else
+      message = '';
+      feedbackTime = 0.001;
     end
   else
     resp = 'none';
@@ -453,8 +435,8 @@ for i = 1:length(stim2Tex)
     
     % "need to respond faster"
     message = cfg.text.respondFaster;
-    feedbackColor = respFasterColor;
-    feedbackTime = respondFasterFeedbackTime;
+    feedbackColor = cfg.text.respondFasterColor;
+    feedbackTime = cfg.text.respondFasterFeedbackTime;
     if phaseCfg.playSound
       respSound = phaseCfg.incorrectSound;
     end

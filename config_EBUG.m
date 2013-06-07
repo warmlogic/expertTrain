@@ -37,29 +37,30 @@ incorrectSound = 'low';
 % matching task defaults
 matchTextPrompt = true;
 
-% Set the number of sessions
-expParam.nSessions = 9;
-
-% Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
-
-% set up a field for each session type
-expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
-expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
-expParam.session.train2.phases = {'match','name','match'};
-expParam.session.train3.phases = {'match','name','match'};
-expParam.session.train4.phases = {'match','name','match'};
-expParam.session.train5.phases = {'match','name','match'};
-expParam.session.train6.phases = {'match','name','match'};
-expParam.session.posttest.phases = {'match','prac_recog','recog'};
-expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
-
-% % demo - debug
-% expParam.nSessions = 2;
-% expParam.sesTypes = {'pretest','train1'};
+% % Set the number of sessions
+% expParam.nSessions = 9;
+% 
+% % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
+% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
+% 
 % % set up a field for each session type
+% expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
+% expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
+% expParam.session.train2.phases = {'match','name','match'};
+% expParam.session.train3.phases = {'match','name','match'};
+% expParam.session.train4.phases = {'match','name','match'};
+% expParam.session.train5.phases = {'match','name','match'};
+% expParam.session.train6.phases = {'match','name','match'};
+% expParam.session.posttest.phases = {'match','prac_recog','recog'};
+% expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
+
+% demo - debug
+expParam.nSessions = 2;
+expParam.sesTypes = {'pretest','train1'};
+% set up a field for each session type
 % expParam.session.pretest.phases = {'prac_match','prac_recog'};
-% expParam.session.train1.phases = {'prac_name','nametrain'};
+expParam.session.pretest.phases = {'prac_recog'};
+expParam.session.train1.phases = {'prac_name','nametrain'};
 
 %% do some error checking
 
@@ -296,27 +297,42 @@ if expParam.sessionNum == 1
   % scale image down (< 1) or up (> 1)
   cfg.files.recogTestRespKeyImgScale = 1;
   
-  %% Text size and symbol configuration
+  %% Screen, text, and symbol configuration for size and color
   
+  % Choose a gray color value to be used as experiment backdrop
+  %cfg.screen.gray = 181;
+  cfg.screen.gray = 210;
+
   % font size for small messages printed to the screen
   cfg.text.basicTextSize = 32;
+  cfg.text.basicTextColor = uint8((rgb('Black') * 255) + 0.5);
   % font size for instructsions
   cfg.text.instructTextSize = 28;
+  cfg.text.instructColor = uint8((rgb('Black') * 255) + 0.5);
+  
   % number of characters wide at which the instructions will be shown
   cfg.text.instructCharWidth = 70;
+  % key to push to dismiss instruction screen
   cfg.keys.instructContKey = 'space';
   
   % fixation info
   cfg.text.fixSize = 32;
   cfg.text.fixSymbol = '+';
   cfg.text.respSymbol = '?';
+  cfg.text.fixationColor = uint8((rgb('Black') * 255) + 0.5);
   
   if matchTextPrompt
     cfg.text.matchSame = 'Same';
     cfg.text.matchDiff = 'Diff   ';
   end
   
-  cfg.text.respondFaster = 'No response recorded!\nRespond faster next time!';
+  % "respond faster" text
+  cfg.text.respondFaster = 'No response recorded!\nRespond faster!';
+  cfg.text.respondFasterColor = uint8((rgb('Red') * 255) + 0.5);
+  cfg.text.respondFasterFeedbackTime = 1.5;
+  % "too fast" text
+  cfg.text.tooFast = 'Too fast!\nWait to respond!';
+  cfg.text.tooFastColor = uint8((rgb('Red') * 255) + 0.5);
   
   %% Session/phase configuration
   

@@ -59,16 +59,6 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
-% set some text color
-instructColor = WhiteIndex(w);
-fixationColor = WhiteIndex(w);
-
-% for "respond faster" text
-respFasterColor = uint8((rgb('Red') * 255) + 0.5);
-%[respondFasterX,respondFasterY] = RectCenter(cfg.screen.wRect);
-%respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
-respondFasterFeedbackTime = 1.5;
-
 % read the proper response key image
 respKeyImg = imread(cfg.files.recogTestRespKeyImg);
 respKeyImgHeight = size(respKeyImg,1) * cfg.files.recogTestRespKeyImgScale;
@@ -96,7 +86,7 @@ if expParam.useNS
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
-DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
 % put it on
 Screen('Flip', w);
 % Wait before starting trial
@@ -128,7 +118,7 @@ for b = 1:phaseCfg.nBlocks
     [NSStopStatus, NSStopError] = NetStation('StartRecording');
     
     message = 'Starting data acquisition...';
-    DrawFormattedText(w, message, 'center', 'center', WhiteIndex(w),70);
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     WaitSecs(5.000);
   end
@@ -157,19 +147,22 @@ for b = 1:phaseCfg.nBlocks
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
   
+  [~,tooFastY] = RectCenter(cfg.screen.wRect);
+  tooFastY = tooFastY + (stimImgHeight / 2);
+  
   %% show the study instructions
   
   for i = 1:length(phaseCfg.instruct.recogIntro)
     WaitSecs(1.000);
     et_showTextInstruct(w,phaseCfg.instruct.recogIntro(i),cfg.keys.instructContKey,...
-      instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
       {'blockNum'},{num2str(b)});
   end
   
   for i = 1:length(phaseCfg.instruct.recogStudy)
     WaitSecs(1.000);
     et_showTextInstruct(w,phaseCfg.instruct.recogStudy(i),cfg.keys.instructContKey,...
-      instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
       {'blockNum'},{num2str(b)});
   end
   
@@ -200,7 +193,7 @@ for b = 1:phaseCfg.nBlocks
       KbWait(-1); % listen for keypress on either keyboard
       
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
       Screen('Flip',w);
       WaitSecs(0.5);
       % reset the timer
@@ -224,7 +217,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     [preStimFixOn] = Screen('Flip',w);
     
     % ISI between trials
@@ -342,7 +335,7 @@ for b = 1:phaseCfg.nBlocks
   for i = 1:length(phaseCfg.instruct.recogTest)
     WaitSecs(1.000);
     et_showTextInstruct(w,phaseCfg.instruct.recogTest(i),cfg.keys.instructContKey,...
-      instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   end
   
   % Wait a second before starting trial
@@ -375,7 +368,7 @@ for b = 1:phaseCfg.nBlocks
       KbWait(-1); % listen for keypress on either keyboard
       
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
       Screen('Flip',w);
       WaitSecs(0.5);
       % reset the timer
@@ -399,7 +392,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     [preStimFixOn] = Screen('Flip',w);
     
     % ISI between trials
@@ -418,9 +411,19 @@ for b = 1:phaseCfg.nBlocks
     % debug
     fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ);
     
-    % while loop to show stimulus until subjects response or until
-    % "duration" seconds elapsed.
+    % while loop to show stimulus until "duration" seconds elapsed.
     while (GetSecs - stimOnset) <= phaseCfg.recog_test_stim
+      
+      if ~phaseCfg.isExp
+        [keyIsDown] = KbCheck;
+        % if they press a key too early, tell them they responded too fast
+        if keyIsDown
+          Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+          DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+          Screen('Flip', w);
+        end
+      end
+      
       % Wait <1 ms before checking the keyboard again to prevent
       % overload of the machine at elevated Priority():
       WaitSecs(0.0001);
@@ -465,7 +468,7 @@ for b = 1:phaseCfg.nBlocks
       end
       
       % "need to respond faster"
-      DrawFormattedText(w,cfg.text.respondFaster,'center','center',respFasterColor);
+      DrawFormattedText(w,cfg.text.respondFaster,'center','center',cfg.text.respondFasterColor);
       
       Screen('Flip', w);
       
@@ -473,7 +476,7 @@ for b = 1:phaseCfg.nBlocks
       endRT = GetSecs;
       
       % wait to let them view the feedback
-      WaitSecs(respondFasterFeedbackTime);
+      WaitSecs(cfg.text.respondFasterFeedbackTime);
     end
     
     % Clear screen to background color after response
