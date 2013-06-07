@@ -37,35 +37,29 @@ incorrectSound = 'low';
 % matching task defaults
 matchTextPrompt = true;
 
-% % Set the number of sessions
-% expParam.nSessions = 9;
-% 
-% % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
-% 
+% Set the number of sessions
+expParam.nSessions = 9;
+
+% Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
+expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
+
+% set up a field for each session type
+expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
+expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
+expParam.session.train2.phases = {'match','name','match'};
+expParam.session.train3.phases = {'match','name','match'};
+expParam.session.train4.phases = {'match','name','match'};
+expParam.session.train5.phases = {'match','name','match'};
+expParam.session.train6.phases = {'match','name','match'};
+expParam.session.posttest.phases = {'match','prac_recog','recog'};
+expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
+
+% % demo - debug
+% expParam.nSessions = 2;
+% expParam.sesTypes = {'pretest','train1'};
 % % set up a field for each session type
-% expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
-% expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
-% expParam.session.train2.phases = {'match','name','match'};
-% expParam.session.train3.phases = {'match','name','match'};
-% expParam.session.train4.phases = {'match','name','match'};
-% expParam.session.train5.phases = {'match','name','match'};
-% expParam.session.train6.phases = {'match','name','match'};
-% expParam.session.posttest.phases = {'match','prac_recog','recog'};
-% expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
-
-% demo - debug
-expParam.nSessions = 2;
-expParam.sesTypes = {'pretest','train1'};
-% set up a field for each session type
 % expParam.session.pretest.phases = {'prac_match','prac_recog'};
-expParam.session.pretest.phases = {'prac_recog'};
-expParam.session.train1.phases = {'prac_name','nametrain'};
-
-expParam.nSessions = 1;
-expParam.sesTypes = {'train1'};
-% set up a field for each session type
-expParam.session.train1.phases = {'nametrain'};
+% expParam.session.train1.phases = {'prac_name','nametrain'};
 
 %% do some error checking
 
