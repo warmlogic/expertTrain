@@ -55,6 +55,7 @@ Preparing the experiment
    1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
    1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
+   - `et_calcExpDuration()` is a function to determine how long your experiment will be.
    - Instructions are read from external text files in `expertTrain/text/instructions`.
    - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up.
       - Practice stimuli can either be chosen from a separate directory of images (in the `Set/Family/Species/` directory structure, as with experiment stimuli), or they can be randomly selected from the experimental families/species.
@@ -63,6 +64,7 @@ Preparing the experiment
    - Blink breaks (every X seconds)
    - Test using a previous phase's stimuli in a current phase (see the example field `usePrevPhase` in `config_EBUG.m`, as well as the field `reshuffleStims` (which must be `true` or `false`). e.g., `usePrevPhase = {'sesName', 'phaseName', phaseNum};`)
    - Resize image stimuli using the field `cfg.stim.stimScale` in in `config_EBUG.m`. Set equal to the proportion of image; e.g., 1.0 = full-size image. Instruction images can be scaled as well.
+   - There are multiple versions of the recognition and naming/viewing response key images.
 
 Running the experiment
 ----
@@ -85,7 +87,6 @@ Running the experiment
 TODO
 ====
 
-- Finalize recognition task response key images
 - Finalize Net Station support: http://docs.psychtoolbox.org/NetStation
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
 
