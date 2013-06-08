@@ -300,9 +300,13 @@ if expParam.sessionNum == 1
     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
   end
   
-  cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
+  cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_upper_%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_middle_%d.jpg',cfg.keys.recogKeySet));
   % scale image down (< 1) or up (> 1)
-  cfg.files.recogTestRespKeyImgScale = 1;
+  cfg.files.recogTestRespKeyImgScale = 0.5;
   
   %% Screen, text, and symbol configuration for size and color
   

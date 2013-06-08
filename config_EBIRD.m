@@ -274,39 +274,44 @@ if expParam.sessionNum == 1
     cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{1});
   end
   
-  % recognition keys
-  
-  % upper row
-  cfg.keys.recogKeyNames = {{'q','w','e','r','u'},{'r','u','i','o','p'}};
-  % % middle row
-  % if ismac || isunix
-  %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
-  % elseif ispc
-  %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
-  % end
-  
-  % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
-  if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
-    cfg.keys.recogKeySet = 1;
-    cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
-    cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{1});
-    cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{2});
-    cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
-    cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{4});
-    cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{5});
-  elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
-    cfg.keys.recogKeySet = 2;
-    cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
-    cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{5});
-    cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{4});
-    cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
-    cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{2});
-    cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
-  end
-  
-  cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
-  % scale image down (< 1) or up (> 1)
-  cfg.files.recogTestRespKeyImgScale = 1;
+  %   % recognition keys
+  %
+  %   % upper row
+  %   cfg.keys.recogKeyNames = {{'q','w','e','r','u'},{'r','u','i','o','p'}};
+  %   % % middle row
+  %   % if ismac || isunix
+  %   %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
+  %   % elseif ispc
+  %   %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
+  %   % end
+  %
+  %   % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
+  %   if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
+  %     cfg.keys.recogKeySet = 1;
+  %     cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
+  %     cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{1});
+  %     cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{2});
+  %     cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
+  %     cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{4});
+  %     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{5});
+  %   elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
+  %     cfg.keys.recogKeySet = 2;
+  %     cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
+  %     cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{5});
+  %     cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{4});
+  %     cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
+  %     cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{2});
+  %     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
+  %   end
+  %
+  %   %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
+  %   %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
+  %   %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
+  %   cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_upper_%d.jpg',cfg.keys.recogKeySet));
+  %   %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_middle_%d.jpg',cfg.keys.recogKeySet));
+  %
+  %   % scale image down (< 1) or up (> 1)
+  %   cfg.files.recogTestRespKeyImgScale = 0.5;
   
   %% Screen, text, and symbol configuration for size and color
   
