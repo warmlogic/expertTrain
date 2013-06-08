@@ -362,7 +362,7 @@ for s = 1:expParam.nSessions
     fprintf('phase %s (%d/%d):\t%.2f min.\n',phaseName,p,length(expParam.session.(sesName).phases),(phaseDur / 60));
     
     if strcmp(phaseName,'viewname')
-      fprintf('\t\t\t%d view trials (%.2f min)',nTrials_view,((trialDur_view * nTrials_view) / 60));
+      fprintf('\t\t\t%d view trials (%.2f min @ %.2f sec/trial)',nTrials_view,((trialDur_view * nTrials_view) / 60),trialDur_view);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_view,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -378,7 +378,7 @@ for s = 1:expParam.nSessions
       else
         fprintf('.\n');
       end
-      fprintf('\t\t\t%d name trials (%.2f min)',nTrials_name,((trialDur_name * nTrials_name) / 60));
+      fprintf('\t\t\t%d name trials (%.2f min @ %.2f sec/trial)',nTrials_name,((trialDur_name * nTrials_name) / 60),trialDur_name);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_name,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -396,7 +396,7 @@ for s = 1:expParam.nSessions
       end
       
     elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-      fprintf('\t\t\t%d study trials (%.2f min)',nTrials_study,((trialDur_study * nTrials_study) / 60));
+      fprintf('\t\t\t%d study trials (%.2f min @ %.2f sec/trial)',nTrials_study,((trialDur_study * nTrials_study) / 60),trialDur_study);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_study,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -412,7 +412,7 @@ for s = 1:expParam.nSessions
       else
         fprintf('.\n');
       end
-      fprintf('\t\t\t%d test trials (%.2f min)',nTrials_test,((trialDur_test * nTrials_test) / 60));
+      fprintf('\t\t\t%d test trials (%.2f min @ %.2f sec/trial)',nTrials_test,((trialDur_test * nTrials_test) / 60),trialDur_test);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_test,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -430,7 +430,7 @@ for s = 1:expParam.nSessions
       end
       
     else
-      fprintf('\t\t\t%d trials',nTrials);
+      fprintf('\t\t\t%d trials (%.2f sec/trial)',nTrials,trialDur);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
