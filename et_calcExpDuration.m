@@ -19,15 +19,15 @@ impedanceDur = 300; % 5 min = 300 seconds
 expDur = 0;
 
 if ~exist('durLimit','var') || isempty(durLimit)
-  error('durLimit variable not set properly! Can be ''min'',''med'', or ''max''.');
+  error('durLimit variable not set properly! Must be ''min'',''med'', or ''max''.');
 end
 
 if strcmp(durLimit,'min')
-  fprintf('Calculating MINIMUM experiment duration (responses limits are 0 sec).');
+  fprintf('MINIMUM %s experiment duration (responses limits are 0 sec).',expParam.expName);
 elseif strcmp(durLimit,'med')
-  fprintf('Calculating MEDIUM experiment duration (responses limits are half length).');
+  fprintf('MEDIUM %s experiment duration (responses limits are half length).',expParam.expName);
 elseif strcmp(durLimit,'max')
-  fprintf('Calculating MAXIMUM experiment duration (responses limits are maximum length).');
+  fprintf('MAXIMUM %s experiment duration (responses limits are maximum length).',expParam.expName);
 end
 
 if expParam.useNS
@@ -36,7 +36,7 @@ else
   fprintf(' Not using EEG.\n');
 end
 
-fprintf('Assuming %.1f min initial setup, %d sec instructions per phase, %d sec blink break, and %.1f min impedance break.\n',(initialNetSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
+fprintf('Assuming %.1f min initial setup, %d sec instructions per phase, %d sec blink breaks, and %.1f min impedance breaks.\n',(initialNetSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
 
 for s = 1:expParam.nSessions
   % initialize
@@ -44,7 +44,7 @@ for s = 1:expParam.nSessions
   
   % get the session name
   sesName = expParam.sesTypes{s};
-  fprintf('\tSession %s (%d/%d)...\n',sesName,s,expParam.nSessions);
+  fprintf('\n\tSession %s (%d/%d)...\n',sesName,s,expParam.nSessions);
   
   % counting the phases, in case any sessions have the same phase type
   % multiple times
@@ -294,12 +294,12 @@ for s = 1:expParam.nSessions
             nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
           elseif strcmp(phaseName,'viewname')
             % only has 1 impedance break, so we don't want to subtract it
-            nImpedanceBreaks_view = floor(nTrials_view / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-            nImpedanceBreaks_name = floor(nTrials_name / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
+            nImpedanceBreaks_view = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
+            nImpedanceBreaks_name = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
             nImpedanceBreaks = nImpedanceBreaks_view + nImpedanceBreaks_name;
           elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-            nImpedanceBreaks_study = floor(nTrials_study / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
-            nImpedanceBreaks_test = floor(nTrials_test / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
+            nImpedanceBreaks_study = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
+            nImpedanceBreaks_test = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
             nImpedanceBreaks = nImpedanceBreaks_study + nImpedanceBreaks_test;
           else
             nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
@@ -373,8 +373,12 @@ for s = 1:expParam.nSessions
     end
     fprintf('phase %s (%d/%d):\t%.2f min.\n',phaseName,p,length(expParam.session.(sesName).phases),(phaseDur / 60));
     
+    if strcmp(phaseName,'nametrain')
+      fprintf('\t\t\t%d blocks:\n',nBlocks);
+    end
     if strcmp(phaseName,'viewname')
-      fprintf('\t\t\t%d view trials (%.2f min @ %.2f sec/trial)',nTrials_view,((trialDur_view * nTrials_view) / 60),trialDur_view);
+      fprintf('\t\t\t%d blocks:\n',nBlocks);
+      fprintf('\t\t\t%d view trials (%.2f min/phase @ %.2f sec/trial)',nTrials_view,((trialDur_view * nTrials_view) / 60),trialDur_view);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_view,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -390,7 +394,7 @@ for s = 1:expParam.nSessions
       else
         fprintf('.\n');
       end
-      fprintf('\t\t\t%d name trials (%.2f min @ %.2f sec/trial)',nTrials_name,((trialDur_name * nTrials_name) / 60),trialDur_name);
+      fprintf('\t\t\t%d name trials (%.2f min/phase @ %.2f sec/trial)',nTrials_name,((trialDur_name * nTrials_name) / 60),trialDur_name);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_name,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -408,7 +412,8 @@ for s = 1:expParam.nSessions
       end
       
     elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-      fprintf('\t\t\t%d study trials (%.2f min @ %.2f sec/trial)',nTrials_study,((trialDur_study * nTrials_study) / 60),trialDur_study);
+      fprintf('\t\t\t%d blocks:\n',nBlocks);
+      fprintf('\t\t\t%d study trials (%.2f min/phase @ %.2f sec/trial)',nTrials_study,((trialDur_study * nTrials_study) / 60),trialDur_study);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_study,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -424,7 +429,7 @@ for s = 1:expParam.nSessions
       else
         fprintf('.\n');
       end
-      fprintf('\t\t\t%d test trials (%.2f min @ %.2f sec/trial)',nTrials_test,((trialDur_test * nTrials_test) / 60),trialDur_test);
+      fprintf('\t\t\t%d test trials (%.2f min/phase @ %.2f sec/trial)',nTrials_test,((trialDur_test * nTrials_test) / 60),trialDur_test);
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_test,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
@@ -471,18 +476,18 @@ for s = 1:expParam.nSessions
   elseif strcmp(durLimit,'max')
     fprintf('\tMAXIMUM ');
   end
-  fprintf('session %s (%d/%d): %.2f min.\n\n',sesName,s,expParam.nSessions,(sesDur / 60));
+  fprintf('session %s (%d/%d): %.2f min.\n',sesName,s,expParam.nSessions,(sesDur / 60));
   
   % add this session to the entire experiment
   expDur = expDur + sesDur;
 end % s
 
 if strcmp(durLimit,'min')
-  fprintf('MINIMUM ');
+  fprintf('\nMINIMUM ');
 elseif strcmp(durLimit,'med')
-  fprintf('MEDIUM ');
+  fprintf('\nMEDIUM ');
 elseif strcmp(durLimit,'max')
-  fprintf('MAXIMUM ');
+  fprintf('\nMAXIMUM ');
 end
 fprintf('%s experiment: %.2f min (across %d sessions).\n\n',expParam.expName,(expDur / 60),expParam.nSessions);
 
