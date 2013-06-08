@@ -39,6 +39,7 @@ Installation
       - e.g., `expertTrain/images/Creatures/a/` (for family "a" images)
    - There is a creature set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip`
       - NB: If you use this stimulus set and the provided config files (see "Preparing the experiment", below), you must rename the family 1 directory to "a" and the family 2 directory to "s".
+   - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt` and look for `Finch_bmp.zip` and `Warbler_bmp.zip` (email me or `tclab@colorado` if you need help)
 
 Preparing the experiment
 ----
@@ -56,15 +57,16 @@ Preparing the experiment
    1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
    - `et_calcExpDuration()` is a function to determine how long your experiment will be.
-   - Instructions are read from external text files in `expertTrain/text/instructions`.
+   - Instructions are read from external text files in `expertTrain/text/instructions/`.
+   - Hold down the `g` key for a second to end the impedance check, continue when there is a message to the experimenter, dismiss the final screen, etc.
    - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up.
-      - Practice stimuli can either be chosen from a separate directory of images (in the `Set/Family/Species/` directory structure, as with experiment stimuli), or they can be randomly selected from the experimental families/species.
+      - Practice stimuli can either be chosen from a separate directory of images (in the `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/` directory structure, as with experiment stimuli), or they can be randomly selected from the experimental families/species.
    - Image manipulation conditions are supported. Use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
-   - Impedance breaks (every X trials [phases: matching, name] or Y blocks [phases: recognition, nametrain, viewname]). Use "g" key to end the impedance check.
+   - Impedance breaks (every X trials [phases: matching, name] or Y blocks [phases: recognition, nametrain, viewname]).
    - Blink breaks (every X seconds)
    - Test using a previous phase's stimuli in a current phase (see the example field `usePrevPhase` in `config_EBUG.m`, as well as the field `reshuffleStims` (which must be `true` or `false`). e.g., `usePrevPhase = {'sesName', 'phaseName', phaseNum};`)
    - Resize image stimuli using the field `cfg.stim.stimScale` in in `config_EBUG.m`. Set equal to the proportion of image; e.g., 1.0 = full-size image. Instruction images can be scaled as well.
-   - There are multiple versions of the recognition and naming/viewing response key images.
+   - There are multiple versions of the recognition and naming/viewing response key images (in `expertTrain/images/resources/`).
 
 Running the experiment
 ----
@@ -81,7 +83,7 @@ Running the experiment
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 - Debugging
    - PTB seems bad at showing actual error messages, so using multiple monitors is a good way to debug.
-   - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `db up` and then `ME` to see the error stack trace.
+   - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `dbup` and then `ME` to see the error stack trace.
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 
 TODO
