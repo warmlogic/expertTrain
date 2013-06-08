@@ -358,26 +358,33 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
-      % number of pairs of stimuli per family for "same" and "diff" trials.
-      % (gets capped at nSame+nDiff pairs of same and diff species per
-      % family, so 1 of each is 8 trials total)
+      % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.practice.nPractice;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.practice.nPractice;
-      % minimum number of trials needed between exact repeats of a given
-      % stimulus as stim2
-      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 0;
-      % whether to have "same" and "diff" text with the response prompt
-      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
-      
-      % rmStims_orig is false because we don't want the selected stimuli to
-      % be used elsewhere
+      % rmStims_orig is false because all stimuli are used in both "same"
+      % and "diff" conditions
       cfg.stim.(sesName).(phaseName).rmStims_orig = false;
+      
+      % % number per species per family (half because each stimulus is only in
+      % % same or different condition)
+      % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.practice.nPractice / 2;
+      % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.practice.nPractice / 2;
+      % % rmStims_orig is true because half of stimuli are in "same" cond and
+      % % half are in "diff"
+      % cfg.stim.(sesName).(phaseName).rmStims_orig = true;
+      
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
       % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
       % if rmStims_orig=false). nSpecies = (nSame + nDiff) in practice.
+      
+      % minimum number of trials needed between exact repeats of a given
+      % stimulus as stim2
+      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 0;
+      % whether to have "same" and "diff" text with the response prompt
+      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
       
       % durations, in seconds
       cfg.stim.(sesName).(phaseName).match_isi = 0.5;
@@ -410,21 +417,30 @@ if expParam.sessionNum == 1
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
-      % minimum number of trials needed between exact repeats of a given
-      % stimulus as stim2
-      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
-      % whether to have "same" and "diff" text with the response prompt
-      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
-      
-      % rmStims_orig is false because all stimuli are used in both 'same' and
-      % 'diff' conditions
+      % rmStims_orig is false because all stimuli are used in both "same"
+      % and "diff" conditions
       cfg.stim.(sesName).(phaseName).rmStims_orig = false;
+      
+      % % number per species per family (half because each stimulus is only in
+      % % same or different condition)
+      % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained / 2;
+      % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained / 2;
+      % % rmStims_orig is true because half of stimuli are in "same" cond and
+      % % half are in "diff"
+      % cfg.stim.(sesName).(phaseName).rmStims_orig = true;
+      
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
       % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
       % if rmStims_orig=false)
+      
+      % minimum number of trials needed between exact repeats of a given
+      % stimulus as stim2
+      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
+      % whether to have "same" and "diff" text with the response prompt
+      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
       
       if expParam.useNS
         cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
@@ -840,21 +856,33 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % % every stimulus is in both the same and the different condition.
+      % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
+      % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
+      % % rmStims_orig is false because all stimuli are used in both "same"
+      % % and "diff" conditions
+      % cfg.stim.(sesName).(phaseName).rmStims_orig = false;
+      
       % number per species per family (half because each stimulus is only in
       % same or different condition)
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained / 2;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained / 2;
+      % rmStims_orig is true because half of stimuli are in "same" cond and
+      % half are in "diff"
+      cfg.stim.(sesName).(phaseName).rmStims_orig = true;
+      
+      % rmStims_pair is true because pairs are removed after they're added
+      cfg.stim.(sesName).(phaseName).rmStims_pair = true;
+      cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+      % if rmStims_orig=false)
+      
       % minimum number of trials needed between exact repeats of a given
       % stimulus as stim2
       cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
       % whether to have "same" and "diff" text with the response prompt
       cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
-      
-      % rmStims_orig is true because we're using half of stimuli in each cond
-      cfg.stim.(sesName).(phaseName).rmStims_orig = true;
-      % rmStims_pair is true because pairs are removed after they're added
-      cfg.stim.(sesName).(phaseName).rmStims_pair = true;
-      cfg.stim.(sesName).(phaseName).shuffleFirst = true;
       
       if expParam.useNS
         cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
@@ -894,17 +922,33 @@ if expParam.sessionNum == 1
         matchNum = 1;
         cfg.stim.(sesName).(phaseName)(matchNum).isExp = true;
         
+        % % every stimulus is in both the same and the different condition.
+        % cfg.stim.(sesName).(phaseName)(matchNum).nSame = cfg.stim.nTrained;
+        % cfg.stim.(sesName).(phaseName)(matchNum).nDiff = cfg.stim.nTrained;
+        % % rmStims_orig is false because all stimuli are used in both "same"
+        % % and "diff" conditions
+        % cfg.stim.(sesName).(phaseName)(matchNum).rmStims_orig = false;
+        
+        % number per species per family (half because each stimulus is only in
+        % same or different condition)
         cfg.stim.(sesName).(phaseName)(matchNum).nSame = cfg.stim.nTrained / 2;
         cfg.stim.(sesName).(phaseName)(matchNum).nDiff = cfg.stim.nTrained / 2;
-        cfg.stim.(sesName).(phaseName)(matchNum).stim2MinRepeatSpacing = 2;
-        % whether to have "same" and "diff" text with the response prompt
-        cfg.stim.(sesName).(phaseName)(matchNum).matchTextPrompt = matchTextPrompt;
-        
-        % rmStims_orig is true because we're using half of stimuli in each cond
+        % rmStims_orig is true because half of stimuli are in "same" cond and
+        % half are in "diff"
         cfg.stim.(sesName).(phaseName)(matchNum).rmStims_orig = true;
+        
         % rmStims_pair is true because pairs are removed after they're added
         cfg.stim.(sesName).(phaseName)(matchNum).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(matchNum).shuffleFirst = true;
+        
+        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % if rmStims_orig=false)
+        
+        % minimum number of trials needed between exact repeats of a given
+        % stimulus as stim2
+        cfg.stim.(sesName).(phaseName)(matchNum).stim2MinRepeatSpacing = 2;
+        % whether to have "same" and "diff" text with the response prompt
+        cfg.stim.(sesName).(phaseName)(matchNum).matchTextPrompt = matchTextPrompt;
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(matchNum).impedanceAfter_nTrials = 120;
@@ -971,17 +1015,33 @@ if expParam.sessionNum == 1
         matchNum = 2;
         cfg.stim.(sesName).(phaseName)(matchNum).isExp = true;
         
+        % % every stimulus is in both the same and the different condition.
+        % cfg.stim.(sesName).(phaseName)(matchNum).nSame = cfg.stim.nTrained;
+        % cfg.stim.(sesName).(phaseName)(matchNum).nDiff = cfg.stim.nTrained;
+        % % rmStims_orig is false because all stimuli are used in both "same"
+        % % and "diff" conditions
+        % cfg.stim.(sesName).(phaseName)(matchNum).rmStims_orig = false;
+        
+        % number per species per family (half because each stimulus is only in
+        % same or different condition)
         cfg.stim.(sesName).(phaseName)(matchNum).nSame = cfg.stim.nTrained / 2;
         cfg.stim.(sesName).(phaseName)(matchNum).nDiff = cfg.stim.nTrained / 2;
-        cfg.stim.(sesName).(phaseName)(matchNum).stim2MinRepeatSpacing = 2;
-        % whether to have "same" and "diff" text with the response prompt
-        cfg.stim.(sesName).(phaseName)(matchNum).matchTextPrompt = matchTextPrompt;
-        
-        % rmStims_orig is true because we're using half of stimuli in each cond
+        % rmStims_orig is true because half of stimuli are in "same" cond and
+        % half are in "diff"
         cfg.stim.(sesName).(phaseName)(matchNum).rmStims_orig = true;
+        
         % rmStims_pair is true because pairs are removed after they're added
         cfg.stim.(sesName).(phaseName)(matchNum).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(matchNum).shuffleFirst = true;
+        
+        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % if rmStims_orig=false)
+        
+        % minimum number of trials needed between exact repeats of a given
+        % stimulus as stim2
+        cfg.stim.(sesName).(phaseName)(matchNum).stim2MinRepeatSpacing = 2;
+        % whether to have "same" and "diff" text with the response prompt
+        cfg.stim.(sesName).(phaseName)(matchNum).matchTextPrompt = matchTextPrompt;
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(matchNum).impedanceAfter_nTrials = 120;
@@ -1021,16 +1081,30 @@ if expParam.sessionNum == 1
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
-      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
-      % whether to have "same" and "diff" text with the response prompt
-      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
-      
-      % rmStims_orig is false because all stimuli are used in both 'same' and
-      % 'diff' conditions
+      % rmStims_orig is false because all stimuli are used in both "same"
+      % and "diff" conditions
       cfg.stim.(sesName).(phaseName).rmStims_orig = false;
+      
+      % % number per species per family (half because each stimulus is only in
+      % % same or different condition)
+      % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained / 2;
+      % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained / 2;
+      % % rmStims_orig is true because half of stimuli are in "same" cond and
+      % % half are in "diff"
+      % cfg.stim.(sesName).(phaseName).rmStims_orig = true;
+      
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+      % if rmStims_orig=false)
+      
+      % minimum number of trials needed between exact repeats of a given
+      % stimulus as stim2
+      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
+      % whether to have "same" and "diff" text with the response prompt
+      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
       
       if expParam.useNS
         cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
@@ -1148,16 +1222,30 @@ if expParam.sessionNum == 1
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
-      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
-      % whether to have "same" and "diff" text with the response prompt
-      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
-      
-      % rmStims_orig is false because all stimuli are used in both 'same' and
-      % 'diff' conditions
+      % rmStims_orig is false because all stimuli are used in both "same"
+      % and "diff" conditions
       cfg.stim.(sesName).(phaseName).rmStims_orig = false;
+      
+      % % number per species per family (half because each stimulus is only in
+      % % same or different condition)
+      % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained / 2;
+      % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained / 2;
+      % % rmStims_orig is true because half of stimuli are in "same" cond and
+      % % half are in "diff"
+      % cfg.stim.(sesName).(phaseName).rmStims_orig = true;
+      
       % rmStims_pair is true because pairs are removed after they're added
       cfg.stim.(sesName).(phaseName).rmStims_pair = true;
       cfg.stim.(sesName).(phaseName).shuffleFirst = true;
+      
+      % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+      % if rmStims_orig=false)
+      
+      % minimum number of trials needed between exact repeats of a given
+      % stimulus as stim2
+      cfg.stim.(sesName).(phaseName).stim2MinRepeatSpacing = 2;
+      % whether to have "same" and "diff" text with the response prompt
+      cfg.stim.(sesName).(phaseName).matchTextPrompt = matchTextPrompt;
       
       if expParam.useNS
         cfg.stim.(sesName).(phaseName).impedanceAfter_nTrials = 120;
