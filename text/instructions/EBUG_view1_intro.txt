@@ -9,9 +9,6 @@ and you will chunk all species of the other family together as "basicFamStr".
 Your job is to learn the family and species members by pressing the species key
 that corresponds to the species number you see below each creature.
 
-key=species: s01=1, s02=2, s03=3, s04=4, s05=5, s06=6, s07=7, s08=8, s09=9, s10=10
-"s00" is the key for the "basicFamStr" family species members.
-
 Please place your fingers on the keys now.
 
 Press "contKey" to begin the viewing task.
