@@ -1,12 +1,18 @@
 function et_calcExpDuration(cfg,expParam,durLimit)
+% function et_calcExpDuration(cfg,expParam,durLimit)
+% 
 % calculates the experiment duration
-
-% if expParam.useNS
+%
+% durLimit can be 'min','med', or 'max'.
+%  'min': responses limits are 0 sec
+%  'med': responses limits are half length
+%  'max': responses limits are maximum length
+%
 
 % set some constant durations (in seconds)
-
 instructDur = 30;
 blinkBreakDur = 5;
+initialNetSetup = 600; % 5 min = 300 seconds
 impedanceDur = 300; % 5 min = 300 seconds
 
 % initialize
@@ -29,6 +35,8 @@ if expParam.useNS
 else
   fprintf(' Not using EEG.\n');
 end
+
+fprintf('Assuming %.1f min initial setup, %d sec instructions per phase, %d sec blink break, and %.1f min impedance break.\n',(initialNetSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
 
 for s = 1:expParam.nSessions
   % initialize
@@ -279,19 +287,23 @@ for s = 1:expParam.nSessions
     if expParam.useNS
       if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
         if isfield(cfg.stim.(sesName).(phaseName),'impedanceAfter_nTrials')
-          if strcmp(phaseName,'viewname')
-            nImpedanceBreaks_view = floor(nTrials_view / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
-            nImpedanceBreaks_name = floor(nTrials_name / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
+          nImpedanceBreaks = floor(nTrials / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
+        elseif isfield(cfg.stim.(sesName).(phaseName),'impedanceAfter_nBlocks')
+          if strcmp(phaseName,'nametrain')
+            % only has 1 impedance break, so we don't want to subtract it
+            nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
+          elseif strcmp(phaseName,'viewname')
+            % only has 1 impedance break, so we don't want to subtract it
+            nImpedanceBreaks_view = floor(nTrials_view / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
+            nImpedanceBreaks_name = floor(nTrials_name / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
             nImpedanceBreaks = nImpedanceBreaks_view + nImpedanceBreaks_name;
           elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-            nImpedanceBreaks_study = floor(nTrials_study / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
-            nImpedanceBreaks_test = floor(nTrials_test / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
+            nImpedanceBreaks_study = floor(nTrials_study / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
+            nImpedanceBreaks_test = floor(nTrials_test / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
             nImpedanceBreaks = nImpedanceBreaks_study + nImpedanceBreaks_test;
           else
-            nImpedanceBreaks = floor(nTrials / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
+            nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
           end
-        elseif isfield(cfg.stim.(sesName).(phaseName),'impedanceAfter_nBlocks')
-          nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
         end
       else
         if strcmp(phaseName,'viewname')
@@ -449,7 +461,7 @@ for s = 1:expParam.nSessions
     end
     
     % add this phase to the session
-    sesDur = sesDur + phaseDur;
+    sesDur = sesDur + phaseDur + initialNetSetup;
   end % p
   
   if strcmp(durLimit,'min')
