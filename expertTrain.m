@@ -217,9 +217,9 @@ try
     [NSStartStatus, NSStartError] = NetStation('StartRecording');
     
     if NSConnectStatus || NSSyncStatus || NSStartStatus
-      error('!!! ERROR: Problem with Netstation connect/sync/start. Check error messages for more information !!!');
+      error('!!! ERROR: Problem with Net Station connect/sync/start. Check error messages for more information !!!');
     else
-      fprintf('\nConnected to Netstation @ %s\n', expParam.NSHost);
+      fprintf('\nConnected to Net Station @ %s\n', expParam.NSHost);
       % stop recording
       [NSStopStatus, NSStopError] = NetStation('StopRecording');
     end
@@ -374,7 +374,7 @@ try
   if expParam.useNS
     % stop recording
     [NSStopStatus, NSStopError] = NetStation('StopRecording');
-    fprintf('\nDisconnecting from Netstation @ %s\n', NSHost);
+    fprintf('\nDisconnecting from Net Station @ %s\n', NSHost);
     [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect');
   end
   
@@ -421,7 +421,7 @@ catch ME
   if expParam.useNS
     % stop recording
     [NSStopStatus, NSStopError] = NetStation('StopRecording');
-    fprintf('\nDisconnecting from Netstation @ %s\n', NSHost);
+    fprintf('\nDisconnecting from Net Station @ %s\n', NSHost);
     [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect');
   end
   
