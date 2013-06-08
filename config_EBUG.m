@@ -16,7 +16,7 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 % on.
 
 % do we want to record EEG using Net Station?
-expParam.useNS = true;
+expParam.useNS = false;
 % what host is netstation running on?
 if expParam.useNS
   expParam.NSPort = 55513;
@@ -256,6 +256,13 @@ if expParam.sessionNum == 1
     cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeyNames{i});
   end
   
+  cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_black_upper.jpg');
+  %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_black_middle.jpg');
+  %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_white_upper.jpg');
+  %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_white_middle.jpg');
+  % scale image down (< 1) or up (> 1)
+  cfg.files.speciesNumKeyImgScale = 0.6;
+  
   % subordinate matching keys (counterbalanced based on subNum 1-5, 6-0)
   
   % upper row
@@ -300,13 +307,13 @@ if expParam.sessionNum == 1
     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
   end
   
-  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
-  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
-  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
   cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_upper_%d.jpg',cfg.keys.recogKeySet));
   %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_middle_%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
+  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
   % scale image down (< 1) or up (> 1)
-  cfg.files.recogTestRespKeyImgScale = 0.5;
+  cfg.files.recogTestRespKeyImgScale = 0.6;
   
   %% Screen, text, and symbol configuration for size and color
   
@@ -512,7 +519,7 @@ if expParam.sessionNum == 1
         fullfile(cfg.files.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName)),...
         {'contKey'},{cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.recogIntro(3).image = cfg.files.recogTestRespKeyImg;
-      cfg.stim.(sesName).(phaseName).instruct.recogIntro(3).imageScale = 1;
+      cfg.stim.(sesName).(phaseName).instruct.recogIntro(3).imageScale = cfg.files.recogTestRespKeyImgScale;
       
       nExemplars = cfg.stim.(sesName).(phaseName).nStudyTarg * cfg.stim.practice.nSpecies * length(cfg.stim.practice.familyNames);
       [cfg.stim.(sesName).(phaseName).instruct.recogStudy.text] = et_processTextInstruct(...
@@ -523,7 +530,7 @@ if expParam.sessionNum == 1
         fullfile(cfg.files.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName)),...
         {'contKey'},{cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
-      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = 1;
+      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -577,7 +584,7 @@ if expParam.sessionNum == 1
         fullfile(cfg.files.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName)),...
         {'contKey'},{cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
-      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = 1;
+      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
     end
     
   end
@@ -614,11 +621,10 @@ if expParam.sessionNum == 1
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_name1_practice_intro.txt',expParam.expName)),...
-        {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
-        KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-        KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-        KbName(cfg.keys.s00),cfg.keys.instructContKey});
+        {'nFamily','basicFamStr','contKey'},...
+        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
+      cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
+      cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
     end
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -723,20 +729,20 @@ if expParam.sessionNum == 1
 %       % instructions (view)
 %       [cfg.stim.(sesName).(phaseName).instruct.view.text] = et_processTextInstruct(...
 %         fullfile(cfg.files.instructDir,sprintf('%s_viewname1_intro.txt',expParam.expName)),...
-%         {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%         {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
 %         {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
-%         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-%         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-%         KbName(cfg.keys.s00),cfg.keys.instructContKey});
+%         cfg.keys.instructContKey});
+%       cfg.stim.(sesName).(phaseName).instruct.view.image = cfg.files.speciesNumKeyImg;
+%       cfg.stim.(sesName).(phaseName).instruct.view.imageScale = cfg.files.speciesNumKeyImgScale;
 %       
 %       % instructions (name)
 %       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
 %         fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
-%         {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+%         {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
 %         {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
-%         KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-%         KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-%         KbName(cfg.keys.s00),cfg.keys.instructContKey});
+%         cfg.keys.instructContKey});
+%       cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
+%       cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
 %     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -808,11 +814,11 @@ if expParam.sessionNum == 1
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
-        {'nFamily','nSpeciesTotal','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
+        {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
         {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
-        KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-        KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-        KbName(cfg.keys.s00),cfg.keys.instructContKey});
+        cfg.keys.instructContKey});
+      cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
+      cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -845,11 +851,10 @@ if expParam.sessionNum == 1
       % instructions
       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
-        {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
-        KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-        KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-        KbName(cfg.keys.s00),cfg.keys.instructContKey});
+        {'nFamily','basicFamStr','contKey'},...
+        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
+      cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
+      cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
     end
       
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1003,11 +1008,10 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
-          {'nFamily','basicFamStr','s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s00','contKey'},...
-          {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
-          KbName(cfg.keys.s01),KbName(cfg.keys.s02),KbName(cfg.keys.s03),KbName(cfg.keys.s04),KbName(cfg.keys.s05),...
-          KbName(cfg.keys.s06),KbName(cfg.keys.s07),KbName(cfg.keys.s08),KbName(cfg.keys.s09),KbName(cfg.keys.s10),...
-          KbName(cfg.keys.s00),cfg.keys.instructContKey});
+          {'nFamily','basicFamStr','contKey'},...
+          {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
+        cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
+        cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
       end
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1192,7 +1196,7 @@ if expParam.sessionNum == 1
         fullfile(cfg.files.instructDir,sprintf('%s_recog_post_test.txt',expParam.expName)),...
         {'contKey'},{cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
-      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = 1;
+      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
     end
   end
   
@@ -1332,7 +1336,7 @@ if expParam.sessionNum == 1
         fullfile(cfg.files.instructDir,sprintf('%s_recog_post_test.txt',expParam.expName)),...
         {'contKey'},{cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
-      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = 1;
+      cfg.stim.(sesName).(phaseName).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
     end
   end
   
