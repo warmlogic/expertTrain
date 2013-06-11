@@ -42,7 +42,7 @@ end
 % image manipulations to translate in the same way (cropImage = false; is
 % required)
 % manipulations = {};
-manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'invertab'}};
+manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'inverta', 'swap', 'invertb', 'invertab', 'swapinverta', 'swapinvertb', 'swapinvertab'}};
 
 outputDir = strcat(familyDir,'cent');
 if ~exist(outputDir,'dir')
@@ -74,4 +74,18 @@ for i = 1:length(files)
   
   outputFile = fullfile(outputDir,strcat(familyName,speciesName,'cent_',exemplarNumStr,ext));
   imwrite(centeredImage,outputFile);
+  
+  if ~isempty(manipulations)
+    for m = 1:length(manipulations{2})
+      manip_outputDir = strcat(familyDir,manipulations{2}{m},'_cent');
+      if ~exist(manip_outputDir,'dir')
+        mkdir(manip_outputDir);
+      end
+
+      manip_outputFile = fullfile(manip_outputDir,sprintf('%s%s_%scent_%s%s',familyName,manipulations{2}{m},speciesName,exemplarNumStr,ext));
+      imwrite(manipulatedImages{m},manip_outputFile);
+    end
+
+  end
+  
 end

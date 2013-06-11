@@ -300,8 +300,8 @@ if ~isempty(manipulations)
   
   % initialize to hold the centered manipualted images
   centeredManipImage = cell(1,length(manipulations{2}));
-  for i = 1:length(manipulations{2})
-    manip_file = fullfile(strcat(orig_path,manipulations{2}{i}),sprintf('%s%s_%s%s%s',familyName,manipulations{2}{i},speciesName,exemplarNumStr,ext));
+  for m = 1:length(manipulations{2})
+    manip_file = fullfile(strcat(orig_path,manipulations{2}{m}),sprintf('%s%s_%s%s%s',familyName,manipulations{2}{m},speciesName,exemplarNumStr,ext));
     if exist(manip_file,'file')
       im_manip = imread(manip_file);
     else
@@ -315,7 +315,7 @@ if ~isempty(manipulations)
     
     % translate the manipulated image
     [cManipImage] = translateAroundCentroid(im_manip, leftCentroid, topCentroid, trans1_x, trans1_y, trans2_x, trans2_y, out_x, out_y, bgColor, plotSteps);
-    centeredManipImage{i} = cManipImage;
+    centeredManipImage{m} = cManipImage;
   end
 else
   centeredManipImage = {};
