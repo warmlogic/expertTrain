@@ -45,12 +45,12 @@ expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','tra
 
 % set up a field for each session type
 expParam.session.pretest.phases = {'prac_match','match'};
-expParam.session.train1.phases = {'prac_name','nametrain','name'};
-expParam.session.train2.phases = {'name'};
-expParam.session.train3.phases = {'name'};
-expParam.session.train4.phases = {'name'};
-expParam.session.train5.phases = {'name'};
-expParam.session.train6.phases = {'name'};
+expParam.session.train1.phases = {'prac_name','nametrain','name','name'};
+expParam.session.train2.phases = {'name','name','name'};
+expParam.session.train3.phases = {'name','name','name'};
+expParam.session.train4.phases = {'name','name','name'};
+expParam.session.train5.phases = {'name','name','name'};
+expParam.session.train6.phases = {'name','name','name'};
 expParam.session.posttest.phases = {'prac_match','match'};
 expParam.session.posttest_delay.phases = {'prac_match','match'};
 
@@ -520,7 +520,7 @@ if expParam.sessionNum == 1
       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_name1_practice_intro.txt',expParam.expName)),...
         {'nFamily','basicFamStr','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
+        {num2str(length(cfg.stim.(sesName).(phaseName).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
       cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
     end
@@ -647,7 +647,7 @@ if expParam.sessionNum == 1
       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
         {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
+        {num2str(length(cfg.stim.(sesName).(phaseName).familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
         cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
       cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
@@ -687,7 +687,7 @@ if expParam.sessionNum == 1
       [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
         {'nFamily','basicFamStr','contKey'},...
-        {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,...
+        {num2str(length(cfg.stim.(sesName).(phaseName).familyNames)),cfg.text.basicFamStr,...
         cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
       cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
@@ -737,7 +737,7 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName).instruct.name.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
           {'nFamily','basicFamStr','contKey'},...
-          {num2str(length(cfg.stim.familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
+          {num2str(length(cfg.stim.(sesName).(phaseName).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName).instruct.name.image = cfg.files.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
       end
