@@ -46,11 +46,11 @@ expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','tra
 % set up a field for each session type
 expParam.session.pretest.phases = {'prac_match','match'};
 expParam.session.train1.phases = {'prac_name','nametrain','name','name'};
-expParam.session.train2.phases = {'name','name','name'};
-expParam.session.train3.phases = {'name','name','name'};
-expParam.session.train4.phases = {'name','name','name'};
-expParam.session.train5.phases = {'name','name','name'};
-expParam.session.train6.phases = {'name','name','name'};
+expParam.session.train2.phases = {'name','name','name','name'};
+expParam.session.train3.phases = {'name','name','name','name'};
+expParam.session.train4.phases = {'name','name','name','name'};
+expParam.session.train5.phases = {'name','name','name','name'};
+expParam.session.train6.phases = {'name','name','name','name'};
 expParam.session.posttest.phases = {'prac_match','match'};
 expParam.session.posttest_delay.phases = {'prac_match','match'};
 
