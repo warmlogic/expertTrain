@@ -285,7 +285,7 @@ end
 
 %% do the translation
 
-[centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, out_x, out_y, bgColor, plotSteps);
+[centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_x, trans1_y, trans2_x, trans2_y, out_x, out_y, bgColor, plotSteps);
 
 %% are there manipulated images to prcess as well?
 
@@ -308,7 +308,13 @@ if ~isempty(manipulations)
       error('manipulated image file %s does not exist',manip_file);
     end
     
-    [cManipImage] = translateAroundCentroid(im_manip, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, bgColor, plotSteps);
+    % make 3D if we need to
+    if ndims(im_manip) == 2
+      im_manip = repmat(im_manip,[1 1 3]);
+    end
+    
+    % translate the manipulated image
+    [cManipImage] = translateAroundCentroid(im_manip, leftCentroid, topCentroid, trans1_x, trans1_y, trans2_x, trans2_y, out_x, out_y, bgColor, plotSteps);
     centeredManipImage{i} = cManipImage;
   end
 else
@@ -323,7 +329,7 @@ end
 
 %% reusable function to do translation
 
-function [centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, out_x, out_y, bgColor, plotSteps)
+function [centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_x, trans1_y, trans2_x, trans2_y, out_x, out_y, bgColor, plotSteps)
 
 im_bb_t = imtranslate(im_bb,[trans1_y, trans1_x, 0],bgColor,'linear',0);
 if plotSteps

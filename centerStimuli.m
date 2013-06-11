@@ -10,17 +10,18 @@ bgColor = 210;
 % type of mask to use.
 %
 % 'manual' expects to find a file in a FAMILY_mask dir
-% processMask = 'manual';
+processMask = 'manual';
 % % the threshold used by makeMask.m
-processMask = 0.7;
+% processMask = 0.7;
 
-cropImage = true;
+cropImage = false;
 
 plotSteps = false;
 
-% familyName = 'Finch_';
-familyName = 'Warbler_';
-imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+familyName = 'Finch_';
+% familyName = 'Warbler_';
+% imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+imgDir = '~/Downloads/croppedbirds/Birds';
 familyDir = fullfile(imgDir,familyName);
 if exist(familyDir,'dir')
   files = dir(fullfile(familyDir,'*.bmp'));
@@ -41,7 +42,7 @@ end
 % image manipulations to translate in the same way (cropImage = false; is
 % required)
 % manipulations = {};
-% manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'invertab'}};
+manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'invertab'}};
 
 outputDir = strcat(familyDir,'cent');
 if ~exist(outputDir,'dir')

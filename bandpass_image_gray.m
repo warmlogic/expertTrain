@@ -35,8 +35,8 @@ close all
 
 val = 210;
 
-% familyName = 'Finch_';
-familyName = 'Warbler_';
+familyName = 'Finch_';
+% familyName = 'Warbler_';
 % imgDir = '~/Documents/experiments/expertTrain/images/Birds';
 imgDir = '~/Downloads/croppedbirds/Birds';
 familyDir = fullfile(imgDir,familyName);
@@ -113,7 +113,7 @@ for i = 1:length(files)
     outputFile = fullfile(outputDir,sprintf('%sg_%s%i_%i_%s%s%s',familyName,filtStr,freq(1),freq(2),speciesName,exemplarNumStr,ext));
   elseif low_pass == -1
     outputDir = fullfile(imgDir,sprintf('%sg',familyName));
-    outputFile = fullfile(outputDir,sprintf('%sg%s%s%s',familyName,speciesName,exemplarNumStr,ext));
+    outputFile = fullfile(outputDir,sprintf('%sg_%s%s%s',familyName,speciesName,exemplarNumStr,ext));
   end
   
   % make sure output directory exists
@@ -126,28 +126,20 @@ for i = 1:length(files)
     [im_gray,HSF] = fft_filter(im_gray,freq,plot_flag);
   elseif low_pass == 0
     [LSF,im_gray] = fft_filter(im_gray,freq,plot_flag);
-    %im_gray = im_gray + mim; % add back mean intensity, as high-pass removes mean intensity
+  elseif low_pass == -1
+    im_gray = double(im_gray);
   end
   
   % reset background
   im_gray = msk.*im_gray + (1-msk).*graybackground;
   
   if show_image
-    if low_pass == 1 || low_pass == 0
-      figure
-      imshow(im_gray./255);
-    elseif low_pass == -1
-      figure
-      imshow(im_gray);
-    end
+    figure
+    imshow(im_gray./255);
   end
   
   % write the image to file
-  if low_pass == 1 || low_pass == 0
-    imwrite(im_gray./255,outputFile);
-  elseif low_pass == -1
-    imwrite(im_gray,outputFile);
-  end
+  imwrite(im_gray./255,outputFile);
 end
 
 fprintf('Done.\n');  

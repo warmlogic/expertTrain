@@ -133,7 +133,7 @@ for i = 1:length(files)
       mkdir(outputDir);
     end
     
-    outfilename = fullfile(outputDir,sprintf('%s%s%s%s%s%s',familyName,swap_nm,invert_nm,speciesName,exemplarNumStr,ext));
+    outfilename = fullfile(outputDir,sprintf('%s%s%s_%s%s%s',familyName,swap_nm,invert_nm,speciesName,exemplarNumStr,ext));
     %outfilename = sprintf('%s_%s%s.bmp',current_file,swap_nm,invert_nm);
     
     imwrite(rgb_img,outfilename);
