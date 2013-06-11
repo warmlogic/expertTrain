@@ -603,6 +603,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.practice.familyNames;
+        
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
       
@@ -753,6 +756,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
+      
       % hard coded order of which species are presented in each block
       % (counterbalanced). Blocks are denoted by vectors.
       cfg.stim.(sesName).(phaseName).blockSpeciesOrder = {...
@@ -828,6 +834,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
@@ -985,6 +994,9 @@ if expParam.sessionNum == 1
       
       if ismember(phaseName,expParam.session.(sesName).phases)
         cfg.stim.(sesName).(phaseName).isExp = true;
+        
+        % only use stimuli from particular families
+        cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
@@ -1352,11 +1364,11 @@ if expParam.sessionNum == 1
   
   %% print out the experiment length
   
-  % maximum duration
-  et_calcExpDuration(cfg,expParam,'max');
+  % % maximum duration
+  % et_calcExpDuration(cfg,expParam,'max');
   % medium duration
   et_calcExpDuration(cfg,expParam,'med');
-  % minimum duration
-  et_calcExpDuration(cfg,expParam,'min');
+  % % minimum duration
+  % et_calcExpDuration(cfg,expParam,'min');
   
 end

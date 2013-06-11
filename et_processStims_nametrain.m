@@ -5,6 +5,14 @@ fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 
+if ~isfield(phaseCfg,'familyNames')
+  if ~phaseCfg.isExp
+    phaseCfg.familyNames = cfg.stim.practice.familyNames;
+  else
+    phaseCfg.familyNames = cfg.stim.familyNames;
+  end
+end
+
 % add the species in order from 1 to nSpecies; this is ok because, for each
 % subject, each species number corresonds to a random species letter, as
 % determined in et_saveStimList()
@@ -19,18 +27,20 @@ expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cell(1,length(pha
 for b = 1:length(phaseCfg.blockSpeciesOrder)
   for s = 1:length(phaseCfg.blockSpeciesOrder{b})
     for f = 1:length(cfg.stim.familyNames)
-      % get the indices for this species
-      sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,phaseCfg.blockSpeciesOrder{b}(s)));
-      % shuffle the stimulus index
-      randind = randperm(length(sInd));
-      
-      % shuffle the exemplars
-      thisSpecies = expParam.session.(sprintf('f%dTrained',f))(sInd(randind));
-      
-      % add them to the naming list
-      expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b} = cat(1,...
-        expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},...
-        thisSpecies(phaseCfg.nameIndices{b}{s}));
+      if ismember(cfg.stim.familyNames{f},phaseCfg.familyNames)
+        % get the indices for this species
+        sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,phaseCfg.blockSpeciesOrder{b}(s)));
+        % shuffle the stimulus index
+        randind = randperm(length(sInd));
+        
+        % shuffle the exemplars
+        thisSpecies = expParam.session.(sprintf('f%dTrained',f))(sInd(randind));
+        
+        % add them to the naming list
+        expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b} = cat(1,...
+          expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},...
+          thisSpecies(phaseCfg.nameIndices{b}{s}));
+      end
     end % for each family
   end % for each species
   

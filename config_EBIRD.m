@@ -135,6 +135,8 @@ if expParam.sessionNum == 1
   
   % family names correspond to the directories in which stimuli reside
   cfg.stim.familyNames = {'Finch_', 'Finch_g', 'Finch_g_hi8', 'Finch_g_lo8', 'Finch_invertab', 'Warbler_', 'Warbler_g', 'Warbler_g_hi8', 'Warbler_g_lo8', 'Warbler_invertab'};
+  %cfg.stim.familyNames = {'Finch_', 'Warbler_'};
+  %cfg.stim.manipulations = {'', 'g', 'g_hi8', 'g_lo8', 'invertab'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
@@ -492,6 +494,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.practice.familyNames;
+      
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
       
@@ -523,6 +528,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = {'Finch_', 'Warbler_'};
       
       % hard coded order of which species are presented in each block
       % (counterbalanced). Blocks are denoted by vectors.
@@ -649,6 +657,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = {'Finch_', 'Warbler_'};
+      
       % maximum number of repeated exemplars from each family in naming
       cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
       
@@ -695,6 +706,9 @@ if expParam.sessionNum == 1
       
       if ismember(phaseName,expParam.session.(sesName).phases)
         cfg.stim.(sesName).(phaseName).isExp = true;
+        
+        % only use stimuli from particular families
+        cfg.stim.(sesName).(phaseName).familyNames = {'Finch_', 'Warbler_'};
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName).nameMaxConsecFamily = 3;
@@ -887,11 +901,11 @@ if expParam.sessionNum == 1
   
   %% print out the experiment length
   
-  % maximum duration
-  %et_calcExpDuration(cfg,expParam,'max');
+  % % maximum duration
+  % et_calcExpDuration(cfg,expParam,'max');
   % medium duration
   et_calcExpDuration(cfg,expParam,'med');
-  % minimum duration
-  %et_calcExpDuration(cfg,expParam,'min');
+  % % minimum duration
+  % et_calcExpDuration(cfg,expParam,'min');
   
 end

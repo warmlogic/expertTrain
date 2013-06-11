@@ -5,18 +5,32 @@ fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 
+if ~isfield(phaseCfg,'familyNames')
+  if ~phaseCfg.isExp
+    phaseCfg.familyNames = cfg.stim.practice.familyNames;
+  else
+    phaseCfg.familyNames = cfg.stim.familyNames;
+  end
+end
+
 % initialize to hold the trained stimuli
 expParam.session.(sesName).(phaseName)(phaseCount).nameStims = [];
 
 if ~phaseCfg.isExp
   % for the practice, put all the practice stimuli together
   for f = 1:length(cfg.stim.practice.familyNames)
-    expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dPractice',f)));
+    if ismember(cfg.stim.practice.familyNames{f},phaseCfg.familyNames)
+      expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,...
+        expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dPractice',f)));
+    end
   end
 else
   % for the real experiment, put all the trained stimuli together
   for f = 1:length(cfg.stim.familyNames)
-    expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dTrained',f)));
+    if ismember(cfg.stim.familyNames{f},phaseCfg.familyNames)
+      expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,...
+        expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dTrained',f)));
+    end
   end
 end
 
