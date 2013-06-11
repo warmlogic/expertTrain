@@ -38,6 +38,11 @@ if ischar(processMask) && strcmp(processMask,'manual')
   end
 end
 
+% any image manipulations to translate in the same way (cropImage = false
+% is required)
+% % manipulations = {};
+manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'invertab'}};
+
 outputDir = strcat(familyDir,'cent');
 if ~exist(outputDir,'dir')
   mkdir(outputDir);
@@ -52,15 +57,14 @@ for i = 1:length(files)
     fprintf('processing %s with a manual mask...\n',files{i});
     maskInfo = fullfile(maskDir,strcat(current_file,'_mask',ext));
   elseif isnumeric(processMask)
-    fprintf('processing %s with an internally generated mask...\n',files{i});
+    fprintf('processing %s with an internally generated mask (using makeMask.m)...\n',files{i});
     maskInfo = processMask;
   else
-    fprintf('processing %s without a manual mask...\n',files{i});
+    fprintf('processing %s without a mask...\n',files{i});
     maskInfo = [];
   end
   
-  imageFile = '~/Desktop/birds/Original_340.bmp';
-  [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,cropImage,plotSteps);
+  [centeredImage,manipulatedImages] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,cropImage,plotSteps,manipulations);
   
   fNameInd = strfind(current_file,familyName);
   speciesNameExemplarNum = current_file((fNameInd(1)+length(familyName)):end);

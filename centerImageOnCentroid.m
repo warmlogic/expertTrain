@@ -1,25 +1,34 @@
-function [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,cropImage,plotSteps)
-% function [centeredImage] = centerImageOnCentroid(imageFile,mask_file,centeredDims,bgColor,cropImage,plotSteps)
+function [centeredImage,centeredManipImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,cropImage,plotSteps,manipulations)
+% function [centeredImage,centeredManipImage] = centerImageOnCentroid(imageFile,mask_file,centeredDims,bgColor,cropImage,plotSteps,manipulations)
 %
 % Description:
 %  Centers images on the centroid (center of mass). Expects images with
 %  cropped-out objects on uniform backgrounds.
 %
 % Input:
-%  imageFile:    string to an image file
-%  maskInfo:     optional. string to a black-background white-object mask
-%                file. or a threshold number at which to auto-mask. or
-%                empty to make not as good of a mask.
-%  centeredDims: [x y] dimensions of the output image; optional. Default:
-%                the same size as the input image.
-%  bgColor:      single scalar digit reperesenting the background color
-%                (e.g., 210 for gray). optional. Default: the most common
-%                color outside of the identified object.
-%  cropImage:    true/false. whether to crop the image. (Default: true)
-%  plotSteps:    true/false. whether to plot each step. (Default: false)
+%  imageFile:     image file path (string).
+%  maskInfo:      black-background white-object mask file path (string).
+%                 can also be a threshold number at which to auto-mask.
+%                 or empty to make not as good of a mask. optional.
+%                 (Default: [])
+%  centeredDims:  [x y] dimensions of the output image. optional. (Default:
+%                 the same size as the input image.)
+%  bgColor:       single scalar digit reperesenting the background color
+%                 (e.g., 210 for gray). optional. (Default: the most common
+%                 color outside of the identified object.)
+%  cropImage:     true/false. whether to crop the image. optional.
+%                 (Default: true)
+%  plotSteps:     true/false. whether to plot each step. optional.
+%                 (Default: false)
+%  manipulations: optional. two-element cell array containing the
+%                 familyName as the first element and the image
+%                 manipulation strings to be appended as part of the family
+%                 name as the second element.
+%                 (Default: {})
 %
 % Output:
-%  centeredImage: the image, centered on the centroid
+%  centeredImage:       the image, centered on the centroid
+%  centeredManipImage:  cell array of the translated manipulated image(s)
 %
 % NB: uses the function imtranslate(), from the MATLAB File Exchange:
 %     http://www.mathworks.com/matlabcentral/fileexchange/27251-imtranslate
@@ -34,6 +43,11 @@ end
 if ~exist('cropImage','var') || isempty(cropImage)
   cropImage = true;
 end
+
+if ~exist('cropImage','var') || isempty(cropImage)
+  cropImage = true;
+end
+
 
 if ~exist('maskInfo','var') || isempty(maskInfo)
   maskInfo = [];
@@ -255,8 +269,6 @@ else
   trans2_y = (out_y - im_bb_y) / 2;
 end
 
-%% do the translation
-
 if ~centerXCentroid
   trans1_x = add_x;
 else
@@ -267,6 +279,47 @@ if ~centerYCentroid
 else
   trans1_y = 0;
 end
+
+%% do the translation
+
+[centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, bgColor, plotSteps);
+
+%% are there manipulated images to prcess as well?
+
+if ~isempty(manipulations)
+  [orig_path,current_file,ext] = fileparts(imageFile);
+  
+  fNameInd = strfind(current_file,manipulations{1});
+  speciesNameExemplarNum = current_file((fNameInd(1)+length(familyName)):end);
+  speciesName = speciesNameExemplarNum(~isstrprop(speciesNameExemplarNum,'digit'));
+  exemplarNumStr = speciesNameExemplarNum(isstrprop(speciesNameExemplarNum,'digit'));
+  
+  % initialize to hold the centered manipualted images
+  centeredManipImage = cell(1,length(manipulations{2}));
+  for i = 1:length(manipulations{2})
+    manip_file = fullfile(strcat(orig_path,manipulations{2}{i}),sprintf('%s%s%s%s%s',familyName,manipulations{2}{i},speciesName,exemplarNumStr,ext));
+    if exist(manip_file,'file')
+      im_manip = imread(manip_file);
+    else
+      error('manipulated image file %s does not exist',manip_file);
+    end
+    
+    [cManipImage] = translateAroundCentroid(im_manip, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, bgColor, plotSteps);
+    centeredManipImage{i} = cManipImage;
+  end
+else
+  centeredManipImage = {};
+end
+
+%% clean up
+
+if plotSteps
+  close all
+end
+
+%% reusable function to do translation
+
+function [centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, out_x, out_y, bgColor, plotSteps)
 
 im_bb_t = imtranslate(im_bb,[trans1_y, trans1_x, 0],bgColor,'linear',0);
 if plotSteps
@@ -312,11 +365,11 @@ if trans2_x > 0 || trans2_y > 0
     imshow(centeredImage);
     title('4');
     hold on
-    plot(225, 225, 'r*');
+    plot((out_x / 2), (out_y / 2), 'r*');
     hold off
   end
 end
 
-if plotSteps
-  close all
-end
+end % translateAroundCentroid
+
+end % centerImageOnCentroid
