@@ -888,10 +888,10 @@ if expParam.sessionNum == 1
   %% print out the experiment length
   
   % maximum duration
-  et_calcExpDuration(cfg,expParam,'max');
+  %et_calcExpDuration(cfg,expParam,'max');
   % medium duration
   et_calcExpDuration(cfg,expParam,'med');
   % minimum duration
-  et_calcExpDuration(cfg,expParam,'min');
+  %et_calcExpDuration(cfg,expParam,'min');
   
 end
