@@ -24,35 +24,6 @@ function [centeredImage] = centerImageOnCentroid(image_file,mask_file,centeredDi
 % See also: IMTRANSLATE
 %
 
-
-% image_file = '~/Desktop/birds/Original_340.bmp';
-% mask_file = '';
-
-% % left bottom - good
-% image_file = '~/Desktop/birds/Finch_BlackRosy_7.bmp';
-% % read the mask, bird is white, background is black
-% mask_file = '~/Desktop/birds/Finch_BlackRosy_7_mask.bmp';
-
-% % left top - good
-% image_file = '~/Desktop/birds/Finch_BlackRosy_7_up.bmp';
-% % read the mask, bird is white, background is black
-% mask_file = '~/Desktop/birds/Finch_BlackRosy_7_up_mask.bmp';
-
-% right bottom - good
-% image_file = '~/Desktop/birds/Finch_BlackRosy_10.bmp';
-% % read the mask, bird is white, background is black
-% mask_file = '~/Desktop/birds/Finch_BlackRosy_10_mask.bmp';
-
-% % right top - good
-% image_file = '~/Desktop/birds/Finch_BlackRosy_10_up.bmp';
-% % read the mask, bird is white, background is black
-% mask_file = '~/Desktop/birds/Finch_BlackRosy_10_up_mask.bmp';
-
-% % right top - good
-% image_file = '~/Desktop/birds/Warbler_BlackThroatedGreen_10.bmp';
-% % read the mask, bird is white, background is black
-% mask_file = '~/Desktop/birds/Warbler_BlackThroatedGreen_10_mask.bmp';
-
 if ~exist('mask_file','var') || isempty(mask_file)
   mask_file = [];
 end
@@ -136,34 +107,6 @@ bbs = cat(1, bb.BoundingBox);
 im_bb = im(floor(bbs(2)):(bbs(4)+ceil(bbs(2))),floor(bbs(1)):(bbs(3)+ceil(bbs(1))),:);
 % im_bw_bb = im_bw(floor(bbs(2)):(bbs(4)+ceil(bbs(2))),floor(bbs(1)):(bbs(3)+ceil(bbs(1))),:);
 L_bb = L(floor(bbs(2)):(bbs(4)+ceil(bbs(2))),floor(bbs(1)):(bbs(3)+ceil(bbs(1))),:);
-
-% figure
-% imshow(im_bb);
-% title('color bounding box');
-% % figure
-% % imshow(im_bw_bb);
-% % title('bw bounding box');
-% figure
-% imshow(L_bb);
-% title('L bounding box');
-
-% % convert to gray scale
-% im_gray = rgb2gray(im_bb);
-% % % Bright objects will be the chosen if you use >.
-% im_bw = im_gray > 100;
-% % Dark objects will be the chosen if you use <.
-% % im_bw = im_gray < 100;
-% % Do a "hole fill" to get rid of any background pixels inside the blobs.
-% im_bw = imfill(im_bw, 'holes');
-% % figure;
-% % imshow(im_bw);
-% 
-% % % Label the disconnected foreground regions (using 8 conned neighbourhood)
-% % L = bwlabel(im_bw, 8);
-% L = logical(im_bw);
-% 
-% % % only get the first object
-% % L(L ~= 1) = 0;
 
 % calculate the centroid
 stat = regionprops(L_bb, 'Centroid');
@@ -317,45 +260,3 @@ if trans2_x > 0 || trans2_y > 0
   %plot(225, 225, 'r*');
   %hold off
 end
-
-% 
-% bg_rect = uint8(cat(3, repmat(bgColor,newim_xy), repmat(bgColor,newim_xy), repmat(bgColor,newim_xy)));
-% hold on
-% imshow(bg_rect);
-% hold off
-% 
-% 
-% input_points = [cent_x, cent_y; (cent_x + 1), (cent_y + 1)];
-% base_points = [(newim_x/2), (newim_y/2); ((newim_x/2) + 1), ((newim_y/2) + 1)];
-% 
-% cpselect(bg_rect,im_bw,input_points,base_points);
-% 
-% tform = cp2tform(input_points,base_points,'nonreflective similarity');
-% 
-% 
-% 
-% % Crop the individual objects and store them in a cell
-% siz = size(im_bw); % image dimensions
-% n=max(L(:)); % number of objects
-% ObjCell=cell(n,1);
-% for i=1:n
-%   % Get the bb of the i-th object and offest by 2 pixels in all
-%   % directions
-%   bb_i=ceil(bb(i).BoundingBox);
-%   idx_x=[bb_i(1)-2 bb_i(1)+bb_i(3)+2];
-%   idx_y=[bb_i(2)-2 bb_i(2)+bb_i(4)+2];
-%   if idx_x(1)<1, idx_x(1)=1; end
-%   if idx_y(1)<1, idx_y(1)=1; end
-%   if idx_x(2)>siz(2), idx_x(2)=siz(2); end
-%   if idx_y(2)>siz(1), idx_y(2)=siz(1); end
-%   % Crop the object and write to ObjCell
-%   im_bw = L == i;
-%   ObjCell{i}=im(idx_y(1):idx_y(2),idx_x(1):idx_x(2));
-% end
-% 
-% % Visualize the individual objects
-% figure
-% for i=1:n
-%   subplot(1,n,i)
-%   imshow(ObjCell{i})
-% end
