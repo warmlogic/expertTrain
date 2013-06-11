@@ -133,10 +133,9 @@ if expParam.sessionNum == 1
   % set the instructions directory
   cfg.files.instructDir = fullfile(cfg.files.expDir,'text','instructions');
   
-  % family names correspond to the directories in which stimuli reside
+  % family names correspond to the directories in which stimuli reside;
+  % includes manipulations
   cfg.stim.familyNames = {'Finch_', 'Finch_g', 'Finch_g_hi8', 'Finch_g_lo8', 'Finch_invertab', 'Warbler_', 'Warbler_g', 'Warbler_g_hi8', 'Warbler_g_lo8', 'Warbler_invertab'};
-  %cfg.stim.familyNames = {'Finch_', 'Warbler_'};
-  %cfg.stim.manipulations = {'', 'g', 'g_hi8', 'g_lo8', 'invertab'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
