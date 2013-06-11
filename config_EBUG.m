@@ -139,9 +139,6 @@ if expParam.sessionNum == 1
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
   
-  % save an individual stimulus list for each subject
-  cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
-  
   % whether to use the same species order across families
   cfg.stim.yokeSpecies = false;
   if cfg.stim.yokeSpecies
@@ -151,6 +148,9 @@ if expParam.sessionNum == 1
   % Number of trained and untrained exemplars per species per family
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
+  
+  % save an individual stimulus list for each subject
+  cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
   % create the stimulus list if it doesn't exist
   shuffleSpecies = true;
@@ -174,13 +174,15 @@ if expParam.sessionNum == 1
     
     if cfg.stim.useSeparatePracStims
       cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Birds');
-      cfg.stim.practice.stimListFile = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
       cfg.stim.practice.familyNames = {'Finch_','Warbler_'};
       cfg.stim.practice.nSpecies = 2;
+      
       cfg.stim.practice.yokeSpecies = false;
       if cfg.stim.practice.yokeSpecies
         cfg.stim.practice.yokeTogether = [1 1];
       end
+      
+      cfg.stim.practice.stimListFile = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
       
       shuffleSpecies = true;
       if ~exist(cfg.stim.practice.stimListFile,'file')
