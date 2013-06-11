@@ -16,7 +16,7 @@ function [cfg,expParam] = config_EBIRD(cfg,expParam)
 % on.
 
 % do we want to record EEG using Net Station?
-expParam.useNS = true;
+expParam.useNS = false;
 % what host is netstation running on?
 if expParam.useNS
   expParam.NSPort = 55513;

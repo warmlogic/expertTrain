@@ -12,7 +12,7 @@ function et_calcExpDuration(cfg,expParam,durLimit)
 % set some constant durations (in seconds)
 instructDur = 30;
 blinkBreakDur = 5;
-initialNetSetup = 0; % 10 min = 600 seconds; 20 min = 1200 sec
+initialNetSetup = 1200; % 10 min = 600 seconds; 20 min = 1200 sec
 impedanceDur = 300; % 5 min = 300 seconds
 
 % initialize
