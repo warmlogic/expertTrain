@@ -371,6 +371,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.practice.familyNames;
+      
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.practice.nPractice;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.practice.nPractice;
@@ -427,6 +430,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
+      
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
@@ -482,6 +488,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.practice.familyNames;
+      
       cfg.stim.(sesName).(phaseName).nBlocks = 1;
       % number of target and lure stimuli per species per family per study/test
       % block. Assumes all targets and lures are tested in a block.
@@ -523,7 +532,7 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).instruct.recogIntro(3).image = cfg.files.recogTestRespKeyImg;
       cfg.stim.(sesName).(phaseName).instruct.recogIntro(3).imageScale = cfg.files.recogTestRespKeyImgScale;
       
-      nExemplars = cfg.stim.(sesName).(phaseName).nStudyTarg * cfg.stim.practice.nSpecies * length(cfg.stim.practice.familyNames);
+      nExemplars = cfg.stim.(sesName).(phaseName).nStudyTarg * cfg.stim.practice.nSpecies * length(cfg.stim.(sesName).(phaseName).familyNames);
       [cfg.stim.(sesName).(phaseName).instruct.recogStudy.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName)),...
         {'nExemplars','contKey'},{num2str(nExemplars),cfg.keys.instructContKey});
@@ -542,6 +551,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       cfg.stim.(sesName).(phaseName).nBlocks = 8;
       % number of target and lure stimuli per species per family per study/test
@@ -575,7 +587,7 @@ if expParam.sessionNum == 1
       cfg.stim.(sesName).(phaseName).incorrectSound = incorrectSound;
       
       % instructions
-      nExemplars = cfg.stim.(sesName).(phaseName).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.familyNames);
+      nExemplars = cfg.stim.(sesName).(phaseName).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.(sesName).(phaseName).familyNames);
       [cfg.stim.(sesName).(phaseName).instruct.recogIntro.text] = et_processTextInstruct(...
         fullfile(cfg.files.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName)),...
         {'nBlocks','contKey'},{num2str(cfg.stim.(sesName).(phaseName).nBlocks),cfg.keys.instructContKey});
@@ -640,6 +652,9 @@ if expParam.sessionNum == 1
 %     if ismember(phaseName,expParam.session.(sesName).phases)
 %       cfg.stim.(sesName).(phaseName).isExp = true;
 %       
+%       % only use stimuli from particular families
+%       cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
+%         
 %       % hard coded order of which species are presented in each block
 %       % (counterbalanced). Blocks are denoted by vectors.
 %       cfg.stim.(sesName).(phaseName).blockSpeciesOrder = {...
@@ -876,6 +891,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
+      
       % % every stimulus is in both the same and the different condition.
       % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
@@ -941,6 +959,9 @@ if expParam.sessionNum == 1
       if ismember(phaseName,expParam.session.(sesName).phases)
         matchNum = 1;
         cfg.stim.(sesName).(phaseName)(matchNum).isExp = true;
+        
+        % only use stimuli from particular families
+        cfg.stim.(sesName).(phaseName)(matchNum).familyNames = cfg.stim.familyNames;
         
         % % every stimulus is in both the same and the different condition.
         % cfg.stim.(sesName).(phaseName)(matchNum).nSame = cfg.stim.nTrained;
@@ -1037,6 +1058,9 @@ if expParam.sessionNum == 1
         matchNum = 2;
         cfg.stim.(sesName).(phaseName)(matchNum).isExp = true;
         
+        % only use stimuli from particular families
+        cfg.stim.(sesName).(phaseName)(matchNum).familyNames = cfg.stim.familyNames;
+        
         % % every stimulus is in both the same and the different condition.
         % cfg.stim.(sesName).(phaseName)(matchNum).nSame = cfg.stim.nTrained;
         % cfg.stim.(sesName).(phaseName)(matchNum).nDiff = cfg.stim.nTrained;
@@ -1099,6 +1123,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
@@ -1166,6 +1193,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       cfg.stim.(sesName).(phaseName).nBlocks = 8;
       % number of target and lure stimuli per species per family. Assumes all
@@ -1241,6 +1271,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
+      
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
@@ -1307,6 +1340,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       cfg.stim.(sesName).(phaseName).nBlocks = 8;
       % number of target and lure stimuli per species per family. Assumes all

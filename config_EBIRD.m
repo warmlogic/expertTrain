@@ -374,6 +374,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = false;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.practice.familyNames;
+      
       % every stimulus is in both the same and the different condition.
       cfg.stim.(sesName).(phaseName).nSame = cfg.stim.practice.nPractice;
       cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.practice.nPractice;
@@ -429,6 +432,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       % % every stimulus is in both the same and the different condition.
       % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
@@ -764,6 +770,9 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
       
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
+      
       % % every stimulus is in both the same and the different condition.
       % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;
       % cfg.stim.(sesName).(phaseName).nDiff = cfg.stim.nTrained;
@@ -838,6 +847,9 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       cfg.stim.(sesName).(phaseName).isExp = true;
+      
+      % only use stimuli from particular families
+      cfg.stim.(sesName).(phaseName).familyNames = cfg.stim.familyNames;
       
       % % every stimulus is in both the same and the different condition.
       % cfg.stim.(sesName).(phaseName).nSame = cfg.stim.nTrained;

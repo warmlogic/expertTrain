@@ -113,14 +113,20 @@ for s = 1:expParam.nSessions
       case {'recog'}
         recogCount = recogCount + 1;
         
+        if ~isfield(cfg.stim.(sesName).(phaseName)(recogCount),'familyNames')
+          cfg.stim.(sesName).(phaseName)(recogCount).familyNames = cfg.stim.familyNames;
+        end
+        
         if ~isfield(cfg.stim.(sesName).(phaseName)(recogCount),'usePrevPhase') || isempty(cfg.stim.(sesName).(phaseName)(recogCount).usePrevPhase)
           expParam.session.(sesName).(phaseName)(recogCount).allStims = cell(1,cfg.stim.(sesName).(phaseName)(recogCount).nBlocks);
           for b = 1:cfg.stim.(sesName).(phaseName)(recogCount).nBlocks
             for f = 1:length(cfg.stim.familyNames)
-              [expParam.session.(sesName).(phaseName)(recogCount).allStims{b},stimStruct(f).fStims] = et_divvyStims(...
-                stimStruct(f).fStims,expParam.session.(sesName).(phaseName)(recogCount).allStims{b},...
-                cfg.stim.(sesName).(phaseName)(recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(recogCount).nTestLure,...
-                cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{0});
+              if ismember(cfg.stim.familyNames{f},cfg.stim.(sesName).(phaseName)(recogCount).familyNames)
+                [expParam.session.(sesName).(phaseName)(recogCount).allStims{b},stimStruct(f).fStims] = et_divvyStims(...
+                  stimStruct(f).fStims,expParam.session.(sesName).(phaseName)(recogCount).allStims{b},...
+                  cfg.stim.(sesName).(phaseName)(recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(recogCount).nTestLure,...
+                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{0});
+              end
             end
           end
         end
@@ -239,14 +245,20 @@ if expParam.runPractice
         case {'prac_recog'}
           prac_recogCount = prac_recogCount + 1;
           
+          if ~isfield(cfg.stim.(sesName).(phaseName)(prac_recogCount),'familyNames')
+            cfg.stim.(sesName).(phaseName)(prac_recogCount).familyNames = cfg.stim.practice.familyNames;
+          end
+          
           if ~isfield(cfg.stim.(sesName).(phaseName)(prac_recogCount),'usePrevPhase') || isempty(cfg.stim.(sesName).(phaseName)(prac_recogCount).usePrevPhase)
             expParam.session.(sesName).(phaseName)(prac_recogCount).allStims = cell(1,cfg.stim.(sesName).(phaseName)(prac_recogCount).nBlocks);
             for b = 1:cfg.stim.(sesName).(phaseName)(prac_recogCount).nBlocks
-              for f = 1:length(cfg.stim.familyNames)
-                [expParam.session.(sesName).(phaseName)(prac_recogCount).allStims{b},stimStruct_prac(f).fStims] = et_divvyStims(...
-                  stimStruct_prac(f).fStims,expParam.session.(sesName).(phaseName)(prac_recogCount).allStims{b},...
-                  cfg.stim.(sesName).(phaseName)(prac_recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(prac_recogCount).nTestLure,...
-                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{1});
+              for f = 1:length(cfg.stim.practice.familyNames)
+                if ismember(cfg.stim.practice.familyNames{f},cfg.stim.(sesName).(phaseName)(recogCount).familyNames)
+                  [expParam.session.(sesName).(phaseName)(prac_recogCount).allStims{b},stimStruct_prac(f).fStims] = et_divvyStims(...
+                    stimStruct_prac(f).fStims,expParam.session.(sesName).(phaseName)(prac_recogCount).allStims{b},...
+                    cfg.stim.(sesName).(phaseName)(prac_recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(prac_recogCount).nTestLure,...
+                    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{1});
+                end
               end
             end
           end

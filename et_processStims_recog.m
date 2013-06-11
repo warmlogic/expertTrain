@@ -6,20 +6,22 @@ fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 
+if ~isfield(phaseCfg,'familyNames')
+  if ~phaseCfg.isExp
+    phaseCfg.familyNames = cfg.stim.practice.familyNames;
+  else
+    phaseCfg.familyNames = cfg.stim.familyNames;
+  end
+end
+
 % initialize for storing both families together
 expParam.session.(sesName).(phaseName)(phaseCount).targStims = cell(1,phaseCfg.nBlocks);
 expParam.session.(sesName).(phaseName)(phaseCount).lureStims = cell(1,phaseCfg.nBlocks);
 
-if ~phaseCfg.isExp
-  nFamilies = length(cfg.stim.practice.familyNames);
-else
-  nFamilies = length(cfg.stim.familyNames);
-end
-
 for b = 1:phaseCfg.nBlocks
   % this is for both practice and the real experiment
   
-  for f = 1:nFamilies
+  for f = 1:length(phaseCfg.familyNames)
     % targets
     [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_divvyStims(...
       expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},phaseCfg.nStudyTarg,...

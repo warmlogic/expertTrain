@@ -5,6 +5,14 @@ fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 
+if ~isfield(phaseCfg,'familyNames')
+  if ~phaseCfg.isExp
+    phaseCfg.familyNames = cfg.stim.practice.familyNames;
+  else
+    phaseCfg.familyNames = cfg.stim.familyNames;
+  end
+end
+
 % add the species in order from 1 to nSpecies; this is ok because, for each
 % subject, each species number corresonds to a random species letter, as
 % determined in et_saveStimList()
