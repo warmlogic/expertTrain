@@ -10,9 +10,9 @@ bgColor = 210;
 % type of mask to use.
 %
 % 'manual' expects to find a file in a FAMILY_mask dir
-processMask = 'manual';
+% processMask = 'manual';
 % % the threshold used by makeMask.m
-% processMask = 0.7;
+processMask = 0.7;
 
 cropImage = true;
 
@@ -38,10 +38,10 @@ if ischar(processMask) && strcmp(processMask,'manual')
   end
 end
 
-% any image manipulations to translate in the same way (cropImage = false
-% is required)
-% % manipulations = {};
-manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'invertab'}};
+% image manipulations to translate in the same way (cropImage = false; is
+% required)
+% manipulations = {};
+% manipulations = {{familyName}, {'g', 'g_hi8', 'g_lo8', 'invertab'}};
 
 outputDir = strcat(familyDir,'cent');
 if ~exist(outputDir,'dir')

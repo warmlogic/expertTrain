@@ -44,10 +44,13 @@ if ~exist('cropImage','var') || isempty(cropImage)
   cropImage = true;
 end
 
-if ~exist('cropImage','var') || isempty(cropImage)
-  cropImage = true;
+if ~exist('manipulations','var')
+  manipulations = {};
 end
-
+if ~isempty(manipulations) && cropImage == true
+  warning('when using manipulations, cropImage must be false; setting cropImage = false');
+  cropImage = false;
+end
 
 if ~exist('maskInfo','var') || isempty(maskInfo)
   maskInfo = [];
@@ -282,14 +285,15 @@ end
 
 %% do the translation
 
-[centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, bgColor, plotSteps);
+[centeredImage] = translateAroundCentroid(im_bb, leftCentroid, topCentroid, trans1_y, trans1_x, trans2_y, trans2_x, out_x, out_y, bgColor, plotSteps);
 
 %% are there manipulated images to prcess as well?
 
 if ~isempty(manipulations)
   [orig_path,current_file,ext] = fileparts(imageFile);
   
-  fNameInd = strfind(current_file,manipulations{1});
+  familyName = manipulations{1}{1};
+  fNameInd = strfind(current_file,familyName);
   speciesNameExemplarNum = current_file((fNameInd(1)+length(familyName)):end);
   speciesName = speciesNameExemplarNum(~isstrprop(speciesNameExemplarNum,'digit'));
   exemplarNumStr = speciesNameExemplarNum(isstrprop(speciesNameExemplarNum,'digit'));
@@ -297,7 +301,7 @@ if ~isempty(manipulations)
   % initialize to hold the centered manipualted images
   centeredManipImage = cell(1,length(manipulations{2}));
   for i = 1:length(manipulations{2})
-    manip_file = fullfile(strcat(orig_path,manipulations{2}{i}),sprintf('%s%s%s%s%s',familyName,manipulations{2}{i},speciesName,exemplarNumStr,ext));
+    manip_file = fullfile(strcat(orig_path,manipulations{2}{i}),sprintf('%s%s_%s%s%s',familyName,manipulations{2}{i},speciesName,exemplarNumStr,ext));
     if exist(manip_file,'file')
       im_manip = imread(manip_file);
     else
