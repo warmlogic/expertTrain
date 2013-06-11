@@ -12,7 +12,7 @@ function et_calcExpDuration(cfg,expParam,durLimit)
 % set some constant durations (in seconds)
 instructDur = 30;
 blinkBreakDur = 5;
-initialNetSetup = 600; % 5 min = 300 seconds
+initialNetSetup = 0; % 10 min = 600 seconds; 20 min = 1200 sec
 impedanceDur = 300; % 5 min = 300 seconds
 
 % initialize
@@ -466,7 +466,7 @@ for s = 1:expParam.nSessions
     end
     
     % add this phase to the session
-    sesDur = sesDur + phaseDur + initialNetSetup;
+    sesDur = sesDur + phaseDur;
   end % p
   
   if strcmp(durLimit,'min')
@@ -479,7 +479,7 @@ for s = 1:expParam.nSessions
   fprintf('session %s (%d/%d): %.2f min.\n',sesName,s,expParam.nSessions,(sesDur / 60));
   
   % add this session to the entire experiment
-  expDur = expDur + sesDur;
+  expDur = expDur + sesDur + initialNetSetup;
 end % s
 
 if strcmp(durLimit,'min')
