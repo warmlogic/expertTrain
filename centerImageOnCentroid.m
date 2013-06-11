@@ -1,5 +1,5 @@
-function [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,plotSteps)
-% function [centeredImage] = centerImageOnCentroid(imageFile,mask_file,centeredDims,bgColor,plotSteps)
+function [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,cropImage,plotSteps)
+% function [centeredImage] = centerImageOnCentroid(imageFile,mask_file,centeredDims,bgColor,cropImage,plotSteps)
 %
 % Description:
 %  Centers images on the centroid (center of mass). Expects images with
@@ -15,6 +15,8 @@ function [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims
 %  bgColor:      single scalar digit reperesenting the background color
 %                (e.g., 210 for gray). optional. Default: the most common
 %                color outside of the identified object.
+%  cropImage:    true/false. whether to crop the image. (Default: true)
+%  plotSteps:    true/false. whether to plot each step. (Default: false)
 %
 % Output:
 %  centeredImage: the image, centered on the centroid
@@ -27,6 +29,10 @@ function [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims
 
 if ~exist('plotSteps','var') || isempty(plotSteps)
   plotSteps = false;
+end
+
+if ~exist('cropImage','var') || isempty(cropImage)
+  cropImage = true;
 end
 
 if ~exist('maskInfo','var') || isempty(maskInfo)
@@ -121,16 +127,20 @@ if strcmp(processMaskType,'auto')
   L(L ~= 1) = 0;
 end
 
-% Get the bounding box around each object
-bb = regionprops(L, 'BoundingBox');
-%bbs = cat(1, bb.BoundingBox);
-thisBB = bb(1).BoundingBox;
-
-% trim the image to the bounding box
-im_bb = im(floor(thisBB(2)):(thisBB(4)+ceil(thisBB(2))),floor(thisBB(1)):(thisBB(3)+ceil(thisBB(1))),:);
-% im_bw_bb = im_bw(floor(bbs(2)):(bbs(4)+ceil(bbs(2))),floor(bbs(1)):(bbs(3)+ceil(bbs(1))),:);
-L_bb = L(floor(thisBB(2)):(thisBB(4)+ceil(thisBB(2))),floor(thisBB(1)):(thisBB(3)+ceil(thisBB(1))),:);
-
+if cropImage
+  % Get the bounding box around each object
+  bb = regionprops(L, 'BoundingBox');
+  %bbs = cat(1, bb.BoundingBox);
+  thisBB = bb(1).BoundingBox;
+  
+  % trim the image to the bounding box
+  im_bb = im(floor(thisBB(2)):(thisBB(4)+ceil(thisBB(2))),floor(thisBB(1)):(thisBB(3)+ceil(thisBB(1))),:);
+  % im_bw_bb = im_bw(floor(bbs(2)):(bbs(4)+ceil(bbs(2))),floor(bbs(1)):(bbs(3)+ceil(bbs(1))),:);
+  L_bb = L(floor(thisBB(2)):(thisBB(4)+ceil(thisBB(2))),floor(thisBB(1)):(thisBB(3)+ceil(thisBB(1))),:);
+else
+  im_bb = im;
+  L_bb = L;
+end
 % calculate the centroid
 stat = regionprops(L_bb, 'Centroid');
 %centroids = round(cat(1, stat.Centroid));

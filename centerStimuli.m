@@ -11,8 +11,10 @@ bgColor = 210;
 %
 % 'manual' expects to find a file in a FAMILY_mask dir
 processMask = 'manual';
-% a number is the threshold used by makeMask.m
-% processMask = 0.8;
+% % the threshold used by makeMask.m
+% processMask = 0.7;
+
+cropImage = true;
 
 plotSteps = false;
 
@@ -57,7 +59,8 @@ for i = 1:length(files)
     maskInfo = [];
   end
   
-  [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,plotSteps);
+  imageFile = '~/Desktop/birds/Original_340.bmp';
+  [centeredImage] = centerImageOnCentroid(imageFile,maskInfo,centeredDims,bgColor,cropImage,plotSteps);
   
   fNameInd = strfind(current_file,familyName);
   speciesNameExemplarNum = current_file((fNameInd(1)+length(familyName)):end);
