@@ -111,12 +111,12 @@ L_bb = L(floor(bbs(2)):(bbs(4)+ceil(bbs(2))),floor(bbs(1)):(bbs(3)+ceil(bbs(1)))
 % calculate the centroid
 stat = regionprops(L_bb, 'Centroid');
 centroids = round(cat(1, stat.Centroid));
-figure
-imshow(im_bb);
-hold on
-plot(centroids(:,1), centroids(:,2), 'r*');
-hold off
-title('centroid');
+% figure
+% imshow(im_bb);
+% hold on
+% plot(centroids(:,1), centroids(:,2), 'r*');
+% hold off
+% title('centroid');
 
 %% grow around the centroid so it is in the middle
 
@@ -134,6 +134,7 @@ elseif cent_x > (im_bb_x / 2)
   leftCentroid = false;
   centerXCentroid = false;
 else
+  leftCentroid = false;
   centerXCentroid = true;
 end
 
@@ -144,6 +145,7 @@ elseif cent_y > (im_bb_y / 2)
   topCentroid = false;
   centerYCentroid = false;
 else
+  topCentroid = false;
   centerYCentroid = true;
 end
 
@@ -177,6 +179,8 @@ if ~centerXCentroid
       trans2_x = 0;
     end
   end
+else
+  trans2_x = 0;
 end
 
 if ~centerYCentroid
@@ -209,6 +213,8 @@ if ~centerYCentroid
       trans2_y = 0;
     end
   end
+else
+  trans2_y = 0;
 end
 
 %% do the translation
