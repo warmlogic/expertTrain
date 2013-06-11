@@ -12,7 +12,8 @@ function et_calcExpDuration(cfg,expParam,durLimit)
 % set some constant durations (in seconds)
 instructDur = 30;
 blinkBreakDur = 5;
-initialNetSetup = 1200; % 10 min = 600 seconds; 20 min = 1200 sec
+%initialNetSetup = 1200; % 10 min = 600 seconds; 20 min = 1200 sec
+initialNetSetup = 0; % 10 min = 600 seconds; 20 min = 1200 sec
 impedanceDur = 300; % 5 min = 300 seconds
 
 % initialize
@@ -36,11 +37,11 @@ else
   fprintf(' Not using EEG.\n');
 end
 
-fprintf('Assuming %.1f min initial setup, %d sec instructions per phase, %d sec blink breaks, and %.1f min impedance breaks.\n',(initialNetSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
+fprintf('Assuming %.1f min initial setup per session, %d sec instructions per phase, %d sec blink breaks, and %.1f min impedance breaks.\n',(initialNetSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
 
 for s = 1:expParam.nSessions
   % initialize
-  sesDur = 0;
+  sesDur = initialNetSetup;
   
   % get the session name
   sesName = expParam.sesTypes{s};
@@ -479,7 +480,7 @@ for s = 1:expParam.nSessions
   fprintf('session %s (%d/%d): %.2f min.\n',sesName,s,expParam.nSessions,(sesDur / 60));
   
   % add this session to the entire experiment
-  expDur = expDur + sesDur + initialNetSetup;
+  expDur = expDur + sesDur;
 end % s
 
 if strcmp(durLimit,'min')
