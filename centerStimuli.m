@@ -20,7 +20,7 @@ plotSteps = false;
 
 % familyName = 'Finch_';
 familyName = 'Warbler_';
-imgDir = '/Users/matt/Documents/experiments/expertTrain/images/Birds';
+imgDir = '~/Documents/experiments/expertTrain/images/Birds';
 familyDir = fullfile(imgDir,familyName);
 if exist(familyDir,'dir')
   files = dir(fullfile(familyDir,'*.bmp'));
