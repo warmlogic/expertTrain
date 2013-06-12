@@ -174,7 +174,7 @@ if expParam.sessionNum == 1
     
     if cfg.stim.useSeparatePracStims
       cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Birds');
-      cfg.stim.practice.familyNames = {'Finch_cent_','Warbler_cent_'};
+      cfg.stim.practice.familyNames = {'Finch_','Warbler_'};
       cfg.stim.practice.nSpecies = 2;
       
       cfg.stim.practice.yokeSpecies = false;
