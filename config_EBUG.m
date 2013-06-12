@@ -37,29 +37,29 @@ incorrectSound = 'low';
 % matching task defaults
 matchTextPrompt = true;
 
-% Set the number of sessions
-expParam.nSessions = 9;
-
-% Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
-
-% set up a field for each session type
-expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
-expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
-expParam.session.train2.phases = {'match','name','match'};
-expParam.session.train3.phases = {'match','name','match'};
-expParam.session.train4.phases = {'match','name','match'};
-expParam.session.train5.phases = {'match','name','match'};
-expParam.session.train6.phases = {'match','name','match'};
-expParam.session.posttest.phases = {'match','prac_recog','recog'};
-expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
-
-% % demo - debug
-% expParam.nSessions = 2;
-% expParam.sesTypes = {'pretest','train1'};
+% % Set the number of sessions
+% expParam.nSessions = 9;
+% 
+% % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
+% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
+% 
 % % set up a field for each session type
-% expParam.session.pretest.phases = {'prac_match','prac_recog'};
-% expParam.session.train1.phases = {'prac_name','nametrain'};
+% expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
+% expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
+% expParam.session.train2.phases = {'match','name','match'};
+% expParam.session.train3.phases = {'match','name','match'};
+% expParam.session.train4.phases = {'match','name','match'};
+% expParam.session.train5.phases = {'match','name','match'};
+% expParam.session.train6.phases = {'match','name','match'};
+% expParam.session.posttest.phases = {'match','prac_recog','recog'};
+% expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
+
+% demo - debug
+expParam.nSessions = 2;
+expParam.sesTypes = {'pretest','train1'};
+% set up a field for each session type
+expParam.session.pretest.phases = {'prac_match','prac_recog'};
+expParam.session.train1.phases = {'prac_name','nametrain'};
 
 %% do some error checking
 
@@ -174,7 +174,7 @@ if expParam.sessionNum == 1
     
     if cfg.stim.useSeparatePracStims
       cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Birds');
-      cfg.stim.practice.familyNames = {'Finch_','Warbler_'};
+      cfg.stim.practice.familyNames = {'Finch_cent_','Warbler_cent_'};
       cfg.stim.practice.nSpecies = 2;
       
       cfg.stim.practice.yokeSpecies = false;
@@ -233,44 +233,52 @@ if expParam.sessionNum == 1
   % the experimenter's secret key to continue the experiment
   cfg.keys.expContinue = 'g';
   
+  % which row of keys to use in matching and recognition tasks. Can be
+  % 'upper' or 'middle'
+  cfg.keys.keyRow = 'upper';
+  
   % use spacebar for naming "other" family (basic-level naming)
   cfg.keys.otherKeyNames = {'space'};
   cfg.keys.s00 = KbName(cfg.keys.otherKeyNames{1});
-  % for i = 1:length(cfg.keys.otherKeyNames)
-  %   cfg.keys.(sprintf('s%.2d',i-1)) = KbName(cfg.keys.otherKeyNames{i});
-  % end
   
   % keys for naming particular species (subordinate-level naming)
-  
-  % upper row
-  cfg.keys.speciesKeyNames = {'q','w','e','r','v','n','u','i','o','p'};
-  % % middle row
-  % if ismac || isunix
-  %   cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
-  % elseif ispc
-  %   cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';'};
-  % end
+  if strcmp(cfg.keys.keyRow,'upper')
+    % upper row
+    cfg.keys.speciesKeyNames = {'q','w','e','r','v','n','u','i','o','p'};
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    % middle row
+    if ismac || isunix
+      cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';:'};
+    elseif ispc
+      cfg.keys.speciesKeyNames = {'a','s','d','f','v','n','j','k','l',';'};
+    end
+  end
   
   % set the species keys
   for i = 1:length(cfg.keys.speciesKeyNames)
     % sXX, where XX is an integer, buffered with a zero if i <= 9
-    %cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeyNames{cfg.keys.randKeyOrder(i)});
     cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeyNames{i});
   end
   
-  cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_black_upper.jpg');
-  %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_black_middle.jpg');
-  %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_white_upper.jpg');
-  %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_white_middle.jpg');
+  if strcmp(cfg.keys.keyRow,'upper')
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_black_upper.jpg');
+    %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_white_upper.jpg');
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_black_middle.jpg');
+    %cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_white_middle.jpg');
+  end
+  
   % scale image down (< 1) or up (> 1)
   cfg.files.speciesNumKeyImgScale = 0.6;
   
   % subordinate matching keys (counterbalanced based on subNum 1-5, 6-0)
-  
-  % upper row
-  cfg.keys.matchKeyNames = {'r','u'};
-  % % middle row
-  % cfg.keys.matchKeyNames = {'f','j'};
+  if strcmp(cfg.keys.keyRow,'upper')
+    % upper row
+    cfg.keys.matchKeyNames = {'r','u'};
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    % middle row
+    cfg.keys.matchKeyNames = {'f','j'};
+  end
   if expParam.is15
     cfg.keys.matchSame = KbName(cfg.keys.matchKeyNames{1});
     cfg.keys.matchDiff = KbName(cfg.keys.matchKeyNames{2});
@@ -280,15 +288,17 @@ if expParam.sessionNum == 1
   end
   
   % recognition keys
-  
-  % upper row
-  cfg.keys.recogKeyNames = {{'q','w','e','r','u'},{'r','u','i','o','p'}};
-  % % middle row
-  % if ismac || isunix
-  %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
-  % elseif ispc
-  %   cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
-  % end
+  if strcmp(cfg.keys.keyRow,'upper')
+    % upper row
+    cfg.keys.recogKeyNames = {{'q','w','e','r','u'},{'r','u','i','o','p'}};
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    % middle row
+    if ismac || isunix
+      cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
+    elseif ispc
+      cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
+    end
+  end
   
   % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
   if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
@@ -309,11 +319,15 @@ if expParam.sessionNum == 1
     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
   end
   
-  cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_upper_%d.jpg',cfg.keys.recogKeySet));
-  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_middle_%d.jpg',cfg.keys.recogKeySet));
-  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
-  %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
+  if strcmp(cfg.keys.keyRow,'upper')
+    cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_upper_%d.jpg',cfg.keys.recogKeySet));
+    %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_middle_%d.jpg',cfg.keys.recogKeySet));
+    %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
+  end
   %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recog_test_resp%d.jpg',cfg.keys.recogKeySet));
+  
   % scale image down (< 1) or up (> 1)
   cfg.files.recogTestRespKeyImgScale = 0.6;
   

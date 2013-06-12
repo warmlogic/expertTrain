@@ -74,10 +74,10 @@ incorrectColor = uint8((rgb('Red') * 255) + 0.5);
 
 % if we're using matchTextPrompt
 if phaseCfg.matchTextPrompt
-  if strcmp(KbName(cfg.keys.matchSame),'f')
+  if strcmp(KbName(cfg.keys.matchSame),'f') || strcmp(KbName(cfg.keys.matchSame),'r')
     leftKey = cfg.text.matchSame;
     rightKey = cfg.text.matchDiff;
-  elseif strcmp(KbName(cfg.keys.matchSame),'j')
+  elseif strcmp(KbName(cfg.keys.matchSame),'j') || strcmp(KbName(cfg.keys.matchSame),'u')
     leftKey = cfg.text.matchDiff;
     rightKey = cfg.text.matchSame;
   end
