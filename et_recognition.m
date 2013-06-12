@@ -100,8 +100,7 @@ DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.t
 Screen('Flip', w);
 % Wait before starting trial
 WaitSecs(5.000);
-% Clear screen to background color (our 'gray' as set at the
-% beginning):
+% Clear screen to background color (our 'gray' as set at the beginning):
 Screen('Flip', w);
 
 %% Run recognition study and test
