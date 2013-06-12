@@ -9,17 +9,27 @@ function et_calcExpDuration(cfg,expParam,durLimit)
 %  'max': responses limits are maximum length
 %
 
+% duration to set up experiment (consent forms, EEG net, etc.)
+%
+% 10 min = 600 sec; 20 min = 1200 sec; 30 m = 1800 sec
+if expParam.useNS
+  initialSetup = 1800;
+  %initialSetup = 0;
+else
+  initialSetup = 600;
+  %initialSetup = 0;
+end
+
+% duration of impedance breaks
+if expParam.useNS
+  impedanceDur = 300; % 5 min = 300 seconds
+else
+  impedanceDur = 0;
+end
+
 % set some constant durations (in seconds)
 instructDur = 30;
 blinkBreakDur = 5;
-impedanceDur = 300; % 5 min = 300 seconds
-
-% 10 min = 600 sec; 20 min = 1200 sec; 30 m = 1800 sec
-initialNetSetup = 1800;
-% initialNetSetup = 0;
-
-% initialize
-expDur = 0;
 
 if ~exist('durLimit','var') || isempty(durLimit) || (~strcmp(durLimit,'min') && ~strcmp(durLimit,'med') && ~strcmp(durLimit,'max'))
   error('durLimit variable not set properly! Must be ''min'',''med'', or ''max''.');
@@ -33,17 +43,25 @@ elseif strcmp(durLimit,'max')
   fprintf('\nMAXIMUM %s experiment duration (responses limits are maximum length).',expParam.expName);
 end
 
+% print whether using EEG and initialize experiment duration
 if expParam.useNS
   fprintf(' Using EEG.\n');
+  expDur = expParam.baselineRecordSecs;
 else
   fprintf(' Not using EEG.\n');
+  expDur = 0;
 end
 
-fprintf('Assuming %.1f min initial setup per session, %d sec instructions per phase, %d sec blink breaks, and %.1f min impedance breaks.\n',(initialNetSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
+% summarize
+if expParam.useNS
+  fprintf('Assuming %.1f min initial setup per session, %d sec instructions per phase, %d sec blink breaks, and %.1f min impedance breaks.\n',(initialSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
+else
+  fprintf('Assuming %.1f min initial setup per session, %d sec instructions per phase, and %d sec (blink) breaks.\n',(initialSetup / 60),instructDur,blinkBreakDur);
+end
 
 for s = 1:expParam.nSessions
-  % initialize
-  sesDur = initialNetSetup;
+  % initialize this session duration
+  sesDur = initialSetup;
   
   % get the session name
   sesName = expParam.sesTypes{s};
