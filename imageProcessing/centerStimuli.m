@@ -1,4 +1,3 @@
-
 %% set up files
 
 centeredDims = [450 450];
