@@ -26,11 +26,11 @@ if ~exist('durLimit','var') || isempty(durLimit) || (~strcmp(durLimit,'min') && 
 end
 
 if strcmp(durLimit,'min')
-  fprintf('MINIMUM %s experiment duration (responses limits are 0 sec).',expParam.expName);
+  fprintf('\nMINIMUM %s experiment duration (responses limits are 0 sec).',expParam.expName);
 elseif strcmp(durLimit,'med')
-  fprintf('MEDIUM %s experiment duration (responses limits are half length).',expParam.expName);
+  fprintf('\nMEDIUM %s experiment duration (responses limits are half length).',expParam.expName);
 elseif strcmp(durLimit,'max')
-  fprintf('MAXIMUM %s experiment duration (responses limits are maximum length).',expParam.expName);
+  fprintf('\nMAXIMUM %s experiment duration (responses limits are maximum length).',expParam.expName);
 end
 
 if expParam.useNS
@@ -383,7 +383,7 @@ for s = 1:expParam.nSessions
     fprintf('phase %s (%d/%d):\t%.2f min.\n',phaseName,p,length(expParam.session.(sesName).phases),(phaseDur / 60));
     
     if cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase
-      fprintf('%d impedance break before %s begins.\n',nImpedanceBreaks_before,phaseName);
+      fprintf('\t\t\t%d impedance break before %s begins.\n',nImpedanceBreaks_before,phaseName);
     end
     
     if strcmp(phaseName,'nametrain')
