@@ -43,25 +43,24 @@ elseif strcmp(durLimit,'max')
   fprintf('\nMAXIMUM %s experiment duration (responses limits are maximum length).',expParam.expName);
 end
 
-% print whether using EEG and initialize experiment duration
-if expParam.useNS
-  fprintf(' Using EEG.\n');
-  expDur = expParam.baselineRecordSecs;
-else
-  fprintf(' Not using EEG.\n');
-  expDur = 0;
-end
+% initialize experiment duration
+expDur = 0;
 
 % summarize
 if expParam.useNS
+  fprintf(' Using EEG.\n');
   fprintf('Assuming %.1f min initial setup per session, %d sec instructions per phase, %d sec blink breaks, and %.1f min impedance breaks.\n',(initialSetup / 60),instructDur,blinkBreakDur,(impedanceDur / 60));
 else
+  fprintf(' Not using EEG.\n');
   fprintf('Assuming %.1f min initial setup per session, %d sec instructions per phase, and %d sec (blink) breaks.\n',(initialSetup / 60),instructDur,blinkBreakDur);
 end
 
 for s = 1:expParam.nSessions
   % initialize this session duration
   sesDur = initialSetup;
+  if expParam.useNS
+    sesDur = sesDur + expParam.baselineRecordSecs;
+  end
   
   % get the session name
   sesName = expParam.sesTypes{s};
@@ -315,26 +314,31 @@ for s = 1:expParam.nSessions
             nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
           elseif strcmp(phaseName,'viewname')
             % only has 1 impedance break, so we don't want to subtract it
-            nImpedanceBreaks_view = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-            nImpedanceBreaks_name = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-            nImpedanceBreaks = nImpedanceBreaks_view + nImpedanceBreaks_name;
+            %nImpedanceBreaks_view = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
+            %nImpedanceBreaks_name = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
+            %nImpedanceBreaks = nImpedanceBreaks_view + nImpedanceBreaks_name;
+            nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
           elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-            nImpedanceBreaks_study = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
-            nImpedanceBreaks_test = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
-            nImpedanceBreaks = nImpedanceBreaks_study + nImpedanceBreaks_test;
+            %nImpedanceBreaks_study = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
+            %nImpedanceBreaks_test = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
+            %nImpedanceBreaks = nImpedanceBreaks_study + nImpedanceBreaks_test;
+            nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
           else
             nImpedanceBreaks = floor(nBlocks / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks) - 1;
           end
         end
       else
         if strcmp(phaseName,'viewname')
-          nImpedanceBreaks_view = 0;
-          nImpedanceBreaks_name = 0;
+          %nImpedanceBreaks_view = 0;
+          %nImpedanceBreaks_name = 0;
+          nImpedanceBreaks = 0;
         elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-          nImpedanceBreaks_study = 0;
-          nImpedanceBreaks_test = 0;
+          %nImpedanceBreaks_study = 0;
+          %nImpedanceBreaks_test = 0;
+          nImpedanceBreaks = 0;
+        else
+          nImpedanceBreaks = 0;
         end
-        nImpedanceBreaks = 0;
       end
       % real and practice phases can have impedanceBeforePhase
       if cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase
@@ -344,19 +348,31 @@ for s = 1:expParam.nSessions
       end
     else
       if strcmp(phaseName,'viewname')
-        nImpedanceBreaks_view = 0;
-        nImpedanceBreaks_name = 0;
+        %nImpedanceBreaks_view = 0;
+        %nImpedanceBreaks_name = 0;
+        nImpedanceBreaks = 0;
       elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
-        nImpedanceBreaks_study = 0;
-        nImpedanceBreaks_test = 0;
+        %nImpedanceBreaks_study = 0;
+        %nImpedanceBreaks_test = 0;
+        nImpedanceBreaks = 0;
+      else
+        nImpedanceBreaks = 0;
       end
-      nImpedanceBreaks = 0;
     end
     
-    if strcmp(phaseName,'viewname')
+    if strcmp(phaseName,'nametrain')
       % calculate the phase duration without blink breaks
-      phaseDur_view = instructDur + (trialDur_view * nTrials_view) + (nImpedanceBreaks_view * impedanceDur);
-      phaseDur_name = instructDur + (trialDur_name * nTrials_name) + (nImpedanceBreaks_name * impedanceDur);
+      phaseDur = instructDur + (trialDur * nTrials);
+      % calculate the number of blink breaks
+      nBlinkBreaks = floor((trialDur * nTrials) / cfg.stim.secUntilBlinkBreak);
+      % calculate the full phase duration
+      phaseDur = phaseDur + (nBlinkBreaks * blinkBreakDur) + (nImpedanceBreaks_before * impedanceDur) + (nImpedanceBreaks * impedanceDur);
+    elseif strcmp(phaseName,'viewname')
+      % calculate the phase duration without blink breaks
+      %phaseDur_view = instructDur + (trialDur_view * nTrials_view) + (nImpedanceBreaks_view * impedanceDur);
+      %phaseDur_name = instructDur + (trialDur_name * nTrials_name) + (nImpedanceBreaks_name * impedanceDur);
+      phaseDur_view = instructDur + (trialDur_view * nTrials_view);
+      phaseDur_name = instructDur + (trialDur_name * nTrials_name);
       
       % calculate the number of blink breaks
       nBlinkBreaks_view = floor((trialDur_view * nTrials_view) / cfg.stim.secUntilBlinkBreak);
@@ -366,11 +382,13 @@ for s = 1:expParam.nSessions
       % calculate the full phase duration
       phaseDur_view = phaseDur_view + (nBlinkBreaks_view * blinkBreakDur);
       phaseDur_name = phaseDur_name + (nBlinkBreaks_name * blinkBreakDur);
-      phaseDur = phaseDur_view + phaseDur_name + (nImpedanceBreaks_before * impedanceDur);
+      phaseDur = phaseDur_view + phaseDur_name + (nImpedanceBreaks_before * impedanceDur) + (nImpedanceBreaks * impedanceDur);
     elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
       % calculate the phase duration without blink breaks
-      phaseDur_study = instructDur + (trialDur_study * nTrials_study) + (nImpedanceBreaks_study * impedanceDur);
-      phaseDur_test = instructDur + (trialDur_test * nTrials_test) + (nImpedanceBreaks_test * impedanceDur);
+      %phaseDur_study = instructDur + (trialDur_study * nTrials_study) + (nImpedanceBreaks_study * impedanceDur);
+      %phaseDur_test = instructDur + (trialDur_test * nTrials_test) + (nImpedanceBreaks_test * impedanceDur);
+      phaseDur_study = instructDur + (trialDur_study * nTrials_study);
+      phaseDur_test = instructDur + (trialDur_test * nTrials_test);
       
       % calculate the number of blink breaks
       nBlinkBreaks_study = floor((trialDur_study * nTrials_study) / cfg.stim.secUntilBlinkBreak);
@@ -380,7 +398,7 @@ for s = 1:expParam.nSessions
       % calculate the full phase duration
       phaseDur_study = phaseDur_study + (nBlinkBreaks_study * blinkBreakDur);
       phaseDur_test = phaseDur_test + (nBlinkBreaks_test * blinkBreakDur);
-      phaseDur = phaseDur_study + phaseDur_test + (nImpedanceBreaks_before * impedanceDur);
+      phaseDur = phaseDur_study + phaseDur_test + (nImpedanceBreaks_before * impedanceDur) + (nImpedanceBreaks * impedanceDur);
     else
       % calculate the phase duration without blink breaks
       phaseDur = instructDur + (trialDur * nTrials) + (nImpedanceBreaks * impedanceDur);
@@ -410,72 +428,38 @@ for s = 1:expParam.nSessions
     
     if strcmp(phaseName,'viewname')
       fprintf('\t\t\t%d blocks:\n',nBlocks);
+      
       fprintf('\t\t\t%d view trials (%.2f min/phase @ %.2f sec/trial)',nTrials_view,((trialDur_view * nTrials_view) / 60),trialDur_view);
-      fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_view,cfg.stim.secUntilBlinkBreak);
-      if expParam.useNS
-        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          fprintf(', %d impedance breaks during',nImpedanceBreaks_view);
-          if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nTrials')
-            fprintf(' (every %d trials).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials);
-          elseif isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nBlocks')
-            fprintf(' (every %d blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-          end
-        else
-          fprintf(', no impdance breaks during practice.\n');
-        end
-      else
-        fprintf('.\n');
-      end
+      fprintf(', %d blink breaks (every %d sec).\n',nBlinkBreaks_view,cfg.stim.secUntilBlinkBreak);
+      
       fprintf('\t\t\t%d name trials (%.2f min/phase @ %.2f sec/trial)',nTrials_name,((trialDur_name * nTrials_name) / 60),trialDur_name);
-      fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_name,cfg.stim.secUntilBlinkBreak);
+      fprintf(', %d blink breaks (every %d sec).\n',nBlinkBreaks_name,cfg.stim.secUntilBlinkBreak);
+      
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          fprintf(', %d impedance breaks during',nImpedanceBreaks_name);
-          if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nTrials')
-            fprintf(' (every %d trials).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials);
-          elseif isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nBlocks')
-            fprintf(' (every %d blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-          end
+          fprintf('\t\t\t%d impedance breaks',nImpedanceBreaks);
+          fprintf(' (every %d view-name blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
         else
-          fprintf(', no impdance breaks during practice.\n');
+          fprintf('\t\t\tNo impedance breaks during practice.\n');
         end
-      else
-        fprintf('.\n');
       end
       
     elseif strcmp(phaseName,'recog') || strcmp(phaseName,'prac_recog')
       fprintf('\t\t\t%d blocks:\n',nBlocks);
+      
       fprintf('\t\t\t%d study trials (%.2f min/phase @ %.2f sec/trial)',nTrials_study,((trialDur_study * nTrials_study) / 60),trialDur_study);
-      fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_study,cfg.stim.secUntilBlinkBreak);
-      if expParam.useNS
-        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          fprintf(', %d impedance breaks during',nImpedanceBreaks_study);
-          if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nTrials')
-            fprintf(' (every %d trials).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials);
-          elseif isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nBlocks')
-            fprintf(' (every %d blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-          end
-        else
-          fprintf(', no impdance breaks during practice.\n');
-        end
-      else
-        fprintf('.\n');
-      end
+      fprintf(', %d blink breaks (every %d sec).\n',nBlinkBreaks_study,cfg.stim.secUntilBlinkBreak);
+      
       fprintf('\t\t\t%d test trials (%.2f min/phase @ %.2f sec/trial)',nTrials_test,((trialDur_test * nTrials_test) / 60),trialDur_test);
-      fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks_test,cfg.stim.secUntilBlinkBreak);
+      fprintf(', %d blink breaks (every %d sec).\n',nBlinkBreaks_test,cfg.stim.secUntilBlinkBreak);
+      
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          fprintf(', %d impedance breaks during',nImpedanceBreaks_test);
-          if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nTrials')
-            fprintf(' (every %d trials).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials);
-          elseif isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nBlocks')
-            fprintf(' (every %d blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
-          end
+          fprintf('\t\t\t%d impedance breaks',nImpedanceBreaks);
+            fprintf(' (every %d study-test blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
         else
-          fprintf(', no impdance breaks during practice.\n');
+          fprintf('\t\t\tNo impedance breaks during practice.\n');
         end
-      else
-        fprintf('.\n');
       end
       
     else
@@ -483,14 +467,14 @@ for s = 1:expParam.nSessions
       fprintf(', %d blink breaks (every %d sec)',nBlinkBreaks,cfg.stim.secUntilBlinkBreak);
       if expParam.useNS
         if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          fprintf(', %d impedance breaks during',nImpedanceBreaks);
+          fprintf(', %d impedance breaks',nImpedanceBreaks);
           if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nTrials')
             fprintf(' (every %d trials).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials);
           elseif isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nBlocks')
             fprintf(' (every %d blocks).\n',cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks);
           end
         else
-          fprintf(', no impdance breaks during practice.\n');
+          fprintf(', no impedance breaks during practice.\n');
         end
       else
         fprintf('.\n');
