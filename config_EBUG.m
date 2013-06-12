@@ -421,13 +421,13 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).matchTextPrompt = matchTextPrompt;
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.5;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim1 = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim2 = 0.8;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
@@ -487,13 +487,13 @@ if expParam.sessionNum == 1
         end
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.5;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim1 = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim2 = 0.8;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
@@ -976,13 +976,13 @@ if expParam.sessionNum == 1
         end
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.5;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim1 = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim2 = 0.8;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
@@ -1056,13 +1056,13 @@ if expParam.sessionNum == 1
           end
           
           % durations, in seconds
-          cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.0;
+          cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.5;
           cfg.stim.(sesName).(phaseName)(phaseNum).match_stim1 = 0.8;
           cfg.stim.(sesName).(phaseName)(phaseNum).match_stim2 = 0.8;
           % random intervals are generated on the fly
           cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
           cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-          cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
+          cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
           
           % do we want to play feedback beeps for no response?
           cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
@@ -1173,13 +1173,13 @@ if expParam.sessionNum == 1
         end
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.5;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim1 = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim2 = 0.8;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
@@ -1336,13 +1336,13 @@ if expParam.sessionNum == 1
         end
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_isi = 0.5;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim1 = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseNum).match_stim2 = 0.8;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
