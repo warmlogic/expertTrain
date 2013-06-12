@@ -27,7 +27,7 @@ if expParam.useNS
   % % D464
   % expParam.NSHost = '128.138.223.26'
   
-  expParam.baselineRecordSecs = 10.0;
+  expParam.baselineRecordSecs = 20.0;
 end
 
 % sound defaults
@@ -746,7 +746,11 @@ if expParam.sessionNum == 1
       if ismember(phaseName,expParam.session.(sesName).phases)
         for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
           cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
-          cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
+          if phaseNum == 3
+            cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = true;
+          else
+            cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
+          end
           
           % only use stimuli from particular families
           cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = {'Finch_', 'Warbler_'};
