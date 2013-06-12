@@ -202,8 +202,8 @@ try
   if expParam.useNS
     Screen('TextSize', w, cfg.text.basicTextSize);
     % put wait for experimenter instructions on screen
-    message = 'Experimenter:\nStart the Net Station application, apply the EEG cap, and check impedance measures...\n';
-    DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
+    message = 'Experimenter:\nStart the Net Station application, apply the EEG cap, and check impedance measures...';
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
     % wait until g key is held for ~1 seconds
@@ -230,8 +230,8 @@ try
   if expParam.useNS && expParam.baselineRecordSecs > 0
     Screen('TextSize', w, cfg.text.basicTextSize);
     %display instructions
-    baselineMsg = sprintf('The experimenter will now record baseline activity\nPlease remain still...');
-    DrawFormattedText(w, baselineMsg, 'center', 'center');
+    baselineMsg = sprintf('The experimenter will now record baseline activity.\nPlease remain still...');
+    DrawFormattedText(w, baselineMsg, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
     % wait until g key is held for ~1 seconds
@@ -242,18 +242,21 @@ try
     [NSStartStatus, NSStartError] = NetStation('StartRecording');
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
     Screen('Flip', w);
-    WaitSecs(5);
+    WaitSecs(5.0);
     
     [NSEventStatus, NSEventError] = NetStation('Event', 'REST', GetSecs, .001); % tag the start of the rest period
     
     % draw a countdown -- no need for super accurate timing here
     Screen('TextSize', w, cfg.text.basicTextSize);
-    for sec = baselineRecordSecs:-1:1
+    for sec = expParam.baselineRecordSecs:-1:1
       DrawFormattedText(w, num2str(sec), 'center', 'center');
       Screen('Flip', w);
       fprintf('%s ', num2str(sec));
       WaitSecs(1.0);
     end
+    
+    [NSEventStatus, NSEventError] = NetStation('Event', 'DONE', GetSecs, .001); % tag the end of the rest period
+    
     % stop recording
     [NSStopStatus, NSStopError] = NetStation('StopRecording');
   end
@@ -266,7 +269,7 @@ try
     [NSStartStatus, NSStartError] = NetStation('StartRecording');
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
     Screen('Flip', w);
-    WaitSecs(5);
+    WaitSecs(5.0);
   end
   
   %% Run through the experiment
@@ -385,7 +388,7 @@ try
   message = sprintf('Thank you, this session is complete.\n\nPlease wait for the experimenter.');
   Screen('TextSize', w, cfg.text.basicTextSize);
   % put the instructions on the screen
-  DrawFormattedText(w, message, 'center', 'center');
+  DrawFormattedText(w, message, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
   % Update the display to show the message:
   Screen('Flip', w);
   
