@@ -20,8 +20,8 @@ plotSteps = false;
 
 familyName = 'Finch_';
 % familyName = 'Warbler_';
-% imgDir = '~/Documents/experiments/expertTrain/images/Birds';
-imgDir = '~/Downloads/croppedbirds/Birds';
+imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+% imgDir = '~/Downloads/croppedbirds/Birds';
 familyDir = fullfile(imgDir,familyName);
 if exist(familyDir,'dir')
   files = dir(fullfile(familyDir,'*.bmp'));
@@ -72,7 +72,7 @@ for i = 1:length(files)
   speciesName = speciesNameExemplarNum(~isstrprop(speciesNameExemplarNum,'digit'));
   exemplarNumStr = speciesNameExemplarNum(isstrprop(speciesNameExemplarNum,'digit'));
   
-  outputFile = fullfile(outputDir,strcat(familyName,speciesName,'cent_',exemplarNumStr,ext));
+  outputFile = fullfile(outputDir,strcat(familyName,'cent_',speciesName,exemplarNumStr,ext));
   imwrite(centeredImage,outputFile);
   
   if ~isempty(manipulations)
@@ -82,7 +82,7 @@ for i = 1:length(files)
         mkdir(manip_outputDir);
       end
 
-      manip_outputFile = fullfile(manip_outputDir,sprintf('%s%s_%scent_%s%s',familyName,manipulations{2}{m},speciesName,exemplarNumStr,ext));
+      manip_outputFile = fullfile(manip_outputDir,sprintf('%s%s_cent_%s%s%s',familyName,manipulations{2}{m},speciesName,exemplarNumStr,ext));
       imwrite(manipulatedImages{m},manip_outputFile);
     end
 
