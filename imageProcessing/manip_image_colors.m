@@ -1,4 +1,4 @@
-function manip_image_colors(swap_flag,invert_flag,manualMask,save_gray)
+function manip_image_colors(swap_flag,invert_flag,manualMask,save_gray,plot_flag)
 % function manip_image_colors(swap_flag,invert_flag,manualMask,save_gray)
 %
 % swap_flag:   to swap colors (1 or 0) (default: 0)
@@ -8,6 +8,7 @@ function manip_image_colors(swap_flag,invert_flag,manualMask,save_gray)
 % manualMask:  look for a manually created mask file (default: false)
 % save_gray:   whether to save the grayscale and inverted gray (default:
 %              false)
+% plot_flag:  true/false, if you want to see some plots (default: false)
 %
 % NB: requires functions makeMask.m and modifyLab.m
 %
@@ -33,20 +34,23 @@ end
 if ~exist('save_gray','var') || isempty(save_gray)
   save_gray = false;
 end
-
-close all
-
-% colour conversion structures:
-C2lab = makecform('srgb2lab');
-C2rgb = makecform('lab2srgb');
+if ~exist('plot_flag','var') || isempty(plot_flag)
+  plot_flag = false;
+end
 
 % set background gray level:
 val = 210;
 
 familyName = 'Finch_';
 % familyName = 'Warbler_';
+imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+% imgDir = '~/Downloads/croppedbirds/Birds';
+
+% familyName = 'Perching_';
+% % familyName = 'Wading_';
 % imgDir = '~/Documents/experiments/expertTrain/images/Birds';
-imgDir = '~/Downloads/croppedbirds/Birds';
+% % imgDir = '~/Downloads/croppedbirds/PracticeBirds';
+
 familyDir = fullfile(imgDir,familyName);
 if exist(familyDir,'dir')
   files = dir(fullfile(familyDir,'*.bmp'));
@@ -67,6 +71,10 @@ if manualMask
 else
   thresh = repmat(0.7,size(files));
 end
+
+% colour conversion structures:
+C2lab = makecform('srgb2lab');
+C2rgb = makecform('lab2srgb');
 
 % loop through files
 for i = 1:length(files)
@@ -176,15 +184,19 @@ end
 
 fprintf('Done.\n');  
 
-figure(1);
-imshow(rgb_img);
-title(sprintf('normal%s%s',swap_nm,invert_nm));
-figure(2);
-imshow(msk);
-title('mask');
-figure(3);
-imshow(LL);
-title('gray');
-figure(4);
-imshow(imr);
-title('gray reversed');
+if plot_flag
+  figure(1);
+  imshow(rgb_img);
+  title(sprintf('normal%s%s',swap_nm,invert_nm));
+  figure(2);
+  imshow(msk);
+  title('mask');
+  figure(3);
+  imshow(LL);
+  title('gray');
+  if save_gray
+    figure(4);
+    imshow(imr);
+    title('gray reversed');
+  end
+end

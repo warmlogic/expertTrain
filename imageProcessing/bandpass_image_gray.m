@@ -13,7 +13,7 @@ function bandpass_image_gray(freq,low_pass,manualMask,plot_flag,show_image)
 %
 % see also: MAKEMASK, FFT_FILTER
 
-% bandpass_image_gray(8,1,true,false,false);bandpass_image_gray(8,0,true,false,false);
+% bandpass_image_gray(8,1,true,false,false);bandpass_image_gray(8,0,true,false,false);bandpass_image_gray(8,-1,true,false,false);
 
 if ~exist('freq','var')
   freq = 8;
@@ -31,14 +31,18 @@ if ~exist('show_image','var') || isempty(show_image)
   show_image = false;
 end
 
-close all
-
 val = 210;
 
 familyName = 'Finch_';
 % familyName = 'Warbler_';
+imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+% imgDir = '~/Downloads/croppedbirds/Birds';
+
+% familyName = 'Perching_';
+% % familyName = 'Wading_';
 % imgDir = '~/Documents/experiments/expertTrain/images/Birds';
-imgDir = '~/Downloads/croppedbirds/Birds';
+% % imgDir = '~/Downloads/croppedbirds/PracticeBirds';
+
 familyDir = fullfile(imgDir,familyName);
 if exist(familyDir,'dir')
   files = dir(fullfile(familyDir,'*.bmp'));

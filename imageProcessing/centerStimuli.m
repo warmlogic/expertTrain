@@ -21,6 +21,12 @@ familyName = 'Finch_';
 % familyName = 'Warbler_';
 imgDir = '~/Documents/experiments/expertTrain/images/Birds';
 % imgDir = '~/Downloads/croppedbirds/Birds';
+
+% familyName = 'Perching_';
+% % familyName = 'Wading_';
+% imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+% % imgDir = '~/Downloads/croppedbirds/PracticeBirds';
+
 familyDir = fullfile(imgDir,familyName);
 if exist(familyDir,'dir')
   files = dir(fullfile(familyDir,'*.bmp'));
