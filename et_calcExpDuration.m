@@ -21,7 +21,7 @@ initialNetSetup = 1800;
 % initialize
 expDur = 0;
 
-if ~exist('durLimit','var') || isempty(durLimit) || ~strcmp(durLimit,'min') || ~strcmp(durLimit,'med') || ~strcmp(durLimit,'max')
+if ~exist('durLimit','var') || isempty(durLimit) || (~strcmp(durLimit,'min') && ~strcmp(durLimit,'med') && ~strcmp(durLimit,'max'))
   error('durLimit variable not set properly! Must be ''min'',''med'', or ''max''.');
 end
 
