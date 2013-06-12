@@ -135,7 +135,7 @@ if expParam.sessionNum == 1
   
   % family names correspond to the directories in which stimuli reside;
   % includes manipulations
-  cfg.stim.familyNames = {'Finch_', 'Finch_g', 'Finch_g_hi8', 'Finch_g_lo8', 'Finch_invertab', 'Warbler_', 'Warbler_g', 'Warbler_g_hi8', 'Warbler_g_lo8', 'Warbler_invertab'};
+  cfg.stim.familyNames = {'Finch_', 'Finch_g_', 'Finch_g_hi8_', 'Finch_g_lo8_', 'Finch_color_', 'Warbler_', 'Warbler_g_', 'Warbler_g_hi8_', 'Warbler_g_lo8_', 'Warbler_color_'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
@@ -492,6 +492,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
@@ -841,6 +846,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
@@ -922,6 +932,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
+        
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...

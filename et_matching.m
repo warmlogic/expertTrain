@@ -454,7 +454,7 @@ for i = 1:length(stim2Tex)
     end
   end
   
-  if phaseCfg.playSound && ~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown)
+  if phaseCfg.playSound && (~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown))
     Beeper(respSound);
   end
   Screen('TextSize', w, cfg.text.instructTextSize);

@@ -37,29 +37,29 @@ incorrectSound = 'low';
 % matching task defaults
 matchTextPrompt = true;
 
-% % Set the number of sessions
-% expParam.nSessions = 9;
-% 
-% % Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-% expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
-% 
-% % set up a field for each session type
-% expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
-% expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
-% expParam.session.train2.phases = {'match','name','match'};
-% expParam.session.train3.phases = {'match','name','match'};
-% expParam.session.train4.phases = {'match','name','match'};
-% expParam.session.train5.phases = {'match','name','match'};
-% expParam.session.train6.phases = {'match','name','match'};
-% expParam.session.posttest.phases = {'match','prac_recog','recog'};
-% expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
+% Set the number of sessions
+expParam.nSessions = 9;
 
-% demo - debug
-expParam.nSessions = 2;
-expParam.sesTypes = {'pretest','train1'};
+% Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
+expParam.sesTypes = {'pretest','train1','train2','train3','train4','train5','train6','posttest','posttest_delay'};
+
 % set up a field for each session type
-expParam.session.pretest.phases = {'prac_match','prac_recog'};
-expParam.session.train1.phases = {'prac_name','nametrain'};
+expParam.session.pretest.phases = {'prac_match','match','prac_recog','recog'};
+expParam.session.train1.phases = {'prac_name','nametrain','name','match'};
+expParam.session.train2.phases = {'match','name','match'};
+expParam.session.train3.phases = {'match','name','match'};
+expParam.session.train4.phases = {'match','name','match'};
+expParam.session.train5.phases = {'match','name','match'};
+expParam.session.train6.phases = {'match','name','match'};
+expParam.session.posttest.phases = {'match','prac_recog','recog'};
+expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
+
+% % demo - debug
+% expParam.nSessions = 2;
+% expParam.sesTypes = {'pretest','train1'};
+% % set up a field for each session type
+% expParam.session.pretest.phases = {'prac_match','prac_recog'};
+% expParam.session.train1.phases = {'prac_name','nametrain'};
 
 %% do some error checking
 
@@ -490,6 +490,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
+        % do we want to play feedback beeps?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
@@ -535,6 +540,7 @@ if expParam.sessionNum == 1
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
         
         % instructions
@@ -604,6 +610,7 @@ if expParam.sessionNum == 1
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
         
         % instructions
@@ -965,6 +972,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
@@ -1034,6 +1046,11 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
           cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
           cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
+          
+          % do we want to play feedback beeps for no response?
+          cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+          cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+          cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
           
           % instructions
           [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -1145,6 +1162,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
@@ -1207,6 +1229,7 @@ if expParam.sessionNum == 1
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
         
         % instructions
@@ -1300,6 +1323,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
         
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
@@ -1362,6 +1390,7 @@ if expParam.sessionNum == 1
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
         
         % instructions
