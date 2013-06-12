@@ -174,12 +174,11 @@ if expParam.sessionNum == 1
     cfg.stim.practice.nPractice = 2;
     
     if cfg.stim.useSeparatePracStims
-      % debug, use creatures
-      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Creatures');
-      cfg.stim.practice.familyNames = {'a','s'};
+      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'PracticeBirds');
+      cfg.stim.practice.familyNames = {'Perching_','Wading_'};
       cfg.stim.practice.nSpecies = 2;
       
-      cfg.stim.practice.yokeSpecies = false;
+      cfg.stim.practice.yokeSpecies = true;
       if cfg.stim.practice.yokeSpecies
         cfg.stim.practice.yokeTogether = [1 1];
       end
