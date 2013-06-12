@@ -40,7 +40,7 @@ imgDir = '~/Documents/experiments/expertTrain/images/Birds';
 
 % familyName = 'Perching_';
 % % familyName = 'Wading_';
-% imgDir = '~/Documents/experiments/expertTrain/images/Birds';
+% imgDir = '~/Documents/experiments/expertTrain/images/PracticeBirds';
 % % imgDir = '~/Downloads/croppedbirds/PracticeBirds';
 
 familyDir = fullfile(imgDir,familyName);
