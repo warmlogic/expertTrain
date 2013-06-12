@@ -43,8 +43,6 @@ function [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,pha
 % cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
 % cfg.stim.(sesName).(phaseName).recog_response = 10.0;
 
-% TODO: make instruction files. read in during config?
-
 fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 %% general preparation for recognition study and test
@@ -71,6 +69,17 @@ end
 % initialize beep player if needed
 if phaseCfg.playSound
   Beeper(1,0);
+end
+
+%% do an impedance check before the phase begins, if desired
+
+if ~isfield(phaseCfg,'impedanceBeforePhase')
+  phaseCfg.impedanceBeforePhase = false;
+end
+
+if expParam.useNS && phaseCfg.impedanceBeforePhase
+  % run the impedance break
+  et_impedanceCheck(w, cfg);
 end
 
 %% start NS recording, if desired
@@ -101,26 +110,8 @@ for b = 1:phaseCfg.nBlocks
   
   %% do an impedance check before the block begins
   if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
-    Screen('TextSize', w, cfg.text.basicTextSize);
-    pauseMsg = sprintf('The experimenter will now check the EEG cap.');
-    % just draw straight into the main window since we don't need speed here
-    DrawFormattedText(w, pauseMsg, 'center', 'center');
-    Screen('Flip', w);
-    
-    WaitSecs(5.000);
-    % stop recording
-    [NSStopStatus, NSStopError] = NetStation('StopRecording');
-    
-    % wait until g key is held for ~1 seconds
-    KbCheckHold(1000, {cfg.keys.expContinue}, -1);
-    
-    % start recording
-    [NSStopStatus, NSStopError] = NetStation('StartRecording');
-    
-    message = 'Starting data acquisition...';
-    DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
-    Screen('Flip', w);
-    WaitSecs(5.000);
+    % run the impedance break
+    et_impedanceCheck(w, cfg);
   end
   
   %% prepare the recognition study task

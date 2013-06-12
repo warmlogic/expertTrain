@@ -12,14 +12,16 @@ function et_calcExpDuration(cfg,expParam,durLimit)
 % set some constant durations (in seconds)
 instructDur = 30;
 blinkBreakDur = 5;
-initialNetSetup = 1200; % 10 min = 600 seconds; 20 min = 1200 sec
-% initialNetSetup = 0; % 10 min = 600 seconds; 20 min = 1200 sec
 impedanceDur = 300; % 5 min = 300 seconds
+
+% 10 min = 600 sec; 20 min = 1200 sec; 30 m = 1800 sec
+initialNetSetup = 1800;
+% initialNetSetup = 0;
 
 % initialize
 expDur = 0;
 
-if ~exist('durLimit','var') || isempty(durLimit)
+if ~exist('durLimit','var') || isempty(durLimit) || ~strcmp(durLimit,'min') || ~strcmp(durLimit,'med') || ~strcmp(durLimit,'max')
   error('durLimit variable not set properly! Must be ''min'',''med'', or ''max''.');
 end
 

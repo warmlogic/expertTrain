@@ -29,8 +29,6 @@ function [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCou
 % % keys
 % cfg.keys.sXX, where XX is an integer, buffered with a zero if i <= 9
 
-% TODO: make instruction files. read in during config?
-
 fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 %% preparation
@@ -132,6 +130,17 @@ if nSpecies < 3
   theseSpeciesStr = strrep(theseSpeciesStr,',','');
 end
 
+%% do an impedance check before the phase begins, if desired
+
+if ~isfield(phaseCfg,'impedanceBeforePhase')
+  phaseCfg.impedanceBeforePhase = false;
+end
+
+if expParam.useNS && phaseCfg.impedanceBeforePhase
+  % run the impedance break
+  et_impedanceCheck(w, cfg);
+end
+
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
@@ -185,26 +194,8 @@ for i = 1:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
-      Screen('TextSize', w, cfg.text.basicTextSize);
-      pauseMsg = sprintf('The experimenter will now check the EEG cap.');
-      % just draw straight into the main window since we don't need speed here
-      DrawFormattedText(w, pauseMsg, 'center', 'center');
-      Screen('Flip', w);
-      
-      WaitSecs(5.000);
-      % stop recording
-      [NSStopStatus, NSStopError] = NetStation('StopRecording');
-      
-      % wait until g key is held for ~1 seconds
-      KbCheckHold(1000, {cfg.keys.expContinue}, -1);
-      
-      % start recording
-      [NSStopStatus, NSStopError] = NetStation('StartRecording');
-      
-      message = 'Starting data acquisition...';
-      DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
-      Screen('Flip', w);
-      WaitSecs(5.000);
+      % run the impedance break
+      et_impedanceCheck(w, cfg);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -213,26 +204,8 @@ for i = 1:length(stimTex)
     end
   else
     if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stimTex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
-      Screen('TextSize', w, cfg.text.basicTextSize);
-      pauseMsg = sprintf('The experimenter will now check the EEG cap.');
-      % just draw straight into the main window since we don't need speed here
-      DrawFormattedText(w, pauseMsg, 'center', 'center');
-      Screen('Flip', w);
-      
-      WaitSecs(5.000);
-      % stop recording
-      [NSStopStatus, NSStopError] = NetStation('StopRecording');
-      
-      % wait until g key is held for ~1 seconds
-      KbCheckHold(1000, {cfg.keys.expContinue}, -1);
-      
-      % start recording
-      [NSStopStatus, NSStopError] = NetStation('StartRecording');
-      
-      message = 'Starting data acquisition...';
-      DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
-      Screen('Flip', w);
-      WaitSecs(5.000);
+      % run the impedance break
+      et_impedanceCheck(w, cfg);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
