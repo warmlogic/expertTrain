@@ -27,7 +27,7 @@ if expParam.useNS
   % % D464
   % expParam.NSHost = '128.138.223.26'
   
-  expParam.baselineRecordSecs = 10.0;
+  expParam.baselineRecordSecs = 20.0;
 end
 
 % sound defaults
