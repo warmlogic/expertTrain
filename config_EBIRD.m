@@ -32,8 +32,8 @@ end
 
 % sound defaults
 playSound = true;
-correctSound = 'high';
-incorrectSound = 'low';
+correctSound = 1000;
+incorrectSound = 300;
 correctVol = 0.4;
 incorrectVol = 0.6;
 
@@ -60,9 +60,13 @@ expParam.session.posttest_delay.phases = {'prac_match','match'};
 % % demo - debug
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
-% % set up a field for each session type
-% expParam.session.pretest.phases = {'prac_match'};
+% expParam.session.pretest.phases = {'prac_match','prac_match'};
 % expParam.session.train1.phases = {'prac_name','nametrain'};
+
+% % % debug
+% % expParam.nSessions = 1;
+% % expParam.sesTypes = {'train1'};
+% % expParam.session.train1.phases = {'prac_name','nametrain','name'};
 
 %% do some error checking
 
@@ -709,8 +713,10 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_nametrain_1_exp_intro.txt',expParam.expName)),...
-          {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
-          {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
+          {'nBlocks','nFamily','nSpeciesTotal','basicFamStr','contKey'},...
+          {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).blockSpeciesOrder)),...
+          num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),...
+          num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
           cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
