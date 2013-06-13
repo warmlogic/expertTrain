@@ -87,6 +87,18 @@ end
 % initialize beep player if needed
 if phaseCfg.playSound
   Beeper(1,0);
+  if ~isfield(phaseCfg,'correctSound')
+    cfg.correctSound = 'high';
+  end
+  if ~isfield(phaseCfg,'incorrectSound')
+    cfg.incorrectSound = 'low';
+  end
+  if ~isfield(phaseCfg,'correctVol')
+    cfg.correctVol = 0.4;
+  end
+  if ~isfield(phaseCfg,'incorrectVol')
+    cfg.incorrectVol = 0.5;
+  end
 end
 
 %% preload all stimuli for presentation
@@ -382,6 +394,7 @@ for i = 1:length(stim2Tex)
           message = sprintf('%s\n%s',correctFeedback,sameFeedback);
           if phaseCfg.playSound
             respSound = phaseCfg.correctSound;
+            respVol = phaseCfg.correctVol;
           end
         end
         feedbackColor = correctColor;
@@ -391,6 +404,7 @@ for i = 1:length(stim2Tex)
           message = sprintf('%s\n%s',incorrectFeedback,diffFeedback);
           if phaseCfg.playSound
             respSound = phaseCfg.incorrectSound;
+            respVol = phaseCfg.incorrectVol;
           end
         end
         feedbackColor = incorrectColor;
@@ -403,6 +417,7 @@ for i = 1:length(stim2Tex)
           message = sprintf('%s\n%s',correctFeedback,diffFeedback);
           if phaseCfg.playSound
             respSound = phaseCfg.correctSound;
+            respVol = phaseCfg.correctVol;
           end
         end
         feedbackColor = correctColor;
@@ -412,6 +427,7 @@ for i = 1:length(stim2Tex)
           message = sprintf('%s\n%s',incorrectFeedback,sameFeedback);
           if phaseCfg.playSound
             respSound = phaseCfg.incorrectSound;
+            respVol = phaseCfg.correctVol;
           end
         end
         feedbackColor = incorrectColor;
@@ -441,11 +457,12 @@ for i = 1:length(stim2Tex)
     feedbackTime = cfg.text.respondFasterFeedbackTime;
     if phaseCfg.playSound
       respSound = phaseCfg.incorrectSound;
+      respVol = phaseCfg.incorrectVol;
     end
   end
   
   if phaseCfg.playSound && (~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown))
-    Beeper(respSound);
+    Beeper(respSound,respVol);
   end
   Screen('TextSize', w, cfg.text.instructTextSize);
   DrawFormattedText(w,message,'center','center',feedbackColor);

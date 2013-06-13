@@ -74,6 +74,18 @@ end
 % initialize beep player if needed
 if phaseCfg.playSound
   Beeper(1,0);
+  if ~isfield(phaseCfg,'correctSound')
+    cfg.correctSound = 'high';
+  end
+  if ~isfield(phaseCfg,'incorrectSound')
+    cfg.incorrectSound = 'low';
+  end
+  if ~isfield(phaseCfg,'correctVol')
+    cfg.correctVol = 0.4;
+  end
+  if ~isfield(phaseCfg,'incorrectVol')
+    cfg.incorrectVol = 0.5;
+  end
 end
 
 %% preload all stimuli for presentation
@@ -292,11 +304,13 @@ for i = 1:length(stimTex)
         sNumColor = correct_sNumColor;
         if phaseCfg.playSound
           respSound = phaseCfg.correctSound;
+          respVol = phaseCfg.correctVol;
         end
       elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
         sNumColor = incorrect_sNumColor;
         if phaseCfg.playSound
           respSound = phaseCfg.incorrectSound;
+          respVol = phaseCfg.incorrectVol;
         end
       end
       % draw the stimulus
@@ -314,7 +328,7 @@ for i = 1:length(stimTex)
       Screen('Flip', w);
       
       if phaseCfg.playSound
-        Beeper(respSound);
+        Beeper(respSound,respVol);
       end
       
       break

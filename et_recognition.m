@@ -69,6 +69,18 @@ end
 % initialize beep player if needed
 if phaseCfg.playSound
   Beeper(1,0);
+  if ~isfield(phaseCfg,'correctSound')
+    cfg.correctSound = 'high';
+  end
+  if ~isfield(phaseCfg,'incorrectSound')
+    cfg.incorrectSound = 'low';
+  end
+  if ~isfield(phaseCfg,'correctVol')
+    cfg.correctVol = 0.4;
+  end
+  if ~isfield(phaseCfg,'incorrectVol')
+    cfg.incorrectVol = 0.5;
+  end
 end
 
 %% do an impedance check before the phase begins, if desired
@@ -467,7 +479,7 @@ for b = 1:phaseCfg.nBlocks
     
     if ~keyIsDown
       if phaseCfg.playSound
-        Beeper(phaseCfg.incorrectSound);
+        Beeper(phaseCfg.incorrectSound,phaseCfg.incorrectVol);
       end
       
       % "need to respond faster"
