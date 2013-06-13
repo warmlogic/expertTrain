@@ -34,6 +34,9 @@ end
 playSound = true;
 correctSound = 'high';
 incorrectSound = 'low';
+correctVol = 0.4;
+incorrectVol = 0.5;
+
 % matching task defaults
 matchTextPrompt = true;
 
@@ -270,7 +273,7 @@ if expParam.sessionNum == 1
   end
   
   % scale image down (< 1) or up (> 1)
-  cfg.files.speciesNumKeyImgScale = 0.6;
+  cfg.files.speciesNumKeyImgScale = 0.4;
   
   % subordinate matching keys (counterbalanced based on subNum 1-5, 6-0)
   if strcmp(cfg.keys.keyRow,'upper')
@@ -329,7 +332,7 @@ if expParam.sessionNum == 1
   %   end
   %
   %   % scale image down (< 1) or up (> 1)
-  %   cfg.files.recogTestRespKeyImgScale = 0.6;
+  %   cfg.files.recogTestRespKeyImgScale = 0.4;
   
   %% Screen, text, and symbol configuration for size and color
   
@@ -428,12 +431,14 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -494,12 +499,14 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -542,6 +549,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -672,6 +681,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -715,6 +726,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -772,6 +785,8 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
           cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
           cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+          cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+          cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
           
           % instructions
           [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -857,12 +872,14 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -945,12 +962,14 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseNum).match_preStim2 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 5.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).match_response = 2.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
