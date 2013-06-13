@@ -34,6 +34,9 @@ end
 playSound = true;
 correctSound = 'high';
 incorrectSound = 'low';
+correctVol = 0.4;
+incorrectVol = 0.5;
+
 % matching task defaults
 matchTextPrompt = true;
 
@@ -173,8 +176,8 @@ if expParam.sessionNum == 1
     cfg.stim.practice.nPractice = 2;
     
     if cfg.stim.useSeparatePracStims
-      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Birds');
-      cfg.stim.practice.familyNames = {'Finch_','Warbler_'};
+      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'PracticeBirds');
+      cfg.stim.practice.familyNames = {'Perching_','Wading_'};
       cfg.stim.practice.nSpecies = 2;
       
       cfg.stim.practice.yokeSpecies = false;
@@ -269,7 +272,7 @@ if expParam.sessionNum == 1
   end
   
   % scale image down (< 1) or up (> 1)
-  cfg.files.speciesNumKeyImgScale = 0.6;
+  cfg.files.speciesNumKeyImgScale = 0.4;
   
   % subordinate matching keys (counterbalanced based on subNum 1-5, 6-0)
   if strcmp(cfg.keys.keyRow,'upper')
@@ -328,7 +331,7 @@ if expParam.sessionNum == 1
   end
   
   % scale image down (< 1) or up (> 1)
-  cfg.files.recogTestRespKeyImgScale = 0.6;
+  cfg.files.recogTestRespKeyImgScale = 0.4;
   
   %% Screen, text, and symbol configuration for size and color
   
@@ -433,6 +436,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -499,6 +504,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -548,6 +555,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro(1).text] = et_processTextInstruct(...
@@ -619,6 +628,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         nExemplars = cfg.stim.(sesName).(phaseName)(phaseNum).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames);
@@ -671,6 +682,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -785,6 +798,8 @@ if expParam.sessionNum == 1
 %         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
 %         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
 %         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+%         cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+%         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
 %         
 %         % instructions (view)
 %         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.view.text] = et_processTextInstruct(...
@@ -876,6 +891,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -919,6 +936,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -988,6 +1007,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -1068,6 +1089,8 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
           cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
           cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+          cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+          cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
           
           % instructions
           [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -1107,6 +1130,8 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
           cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
           cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+          cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+          cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
           
           % instructions
           [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
@@ -1185,6 +1210,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -1251,6 +1278,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         nExemplars = cfg.stim.(sesName).(phaseName)(phaseNum).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames);
@@ -1348,6 +1377,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
@@ -1414,6 +1445,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro.text] = et_processTextInstruct(...
