@@ -155,9 +155,9 @@ end
 message = 'Starting viewing phase...';
 if expParam.useNS
   % start recording
-  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
-  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = 'Starting data acquisition for viewing phase...';
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
@@ -239,15 +239,22 @@ for i = 1:length(stimTex)
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
-    [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   end
   
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if any(viewStims(i).familyNum == cfg.stim.famNumSubord)
+  if phaseCfg.isExp
+    famNumSubord = cfg.stim.practice.famNumSubord;
+    famNumBasic = cfg.stim.practice.famNumBasic;
+  else
+    famNumSubord = cfg.stim.practice.famNumSubord;
+    famNumBasic = cfg.stim.practice.famNumBasic;
+  end
+  if any(viewStims(i).familyNum == famNumSubord)
     subord = 1;
     sNum = viewStims(i).speciesNum;
-  else
+  elseif any(viewStims(i).familyNum == famNumBasic)
     subord = 0;
     sNum = 0;
   end
@@ -487,13 +494,13 @@ for i = 1:length(stimTex)
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % img presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % did they make a response?
     if keyIsDown
@@ -501,7 +508,7 @@ for i = 1:length(stimTex)
       [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
   end % useNS
   
@@ -512,7 +519,7 @@ end
 % stop recording
 if expParam.useNS
   WaitSecs(5.0);
-  [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
 end
 
 % reset the KbCheck

@@ -100,9 +100,9 @@ end
 message = 'Starting recognition phase...';
 if expParam.useNS
   % start recording
-  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
-  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = 'Starting data acquisition for recognition phase...';
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
@@ -204,17 +204,24 @@ for b = 1:phaseCfg.nBlocks
     
     % Is this a subordinate (1) or basic (0) family/species? If subordinate,
     % get the species number.
-    if any(targStims{b}(i).familyNum == cfg.stim.famNumSubord)
+    if phaseCfg.isExp
+      famNumSubord = cfg.stim.practice.famNumSubord;
+      famNumBasic = cfg.stim.practice.famNumBasic;
+    else
+      famNumSubord = cfg.stim.practice.famNumSubord;
+      famNumBasic = cfg.stim.practice.famNumBasic;
+    end
+    if any(targStims{b}(i).familyNum == famNumSubord)
       subord = 1;
       sNum = targStims{b}(i).speciesNum;
-    else
+    elseif any(targStims{b}(i).familyNum == famNumBasic)
       subord = 0;
       sNum = 0;
     end
     
     % resynchronize netstation before the start of drawing
     if expParam.useNS
-      [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+      [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
     end
     
     % draw fixation
@@ -299,13 +306,13 @@ for b = 1:phaseCfg.nBlocks
       [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord,...
-        'targ', targStims{b}(i).targ);
+        'targ', targStims{b}(i).targ); %#ok<NASGU,ASGLU>
       
       % img presentation
       [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord,...
-        'targ', targStims{b}(i).targ);
+        'targ', targStims{b}(i).targ); %#ok<NASGU,ASGLU>
     end % useNS
     
   end % for stimuli
@@ -382,17 +389,24 @@ for b = 1:phaseCfg.nBlocks
     
     % Is this a subordinate (1) or basic (0) family/species? If subordinate,
     % get the species number.
-    if any(allStims{b}(i).familyNum == cfg.stim.famNumSubord)
+    if phaseCfg.isExp
+      famNumSubord = cfg.stim.practice.famNumSubord;
+      famNumBasic = cfg.stim.practice.famNumBasic;
+    else
+      famNumSubord = cfg.stim.practice.famNumSubord;
+      famNumBasic = cfg.stim.practice.famNumBasic;
+    end
+    if any(allStims{b}(i).familyNum == famNumSubord)
       subord = 1;
       sNum = allStims{b}(i).speciesNum;
-    else
+    elseif any(allStims{b}(i).familyNum == famNumBasic)
       subord = 0;
       sNum = 0;
     end
     
     % resynchronize netstation before the start of drawing
     if expParam.useNS
-      [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+      [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
     end
     
     % draw fixation
@@ -635,19 +649,19 @@ for b = 1:phaseCfg.nBlocks
       [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', allStims{b}(i).targ,...
-        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % img presentation
       [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', allStims{b}(i).targ,...
-        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % response prompt
       [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respKeyImgOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', allStims{b}(i).targ,...
-        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % did they make a response?
       if keyIsDown
@@ -655,7 +669,7 @@ for b = 1:phaseCfg.nBlocks
         [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
           'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
           'trln', i, 'stmn', stimName, 'spcn', sNum, 'sord', subord, 'targ', allStims{b}(i).targ,...
-          'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+          'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end
     end % useNS
     
@@ -674,7 +688,7 @@ Screen('Close',respKeyImg);
 % stop recording
 if expParam.useNS
   WaitSecs(5.0);
-  [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
 end
 
 end % function
