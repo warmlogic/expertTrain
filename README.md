@@ -45,9 +45,9 @@ Preparing the experiment
 ----
 
 - Set up a config function file for your experiment (`config_EXPNAME.m`), as well as any supporting functions or files.
-   - Supporting files: the config function runs the functions `et_saveStimList()` and `et_processStims_EXPNAME()`
+   - Supporting files: the config function runs the functions `et_saveStimList()` and `et_processStims()`
    - See `expertTrain/config_EBUG.m` for an example.
-      - Note how it runs `et_saveStimList()` and `et_processStims_EBUG()`
+      - Note how it runs `et_saveStimList()` and `et_processStims()`
       - Apologies for being such a long/extensive config file, but it is well organized.
    - For the config structures in `config_EBUG.m`, each entry in `expParam.sesTypes` is a separate session (e.g., different days of the experiment). The phases for each session are configured below that in the `expParam.session` field. The requirement is that `expParam.session` has a field for each `expParam.sesTypes` entry.
 - For Net Station integration:

@@ -4,9 +4,9 @@ function [cfg,expParam] = config_EBIRD(cfg,expParam)
 % Description:
 %  Configuration function for creature expertise training experiment. This
 %  file should be edited for your particular experiment. This function runs
-%  et_processStims_EBUG to prepare the stimuli for experiment presentation.
+%  et_processStims to prepare the stimuli for experiment presentation.
 %
-% see also: et_saveStimList, et_processStims_EBUG, et_processStims_match,
+% see also: et_saveStimList, et_processStims, et_processStims_match,
 % et_processStims_recog, et_processStims_viewname,
 % et_processStims_nametrain, et_processStims_name
 
@@ -1003,7 +1003,7 @@ if expParam.sessionNum == 1
   
   %% process the stimuli for the entire experiment
   
-  [cfg,expParam] = et_processStims_EBUG(cfg,expParam);
+  [cfg,expParam] = et_processStims(cfg,expParam);
   
   %% save the parameters
   
