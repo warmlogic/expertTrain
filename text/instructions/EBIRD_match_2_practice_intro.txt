@@ -1,0 +1,8 @@
+This is the practice for the Matching experiment, part 2.
+
+On each trial you will see two birds, one after the other, just as before. This time their appearance has been manipulated. These types of trials will be mixed in with normal birds in the real experiment. There will be more trials to get you acquainted with the different types of manipulations.
+
+Press "sameKey" if the creatures are from the same species.
+Press "diffKey" if the creatures are from different species.
+
+Press "contKey" to begin the matching task.
