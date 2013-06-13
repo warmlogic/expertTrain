@@ -63,8 +63,8 @@ end
 % set feedback text
 correctFeedback = 'Correct!';
 incorrectFeedback = 'Incorrect!';
-sameFeedback =  'SAME.';
-diffFeedback =  'DIFFERENT.';
+sameFeedback =  'SAME';
+diffFeedback =  'DIFFERENT';
 
 % set feedback colors
 correctColor = uint8((rgb('Green') * 255) + 0.5);
