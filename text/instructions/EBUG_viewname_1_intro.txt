@@ -1,4 +1,4 @@
-Viewing task: block blockNum.
+Viewing task: block blockNum of nBlocks.
 
 You will see creatures from nFamily families.
 In this block, there are nSpecies different species in each family, and they are called species theseSpecies. These numbers correspond to the keys listed below.
