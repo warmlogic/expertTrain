@@ -174,6 +174,12 @@ stimImgWidth = size(stim1Img,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
 
+% text location for "too fast" text
+if ~phaseCfg.isExp
+  [~,tooFastY] = RectCenter(cfg.screen.wRect);
+  tooFastY = tooFastY + (stimImgHeight / 2);
+end
+
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
@@ -191,9 +197,9 @@ end
 message = 'Starting matching phase...';
 if expParam.useNS
   % start recording
-  [NSStopStatus, NSStopError] = NetStation('StartRecording');
+  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
-  [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = 'Starting data acquisition for matching phase...';
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
@@ -261,11 +267,18 @@ for i = 1:length(stim2Tex)
   
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if any(stim2(i).familyNum == cfg.stim.famNumSubord)
+  if phaseCfg.isExp
+    famNumSubord = cfg.stim.practice.famNumSubord;
+    famNumBasic = cfg.stim.practice.famNumBasic;
+  else
+    famNumSubord = cfg.stim.practice.famNumSubord;
+    famNumBasic = cfg.stim.practice.famNumBasic;
+  end
+  if any(stim2(i).familyNum == famNumSubord)
     subord = 1;
     sNum1 = stim1(i).speciesNum;
     sNum2 = stim2(i).speciesNum;
-  else
+  elseif any(stim2(i).familyNum == famNumBasic)
     subord = 0;
     sNum1 = 0;
     sNum2 = 0;
@@ -273,7 +286,7 @@ for i = 1:length(stim2Tex)
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
-    [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   end
   
   % ISI between trials
@@ -571,25 +584,25 @@ for i = 1:length(stim2Tex)
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStim1FixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim1Name, 'famn', fNum1, 'spcn', sNum1, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % stim1 presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', img1On, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim1Name, 'famn', fNum1, 'spcn', sNum1, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % pre-stim2 fixation
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStim2FixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim2Name, 'famn', fNum2, 'spcn', sNum2, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % stim2 presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', img2On, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim2Name, 'famn', fNum2, 'spcn', sNum2, 'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % response prompt
     [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
@@ -597,7 +610,7 @@ for i = 1:length(stim2Tex)
       'trln', i,...
       'stm1', stim1Name, 'fam1', fNum1, 'spc1', sNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', sNum2,...
       'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % did they make a response?
     if keyIsDown
@@ -607,7 +620,7 @@ for i = 1:length(stim2Tex)
       'trln', i,...
       'stm1', stim1Name, 'fam1', fNum1, 'spc1', sNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', sNum2,...
       'sord', subord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown);
+      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
   end % useNS
   
@@ -618,7 +631,7 @@ end
 % stop recording
 if expParam.useNS
   WaitSecs(5.0);
-  [NSSyncStatus, NSSyncError] = NetStation('StopRecording');
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
 end
 
 % reset the KbCheck
