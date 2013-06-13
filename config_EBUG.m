@@ -35,7 +35,7 @@ playSound = true;
 correctSound = 'high';
 incorrectSound = 'low';
 correctVol = 0.4;
-incorrectVol = 0.5;
+incorrectVol = 0.6;
 
 % matching task defaults
 matchTextPrompt = true;
@@ -165,50 +165,6 @@ if expParam.sessionNum == 1
     error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.stimListFile);
   end
   
-  % practice images stored in separate directories
-  expParam.runPractice = true;
-  cfg.stim.useSeparatePracStims = true;
-  
-  if expParam.runPractice
-    % practice exemplars per species per family for all phases except
-    % recognition (recognition stim count is determined by nStudyTarg and
-    % nStudyLure in each prac_recog phase defined below)
-    cfg.stim.practice.nPractice = 2;
-    
-    if cfg.stim.useSeparatePracStims
-      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'PracticeBirds');
-      cfg.stim.practice.familyNames = {'Perching_','Wading_'};
-      cfg.stim.practice.nSpecies = 2;
-      
-      cfg.stim.practice.yokeSpecies = false;
-      if cfg.stim.practice.yokeSpecies
-        cfg.stim.practice.yokeTogether = [1 1];
-      end
-      
-      cfg.stim.practice.stimListFile = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
-      
-      shuffleSpecies = true;
-      if ~exist(cfg.stim.practice.stimListFile,'file')
-        [cfg] = et_saveStimList(cfg,cfg.files.stimDir_prac,cfg.stim.practice,shuffleSpecies);
-      else
-        % % debug = warning instead of error
-        % warning('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
-        error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
-      end
-    else
-      cfg.files.stimDir_prac = cfg.files.stimDir;
-      cfg.stim.practice.familyNames = cfg.stim.familyNames;
-      %cfg.stim.practice.nSpecies = cfg.stim.nSpecies;
-      %cfg.stim.practice.yokeSpecies = cfg.stim.yokeSpecies;
-      cfg.stim.practice.nSpecies = 2;
-      cfg.stim.practice.yokeSpecies = false;
-      if cfg.stim.practice.yokeSpecies
-        cfg.stim.practice.yokeTogether = [1 1];
-      end
-      cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
-    end
-  end
-  
   % basic/subordinate families (counterbalance based on even/odd subNum)
   if expParam.isEven
     cfg.stim.famNumBasic = 1;
@@ -230,6 +186,61 @@ if expParam.sessionNum == 1
   % cfg.stim.specNum(cfg.stim.famNumSubord,:)
   % % subordinate family species letters
   % cfg.stim.specStr(cfg.stim.famNumSubord,:)
+  
+  % practice images stored in separate directories
+  expParam.runPractice = true;
+  cfg.stim.useSeparatePracStims = true;
+  
+  if expParam.runPractice
+    % practice exemplars per species per family for all phases except
+    % recognition (recognition stim count is determined by nStudyTarg and
+    % nStudyLure in each prac_recog phase defined below)
+    cfg.stim.practice.nPractice = 2;
+    
+    if cfg.stim.useSeparatePracStims
+      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'PracticeBirds');
+      cfg.stim.practice.familyNames = {'Perching_','Wading_'};
+      cfg.stim.practice.nSpecies = 2;
+      
+      % basic/subordinate families (counterbalance for even/odd subNum)
+      if expParam.isEven
+        cfg.stim.practice.famNumBasic = 1;
+        cfg.stim.practice.famNumSubord = 2;
+      else
+        cfg.stim.practice.famNumBasic = 2;
+        cfg.stim.practice.famNumSubord = 1;
+      end
+      
+      cfg.stim.practice.yokeSpecies = false;
+      if cfg.stim.practice.yokeSpecies
+        cfg.stim.practice.yokeTogether = [1 1];
+      end
+      
+      cfg.stim.practice.stimListFile = fullfile(cfg.files.subSaveDir,'stimList_prac.txt');
+      
+      shuffleSpecies = true;
+      if ~exist(cfg.stim.practice.stimListFile,'file')
+        [cfg] = et_saveStimList(cfg,cfg.files.stimDir_prac,cfg.stim.practice,shuffleSpecies);
+      else
+        % % debug = warning instead of error
+        % warning('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
+        error('Stimulus list should not exist at the beginning of Session %d: %s',expParam.sessionNum,cfg.stim.practice.stimListFile);
+      end
+    else
+      cfg.files.stimDir_prac = cfg.files.stimDir;
+      cfg.stim.practice.familyNames = cfg.stim.familyNames;
+      %cfg.stim.practice.nSpecies = cfg.stim.nSpecies;
+      %cfg.stim.practice.yokeSpecies = cfg.stim.yokeSpecies;
+      cfg.stim.practice.famNumBasic = cfg.stim.famNumBasic;
+      cfg.stim.practice.famNumSubord = cfg.stim.famNumSubord;
+      cfg.stim.practice.nSpecies = 2;
+      cfg.stim.practice.yokeSpecies = false;
+      if cfg.stim.practice.yokeSpecies
+        cfg.stim.practice.yokeTogether = [1 1];
+      end
+      cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
+    end
+  end
   
   %% Define the response keys
   
@@ -441,7 +452,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_match1_practice_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_match_1_practice_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
       end
     end
@@ -509,7 +520,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_match_2_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
       end
     end
@@ -560,24 +571,24 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro(1).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog1_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_1_intro.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro(2).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog2_intro_recoll.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_2_intro_recoll.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro(3).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog3_intro_other.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_3_intro_other.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro(3).image = cfg.files.recogTestRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro(3).imageScale = cfg.files.recogTestRespKeyImgScale;
         
         nExemplars = cfg.stim.(sesName).(phaseName)(phaseNum).nStudyTarg * cfg.stim.practice.nSpecies * length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames);
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogStudy.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog4_practice_study.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_4_practice_study.txt',expParam.expName)),...
           {'nExemplars','contKey'},{num2str(nExemplars),cfg.keys.instructContKey});
         
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogTest.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog5_practice_test.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_5_practice_test.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
@@ -634,13 +645,13 @@ if expParam.sessionNum == 1
         % instructions
         nExemplars = cfg.stim.(sesName).(phaseName)(phaseNum).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames);
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogIntro.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog6_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_6_exp_intro.txt',expParam.expName)),...
           {'nBlocks','contKey'},{num2str(cfg.stim.(sesName).(phaseName)(phaseNum).nBlocks),cfg.keys.instructContKey});
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogStudy.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog7_exp_study.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_7_exp_study.txt',expParam.expName)),...
           {'nExemplars','contKey'},{num2str(nExemplars),cfg.keys.instructContKey});
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogTest.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_recog8_exp_test.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_recog_8_exp_test.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
@@ -687,7 +698,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_name1_practice_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_name_1_practice_intro.txt',expParam.expName)),...
           {'nFamily','basicFamStr','contKey'},...
           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
@@ -803,7 +814,7 @@ if expParam.sessionNum == 1
 %         
 %         % instructions (view)
 %         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.view.text] = et_processTextInstruct(...
-%           fullfile(cfg.files.instructDir,sprintf('%s_viewname1_intro.txt',expParam.expName)),...
+%           fullfile(cfg.files.instructDir,sprintf('%s_viewname_1_intro.txt',expParam.expName)),...
 %           {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
 %           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
 %           cfg.keys.instructContKey});
@@ -812,7 +823,7 @@ if expParam.sessionNum == 1
 %         
 %         % instructions (name)
 %         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
-%           fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
+%           fullfile(cfg.files.instructDir,sprintf('%s_nametrain_1_exp_intro.txt',expParam.expName)),...
 %           {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
 %           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
 %           cfg.keys.instructContKey});
@@ -896,7 +907,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_nametrain1_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_nametrain_1_exp_intro.txt',expParam.expName)),...
           {'nFamily','nSpeciesTotal','basicFamStr','contKey'},...
           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
           cfg.keys.instructContKey});
@@ -941,7 +952,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
           {'nFamily','basicFamStr','contKey'},...
           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
@@ -1012,7 +1023,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_match_2_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
       end
     end
@@ -1094,7 +1105,7 @@ if expParam.sessionNum == 1
           
           % instructions
           [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
-            fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
+            fullfile(cfg.files.instructDir,sprintf('%s_match_2_exp_intro.txt',expParam.expName)),...
             {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
         end
       end
@@ -1135,7 +1146,7 @@ if expParam.sessionNum == 1
           
           % instructions
           [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.text] = et_processTextInstruct(...
-            fullfile(cfg.files.instructDir,sprintf('%s_name2_exp_intro.txt',expParam.expName)),...
+            fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
             {'nFamily','basicFamStr','contKey'},...
             {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
           cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
@@ -1215,7 +1226,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_match_2_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
       end
     end
@@ -1382,7 +1393,7 @@ if expParam.sessionNum == 1
         
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_match2_exp_intro.txt',expParam.expName)),...
+          fullfile(cfg.files.instructDir,sprintf('%s_match_2_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
       end
     end
