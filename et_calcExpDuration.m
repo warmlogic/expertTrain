@@ -305,6 +305,9 @@ for s = 1:expParam.nSessions
     
     % calculate the number of impedance breaks
     if expParam.useNS
+      if ~isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceBeforePhase')
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+      end
       if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
         if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'impedanceAfter_nTrials')
           nImpedanceBreaks = floor(nTrials / cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials) - 1;
@@ -358,6 +361,7 @@ for s = 1:expParam.nSessions
       else
         nImpedanceBreaks = 0;
       end
+      nImpedanceBreaks_before = 0;
     end
     
     if strcmp(phaseName,'nametrain')
