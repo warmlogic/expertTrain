@@ -1,4 +1,4 @@
-expertTrain readme
+expertTrain README
 ===========
 
 Purpose
@@ -37,9 +37,9 @@ Installation
          - Family names can also contain digits (e.g., `fam1`), but species names must not contain digits and exemplar numbers can only consist of digits (because any numbers in the `species+exemplarNumber` string will be read as part of the exemplar number).
    - All species exemplar images should be stored flat in a single family directory, within `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/`
       - e.g., `expertTrain/images/Creatures/a/` (for family "a" images)
-   - There is a creature set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip`
+   - There is a creature set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip``Í
       - NB: If you use this stimulus set and the provided config files (see "Preparing the experiment", below), you must rename the family 1 directory to "a" and the family 2 directory to "s".
-   - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt` and look for `Finch_bmp.zip` and `Warbler_bmp.zip` (email me or `tclab@colorado` if you need help)
+   - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt/Final Bird Stimuli` (email me or `tclab@colorado` if you need help)
 
 Preparing the experiment
 ----
