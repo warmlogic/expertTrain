@@ -1,10 +1,12 @@
 %% set up files
 
 centeredDims = [450 450];
+% centeredDims = [512 512];
 
 % the gray color to add in the background of the image. can be empty [] to
 % use most common background color in original image.
 bgColor = 210;
+% bgColor = 255;
 
 % type of mask to use.
 %
@@ -12,10 +14,15 @@ bgColor = 210;
 processMask = 'manual';
 % % the threshold used by makeMask.m
 % processMask = 0.7;
+% processMask = 0.999;
 
 cropImage = false;
 
 plotSteps = false;
+
+% familyName = 'a';
+% % familyName = 's';
+% imgDir = '~/Documents/experiments/expertTrain/images/Creatures';
 
 familyName = 'Finch_';
 % familyName = 'Warbler_';
