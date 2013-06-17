@@ -75,16 +75,16 @@ end
 if phaseCfg.playSound
   Beeper(1,0);
   if ~isfield(phaseCfg,'correctSound')
-    cfg.correctSound = 'high';
+    cfg.correctSound = 1000;
   end
   if ~isfield(phaseCfg,'incorrectSound')
-    cfg.incorrectSound = 'low';
+    cfg.incorrectSound = 300;
   end
   if ~isfield(phaseCfg,'correctVol')
     cfg.correctVol = 0.4;
   end
   if ~isfield(phaseCfg,'incorrectVol')
-    cfg.incorrectVol = 0.5;
+    cfg.incorrectVol = 0.6;
   end
 end
 
@@ -252,11 +252,11 @@ for i = 1:length(stimTex)
     famNumBasic = cfg.stim.practice.famNumBasic;
   end
   if any(viewStims(i).familyNum == famNumSubord)
-    subord = 1;
-    sNum = viewStims(i).speciesNum;
+    isSubord = 1;
+    specNum = viewStims(i).speciesNum;
   elseif any(viewStims(i).familyNum == famNumBasic)
-    subord = 0;
-    sNum = 0;
+    isSubord = 0;
+    specNum = 0;
   end
   
   % ISI between trials
@@ -277,8 +277,8 @@ for i = 1:length(stimTex)
   DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
   % and species number below it
   Screen('TextSize', w, cfg.text.basicTextSize);
-  if sNum > 0
-    DrawFormattedText(w,num2str(sNum),'center',sNumY,initial_sNumColor);
+  if specNum > 0
+    DrawFormattedText(w,num2str(specNum),'center',sNumY,initial_sNumColor);
   else
     DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,initial_sNumColor);
   end
@@ -288,7 +288,7 @@ for i = 1:length(stimTex)
   [imgOn, stimOnset] = Screen('Flip', w);
   
   % debug
-  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),viewStims(i).fileName,sNum);
+  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),viewStims(i).fileName,specNum);
   
   % while loop to show stimulus until subject response or until
   % "duration" seconds elapse.
@@ -307,13 +307,13 @@ for i = 1:length(stimTex)
       end
       % % debug
       % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - stimOnset);
-      if keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
+      if keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
         sNumColor = correct_sNumColor;
         if phaseCfg.playSound
           respSound = phaseCfg.correctSound;
           respVol = phaseCfg.correctVol;
         end
-      elseif keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
+      elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
         sNumColor = incorrect_sNumColor;
         if phaseCfg.playSound
           respSound = phaseCfg.incorrectSound;
@@ -327,8 +327,8 @@ for i = 1:length(stimTex)
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
       % and species number below it in the appropriate color
       Screen('TextSize', w, cfg.text.basicTextSize);
-      if sNum > 0
-        DrawFormattedText(w,num2str(sNum),'center',sNumY,sNumColor);
+      if specNum > 0
+        DrawFormattedText(w,num2str(specNum),'center',sNumY,sNumColor);
       else
         DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,sNumColor);
       end
@@ -361,8 +361,8 @@ for i = 1:length(stimTex)
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
     % and species number below it in the appropriate color
     Screen('TextSize', w, cfg.text.basicTextSize);
-    if sNum > 0
-      DrawFormattedText(w,num2str(sNum),'center',sNumY,incorrect_sNumColor);
+    if specNum > 0
+      DrawFormattedText(w,num2str(specNum),'center',sNumY,incorrect_sNumColor);
     else
       DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,incorrect_sNumColor);
     end
@@ -391,10 +391,10 @@ for i = 1:length(stimTex)
   rt = round(1000 * (endRT - stimOnset));
   
   % compute accuracy
-  if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 1
+  if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
     % pushed the right key
     acc = 1;
-  elseif keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',sNum))) == 0
+  elseif keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
     % pushed the wrong key
     acc = 0;
   elseif ~keyIsDown
@@ -428,7 +428,7 @@ for i = 1:length(stimTex)
   end
   
   % debug
-  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),viewStims(i).fileName,sNum,resp,respKey,acc);
+  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),viewStims(i).fileName,specNum,resp,respKey,acc);
   
   % Write stimulus presentation to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i\n',...
@@ -442,8 +442,8 @@ for i = 1:length(stimTex)
     viewStims(i).familyStr,...
     viewStims(i).speciesStr,...
     viewStims(i).exemplarName,...
-    subord,...
-    sNum);
+    isSubord,...
+    specNum);
   
   % Write response to file:
   fprintf(logFile,'%f %s %s %s %s %i %i %s %s %i %i %i %s %s %i %i\n',...
@@ -457,8 +457,8 @@ for i = 1:length(stimTex)
     viewStims(i).familyStr,...
     viewStims(i).speciesStr,...
     viewStims(i).exemplarName,...
-    subord,...
-    sNum,...
+    isSubord,...
+    specNum,...
     resp,...
     respKey,...
     acc,...
@@ -493,13 +493,13 @@ for i = 1:length(stimTex)
     % pretrial fixation
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % img presentation
-    [NSEventStatus, NSEventError] = NetStation('Event', 'TIMG', imgOn, .001,...
+    [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % did they make a response?
@@ -507,7 +507,7 @@ for i = 1:length(stimTex)
       % button push
       [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
-      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', sNum, 'sord', subord,...
+      'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
   end % useNS
