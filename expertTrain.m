@@ -210,18 +210,18 @@ try
     KbCheckHold(1000, {cfg.keys.expContinue}, -1);
     
     % connect
-    [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost, expParam.NSPort);
+    [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost, expParam.NSPort); %#ok<NASGU>
     % synchronize
-    [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU>
     % start recording
-    [NSStartStatus, NSStartError] = NetStation('StartRecording');
+    [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU>
     
     if NSConnectStatus || NSSyncStatus || NSStartStatus
       error('!!! ERROR: Problem with Net Station connect/sync/start. Check error messages for more information !!!');
     else
       fprintf('\nConnected to Net Station @ %s\n', expParam.NSHost);
       % stop recording
-      [NSStopStatus, NSStopError] = NetStation('StopRecording');
+      [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
     end
   end
   
@@ -239,12 +239,13 @@ try
     
     % start recording
     Screen('TextSize', w, cfg.text.basicTextSize);
-    [NSStartStatus, NSStartError] = NetStation('StartRecording');
+    [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
     Screen('Flip', w);
     WaitSecs(5.0);
     
-    [NSEventStatus, NSEventError] = NetStation('Event', 'REST', GetSecs, .001); % tag the start of the rest period
+    % tag the start of the rest period
+    [NSEventStatus, NSEventError] = NetStation('Event', 'REST', GetSecs, .001); %#ok<NASGU,ASGLU>
     
     % draw a countdown -- no need for super accurate timing here
     Screen('TextSize', w, cfg.text.basicTextSize);
@@ -255,10 +256,11 @@ try
       WaitSecs(1.0);
     end
     
-    [NSEventStatus, NSEventError] = NetStation('Event', 'DONE', GetSecs, .001); % tag the end of the rest period
+    % tag the end of the rest period
+    [NSEventStatus, NSEventError] = NetStation('Event', 'DONE', GetSecs, .001); %#ok<NASGU,ASGLU>
     
     % stop recording
-    [NSStopStatus, NSStopError] = NetStation('StopRecording');
+    [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
   end
   
   %% Start Net Station recording for the experiment
@@ -266,7 +268,7 @@ try
   if expParam.useNS
     Screen('TextSize', w, cfg.text.basicTextSize);
     % start recording
-    [NSStartStatus, NSStartError] = NetStation('StartRecording');
+    [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
     Screen('Flip', w);
     WaitSecs(5.0);
@@ -376,9 +378,9 @@ try
   % end of EEG recording, hang up with netstation
   if expParam.useNS
     % stop recording
-    [NSStopStatus, NSStopError] = NetStation('StopRecording');
+    [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
     fprintf('\nDisconnecting from Net Station @ %s\n', NSHost);
-    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect');
+    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -423,9 +425,9 @@ catch ME
   % end of EEG recording, hang up with netstation
   if expParam.useNS
     % stop recording
-    [NSStopStatus, NSStopError] = NetStation('StopRecording');
-    fprintf('\nDisconnecting from Net Station @ %s\n', NSHost);
-    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect');
+    [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+    fprintf('\nDisconnecting from Net Station @ %s\n', expParam.NSHost);
+    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
   
   % Do same cleanup as at the end of a regular session...

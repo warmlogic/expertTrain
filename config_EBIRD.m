@@ -22,10 +22,10 @@ if expParam.useNS
   expParam.NSPort = 55513;
   
   % % D458
-  expParam.NSHost = '128.138.223.251';
+  % expParam.NSHost = '128.138.223.251';
   
-  % % D464
-  % expParam.NSHost = '128.138.223.26'
+  % D464
+  expParam.NSHost = '128.138.223.26';
   
   expParam.baselineRecordSecs = 20.0;
 end
