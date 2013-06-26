@@ -240,7 +240,7 @@ try
     % start recording
     Screen('TextSize', w, cfg.text.basicTextSize);
     [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
-    DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
+    DrawFormattedText(w,'Starting EEG recording...', 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     WaitSecs(5.0);
     
@@ -250,7 +250,7 @@ try
     % draw a countdown -- no need for super accurate timing here
     Screen('TextSize', w, cfg.text.basicTextSize);
     for sec = expParam.baselineRecordSecs:-1:1
-      DrawFormattedText(w, num2str(sec), 'center', 'center');
+      DrawFormattedText(w, num2str(sec), 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
       Screen('Flip', w);
       fprintf('%s ', num2str(sec));
       WaitSecs(1.0);
@@ -263,16 +263,16 @@ try
     [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
   end
   
-  %% Start Net Station recording for the experiment
-  
-  if expParam.useNS
-    Screen('TextSize', w, cfg.text.basicTextSize);
-    % start recording
-    [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
-    DrawFormattedText(w,'Starting EEG recording...', 'center', 'center');
-    Screen('Flip', w);
-    WaitSecs(5.0);
-  end
+%   %% Start Net Station recording for the experiment
+%   
+%   if expParam.useNS
+%     Screen('TextSize', w, cfg.text.basicTextSize);
+%     % start recording
+%     [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+%     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+%     Screen('Flip', w);
+%     WaitSecs(5.0);
+%   end
   
   %% Run through the experiment
   
@@ -302,7 +302,7 @@ try
         % Subordinate Matching task (same/different)
         matchCount = matchCount + 1;
         
-        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+        et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
         
       case {'name'}
         % Naming task
@@ -378,7 +378,7 @@ try
   % end of EEG recording, hang up with netstation
   if expParam.useNS
     % stop recording
-    [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+    %[NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
     fprintf('\nDisconnecting from Net Station @ %s\n', NSHost);
     [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
@@ -425,7 +425,7 @@ catch ME
   % end of EEG recording, hang up with netstation
   if expParam.useNS
     % stop recording
-    [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+    %[NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
     fprintf('\nDisconnecting from Net Station @ %s\n', expParam.NSHost);
     [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
