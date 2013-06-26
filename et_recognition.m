@@ -91,7 +91,7 @@ end
 
 if expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
-  et_impedanceCheck(w, cfg);
+  et_impedanceCheck(w, cfg, false);
 end
 
 %% start NS recording, if desired
@@ -137,7 +137,7 @@ for b = 1:phaseCfg.nBlocks
   %% do an impedance check before the block begins
   if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
     % run the impedance break
-    et_impedanceCheck(w, cfg);
+    et_impedanceCheck(w, cfg, true);
   end
   
   %% prepare the recognition study task
@@ -202,7 +202,7 @@ for b = 1:phaseCfg.nBlocks
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
-      DrawFormattedText(w, pauseMsg, 'center', 'center');
+      DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
       Screen('Flip', w);
       
       % wait for kb release in case subject is holding down keys
@@ -210,7 +210,7 @@ for b = 1:phaseCfg.nBlocks
       KbWait(-1); % listen for keypress on either keyboard
       
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       Screen('Flip',w);
       WaitSecs(0.5);
       % reset the timer
@@ -241,7 +241,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     [study_preStimFixOn{b}(i)] = Screen('Flip',w);
     
     % ISI between trials
@@ -254,7 +254,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'startrt':
@@ -273,7 +273,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     
     % Clear screen to background color after fixed 'duration'
     Screen('Flip', w);
@@ -392,7 +392,7 @@ for b = 1:phaseCfg.nBlocks
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
-      DrawFormattedText(w, pauseMsg, 'center', 'center');
+      DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
       Screen('Flip', w);
       
       % wait for kb release in case subject is holding down keys
@@ -400,7 +400,7 @@ for b = 1:phaseCfg.nBlocks
       KbWait(-1); % listen for keypress on either keyboard
       
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       Screen('Flip',w);
       WaitSecs(0.5);
       % reset the timer
@@ -431,7 +431,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     [test_preStimFixOn{b}(i)] = Screen('Flip',w);
     
     % ISI between trials
@@ -444,7 +444,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     
     % Show stimulus on screen at next possible display refresh cycle,
     % and record stimulus onset time in 'test_stimOnset':
@@ -462,9 +462,9 @@ for b = 1:phaseCfg.nBlocks
         if keyIsDown
           Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
           Screen('TextSize', w, cfg.text.instructTextSize);
-          DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+          DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor, cfg.text.instructCharWidth);
           Screen('TextSize', w, cfg.text.fixSize);
-          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
           Screen('Flip', w);
         end
       end
@@ -480,7 +480,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     % put them on the screen; measure RT from when response key img appears
     [respKeyImgOn{b}(i), startRT] = Screen('Flip', w);
     
@@ -518,7 +518,7 @@ for b = 1:phaseCfg.nBlocks
       
       % "need to respond faster"
       Screen('TextSize', w, cfg.text.instructTextSize);
-      DrawFormattedText(w,cfg.text.respondFaster,'center','center',cfg.text.respondFasterColor);
+      DrawFormattedText(w,cfg.text.respondFaster,'center','center',cfg.text.respondFasterColor, cfg.text.instructCharWidth);
       
       Screen('Flip', w);
       
@@ -531,7 +531,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     
     % Clear screen to background color after response
     Screen('Flip', w);
@@ -655,8 +655,9 @@ for b = 1:phaseCfg.nBlocks
       % 'spcn', species number (corresponds to keyboard)
       % 'sord', whether this is a subordinate (1) or basic (0) level family
       % 'targ', whether this is a target (1) or not (0)
-      % 'resp', response string
-      % 'resk', the name of the key pressed
+      % 'rsps', response string
+      % 'rspk', the name of the key pressed
+      % 'rspt', the response time
       % 'corr', accuracy code (1=correct, 0=incorrect)
       % 'keyp', key pressed?(1=yes, 0=no)
       
@@ -671,21 +672,21 @@ for b = 1:phaseCfg.nBlocks
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'part','test',...
         'trln', i, 'stmn', stimName, 'spcn', specNum, 'sord', isSubord, 'targ', allStims{b}(i).targ,...
-        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+        'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % img presentation
       [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', test_imgOn{b}(i), .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'part','test',...
         'trln', i, 'stmn', stimName, 'spcn', specNum, 'sord', isSubord, 'targ', allStims{b}(i).targ,...
-        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+        'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % response prompt
       [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respKeyImgOn{b}(i), .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
         'part','test',...
         'trln', i, 'stmn', stimName, 'spcn', specNum, 'sord', isSubord, 'targ', allStims{b}(i).targ,...
-        'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+        'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % did they make a response?
       if keyIsDown
@@ -694,7 +695,7 @@ for b = 1:phaseCfg.nBlocks
           'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
           'part','test',...
           'trln', i, 'stmn', stimName, 'spcn', specNum, 'sord', isSubord, 'targ', allStims{b}(i).targ,...
-          'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+          'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end
       
       % if this is a target, log the study stimulus with response
@@ -714,7 +715,7 @@ for b = 1:phaseCfg.nBlocks
           'part','study',...
           'trln', sInd, 'stmn', stimName, 'spcn', specNum, 'sord', isSubord,...
           'targ', targStims{b}(sInd).targ,...
-          'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+          'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
         
         % img presentation
         [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', study_imgOn{b}(sInd), .001,...
@@ -722,7 +723,7 @@ for b = 1:phaseCfg.nBlocks
           'part','study',...
           'trln', sInd, 'stmn', stimName, 'spcn', specNum, 'sord', isSubord,...
           'targ', targStims{b}(sInd).targ,...
-          'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+          'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end
     end % useNS
     

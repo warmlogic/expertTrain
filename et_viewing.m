@@ -93,7 +93,7 @@ end
 message = sprintf('Preparing images, please wait...');
 Screen('TextSize', w, cfg.text.basicTextSize);
 % put the instructions on the screen
-DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
 % Update the display to show the message:
 Screen('Flip', w);
 
@@ -146,7 +146,7 @@ end
 
 if expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
-  et_impedanceCheck(w, cfg);
+  et_impedanceCheck(w, cfg, false);
 end
 
 %% start NS recording, if desired
@@ -198,7 +198,7 @@ for i = 1:length(stimTex)
   if runInBlocks
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
       % run the impedance break
-      et_impedanceCheck(w, cfg);
+      et_impedanceCheck(w, cfg, true);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -208,7 +208,7 @@ for i = 1:length(stimTex)
   else
     if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stimTex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
       % run the impedance break
-      et_impedanceCheck(w, cfg);
+      et_impedanceCheck(w, cfg, true);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -222,7 +222,7 @@ for i = 1:length(stimTex)
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
     % just draw straight into the main window since we don't need speed here
-    DrawFormattedText(w, pauseMsg, 'center', 'center');
+    DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
     % wait for kb release in case subject is holding down keys
@@ -230,7 +230,7 @@ for i = 1:length(stimTex)
     KbWait(-1); % listen for keypress on either keyboard
     
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     Screen('Flip',w);
     WaitSecs(0.5);
     % reset the timer
@@ -264,7 +264,7 @@ for i = 1:length(stimTex)
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   [preStimFixOn] = Screen('Flip',w);
   
   % fixation on screen before stim
@@ -274,13 +274,13 @@ for i = 1:length(stimTex)
   Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
   % and fixation on top of it
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   % and species number below it
   Screen('TextSize', w, cfg.text.basicTextSize);
   if specNum > 0
-    DrawFormattedText(w,num2str(specNum),'center',sNumY,initial_sNumColor);
+    DrawFormattedText(w,num2str(specNum),'center',sNumY,initial_sNumColor, cfg.text.instructCharWidth);
   else
-    DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,initial_sNumColor);
+    DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,initial_sNumColor, cfg.text.instructCharWidth);
   end
   
   % Show stimulus on screen at next possible display refresh cycle,
@@ -324,13 +324,13 @@ for i = 1:length(stimTex)
       Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
       % and fixation on top of it
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       % and species number below it in the appropriate color
       Screen('TextSize', w, cfg.text.basicTextSize);
       if specNum > 0
-        DrawFormattedText(w,num2str(specNum),'center',sNumY,sNumColor);
+        DrawFormattedText(w,num2str(specNum),'center',sNumY,sNumColor, cfg.text.instructCharWidth);
       else
-        DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,sNumColor);
+        DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,sNumColor, cfg.text.instructCharWidth);
       end
       Screen('Flip', w);
       
@@ -358,17 +358,17 @@ for i = 1:length(stimTex)
     Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     % and species number below it in the appropriate color
     Screen('TextSize', w, cfg.text.basicTextSize);
     if specNum > 0
-      DrawFormattedText(w,num2str(specNum),'center',sNumY,incorrect_sNumColor);
+      DrawFormattedText(w,num2str(specNum),'center',sNumY,incorrect_sNumColor, cfg.text.instructCharWidth);
     else
-      DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,incorrect_sNumColor);
+      DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,incorrect_sNumColor, cfg.text.instructCharWidth);
     end
     % "need to respond faster"
     Screen('TextSize', w, cfg.text.instructTextSize);
-    DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor);
+    DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     if phaseCfg.playSound
       Beeper(phaseCfg.incorrectSound);
@@ -477,8 +477,9 @@ for i = 1:length(stimTex)
     % 'famn', family number
     % 'spcn', species number (corresponds to keyboard)
     % 'sord', whether this is a subordinate (1) or basic (0) level family
-    % 'resp', response string
-    % 'resk', the name of the key pressed
+    % 'rsps', response string
+    % 'rspk', the name of the key pressed
+    % 'rspt', the response time
     % 'corr', accuracy code (1=correct, 0=incorrect)
     % 'keyp', key pressed?(1=yes, 0=no)
     
@@ -494,13 +495,13 @@ for i = 1:length(stimTex)
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % img presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % did they make a response?
     if keyIsDown
@@ -508,7 +509,7 @@ for i = 1:length(stimTex)
       [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
   end % useNS
   
