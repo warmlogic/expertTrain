@@ -379,7 +379,7 @@ if expParam.sessionNum == 1
   
   if matchTextPrompt
     cfg.text.matchSame = 'Same';
-    cfg.text.matchDiff = 'Diff   ';
+    cfg.text.matchDiff = 'Diff';
   end
   
   % "respond faster" text
