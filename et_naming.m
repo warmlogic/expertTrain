@@ -159,9 +159,9 @@ end
 message = 'Starting naming phase...';
 if expParam.useNS
   % start recording
-  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+  [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
-  [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
+  [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = 'Starting data acquisition for naming phase...';
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
@@ -247,7 +247,7 @@ for i = 1:length(stimTex)
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
-    [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
+    [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   end
   
   % TODO: practice fam numbers
@@ -494,7 +494,7 @@ for i = 1:length(stimTex)
   
   % Write netstation logs
   if expParam.useNS
-    % Write trial info to NetStation
+    % Write trial info to et_NetStation
     % mark every event with the following key code/value pairs
     % 'subn', subject number
     % 'sess', session type
@@ -520,19 +520,19 @@ for i = 1:length(stimTex)
     fNum = nameStims(i).familyNum;
   
     % pretrial fixation
-    [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
+    [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % img presentation
-    [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', imgOn, .001,...
+    [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % response prompt
-    [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
+    [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
@@ -540,7 +540,7 @@ for i = 1:length(stimTex)
     % did they make a response?
     if keyIsDown
       % button push
-      [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
+      [NSEventStatus, NSEventError] = et_NetStation('Event', 'RESP', endRT, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'bloc', b,...
       'trln', i, 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
@@ -568,7 +568,7 @@ Screen('Flip', w);
 % stop recording
 if expParam.useNS
   WaitSecs(5.0);
-  [NSSyncStatus, NSSyncError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+  [NSSyncStatus, NSSyncError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
 end
 
 % reset the KbCheck

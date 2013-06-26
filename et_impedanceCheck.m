@@ -23,7 +23,7 @@ Screen('Flip', w);
 if talkToNS
   WaitSecs(5.000);
   % stop recording
-  [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+  [NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
 end
 
 % wait until g key is held for ~1 seconds
@@ -31,7 +31,7 @@ KbCheckHold(1000, {cfg.keys.expContinue}, -1);
 
 if talkToNS
   % start recording
-  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+  [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
 end
 
 message = 'Starting data acquisition...';
