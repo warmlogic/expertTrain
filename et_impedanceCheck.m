@@ -1,12 +1,18 @@
-function et_impedanceCheck(w, cfg)
-% function et_impedanceCheck(w, cfg)
+function et_impedanceCheck(w, cfg, talkToNS)
+% function et_impedanceCheck(w, cfg, talkToNS)
 %
 % Run an impedance check.
 %
 % Input:
-%  w:   The psychtoolbox window
-%  cfg: The experiment config struct
+%  w:        The psychtoolbox window
+%  cfg:      The experiment config struct
+%  talkToNS: Whether Net Station needs to be stopped and started again.
+%            true/false. (default = false)
 %
+
+if ~exist('talkToNS','var') || isempty(talkToNS)
+  talkToNS = false;
+end
 
 Screen('TextSize', w, cfg.text.basicTextSize);
 pauseMsg = sprintf('The experimenter will now check the EEG cap.');
@@ -14,15 +20,19 @@ pauseMsg = sprintf('The experimenter will now check the EEG cap.');
 DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.experimenterColor);
 Screen('Flip', w);
 
-WaitSecs(5.000);
-% stop recording
-[NSStopStatus, NSStopError] = NetStation('StopRecording');
+if talkToNS
+  WaitSecs(5.000);
+  % stop recording
+  [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+end
 
 % wait until g key is held for ~1 seconds
 KbCheckHold(1000, {cfg.keys.expContinue}, -1);
 
-% start recording
-[NSStopStatus, NSStopError] = NetStation('StartRecording');
+if talkToNS
+  % start recording
+  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+end
 
 message = 'Starting data acquisition...';
 DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
