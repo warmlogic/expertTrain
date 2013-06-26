@@ -143,7 +143,7 @@ try
   %% Start data logging
   
   % Open data file and write column headers
-  logFile = fopen(cfg.files.sesLogFile,'w');
+  logFile = fopen(cfg.files.sesLogFile,'wt');
   
   %% Begin PTB display setup
   
@@ -255,9 +255,10 @@ try
       fprintf('%s ', num2str(sec));
       WaitSecs(1.0);
     end
+    fprintf('\n');
     
     % tag the end of the rest period
-    [NSEventStatus, NSEventError] = NetStation('Event', 'DONE', GetSecs, .001); %#ok<NASGU,ASGLU>
+    [NSEventStatus, NSEventError] = NetStation('Event', 'REND', GetSecs, .001); %#ok<NASGU,ASGLU>
     
     % stop recording
     [NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
@@ -308,13 +309,13 @@ try
         % Naming task
         nameCount = nameCount + 1;
         
-        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
+        et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
         
       case {'recog'}
         % Recognition (old/new) task
         recogCount = recogCount + 1;
         
-        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+        et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
 
       case {'nametrain'}
         % Name training task
@@ -322,7 +323,7 @@ try
         
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
-          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+          et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
         end
         
       case {'viewname'}
@@ -333,29 +334,29 @@ try
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           % run the viewing task
-          [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
           
           % then run the naming task
-          [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
         end
         
       case{'prac_match'}
         % Subordinate Matching task (same/different)
         prac_matchCount = prac_matchCount + 1;
         
-        [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
+        et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
         
       case {'prac_name'}
         % Naming task
         prac_nameCount = prac_nameCount + 1;
         
-        [logFile] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
+        et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
         
       case {'prac_recog'}
         % Recognition (old/new) task
         prac_recogCount = prac_recogCount + 1;
         
-        [logFile] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
+        et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
 
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);
@@ -379,7 +380,7 @@ try
   if expParam.useNS
     % stop recording
     %[NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
-    fprintf('\nDisconnecting from Net Station @ %s\n', NSHost);
+    fprintf('\nDisconnecting from Net Station @ %s\n', expParam.NSHost);
     [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
   
@@ -416,6 +417,8 @@ try
 catch ME
   % catch error: This is executed in case something goes wrong in the
   % 'try' part due to programming error etc.:
+  
+  fprintf('\nError during session %d. Exiting gracefully.\n',expParam.sessionNum);
   
   save(cfg.files.expParamFile,'cfg','expParam');
   
