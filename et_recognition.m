@@ -227,10 +227,10 @@ for b = 1:phaseCfg.nBlocks
       famNumBasic = cfg.stim.practice.famNumBasic;
     end
     if any(targStims{b}(i).familyNum == famNumSubord)
-      isSubord = 1;
+      isSubord = true;
       specNum = targStims{b}(i).speciesNum;
     elseif any(targStims{b}(i).familyNum == famNumBasic)
-      isSubord = 0;
+      isSubord = false;
       specNum = 0;
     end
     
@@ -417,10 +417,10 @@ for b = 1:phaseCfg.nBlocks
       famNumBasic = cfg.stim.practice.famNumBasic;
     end
     if any(allStims{b}(i).familyNum == famNumSubord)
-      isSubord = 1;
+      isSubord = true;
       specNum = allStims{b}(i).speciesNum;
     elseif any(allStims{b}(i).familyNum == famNumBasic)
-      isSubord = 0;
+      isSubord = false;
       specNum = 0;
     end
     
@@ -510,6 +510,7 @@ for b = 1:phaseCfg.nBlocks
       % wait so we don't overload the system
       WaitSecs(0.0001);
     end
+    keyIsDown = logical(keyIsDown);
     
     if ~keyIsDown
       if phaseCfg.playSound

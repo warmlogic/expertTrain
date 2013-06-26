@@ -25,11 +25,11 @@ for b = 1:phaseCfg.nBlocks
     % targets
     [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_divvyStims(...
       expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},phaseCfg.nStudyTarg,...
-      phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{1});
+      phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{true});
     % lures
     [expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_divvyStims(...
       expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},expParam.session.(sesName).(phaseName)(phaseCount).lureStims{b},phaseCfg.nTestLure,...
-      phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{0});
+      phaseCfg.rmStims,phaseCfg.shuffleFirst,{'targ'},{false});
   end
   
   % shuffle the study stims so no more than X of the same family appear in

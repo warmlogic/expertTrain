@@ -262,10 +262,10 @@ for i = 1:length(stimTex)
     famNumBasic = cfg.stim.practice.famNumBasic;
   end
   if any(nameStims(i).familyNum == famNumSubord)
-    isSubord = 1;
+    isSubord = true;
     specNum = nameStims(i).speciesNum;
   elseif any(nameStims(i).familyNum == famNumBasic)
-    isSubord = 0;
+    isSubord = false;
     specNum = 0;
   end
   
@@ -367,6 +367,7 @@ for i = 1:length(stimTex)
     % wait so we don't overload the system
     WaitSecs(0.0001);
   end
+  keyIsDown = logical(keyIsDown);
   
   % wait out any remaining time
   while (GetSecs - startRT) <= phaseCfg.name_response

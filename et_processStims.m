@@ -85,13 +85,13 @@ for f = 1:length(cfg.stim.familyNames)
   expParam.session.(sprintf('f%dTrained',f)) = [];
   [expParam.session.(sprintf('f%dTrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nTrained,...
-    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{0, 1});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, true});
   
   % untrained
   expParam.session.(sprintf('f%dUntrained',f)) = [];
   [expParam.session.(sprintf('f%dUntrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nUntrained,...
-    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{0, 0});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, false});
 end
 
 %% if there are recognition phases, get those stimuli
@@ -125,7 +125,7 @@ for s = 1:expParam.nSessions
                 [expParam.session.(sesName).(phaseName)(recogCount).allStims{b},stimStruct(f).fStims] = et_divvyStims(...
                   stimStruct(f).fStims,expParam.session.(sesName).(phaseName)(recogCount).allStims{b},...
                   cfg.stim.(sesName).(phaseName)(recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(recogCount).nTestLure,...
-                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{0});
+                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false});
               end
             end
           end
@@ -220,7 +220,7 @@ if expParam.runPractice
     expParam.session.(sprintf('f%dPractice',f)) = [];
     [expParam.session.(sprintf('f%dPractice',f)),stimStruct_prac(f).fStims] = et_divvyStims(...
       stimStruct_prac(f).fStims,[],cfg.stim.practice.nPractice,...
-      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{1});
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{true});
   end
 end
 
@@ -257,7 +257,7 @@ if expParam.runPractice
                   [expParam.session.(sesName).(phaseName)(prac_recogCount).allStims{b},stimStruct_prac(f).fStims] = et_divvyStims(...
                     stimStruct_prac(f).fStims,expParam.session.(sesName).(phaseName)(prac_recogCount).allStims{b},...
                     cfg.stim.(sesName).(phaseName)(prac_recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(prac_recogCount).nTestLure,...
-                    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{1});
+                    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{true});
                 end
               end
             end

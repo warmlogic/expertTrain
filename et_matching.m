@@ -275,11 +275,11 @@ for i = 1:length(stim2Tex)
     famNumBasic = cfg.stim.practice.famNumBasic;
   end
   if any(stim2(i).familyNum == famNumSubord)
-    isSubord = 1;
+    isSubord = true;
     specNum1 = stim1(i).speciesNum;
     specNum2 = stim2(i).speciesNum;
   elseif any(stim2(i).familyNum == famNumBasic)
-    isSubord = 0;
+    isSubord = false;
     specNum1 = 0;
     specNum2 = 0;
   end
@@ -396,6 +396,7 @@ for i = 1:length(stim2Tex)
     % wait so we don't overload the system
     WaitSecs(0.0001);
   end
+  keyIsDown = logical(keyIsDown);
   
   % determine response and compute accuracy
   if keyIsDown

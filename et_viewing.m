@@ -252,10 +252,10 @@ for i = 1:length(stimTex)
     famNumBasic = cfg.stim.practice.famNumBasic;
   end
   if any(viewStims(i).familyNum == famNumSubord)
-    isSubord = 1;
+    isSubord = true;
     specNum = viewStims(i).speciesNum;
   elseif any(viewStims(i).familyNum == famNumBasic)
-    isSubord = 0;
+    isSubord = false;
     specNum = 0;
   end
   
@@ -344,6 +344,7 @@ for i = 1:length(stimTex)
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);
   end
+  keyIsDown = logical(keyIsDown);
   
   % wait out any remaining time
   while (GetSecs - stimOnset) <= phaseCfg.view_stim

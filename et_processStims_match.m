@@ -34,10 +34,10 @@ if ~phaseCfg.isExp
   end
   % add in the 'trained' field because we need it for running the task
   for e = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).same)
-    expParam.session.(sesName).(phaseName)(phaseCount).same(e).trained = -1;
+    expParam.session.(sesName).(phaseName)(phaseCount).same(e).trained = false;
   end
   for e = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).diff)
-    expParam.session.(sesName).(phaseName)(phaseCount).diff(e).trained = -1;
+    expParam.session.(sesName).(phaseName)(phaseCount).diff(e).trained = false;
   end
 else
   % this is the real experiment
