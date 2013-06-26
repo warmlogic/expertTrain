@@ -73,12 +73,12 @@ theseSpecies = unique([origStims.speciesNum]);
 theseSameStims = [];
 [theseSameStims,origStims] = et_divvyStims(...
   origStims,theseSameStims,nSame,rmStims_orig,shuffleFirst,...
-  {'same', 'matchStimNum', 'matchPairNum'},{1, 2, []},maxChosen);
+  {'same', 'matchStimNum', 'matchPairNum'},{true, 2, []},maxChosen);
 % different: other half are stim2 in "different" condition
 theseDiffStims = [];
 [theseDiffStims,origStims] = et_divvyStims(...
   origStims,theseDiffStims,nDiff,rmStims_orig,shuffleFirst,...
-  {'same', 'matchStimNum', 'matchPairNum'},{0, 2, []},maxChosen);
+  {'same', 'matchStimNum', 'matchPairNum'},{false, 2, []},maxChosen);
 
 % store the stimuli for slicing before modifying
 stim2_same = theseSameStims;
@@ -121,7 +121,7 @@ for s = 1:length(theseSpecies)
     % shuffleFirst so that we keep the new order
     [theseSameStims,stim1_spec] = et_divvyStims(...
       stim1_spec,theseSameStims,1,rmStims_pair,false,...
-      {'same', 'matchStimNum', 'matchPairNum'},{1, 1, pairCount});
+      {'same', 'matchStimNum', 'matchPairNum'},{true, 1, pairCount});
     pairCount = pairCount + 1;
   end
 end
@@ -151,7 +151,7 @@ for s = 1:length(theseSpecies)
     % choose 1 stim1 for each stim2, setting the same pair number
     [theseDiffStims,stim1_spec] = et_divvyStims(...
       stim1_spec,theseDiffStims,1,rmStims_pair,shuffleFirst,...
-      {'same', 'matchStimNum', 'matchPairNum'},{0, 1, pairCount});
+      {'same', 'matchStimNum', 'matchPairNum'},{false, 1, pairCount});
     pairCount = pairCount + 1;
   end
 end
