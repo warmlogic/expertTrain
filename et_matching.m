@@ -1,5 +1,5 @@
-function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
-% function [logFile] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+function et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+% function et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 %
 % Description:
 %  This function runs the matching task. There are no blocks, only short
@@ -118,7 +118,7 @@ stim2Tex = nan(1,length(stim2));
 message = sprintf('Preparing images, please wait...');
 Screen('TextSize', w, cfg.text.basicTextSize);
 % put the "preparing" message on the screen
-DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor);
+DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
 % Update the display to show the message:
 Screen('Flip', w);
 
@@ -188,7 +188,7 @@ end
 
 if expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
-  et_impedanceCheck(w, cfg);
+  et_impedanceCheck(w, cfg, false);
 end
 
 %% start NS recording, if desired
@@ -237,7 +237,7 @@ for i = 1:length(stim2Tex)
   % do an impedance check after a certain number of trials
   if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stim2Tex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
     % run the impedance break
-    et_impedanceCheck(w, cfg);
+    et_impedanceCheck(w, cfg, true);
     
     % reset the blink timer
     if cfg.stim.secUntilBlinkBreak > 0
@@ -250,7 +250,7 @@ for i = 1:length(stim2Tex)
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stim2Tex));
     % just draw straight into the main window since we don't need speed here
-    DrawFormattedText(w, pauseMsg, 'center', 'center');
+    DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
     % wait for kb release in case subject is holding down keys
@@ -258,7 +258,7 @@ for i = 1:length(stim2Tex)
     KbWait(-1); % listen for keypress on either keyboard
     
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     Screen('Flip',w);
     WaitSecs(0.5);
     % reset the timer
@@ -294,7 +294,7 @@ for i = 1:length(stim2Tex)
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   [preStim1FixOn] = Screen('Flip',w);
   
   % fixation on screen before stim1 for a random amount of time
@@ -304,7 +304,7 @@ for i = 1:length(stim2Tex)
   Screen('DrawTexture', w, stim1Tex(i), [], stimImgRect);
   % and fixation on top of it
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
@@ -322,7 +322,7 @@ for i = 1:length(stim2Tex)
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   [preStim2FixOn] = Screen('Flip',w);
   
   % fixation on screen before stim2 for a random amount of time
@@ -332,7 +332,7 @@ for i = 1:length(stim2Tex)
   Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
   % and fixation on top of it
   Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   
   % Show stimulus on screen at next possible display refresh cycle,
   % and record stimulus onset time in 'stimOnset':
@@ -351,9 +351,9 @@ for i = 1:length(stim2Tex)
       if keyIsDown
         Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
         Screen('TextSize', w, cfg.text.instructTextSize);
-        DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor);
+        DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor, cfg.text.instructCharWidth);
         Screen('TextSize', w, cfg.text.fixSize);
-        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         Screen('Flip', w);
       end
     end
@@ -367,9 +367,9 @@ for i = 1:length(stim2Tex)
   Screen('TextSize', w, cfg.text.fixSize);
   if phaseCfg.matchTextPrompt
     responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
-    DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   else
-    DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor);
+    DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   end
   [respPromptOn, startRT] = Screen('Flip',w);
   
@@ -478,7 +478,7 @@ for i = 1:length(stim2Tex)
     Beeper(respSound,respVol);
   end
   Screen('TextSize', w, cfg.text.instructTextSize);
-  DrawFormattedText(w,message,'center','center',feedbackColor);
+  DrawFormattedText(w,message,'center','center',feedbackColor, cfg.text.instructCharWidth);
   Screen('Flip', w);
   % wait to let them view the feedback
   WaitSecs(feedbackTime);
@@ -503,7 +503,7 @@ for i = 1:length(stim2Tex)
   fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc);
   
   % Write stim1 presentation to file:
-  fprintf(logFile,'%f %s %s %s %s %i %s %s %i %i %i %i %i\n',...
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\n',...
     img1On,...
     expParam.subject,...
     sesName,...
@@ -519,7 +519,7 @@ for i = 1:length(stim2Tex)
     stim1(i).same);
   
   % Write stim2 presentation to file:
-  fprintf(logFile,'%f %s %s %s %s %i %s %s %i %i %i %i %i\n',...
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\n',...
     img2On,...
     expParam.subject,...
     sesName,...
@@ -535,7 +535,7 @@ for i = 1:length(stim2Tex)
     stim2(i).same);
   
   % Write trial result to file:
-  fprintf(logFile,'%f %s %s %s %s %i %i %i %i %s %s %i %i\n',...
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%s\t%i\t%i\t%i\t%i\t%s\t%s\t%i\t%i\n',...
     endRT,...
     expParam.subject,...
     sesName,...
@@ -564,8 +564,9 @@ for i = 1:length(stim2Tex)
     % 'sord', whether this is a subordinate (1) or basic (0) level family
     % 'trai', whether this is a trained (1) or untrained (0) stimulus
     % 'same', whether this is a same (1) or different (0) trial
-    % 'resp', response string
-    % 'resk', the name of the key pressed
+    % 'rsps', response string
+    % 'rspk', the name of the key pressed
+    % 'rspt', the response time
     % 'corr', accuracy code (1=correct, 0=incorrect)
     % 'keyp', key pressed?(1=yes, 0=no)
     
@@ -595,28 +596,28 @@ for i = 1:length(stim2Tex)
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim1Name, 'famn', fNum1, 'spcn', specNum1,...
       'sord', isSubord, 'trai', stim1(i).trained, 'same', stim1(i).same,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % stim1 presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', img1On, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim1Name, 'famn', fNum1, 'spcn', specNum1,...
       'sord', isSubord, 'trai', stim1(i).trained, 'same', stim1(i).same,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % pre-stim2 fixation
     [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStim2FixOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim2Name, 'famn', fNum2, 'spcn', specNum2,...
       'sord', isSubord, 'trai', stim2(i).trained, 'same', stim1(i).same,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % stim2 presentation
     [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', img2On, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
       'trln', i, 'stmn', stim2Name, 'famn', fNum2, 'spcn', specNum2,...
       'sord', isSubord, 'trai', stim2(i).trained, 'same', stim1(i).same,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % response prompt
     [NSEventStatus, NSEventError] = NetStation('Event', 'PROM', respPromptOn, .001,...
@@ -624,7 +625,7 @@ for i = 1:length(stim2Tex)
       'trln', i,...
       'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
       'sord', isSubord, 'trai', stim2(i).trained, 'same', stim2(i).same,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     % did they make a response?
     if keyIsDown
@@ -634,7 +635,7 @@ for i = 1:length(stim2Tex)
       'trln', i,...
       'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
       'sord', isSubord, 'trai', stim2(i).trained, 'same', stim2(i).same,...
-      'resp', resp, 'resk', respKey, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
   end % useNS
   
