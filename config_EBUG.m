@@ -355,23 +355,41 @@ if expParam.sessionNum == 1
   %cfg.screen.gray = 181;
   cfg.screen.gray = 210;
   
-  % font size for small messages printed to the screen
-  cfg.text.basicTextSize = 32;
-  cfg.text.basicTextColor = uint8((rgb('Black') * 255) + 0.5);
-  % font size for instructsions
-  cfg.text.instructTextSize = 28;
-  cfg.text.instructColor = uint8((rgb('Black') * 255) + 0.5);
+  % font sizes
+  %
+  % basic: small messages printed to the screen
+  % instruct: instructions
+  % fixSize: fixation
+  if ismac
+    cfg.text.basicTextSize = 32;
+    cfg.text.instructTextSize = 28;
+    cfg.text.fixSize = 32;
+    %cfg.text.basicTextSize = 18;
+    %cfg.text.instructTextSize = 12;
+    %cfg.text.fixSize = 18;
+  elseif ispc
+    cfg.text.basicTextSize = 18;
+    cfg.text.instructTextSize = 12;
+    cfg.text.fixSize = 18;
+  elseif isunix
+    cfg.text.basicTextSize = 18;
+    cfg.text.instructTextSize = 12;
+    cfg.text.fixSize = 18;
+  end
   
+  % text colors
+  cfg.text.basicTextColor = uint8((rgb('Black') * 255) + 0.5);
+  cfg.text.instructColor = uint8((rgb('Black') * 255) + 0.5);
   % text color when experimenter's attention is needed
   cfg.text.experimenterColor = uint8((rgb('Red') * 255) + 0.5);
   
-  % number of characters wide at which the instructions will be shown
+  % number of characters wide at which any text will wrap
   cfg.text.instructCharWidth = 70;
+  
   % key to push to dismiss instruction screen
   cfg.keys.instructContKey = 'space';
   
   % fixation info
-  cfg.text.fixSize = 32;
   cfg.text.fixSymbol = '+';
   cfg.text.respSymbol = '?';
   cfg.text.fixationColor = uint8((rgb('Black') * 255) + 0.5);
