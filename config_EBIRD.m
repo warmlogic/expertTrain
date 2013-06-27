@@ -27,6 +27,9 @@ if expParam.useNS
   % D464
   expParam.NSHost = '128.138.223.26';
   
+  % % server room
+  % expParam.NSHost = '128.138.223.46';
+  
   expParam.baselineRecordSecs = 20.0;
 end
 
@@ -60,7 +63,8 @@ expParam.session.posttest_delay.phases = {'prac_match','match'};
 % % demo - debug
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
-% expParam.session.pretest.phases = {'prac_match','prac_match'};
+% % expParam.session.pretest.phases = {'prac_match','prac_match'};
+% expParam.session.pretest.phases = {'prac_match'};
 % expParam.session.train1.phases = {'prac_name','nametrain'};
 
 % % % debug
