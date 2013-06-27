@@ -187,15 +187,15 @@ try
   if ispc
     Screen('Preference','DefaultFontName','Arial');
     Screen('Preference','DefaultFontStyle',0);
-    Screen('Preference','DefaultFontSize',12);
+    Screen('Preference','DefaultFontSize',18);
   elseif ismac
     Screen('Preference','DefaultFontName','Helvetica');
     Screen('Preference','DefaultFontStyle',0);
-    Screen('Preference','DefaultFontSize',12);
+    Screen('Preference','DefaultFontSize',18);
   elseif isunix
     Screen('Preference','DefaultFontName','Arial');
     Screen('Preference','DefaultFontStyle',0);
-    Screen('Preference','DefaultFontSize',12);
+    Screen('Preference','DefaultFontSize',18);
   end
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
