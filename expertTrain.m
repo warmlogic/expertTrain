@@ -183,8 +183,20 @@ try
   % put on a grey screen
   Screen('Flip',w);
   
-  % basic text size
-  Screen('TextSize', w, cfg.text.basicTextSize);
+  % set some font display options
+  if ispc
+    Screen('Preference','DefaultFontName','Arial');
+    Screen('Preference','DefaultFontStyle',0);
+    Screen('Preference','DefaultFontSize',12);
+  elseif ismac
+    Screen('Preference','DefaultFontName','Helvetica');
+    Screen('Preference','DefaultFontStyle',0);
+    Screen('Preference','DefaultFontSize',12);
+  elseif isunix
+    Screen('Preference','DefaultFontName','Arial');
+    Screen('Preference','DefaultFontStyle',0);
+    Screen('Preference','DefaultFontSize',12);
+  end
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
   % they are loaded and ready when we need them - without delays
@@ -208,6 +220,10 @@ try
     
     % wait until g key is held for ~1 seconds
     KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+    % % wait until g key is pressed
+    % RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+    % KbWait(-1,2);
+    % RestrictKeysForKbCheck([]);
     
     % connect
     [NSConnectStatus, NSConnectError] = et_NetStation('Connect', expParam.NSHost, expParam.NSPort); %#ok<NASGU>
@@ -236,6 +252,10 @@ try
     
     % wait until g key is held for ~1 seconds
     KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+    % % wait until g key is pressed
+    % RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+    % KbWait(-1,2);
+    % RestrictKeysForKbCheck([]);
     
     % start recording
     Screen('TextSize', w, cfg.text.basicTextSize);
@@ -397,6 +417,10 @@ try
   
   % wait until g key is held for ~1 seconds
   KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+  % % wait until g key is pressed
+  % RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+  % KbWait(-1,2);
+  % RestrictKeysForKbCheck([]);
   Screen('Flip', w);
   WaitSecs(1.000);
   

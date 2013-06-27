@@ -28,6 +28,10 @@ end
 
 % wait until g key is held for ~1 seconds
 KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+% % wait until g key is pressed
+% RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+% KbWait(-1,2);
+% RestrictKeysForKbCheck([]);
 
 if talkToNS
   % start recording
