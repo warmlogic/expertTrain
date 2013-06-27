@@ -18,7 +18,8 @@ About
 - There are two additional augmented introductory training phases (typically to be used on Training Day 1):
    1. Nametrain (`nametrain`): Just like the `name` phase, but species are introduced a one or two at a time (as defined in `config_EXPNAME.m`) and subjects have to name the species even if no exposure has occurred. The idea is that this will force subjects to learn the species labels quickly.
    1. Viewname (`viewname`): intermixed viewing and naming blocks (described above) for introducing the subject to different species. **This phase is not being used.**
-- expertTrain has been developed tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3.
+- expertTrain has been developed tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3. It has also been used on Windows XP and Debian 7 with Matlab 2013a, but to a lesser extent.
+- You must use a USB keyboard with this experiment.
 
 Installation
 ----
@@ -51,9 +52,10 @@ Preparing the experiment
       - Apologies for being such a long/extensive config file, but it is well organized.
    - For the config structures in `config_EBUG.m`, each entry in `expParam.sesTypes` is a separate session (e.g., different days of the experiment). The phases for each session are configured below that in the `expParam.session` field. The requirement is that `expParam.session` has a field for each `expParam.sesTypes` entry.
 - For Net Station integration:
+   1. Set up your Net Station acquisition template to have a Multi-Port ECI device between the Source device and the Recorder device, and connect the blue STIM tube through them all the way to the Display device.
    1. Set `expParam.useNS = true;` in the config file.
    1. Connect the behavioral testing computer and the Net Station computer together with an ethernet cable.
-   1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
+   1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`, or it's listed in the Multi-Port ECI panel in Net Station) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
    1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
    - `et_calcExpDuration()` is a function to determine how long your experiment will be.
