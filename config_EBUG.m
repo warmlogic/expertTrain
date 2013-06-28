@@ -10,7 +10,7 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 % et_processStims_recog, et_processStims_viewname,
 % et_processStims_nametrain, et_processStims_name
 
-%% Experiment session information
+%% Experiment defaults
 
 % set up configuration structures to keep track of what day and phase we're
 % on.
@@ -30,15 +30,20 @@ if expParam.useNS
   expParam.baselineRecordSecs = 20.0;
 end
 
-% sound defaults
+% sound defaults, these get set for each phase
 playSound = true;
 correctSound = 1000;
 incorrectSound = 300;
 correctVol = 0.4;
 incorrectVol = 0.6;
 
+% whether to print trial details to the command window
+cfg.text.printTrialInfo = true;
+
 % matching task defaults
 matchTextPrompt = true;
+
+%% Experiment session information
 
 % Set the number of sessions
 expParam.nSessions = 9;

@@ -63,6 +63,12 @@ respKeyImgHeight = size(respKeyImg,1) * cfg.files.recogTestRespKeyImgScale;
 respKeyImgWidth = size(respKeyImg,2) * cfg.files.recogTestRespKeyImgScale;
 respKeyImg = Screen('MakeTexture',w,respKeyImg);
 
+% default is to not print out trial details
+if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
+  cfg.text.printTrialInfo = false;
+end
+
+% default is to not play sounds
 if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
   phaseCfg.playSound = false;
 end
@@ -264,8 +270,9 @@ for b = 1:phaseCfg.nBlocks
     % and record stimulus onset time in 'startrt':
     [study_imgOn{b}(i), study_stimOnset] = Screen('Flip', w);
     
-    % debug
-    fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),allStims{b}(i).fileName);
+    if cfg.text.printTrialInfo
+      fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),allStims{b}(i).fileName);
+    end
     
     % while loop to show stimulus until subjects response or until
     % "duration" seconds elapsed.
@@ -464,8 +471,9 @@ for b = 1:phaseCfg.nBlocks
     % and record stimulus onset time in 'test_stimOnset':
     [test_imgOn{b}(i), test_stimOnset] = Screen('Flip', w);
     
-    % debug
-    fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ);
+    if cfg.text.printTrialInfo
+      fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d.\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ);
+    end
     
     % while loop to show stimulus until "duration" seconds elapsed.
     while (GetSecs - test_stimOnset) <= phaseCfg.recog_test_stim
@@ -511,8 +519,9 @@ for b = 1:phaseCfg.nBlocks
         while KbCheck(-1)
           WaitSecs(0.0001);
         end
-        % % debug
-        % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+        % if cfg.text.printTrialInfo
+        %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+        % end
         if (keyCode(cfg.keys.recogDefUn) == 1 && all(keyCode(~cfg.keys.recogDefUn) == 0)) ||...
             (keyCode(cfg.keys.recogMayUn) == 1 && all(keyCode(~cfg.keys.recogMayUn) == 0)) ||...
             (keyCode(cfg.keys.recogMayF) == 1 && all(keyCode(~cfg.keys.recogMayF) == 0)) ||...
@@ -587,8 +596,7 @@ for b = 1:phaseCfg.nBlocks
       elseif keyCode(cfg.keys.recogDefUn) == 1
         resp = 'definitelyUnfam';
       else
-        % debug
-        fprintf('Key other than a recognition response key was pressed. This should not happen.\n');
+        warning('Key other than a recognition response key was pressed. This should not happen.\n');
         resp = 'ERROR';
       end
     elseif ~keyIsDown
@@ -601,8 +609,9 @@ for b = 1:phaseCfg.nBlocks
       respKey = 'none';
     end
     
-    % debug
-    fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ,resp,respKey,acc);
+    if cfg.text.printTrialInfo
+      fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ,resp,respKey,acc);
+    end
     
     % Write test stimulus presentation to file:
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\t%i\t%i\t%s\t%s\t%i\t%i\t%i\t%i\n',...

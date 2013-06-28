@@ -68,6 +68,12 @@ incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
 [~,respondFasterY] = RectCenter(cfg.screen.wRect);
 respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
 
+% default is to not print out trial details
+if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
+  cfg.text.printTrialInfo = false;
+end
+
+% default is to not play sounds
 if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
   phaseCfg.playSound = false;
 end
@@ -291,8 +297,9 @@ for i = 1:length(stimTex)
   % and record stimulus onset time in 'stimOnset':
   [imgOn, stimOnset] = Screen('Flip', w);
   
-  % debug
-  fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),viewStims(i).fileName,specNum);
+  if cfg.text.printTrialInfo
+    fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),viewStims(i).fileName,specNum);
+  end
   
   % while loop to show stimulus until subject response or until
   % "duration" seconds elapse.
@@ -309,8 +316,9 @@ for i = 1:length(stimTex)
       while KbCheck(-1)
         WaitSecs(0.0001);
       end
-      % % debug
-      % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - stimOnset);
+      % if cfg.text.printTrialInfo
+      %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - stimOnset);
+      % end
       if keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
         sNumColor = correct_sNumColor;
         if phaseCfg.playSound
@@ -432,8 +440,9 @@ for i = 1:length(stimTex)
     resp = 'none';
   end
   
-  % debug
-  fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),viewStims(i).fileName,specNum,resp,respKey,acc);
+  if cfg.text.printTrialInfo
+    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),viewStims(i).fileName,specNum,resp,respKey,acc);
+  end
   
   fNum = int32(viewStims(i).familyNum);
   

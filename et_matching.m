@@ -81,6 +81,12 @@ if phaseCfg.matchTextPrompt
   end
 end
 
+% default is to not print out trial details
+if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
+  cfg.text.printTrialInfo = false;
+end
+
+% default is to not play sounds
 if ~isfield(phaseCfg,'playSound') || isempty(phaseCfg.playSound)
   phaseCfg.playSound = false;
 end
@@ -312,8 +318,9 @@ for i = 1:length(stim2Tex)
   % and record stimulus onset time in 'stimOnset':
   [img1On, stim1Onset] = Screen('Flip', w);
   
-  % debug
-  fprintf('Trial %d of %d: stim1 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim1(i).fileName,stim1(i).familyNum,stim1(i).familyStr,stim1(i).speciesNum,stim1(i).speciesStr,stim1(i).exemplarNum,stim1(i).exemplarName,stim1(i).same);
+  if cfg.text.printTrialInfo
+    fprintf('Trial %d of %d: stim1 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim1(i).fileName,stim1(i).familyNum,stim1(i).familyStr,stim1(i).speciesNum,stim1(i).speciesStr,stim1(i).exemplarNum,stim1(i).exemplarName,stim1(i).same);
+  end
   
   % while loop to show stimulus until "duration" seconds elapsed.
   while (GetSecs - stim1Onset) <= phaseCfg.match_stim1
@@ -340,8 +347,9 @@ for i = 1:length(stim2Tex)
   % and record stimulus onset time in 'stimOnset':
   [img2On, stim2Onset] = Screen('Flip', w);
   
-  % debug
-  fprintf('Trial %d of %d: stim2 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim2(i).fileName,stim2(i).familyNum,stim2(i).familyStr,stim2(i).speciesNum,stim2(i).speciesStr,stim2(i).exemplarNum,stim2(i).exemplarName,stim2(i).same);
+  if cfg.text.printTrialInfo
+    fprintf('Trial %d of %d: stim2 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim2(i).fileName,stim2(i).familyNum,stim2(i).familyStr,stim2(i).speciesNum,stim2(i).speciesStr,stim2(i).exemplarNum,stim2(i).exemplarName,stim2(i).same);
+  end
   
   % while loop to show stimulus until subjects response or until
   % "duration" seconds elapsed.
@@ -388,8 +396,9 @@ for i = 1:length(stim2Tex)
       while KbCheck(-1)
         WaitSecs(0.0001);
       end
-      % % debug
-      % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+      % if cfg.text.printTrialInfo
+      %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+      % end
       if (keyCode(cfg.keys.matchSame) == 1 && all(keyCode(~cfg.keys.matchSame) == 0)) ||...
           (keyCode(cfg.keys.matchDiff) == 1 && all(keyCode(~cfg.keys.matchDiff) == 0))
         break
@@ -449,8 +458,7 @@ for i = 1:length(stim2Tex)
         feedbackColor = incorrectColor;
       end
     else
-      % debug
-      fprintf('Key other than same/diff was pressed. This should not happen.\n');
+      warning('Key other than same/diff was pressed. This should not happen.\n');
       resp = 'ERROR';
     end
     if ~phaseCfg.isExp
@@ -502,8 +510,9 @@ for i = 1:length(stim2Tex)
   % compute response time
   rt = int32(round(1000 * (endRT - startRT)));
   
-  % debug
-  fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc);
+  if cfg.text.printTrialInfo
+    fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc);
+  end
   
   fNum1 = int32(stim1(i).familyNum);
   fNum2 = int32(stim2(i).familyNum);
