@@ -119,10 +119,10 @@ if expParam.sessionNum == 1
   % blink break (set to 0 if you don't want breaks)
   if expParam.useNS
     % timer in secs for when to take a blink break (only when useNS=true)
-    cfg.stim.secUntilBlinkBreak = 45.000;
+    cfg.stim.secUntilBlinkBreak = 45.0;
   else
     % timer in secs for when to take a blink break (only when useNS=false)
-    cfg.stim.secUntilBlinkBreak = 90.000;
+    cfg.stim.secUntilBlinkBreak = 90.0;
   end
   
   %% Stimulus parameters

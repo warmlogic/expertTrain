@@ -245,10 +245,14 @@ for b = 1:phaseCfg.nBlocks
     [study_preStimFixOn{b}(i)] = Screen('Flip',w);
     
     % ISI between trials
-    WaitSecs(phaseCfg.recog_study_isi);
+    if phaseCfg.recog_study_isi > 0
+      WaitSecs(phaseCfg.recog_study_isi);
+    end
     
     % fixation on screen before starting trial
-    WaitSecs(phaseCfg.recog_study_preTarg);
+    if phaseCfg.recog_study_preTarg > 0
+      WaitSecs(phaseCfg.recog_study_preTarg);
+    end
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
@@ -441,10 +445,14 @@ for b = 1:phaseCfg.nBlocks
     [test_preStimFixOn{b}(i)] = Screen('Flip',w);
     
     % ISI between trials
-    WaitSecs(phaseCfg.recog_test_isi);
+    if phaseCfg.recog_test_isi > 0
+      WaitSecs(phaseCfg.recog_test_isi);
+    end
     
     % fixation on screen before starting trial
-    WaitSecs(phaseCfg.recog_test_preStim);
+    if phaseCfg.recog_test_preStim > 0
+      WaitSecs(phaseCfg.recog_test_preStim);
+    end
     
     % draw the stimulus
     Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);

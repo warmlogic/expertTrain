@@ -35,13 +35,13 @@ function et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 %  matchStimNum (1 or 2).
 
 % % durations, in seconds
-% cfg.stim.(sesName).(phaseName).match_isi = 0.5;
+% cfg.stim.(sesName).(phaseName).match_isi = 0.0;
 % cfg.stim.(sesName).(phaseName).match_stim1 = 0.8;
 % cfg.stim.(sesName).(phaseName).match_stim2 = 0.8;
 % % random intervals are generated on the fly
 % cfg.stim.(sesName).(phaseName).match_preStim1 = [0.5 0.7];
 % cfg.stim.(sesName).(phaseName).match_preStim2 = [1.0 1.2];
-% cfg.stim.(sesName).(phaseName).match_response = 5.0;
+% cfg.stim.(sesName).(phaseName).match_response = 2.0;
 
 % % keys
 % cfg.keys.matchSame
@@ -290,7 +290,9 @@ for i = 1:length(stim2Tex)
   end
   
   % ISI between trials
-  WaitSecs(phaseCfg.match_isi);
+  if phaseCfg.match_isi > 0
+    WaitSecs(phaseCfg.match_isi);
+  end
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
@@ -455,7 +457,7 @@ for i = 1:length(stim2Tex)
       feedbackTime = cfg.text.respondFasterFeedbackTime;
     else
       message = '';
-      feedbackTime = 0.001;
+      feedbackTime = 0.01;
     end
   else
     resp = 'none';

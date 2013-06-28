@@ -260,7 +260,9 @@ for i = 1:length(stimTex)
   end
   
   % ISI between trials
-  WaitSecs(phaseCfg.view_isi);
+  if phaseCfg.view_isi > 0
+    WaitSecs(phaseCfg.view_isi);
+  end
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
@@ -268,7 +270,9 @@ for i = 1:length(stimTex)
   [preStimFixOn] = Screen('Flip',w);
   
   % fixation on screen before stim
-  WaitSecs(phaseCfg.view_preStim);
+  if phaseCfg.view_preStim > 0
+    WaitSecs(phaseCfg.view_preStim);
+  end
   
   % draw the stimulus
   Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
@@ -303,7 +307,7 @@ for i = 1:length(stimTex)
     if keyIsDown && sum(keyCode) == 1
       % wait for key to be released
       while KbCheck(-1)
-        WaitSecs(.0001);
+        WaitSecs(0.0001);
       end
       % % debug
       % fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - stimOnset);

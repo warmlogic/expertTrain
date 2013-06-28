@@ -270,7 +270,9 @@ for i = 1:length(stimTex)
   end
   
   % ISI between trials
-  WaitSecs(phaseCfg.name_isi);
+  if phaseCfg.name_isi > 0
+    WaitSecs(phaseCfg.name_isi);
+  end
   
   % draw fixation
   Screen('TextSize', w, cfg.text.fixSize);
