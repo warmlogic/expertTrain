@@ -218,12 +218,12 @@ try
     DrawFormattedText(w, message, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
-    % wait until g key is held for ~1 seconds
-    KbCheckHold(1000, {cfg.keys.expContinue}, -1);
-    % % wait until g key is pressed
-    % RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
-    % KbWait(-1,2);
-    % RestrictKeysForKbCheck([]);
+    % % wait until g key is held for ~1 seconds
+    % KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+    % wait until g key is pressed
+    RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+    KbWait(-1,2);
+    RestrictKeysForKbCheck([]);
     
     % connect
     [NSConnectStatus, NSConnectError] = et_NetStation('Connect', expParam.NSHost, expParam.NSPort); %#ok<NASGU>
@@ -250,12 +250,12 @@ try
     DrawFormattedText(w, baselineMsg, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
-    % wait until g key is held for ~1 seconds
-    KbCheckHold(1000, {cfg.keys.expContinue}, -1);
-    % % wait until g key is pressed
-    % RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
-    % KbWait(-1,2);
-    % RestrictKeysForKbCheck([]);
+    % % wait until g key is held for ~1 seconds
+    % KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+    % wait until g key is pressed
+    RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+    KbWait(-1,2);
+    RestrictKeysForKbCheck([]);
     
     % start recording
     Screen('TextSize', w, cfg.text.basicTextSize);
@@ -415,12 +415,12 @@ try
   % Update the display to show the message:
   Screen('Flip', w);
   
-  % wait until g key is held for ~1 seconds
-  KbCheckHold(1000, {cfg.keys.expContinue}, -1);
-  % % wait until g key is pressed
-  % RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
-  % KbWait(-1,2);
-  % RestrictKeysForKbCheck([]);
+  % % wait until g key is held for ~1 seconds
+  % KbCheckHold(1000, {cfg.keys.expContinue}, -1);
+  % wait until g key is pressed
+  RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
+  KbWait(-1,2);
+  RestrictKeysForKbCheck([]);
   Screen('Flip', w);
   WaitSecs(1.000);
   
