@@ -38,9 +38,9 @@ fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
 % Small hack. Because training day 1 uses blocks, those stims are stored in
 % cells. However, all other training days do not use blocks, and do not use
 % cells, but we need to put them in a cell to access the stimuli correctly.
-if ~iscell(expParam.session.(sesName).(phaseName).viewStims)
+if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).viewStims)
   runInBlocks = false;
-  expParam.session.(sesName).(phaseName).viewStims = {expParam.session.(sesName).(phaseName).viewStims};
+  expParam.session.(sesName).(phaseName)(phaseCount).viewStims = {expParam.session.(sesName).(phaseName)(phaseCount).viewStims};
   if ~exist('b','var') || isempty(b)
     b = 1;
   else
@@ -202,7 +202,7 @@ end
 for i = 1:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
-    if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
+    if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
       % run the impedance break
       et_impedanceCheck(w, cfg, true);
       
