@@ -442,12 +442,16 @@ catch ME
   % catch error: This is executed in case something goes wrong in the
   % 'try' part due to programming error etc.:
   
-  fprintf('\nError during session %d. Exiting gracefully.\n',expParam.sessionNum);
+  fprintf('\nError during session %d. Exiting gracefully (saving experimentParams.mat).\n',expParam.sessionNum);
   
   save(cfg.files.expParamFile,'cfg','expParam');
   
   % close out the log file
   fclose(logFile);
+  
+  % save out the error information
+  errTime = fix(clock);
+  save(fullfile(cfg.files.sesSaveDir,sprintf('error_%s_ses%d_%d_%d_%d_%d%d.mat',expParam.subject,expParam.sessionNum,errTime(1),errTime(2),errTime(3),errTime(4),errTime(5))),'ME');
   
   % end of EEG recording, hang up with netstation
   if expParam.useNS
