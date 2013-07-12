@@ -43,9 +43,7 @@ instructions = strrep(instructions,sprintf('\r'),sprintf('\n'));
 if ~isempty(origText)
   for i = 1:length(origText)
     [findOrig] = strfind(instructions,origText{i});
-    if cfg.text.printTrialInfo
-      fprintf('%s: replacing %d instances of ''%s'' with ''%s''.\n',instructFile,length(findOrig),origText{i},replacementText{i});
-    end
+    fprintf('%s: replacing %d instances of ''%s'' with ''%s''.\n',instructFile,length(findOrig),origText{i},replacementText{i});
     instructions = strrep(instructions,origText{i},replacementText{i});
   end
 end
