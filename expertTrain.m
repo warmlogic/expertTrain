@@ -37,25 +37,6 @@ KbName('UnifyKeyNames');
 % Reseed the random-number generator for each experiment:
 rng('shuffle');
 
-%% Experiment database struct preparation
-
-expParam = struct;
-cfg = struct;
-
-% store the experiment name
-expParam.expName = expName;
-
-%% Set up the subject number and data
-
-if isnumeric(subNum)
-  % store the subject number
-  expParam.subject = sprintf('%s%.3d',expParam.expName,subNum);
-else
-  fprintf('As subject number (variable: ''subNum''), you entered: ');
-  disp(subNum);
-  error('Subject number must be an integer (e.g., 9), not a string or anything else.');
-end
-
 % need to be in the experiment directory to run it. See if this function is
 % in the current directory; if it is then we're in the right spot.
 %if exist(fullfile(pwd,sprintf('%s.m',mfilename)),'file')
@@ -64,6 +45,78 @@ if exist(fullfile(pwd,sprintf('%s.m','expertTrain')),'file')
 else
   error('Must be in the experiment directory to run the experiment.');
 end
+
+%% process experiment name and subject number
+
+if nargin < 2
+  if nargin == 1
+    % cannot proceed with one argument
+    error('You provided one argument, but you need either zero or two! Must provide either no inputs (%s;) or provide both experiment name (as a string) and subject number (as an integer), e.g. %s(''%s'', 9);',mfilename,mfilename,expName);
+  elseif nargin == 0
+    % if no variables are provided, use an input dialogue
+    repeat = 1;
+    while repeat
+      prompt = {'Experiment name (alphanumerics only, no quotes)', 'Subject number (number(s) only)'};
+      defaultAnswer = {'', ''};
+      options.Resize = 'on';
+      answer = inputdlg(prompt,'Subject Information', 1, defaultAnswer, options);
+      [expName, subNum] = deal(answer{:});
+      if isempty(expName) || ~ischar(expName)
+        h = errordlg('Experiment name must consist of characters. Try again.', 'Input Error');
+        repeat = 1;
+        uiwait(h);
+      elseif isempty(str2double(subNum)) || ~isnumeric(str2double(subNum)) || mod(str2double(subNum),1) ~= 0 || str2double(subNum) <= 0
+        h = errordlg('Subject number must be an integer (e.g., 9) and greater than zero. Try again.', 'Input Error');
+        repeat = 1;
+        uiwait(h);
+      else
+        if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
+          h = errordlg(sprintf('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName), 'Input Error');
+          repeat = 1;
+          uiwait(h);
+        else
+          subNum = str2double(subNum);
+          repeat = 0;
+        end
+      end
+    end
+  end
+elseif nargin == 2
+  % the correct number of arguments
+  
+  % check the experiment name make sure the configuration file exists
+  if ~isempty(expName) && ischar(expName)
+    if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
+      error('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName);
+    end
+  elseif isempty(expName) || ~ischar(expName)
+    error('Experiment name must consist of characters.');
+  end
+  
+  % check the subject number
+  if isempty(subNum)
+    error('No subject number provided.');
+  elseif ~isnumeric(subNum) || mod(subNum,1) ~= 0 || subNum <= 0
+    fprintf('As subject number (variable: ''subNum''), you entered: ');
+    disp(subNum);
+    error('Subject number must be an integer (e.g., 9) and greater than zero, and not a string or anything else.');
+  end
+  
+elseif nargin > 2
+  % cannot proceed with more than two arguments
+  error('More than two arguments provided. This function only accetps two arguments: experiment name (as a string) and subject number (as an integer).');
+end
+
+%% Experiment database struct preparation
+
+expParam = struct;
+cfg = struct;
+
+% store the experiment name
+expParam.expName = expName;
+expParam.subject = sprintf('%s%.3d',expParam.expName,subNum);
+
+%% Set up the data directories and files
 
 % make sure the data directory exists, and that we can save data
 cfg.files.dataSaveDir = fullfile(cfg.files.expDir,'data');
