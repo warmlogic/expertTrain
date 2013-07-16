@@ -61,7 +61,7 @@ Preparing the experiment
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
    - `et_calcExpDuration()` is a function to determine how long your experiment will be.
    - Instructions are read from external text files in `expertTrain/text/instructions/`.
-   - Press the `g` key to end the impedance check, to continue when there is a message to the experimenter, to dismiss the final screen, etc.
+   - Press the `g` key (might need to hold it for a second) to end the impedance check to continue when there is a message to the experimenter, to dismiss the final screen, etc.
    - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up. Use `expParam.runPractice=true;` to run the practice.
       - Practice stimuli can either be chosen from a separate directory of images (in the `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/` directory structure, as with experiment stimuli), or they can be randomly selected from the experimental families/species. Set `cfg.stim.useSeparatePracStims` to either `true` or `false`.
    - Image manipulation conditions are supported. Use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
