@@ -40,9 +40,7 @@ rng('shuffle');
 % need to be in the experiment directory to run it. See if this function is
 % in the current directory; if it is then we're in the right spot.
 %if exist(fullfile(pwd,sprintf('%s.m',mfilename)),'file')
-if exist(fullfile(pwd,sprintf('%s.m','expertTrain')),'file')
-  cfg.files.expDir = pwd;
-else
+if ~exist(fullfile(pwd,sprintf('%s.m','expertTrain')),'file')
   error('Must be in the experiment directory to run the experiment.');
 end
 
@@ -115,6 +113,9 @@ cfg = struct;
 % store the experiment name
 expParam.expName = expName;
 expParam.subject = sprintf('%s%.3d',expParam.expName,subNum);
+
+% set the current directory as the experiment directory
+cfg.files.expDir = pwd;
 
 %% Set up the data directories and files
 
