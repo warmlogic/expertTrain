@@ -27,9 +27,10 @@ Installation
 - Download and install Psychtoolbox (PTB) version 3
    - http://psychtoolbox.org/PsychtoolboxDownload
    - Make sure to add it to your Matlab path
-- Download expertTrain (clone with the GitHub app or regular git, or download the zip)
+- Download expertTrain to a reasonable location on your computer (e.g., `~/Documents/experiments/`)
+   - You can clone with the GitHub app or regular git in Terminal, or download the zip.
    - https://github.com/warmlogic/expertTrain
-   - I recommend that you **do not** add it to your Matlab path
+   - It is **not** recommended that you add it to your Matlab path
 - Acquire a stimulus image set (e.g., creatures/sheinbugs or birds)
    - Name stimulus images using this pattern:
       - `ab1.bmp` (family a, species b, exemplar 1); `sc2.bmp` (family s, species c, exemplar 2)
@@ -60,7 +61,7 @@ Preparing the experiment
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
    - `et_calcExpDuration()` is a function to determine how long your experiment will be.
    - Instructions are read from external text files in `expertTrain/text/instructions/`.
-   - Hold down the `g` key for a second to end the impedance check, continue when there is a message to the experimenter, dismiss the final screen, etc.
+   - Press the `g` key to end the impedance check, to continue when there is a message to the experimenter, to dismiss the final screen, etc.
    - There are practice modes for matching, naming, and recognition. Hopefully the provided config is clear enough on how to set them up. Use `expParam.runPractice=true;` to run the practice.
       - Practice stimuli can either be chosen from a separate directory of images (in the `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/` directory structure, as with experiment stimuli), or they can be randomly selected from the experimental families/species. Set `cfg.stim.useSeparatePracStims` to either `true` or `false`.
    - Image manipulation conditions are supported. Use different family names for each condition. Species orders can be yoked together across families if there is something common about conditions and exemplars.
@@ -71,29 +72,31 @@ Preparing the experiment
       - Also use the field `reshuffleStims`, which must be `true` or `false`.
    - Resize image stimuli using the field `cfg.stim.stimScale` in in `config_EBUG.m`. Set equal to the proportion of image; e.g., 1.0 = full-size image. Instruction images can be scaled as well.
    - There are multiple versions of the recognition and naming/viewing response key images (in `expertTrain/images/resources/`).
+   - Net Station support (sending tags to NS) is fully implemented (http://docs.psychtoolbox.org/NetStation) but the NetStation function has been improved. Use `et_NetStation.m` instead of PTB's implementation.
 
 Running the experiment
 ----
 
-- In Matlab, cd into the expertTrain directory
-- Run the experiment: `expertTrain('EXPNAME',subNum);`
+- In Matlab, `cd` into the expertTrain directory.
+- Run the experiment: `expertTrain('EXPNAME',subNum);` (where `'EXPNAME'` is a string and `subNum` is an integer)
    - e.g., `expertTrain('EBUG',1);`
+   - You can also run the experiment by just running the command `expertTrain;` and entering experiment and subject information in the dialogue box.
    - NB: You must have `config_EXPNAME.m` set up ahead of time. See "Preparing the experiment" above.
    - Run each successive session using the same command. The experiment will pick up at the next session.
 - If you just want to try out different sessions or phases of the EBUG experiment without running through the entire thing, you can edit the top of `config_EBUG.m` so that one of the debug code chunks is uncommented.
    - NB: Need to delete the subject folder every time you change `config_EBUG.m` in order to apply the changes.
-- If you need to break out of the experiment while it's running, press `control-c` (might need to push it twice).
-   - NB: If you break out of a session, the experiment currently does not have the capability to resume where you were. If you start it again, it will launch at the beginning of the current session.
+- If you need to break out of the experiment while it's running, press `control-c` (might need to press it twice).
+   - **IMPORTANT**: If you break out of a session, the experiment currently does not have the capability to resume where you were. If you start it again, it will launch at the beginning of the current session.
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 - Debugging
    - PTB seems bad at showing actual error messages, so using multiple monitors is a good way to debug.
    - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `dbup` and then `ME` to see the error stack trace.
+   - A mat file with the error information gets saved to the session directory. Load it and examine the `ME` variable to find your bug.
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 
 TODO
 ====
 
-- Finalize Net Station support: http://docs.psychtoolbox.org/NetStation
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
 
 Links
