@@ -65,14 +65,14 @@ expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','rec
 % % demo - debug
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
-% expParam.session.pretest.phases = {'prac_match','prac_recog'};
-% % expParam.session.pretest.phases = {'prac_recog'};
+% % expParam.session.pretest.phases = {'prac_match','prac_recog'};
+% expParam.session.pretest.phases = {'prac_recog'};
 % expParam.session.train1.phases = {'prac_name','nametrain','name'};
 
-% % % debug
-% % expParam.nSessions = 1;
-% % expParam.sesTypes = {'train1'};
-% % expParam.session.train1.phases = {'prac_name','nametrain','name'};
+% % debug
+% expParam.nSessions = 1;
+% expParam.sesTypes = {'train1'};
+% expParam.session.train1.phases = {'prac_name','nametrain','name'};
 
 %% do some error checking
 
@@ -408,9 +408,15 @@ if expParam.sessionNum == 1
   cfg.text.respondFaster = 'No response recorded!\nRespond faster!';
   cfg.text.respondFasterColor = uint8((rgb('Red') * 255) + 0.5);
   cfg.text.respondFasterFeedbackTime = 1.5;
-  % "too fast" text
-  cfg.text.tooFast = 'Too fast!';
-  cfg.text.tooFastColor = uint8((rgb('Red') * 255) + 0.5);
+  
+  % error text color
+  cfg.text.errorTextColor = uint8((rgb('Red') * 255) + 0.5);
+  
+  % text for when they respond too fast
+  cfg.text.tooFastText = 'Too fast!';
+  
+  % text for when they push multiple keys
+  cfg.text.multiKeyText = 'Do not press multiple keys!\nRelease all keys except your response,\nthen release your response.';
   
   %% Session/phase configuration
   

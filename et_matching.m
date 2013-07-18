@@ -188,11 +188,9 @@ stimImgWidth = size(stim1Img,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
 
-% text location for "too fast" text
-if ~phaseCfg.isExp
-  [~,tooFastY] = RectCenter(cfg.screen.wRect);
-  tooFastY = tooFastY + (stimImgHeight / 2);
-end
+% text location for error (e.g., "too fast") text
+[~,errorTextY] = RectCenter(cfg.screen.wRect);
+errorTextY = errorTextY + (stimImgHeight / 2);
 
 %% do an impedance check before the phase begins, if desired
 
@@ -369,7 +367,7 @@ for i = 1:length(stim2Tex)
       if keyIsDown
         Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
         Screen('TextSize', w, cfg.text.instructTextSize);
-        DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor, cfg.text.instructCharWidth);
+        DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         Screen('Flip', w);
@@ -400,9 +398,13 @@ for i = 1:length(stim2Tex)
     [keyIsDown, endRT, keyCode] = KbCheck;
     % if they push more than one key, don't accept it
     if keyIsDown && sum(keyCode) == 1
-      % wait for key to be released
+      % wait for key to be released, or time limit
       while KbCheck(-1)
         WaitSecs(0.0001);
+        
+        if (GetSecs - startRT) > phaseCfg.match_response
+          break
+        end
       end
       % if cfg.text.printTrialInfo
       %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
@@ -411,6 +413,22 @@ for i = 1:length(stim2Tex)
           (keyCode(cfg.keys.matchDiff) == 1 && all(keyCode(~cfg.keys.matchDiff) == 0))
         break
       end
+    elseif keyIsDown && sum(keyCode) > 1
+      % draw response prompt
+      Screen('TextSize', w, cfg.text.fixSize);
+      if phaseCfg.matchTextPrompt
+        responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
+        DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      else
+        DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      % don't push multiple keys
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+      % put them on the screen
+      Screen('Flip', w);
+      
+      keyIsDown = 0;
     end
     % wait so we don't overload the system
     WaitSecs(0.0001);
@@ -419,7 +437,7 @@ for i = 1:length(stim2Tex)
   
   % determine response and compute accuracy
   if keyIsDown
-    if keyCode(cfg.keys.matchSame) == 1
+    if (keyCode(cfg.keys.matchSame) == 1 && all(keyCode(~cfg.keys.matchSame) == 0))
       resp = 'same';
       if stim1(i).same
         acc = true;
@@ -442,7 +460,7 @@ for i = 1:length(stim2Tex)
         end
         feedbackColor = incorrectColor;
       end
-    elseif keyCode(cfg.keys.matchDiff) == 1
+    elseif (keyCode(cfg.keys.matchDiff) == 1 && all(keyCode(~cfg.keys.matchDiff) == 0))
       resp = 'diff';
       if ~stim1(i).same
         acc = true;
@@ -465,9 +483,15 @@ for i = 1:length(stim2Tex)
         end
         feedbackColor = incorrectColor;
       end
-    else
+    elseif sum(keyCode) > 1
+      warning('Multiple keys were pressed.\n');
+      resp = 'ERROR_MULTIKEY';
+    elseif sum(~ismember(find(keyCode == 1),[cfg.keys.matchDiff cfg.keys.matchSame])) > 0
       warning('Key other than same/diff was pressed. This should not happen.\n');
-      resp = 'ERROR';
+      resp = 'ERROR_OTHERKEY';
+    else
+      warning('Some other error occurred.\n');
+      resp = 'ERROR_OTHER';
     end
     if ~phaseCfg.isExp
       feedbackTime = cfg.text.respondFasterFeedbackTime;
@@ -503,8 +527,14 @@ for i = 1:length(stim2Tex)
   WaitSecs(feedbackTime);
   
   % get key pressed by subject
-  respKey = KbName(keyCode);
-  if isempty(respKey)
+  if keyIsDown
+    if sum(keyCode) == 1
+      respKey = KbName(keyCode);
+    elseif sum(keyCode) > 1
+      thisResp = KbName(keyCode);
+      respKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisResp)),thisResp{:}));
+    end
+  else
     respKey = 'none';
   end
   

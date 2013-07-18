@@ -133,6 +133,10 @@ stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 
+% text location for error (e.g., "too fast") text
+[~,errorTextY] = RectCenter(cfg.screen.wRect);
+errorTextY = errorTextY + (stimImgHeight / 2);
+
 % y-coordinate for stimulus number (below stim by 4% of the screen height)
 sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
 
@@ -320,14 +324,20 @@ for i = 1:length(stimTex)
     [keyIsDown, endRT, keyCode] = KbCheck;
     % if they push more than one key, don't accept it
     if keyIsDown && sum(keyCode) == 1
-      % wait for key to be released
+      % wait for key to be released, or time limit
       while KbCheck(-1)
         WaitSecs(0.0001);
+        
+        if (GetSecs - stimOnset) > phaseCfg.view_stim
+          break
+        end
       end
       % if cfg.text.printTrialInfo
       %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - stimOnset);
       % end
-      if keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
+      
+      % give immediate feedback
+      if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
         sNumColor = correct_sNumColor;
         if phaseCfg.playSound
           respSound = phaseCfg.correctSound;
@@ -359,6 +369,17 @@ for i = 1:length(stimTex)
       end
       
       break
+    elseif keyIsDown && sum(keyCode) > 1
+      % draw response prompt
+      Screen('TextSize', w, cfg.text.basicTextSize);
+      DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor, cfg.text.instructCharWidth);
+      % don't push multiple keys
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+      % put them on the screen
+      Screen('Flip',w);
+      
+      keyIsDown = 0;
     end
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
@@ -412,26 +433,34 @@ for i = 1:length(stimTex)
   rt = int32(round(1000 * (endRT - stimOnset)));
   
   % compute accuracy
-  if keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
-    % pushed the right key
-    acc = true;
-  elseif keyIsDown && keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
-    % pushed the wrong key
-    acc = false;
-  elseif ~keyIsDown
+  if keyIsDown && sum(keyCode) == 1
+    if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
+      % pushed the right key
+      acc = true;
+    elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
+      % pushed the wrong key
+      acc = false;
+    end
+  else
     % did not push a key
     acc = false;
   end
   
   % get key pressed by subject
-  respKey = KbName(keyCode);
-  if isempty(respKey)
+  if keyIsDown
+    if sum(keyCode) == 1
+      respKey = KbName(keyCode);
+    elseif sum(keyCode) > 1
+      thisResp = KbName(keyCode);
+      respKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisResp)),thisResp{:}));
+    end
+  else
     respKey = 'none';
   end
   
   % figure out which species number was chosen
   fn = fieldnames(cfg.keys);
-  if keyIsDown
+  if keyIsDown && sum(keyCode) == 1
     % if they made a response
     for s = 1:length(fn)
       % go through each key fieldname that is s##
@@ -444,6 +473,9 @@ for i = 1:length(stimTex)
         end
       end
     end
+  elseif keyIsDown && sum(keyCode) > 1
+    warning('Multiple keys were pressed.\n');
+    resp = 'ERROR_MULTIKEY';
   else
     resp = 'none';
   end

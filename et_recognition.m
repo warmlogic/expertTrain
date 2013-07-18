@@ -178,11 +178,9 @@ for b = 1:phaseCfg.nBlocks
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
   
-  % text location for "too fast" text
-  if ~phaseCfg.isExp
-    [~,tooFastY] = RectCenter(cfg.screen.wRect);
-    tooFastY = tooFastY + (stimImgHeight / 2);
-  end
+  % text location for error (e.g., "too fast") text
+  [~,errorTextY] = RectCenter(cfg.screen.wRect);
+  errorTextY = errorTextY + (stimImgHeight / 2);
   
   %% show the study instructions
   
@@ -279,7 +277,7 @@ for b = 1:phaseCfg.nBlocks
     [study_imgOn{b}(i), study_stimOnset] = Screen('Flip', w);
     
     if cfg.text.printTrialInfo
-      fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),allStims{b}(i).fileName);
+      fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),targStims{b}(i).fileName);
     end
     
     % while loop to show stimulus until subjects response or until
@@ -492,7 +490,7 @@ for b = 1:phaseCfg.nBlocks
         if keyIsDown
           Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
           Screen('TextSize', w, cfg.text.instructTextSize);
-          DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor, cfg.text.instructCharWidth);
+          DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
           Screen('TextSize', w, cfg.text.fixSize);
           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
           Screen('Flip', w);
@@ -523,9 +521,13 @@ for b = 1:phaseCfg.nBlocks
       [keyIsDown, endRT{b}(i), keyCode] = KbCheck;
       % if they push more than one key, don't accept it
       if keyIsDown && sum(keyCode) == 1
-        % wait for key to be released
+        % wait for key to be released, or time limit
         while KbCheck(-1)
           WaitSecs(0.0001);
+          
+          if (GetSecs - startRT) > phaseCfg.recog_response
+            break
+          end
         end
         % if cfg.text.printTrialInfo
         %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
@@ -537,6 +539,21 @@ for b = 1:phaseCfg.nBlocks
             (keyCode(cfg.keys.recogRecoll) == 1 && all(keyCode(~cfg.keys.recogRecoll) == 0))
           break
         end
+      elseif keyIsDown && sum(keyCode) > 1
+        % draw the stimulus
+        Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+        % with the response key image
+        Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
+        % and fixation on top of it
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        % don't push multiple keys
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        % put them on the screen
+        Screen('Flip', w);
+        
+        keyIsDown = 0;
       end
       % wait so we don't overload the system
       WaitSecs(0.0001);
@@ -555,7 +572,7 @@ for b = 1:phaseCfg.nBlocks
       Screen('Flip', w);
       
       % need a new endRT
-      endRT = GetSecs;
+      endRT{b}(i) = GetSecs;
       
       % wait to let them view the feedback
       WaitSecs(cfg.text.respondFasterFeedbackTime);
@@ -572,7 +589,7 @@ for b = 1:phaseCfg.nBlocks
     Screen('Close', blockStimTex(i));
     
     % compute response time
-    rt = int32(round(1000 * (endRT - startRT)));
+    rt = int32(round(1000 * (endRT{b}(i) - startRT)));
     
     % compute accuracy
     if keyIsDown
@@ -592,7 +609,7 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % get the response
-    if keyIsDown
+    if keyIsDown && sum(keyCode) == 1
       if keyCode(cfg.keys.recogRecoll) == 1
         resp = 'recollect';
       elseif keyCode(cfg.keys.recogDefF) == 1
@@ -603,17 +620,29 @@ for b = 1:phaseCfg.nBlocks
         resp = 'maybeUnfam';
       elseif keyCode(cfg.keys.recogDefUn) == 1
         resp = 'definitelyUnfam';
-      else
+      elseif keyCode(cfg.keys.recogRecoll) == 0 && keyCode(cfg.keys.recogDefF) == 0 && keyCode(cfg.keys.recogMayF) == 0 && keyCode(cfg.keys.recogMayUn) == 0 && keyCode(cfg.keys.recogDefUn) == 0
         warning('Key other than a recognition response key was pressed. This should not happen.\n');
-        resp = 'ERROR';
+        resp = 'ERROR_OTHERKEY';
+      else
+        warning('Some other error occurred.\n');
+        resp = 'ERROR_OTHER';
       end
+    elseif keyIsDown && sum(keyCode) > 1
+      warning('Multiple keys were pressed.\n');
+      resp = 'ERROR_MULTIKEY';
     elseif ~keyIsDown
       resp = 'none';
     end
     
     % get key pressed by subject
-    respKey = KbName(keyCode);
-    if isempty(respKey)
+    if keyIsDown
+      if sum(keyCode) == 1
+        respKey = KbName(keyCode);
+      elseif sum(keyCode) > 1
+        thisResp = KbName(keyCode);
+        respKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisResp)),thisResp{:}));
+      end
+    else
       respKey = 'none';
     end
     

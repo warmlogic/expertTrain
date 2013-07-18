@@ -131,11 +131,9 @@ stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 
-% text location for "too fast" text, only in practice
-if ~phaseCfg.isExp
-  [~,tooFastY] = RectCenter(cfg.screen.wRect);
-  tooFastY = tooFastY + (stimImgHeight / 2);
-end
+% text location for error (e.g., "too fast") text
+[~,errorTextY] = RectCenter(cfg.screen.wRect);
+errorTextY = errorTextY + (stimImgHeight / 2);
 
 % % y-coordinate for stimulus number (below stim by 4% of the screen height)
 % sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
@@ -318,7 +316,7 @@ for i = 1:length(stimTex)
       if keyIsDown
         Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
         Screen('TextSize', w, cfg.text.instructTextSize);
-        DrawFormattedText(w,cfg.text.tooFast,'center',tooFastY,cfg.text.tooFastColor, cfg.text.instructCharWidth);
+        DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         Screen('Flip', w);
@@ -344,43 +342,57 @@ for i = 1:length(stimTex)
     [keyIsDown, endRT, keyCode] = KbCheck;
     % if they push more than one key, don't accept it
     if keyIsDown && sum(keyCode) == 1
-      % wait for key to be released
+      % wait for key to be released, or time limit
       while KbCheck(-1)
         WaitSecs(0.0001);
+        
+        if (GetSecs - startRT) > phaseCfg.name_response
+          break
+        end
       end
       % if cfg.text.printTrialInfo
       %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
       % end
-      if keyIsDown
-        % give immediate feedback
-        if keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
-          sNumColor = correct_sNumColor;
-          if phaseCfg.playSound
-            respSound = phaseCfg.correctSound;
-            respVol = phaseCfg.correctVol;
-          end
-        elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
-          sNumColor = incorrect_sNumColor;
-          if phaseCfg.playSound
-            respSound = phaseCfg.incorrectSound;
-            respVol = phaseCfg.incorrectVol;
-          end
-        end
-        % draw species number in the appropriate color
-        Screen('TextSize', w, cfg.text.basicTextSize);
-        if specNum > 0
-          DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
-        else
-          DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
-        end
-        Screen('Flip', w);
-        
+      
+      % give immediate feedback
+      if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
+        sNumColor = correct_sNumColor;
         if phaseCfg.playSound
-          Beeper(respSound,respVol);
+          respSound = phaseCfg.correctSound;
+          respVol = phaseCfg.correctVol;
         end
-  
-        break
+      elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
+        sNumColor = incorrect_sNumColor;
+        if phaseCfg.playSound
+          respSound = phaseCfg.incorrectSound;
+          respVol = phaseCfg.incorrectVol;
+        end
       end
+      % draw species number in the appropriate color
+      Screen('TextSize', w, cfg.text.basicTextSize);
+      if specNum > 0
+        DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+      else
+        DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
+      end
+      Screen('Flip', w);
+      
+      if phaseCfg.playSound
+        Beeper(respSound,respVol);
+      end
+      
+      break
+    elseif keyIsDown && sum(keyCode) > 1
+      % draw response prompt
+      Screen('TextSize', w, cfg.text.basicTextSize);
+      DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor, cfg.text.instructCharWidth);
+      % don't push multiple keys
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+      % put them on the screen
+      Screen('Flip',w);
+      
+      keyIsDown = 0;
     end
     % wait so we don't overload the system
     WaitSecs(0.0001);
@@ -436,8 +448,8 @@ for i = 1:length(stimTex)
   trialRT(i) = int32(round(1000 * (endRT - startRT)));
   
   % compute accuracy
-  if keyIsDown
-    if keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1
+  if keyIsDown && sum(keyCode) == 1
+    if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
       % pushed the right key
       trialAcc(i) = true;
     elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
@@ -450,14 +462,20 @@ for i = 1:length(stimTex)
   end
   
   % get key pressed by subject
-  respKey = KbName(keyCode);
-  if isempty(respKey)
+  if keyIsDown
+    if sum(keyCode) == 1
+      respKey = KbName(keyCode);
+    elseif sum(keyCode) > 1
+      thisResp = KbName(keyCode);
+      respKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisResp)),thisResp{:}));
+    end
+  else
     respKey = 'none';
   end
   
   % figure out which species number was chosen
   fn = fieldnames(cfg.keys);
-  if keyIsDown
+  if keyIsDown && sum(keyCode) == 1
     % if they made a response
     for s = 1:length(fn)
       % go through each key fieldname that is s##
@@ -470,6 +488,9 @@ for i = 1:length(stimTex)
         end
       end
     end
+  elseif keyIsDown && sum(keyCode) > 1
+    warning('Multiple keys were pressed.\n');
+    resp = 'ERROR_MULTIKEY';
   else
     resp = 'none';
   end
