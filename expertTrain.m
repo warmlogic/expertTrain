@@ -211,9 +211,9 @@ try
   HideCursor;
   
   % don't display keyboard output
-  if ~ispc
-    ListenChar(2);
-  end
+  %if ~ispc
+  ListenChar(2);
+  %end
   
   % Set up the gray color value to be used as experiment backdrop
   if ~isfield(cfg.screen,'gray')
@@ -354,6 +354,11 @@ try
   % find out what session this will be
   sesName = expParam.sesTypes{expParam.sessionNum};
   
+  % record the date and start time for this session
+  expParam.session.(sesName).date = date;
+  startTime = fix(clock);
+  expParam.session.(sesName).startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+  
   % counting the phases, in case any sessions have the same phase type
   % multiple times
   matchCount = 0;
@@ -441,7 +446,11 @@ try
   
   fprintf('Done with session %d.\n',expParam.sessionNum);
   
-  % increment the session number for next time
+  % record the end time for this session
+  endTime = fix(clock);
+  expParam.session.(sesName).endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
+  
+  % increment the session number for running the next session
   expParam.sessionNum = expParam.sessionNum + 1;
   
   % save the experiment data
@@ -498,14 +507,20 @@ catch ME
   
   fprintf('\nError during session %d. Exiting gracefully (saving experimentParams.mat).\n',expParam.sessionNum);
   
+  % record the error date and time for this session
+  errorDate = date;
+  errorTime = fix(clock);
+  expParam.session.(sesName).errorDate = errorDate;
+  expParam.session.(sesName).errorTime = sprintf('%.2d:%.2d:%.2d',errorTime(4),errorTime(5),errorTime(6));
+  
+  % save the experiment info in its current state
   save(cfg.files.expParamFile,'cfg','expParam');
   
   % close out the log file
   fclose(logFile);
   
   % save out the error information
-  errTime = fix(clock);
-  save(fullfile(cfg.files.sesSaveDir,sprintf('error_%s_ses%d_%d_%d_%d_%d%d.mat',expParam.subject,expParam.sessionNum,errTime(1),errTime(2),errTime(3),errTime(4),errTime(5))),'ME');
+  save(fullfile(cfg.files.sesSaveDir,sprintf('error_%s_ses%d_%s_%.2d%.2d%.2d.mat',expParam.subject,expParam.sessionNum,errorDate,errorTime(4),errorTime(5),errorTime(6))),'ME');
   
   % end of EEG recording, hang up with netstation
   if expParam.useNS
