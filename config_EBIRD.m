@@ -376,7 +376,7 @@ if expParam.sessionNum == 1
     %cfg.text.fixSize = 28;
   elseif ispc
     cfg.text.basicTextSize = 18;
-    cfg.text.instructTextSize = 12;
+    cfg.text.instructTextSize = 16;
     cfg.text.fixSize = 18;
   elseif isunix
     cfg.text.basicTextSize = 24;
