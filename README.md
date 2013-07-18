@@ -94,6 +94,13 @@ Running the experiment
    - A mat file with the error information gets saved to the session directory. Load it and examine the `ME` variable to find your bug.
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 
+Important notes
+====
+
+- If you're running on Windows XP, it seems that you should not allow participants to push other keys along with the response key.
+   - For example, do not let participants rest their hand(s) on the Control key, as the double key press will crash the experiment. You may want to physically remove the Control key and other modifier keys (e.g., Alt and Windows keys) from the participant keyboard.
+   - This issue does not seem to exist on Mac OS X.
+
 TODO
 ====
 
