@@ -104,6 +104,7 @@ Important notes
 TODO
 ====
 
+- Resume in case of session crash.
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
 
 Links
