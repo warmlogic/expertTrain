@@ -493,9 +493,9 @@ try
   Screen('CloseAll');
   fclose('all');
   ShowCursor;
-  if ~ispc
-    ListenChar;
-  end
+  %if ~ispc
+  ListenChar;
+  %end
   Priority(0);
   
   % End of experiment:
@@ -534,9 +534,9 @@ catch ME
   Screen('CloseAll');
   fclose('all');
   ShowCursor;
-  if ~ispc
-    ListenChar;
-  end
+  %if ~ispc
+  ListenChar;
+  %end
   Priority(0);
   
   % Output the error message that describes the error:

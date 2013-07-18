@@ -367,17 +367,17 @@ if expParam.sessionNum == 1
   % basic: small messages printed to the screen
   % instruct: instructions
   % fixSize: fixation
-  if ismac
+  if ispc
+    cfg.text.basicTextSize = 18;
+    cfg.text.instructTextSize = 16;
+    cfg.text.fixSize = 18;
+  elseif ismac
     cfg.text.basicTextSize = 32;
     cfg.text.instructTextSize = 28;
     cfg.text.fixSize = 32;
     %cfg.text.basicTextSize = 28;
     %cfg.text.instructTextSize = 24;
     %cfg.text.fixSize = 28;
-  elseif ispc
-    cfg.text.basicTextSize = 18;
-    cfg.text.instructTextSize = 16;
-    cfg.text.fixSize = 18;
   elseif isunix
     cfg.text.basicTextSize = 24;
     cfg.text.instructTextSize = 18;
