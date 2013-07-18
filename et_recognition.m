@@ -1,5 +1,5 @@
-function et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
-% function et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+function [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+% function [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 %
 % Description:
 %  This function runs the recognition study and test tasks.
@@ -44,6 +44,14 @@ function et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 % cfg.stim.(sesName).(phaseName).recog_response = 10.0;
 
 fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
+
+% record the starting date and time for this phase
+expParam.session.(sesName).(phaseName)(phaseCount).date = date;
+startTime = fix(clock);
+startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
+% put it in the log file
+fprintf(logFile,'Start of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,startTime);
 
 %% general preparation for recognition study and test
 
@@ -784,5 +792,12 @@ if expParam.useNS
   WaitSecs(5.0);
   [NSSyncStatus, NSSyncError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
 end
+
+% record the end time for this session
+endTime = fix(clock);
+endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
+expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
+% put it in the log file
+fprintf(logFile,'End of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,endTime);
 
 end % function

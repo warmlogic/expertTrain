@@ -382,19 +382,19 @@ try
         % Subordinate Matching task (same/different)
         matchCount = matchCount + 1;
         
-        et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+        [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
         
       case {'name'}
         % Naming task
         nameCount = nameCount + 1;
         
-        et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
+        [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
         
       case {'recog'}
         % Recognition (old/new) task
         recogCount = recogCount + 1;
         
-        et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+        [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
 
       case {'nametrain'}
         % Name training task
@@ -402,7 +402,7 @@ try
         
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
-          et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+          [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
         end
         
       case {'viewname'}
@@ -413,29 +413,29 @@ try
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           % run the viewing task
-          et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          [expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
           
           % then run the naming task
-          et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
         end
         
       case{'prac_match'}
         % Subordinate Matching task (same/different)
         prac_matchCount = prac_matchCount + 1;
         
-        et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
+        [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
         
       case {'prac_name'}
         % Naming task
         prac_nameCount = prac_nameCount + 1;
         
-        et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
+        [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
         
       case {'prac_recog'}
         % Recognition (old/new) task
         prac_recogCount = prac_recogCount + 1;
         
-        et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
+        [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
 
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);

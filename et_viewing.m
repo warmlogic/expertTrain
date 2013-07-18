@@ -1,5 +1,5 @@
-function [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
-% function [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
+function [expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
+% function [expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
 %
 % Descrption:
 %  This function runs the viewing task.
@@ -32,6 +32,14 @@ function [logFile] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCo
 % cfg.keys.s00 is "other" (basic) family
 
 fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
+
+% record the starting date and time for this phase
+expParam.session.(sesName).(phaseName)(phaseCount).date = date;
+startTime = fix(clock);
+startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
+% put it in the log file
+fprintf(logFile,'Start of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,startTime);
 
 %% preparation
 
@@ -550,5 +558,12 @@ end
 
 % reset the KbCheck
 RestrictKeysForKbCheck([]);
+
+% record the end time for this session
+endTime = fix(clock);
+endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
+expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
+% put it in the log file
+fprintf(logFile,'End of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,endTime);
 
 end % function
