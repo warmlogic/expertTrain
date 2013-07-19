@@ -245,7 +245,15 @@ if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
+% startTrial = 1;
+% if ~expParam.session.(sesName).(phaseName)(phaseNum).phaseFinished
+%   startTrial = expParam.session.(sesName).(phaseName)(phaseNum).trialNum;
+% end
+
 for i = 1:length(stim2Tex)
+  %for i = startTrial:length(stim2Tex)
+  %expParam.session.(sesName).(phaseName)(phaseNum).trialNum = i;
+  
   % do an impedance check after a certain number of trials
   if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stim2Tex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
     % run the impedance break
