@@ -240,7 +240,7 @@ try
   % set some font display options
   if ispc
     Screen('Preference','DefaultFontName','Arial');
-    Screen('Preference','DefaultFontStyle',0);
+    Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
   elseif ismac
     Screen('Preference','DefaultFontName','Helvetica');
@@ -248,7 +248,7 @@ try
     Screen('Preference','DefaultFontSize',18);
   elseif isunix
     Screen('Preference','DefaultFontName','Arial');
-    Screen('Preference','DefaultFontStyle',0);
+    Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
   end
   
