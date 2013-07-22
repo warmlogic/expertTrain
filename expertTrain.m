@@ -180,7 +180,8 @@ cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.txt');
 %cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.log');
 % % debug - comment out exist sesLogFile check
 if exist(cfg.files.sesLogFile,'file')
-  error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
+  %error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
+  warning('Log file for this session already exists (%s). Attempting to resume...',cfg.files.sesLogFile);
 end
 
 %% Save the current experiment data
@@ -197,7 +198,7 @@ try
   %% Start data logging
   
   % Open data file and write column headers
-  logFile = fopen(cfg.files.sesLogFile,'wt');
+  logFile = fopen(cfg.files.sesLogFile,'at');
   
   %% Begin PTB display setup
   
@@ -382,27 +383,71 @@ try
         % Subordinate Matching task (same/different)
         matchCount = matchCount + 1;
         
-        [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,matchCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+        end
         
       case {'name'}
         % Naming task
         nameCount = nameCount + 1;
         
-        [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,nameCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
+        end
         
       case {'recog'}
         % Recognition (old/new) task
         recogCount = recogCount + 1;
         
-        [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,recogCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+        end
 
       case {'nametrain'}
         % Name training task
         nametrainCount = nametrainCount + 1;
         
-        % for each view/name block
+        % for each name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
-          [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+          phaseIsComplete = false;
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,nametrainCount,b));
+          if exist(phaseProgressFile,'file')
+            load(phaseProgressFile);
+            if exist('phaseComplete','var') && phaseComplete
+              phaseIsComplete = true;
+            end
+          end
+          
+          if ~phaseIsComplete
+            [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+          end
         end
         
       case {'viewname'}
@@ -413,29 +458,84 @@ try
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           % run the viewing task
-          [expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          phaseIsComplete = false;
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,viewnameCount,b));
+          if exist(phaseProgressFile,'file')
+            load(phaseProgressFile);
+            if exist('phaseComplete','var') && phaseComplete
+              phaseIsComplete = true;
+            end
+          end
+          
+          if ~phaseIsComplete
+            [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          end
           
           % then run the naming task
-          [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          phaseIsComplete = false;
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,viewnameCount,b));
+          if exist(phaseProgressFile,'file')
+            load(phaseProgressFile);
+            if exist('phaseComplete','var') && phaseComplete
+              phaseIsComplete = true;
+            end
+          end
+          
+          if ~phaseIsComplete
+            [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+          end
         end
         
       case{'prac_match'}
         % Subordinate Matching task (same/different)
         prac_matchCount = prac_matchCount + 1;
         
-        [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,prac_matchCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
+        end
         
       case {'prac_name'}
         % Naming task
         prac_nameCount = prac_nameCount + 1;
         
-        [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,prac_nameCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
+        end
         
       case {'prac_recog'}
         % Recognition (old/new) task
         prac_recogCount = prac_recogCount + 1;
         
-        [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,prac_recogCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
+        end
 
       otherwise
         warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);
@@ -512,6 +612,8 @@ catch ME
   errorTime = fix(clock);
   expParam.session.(sesName).errorDate = errorDate;
   expParam.session.(sesName).errorTime = sprintf('%.2d:%.2d:%.2d',errorTime(4),errorTime(5),errorTime(6));
+  
+  fprintf(logFile,'Crash\t%s\t%s\n',errorDate,expParam.session.(sesName).errorTime);
   
   % save the experiment info in its current state
   save(cfg.files.expParamFile,'cfg','expParam');

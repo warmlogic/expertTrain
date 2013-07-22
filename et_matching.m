@@ -1,5 +1,5 @@
-function [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
-% function [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+function [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+% function [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 %
 % Description:
 %  This function runs the matching task. There are no blocks, only short
@@ -47,15 +47,16 @@ function [expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phase
 % cfg.keys.matchSame
 % cfg.keys.matchDiff
 
-fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
+fprintf('Running %s %s (match) (%d)...\n',sesName,phaseName,phaseCount);
 
-% record the starting date and time for this phase
-expParam.session.(sesName).(phaseName)(phaseCount).date = date;
+%% record the starting date and time for this phase
+thisDate = date;
+expParam.session.(sesName).(phaseName)(phaseCount).date = thisDate;
 startTime = fix(clock);
 startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
 % put it in the log file
-fprintf(logFile,'Start of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,startTime);
+fprintf(logFile,'Start of %s %s (match) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,startTime);
 
 %% preparation
 
@@ -113,6 +114,29 @@ if phaseCfg.playSound
   if ~isfield(phaseCfg,'incorrectVol')
     cfg.incorrectVol = 0.6;
   end
+end
+
+%% determine the starting trial, useful for resuming
+
+% set up progress file, to resume this phase in case of a crash, etc.
+phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,phaseCount));
+if exist(phaseProgressFile,'file')
+  load(phaseProgressFile);
+else
+  trialComplete = false(1,length(allStims([allStims.matchStimNum] == 2)));
+  phaseComplete = false; %#ok<NASGU>
+  save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
+end
+
+% find the starting trial
+incompleteTrials = find(~trialComplete);
+if ~isempty(incompleteTrials)
+  trialNum = incompleteTrials(1);
+else
+  fprintf('All trials for %s %s (match) (%d) have been completed. Moving on to next phase...\n',sesName,phaseName,phaseCount);
+  % release any remaining textures
+  Screen('Close');
+  return
 end
 
 %% preload all stimuli for presentation
@@ -245,15 +269,7 @@ if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
-% startTrial = 1;
-% if ~expParam.session.(sesName).(phaseName)(phaseNum).phaseFinished
-%   startTrial = expParam.session.(sesName).(phaseName)(phaseNum).trialNum;
-% end
-
-for i = 1:length(stim2Tex)
-  %for i = startTrial:length(stim2Tex)
-  %expParam.session.(sesName).(phaseName)(phaseNum).trialNum = i;
-  
+for i = trialNum:length(stim2Tex)
   % do an impedance check after a certain number of trials
   if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stim2Tex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
     % run the impedance break
@@ -410,9 +426,10 @@ for i = 1:length(stim2Tex)
       while KbCheck(-1)
         WaitSecs(0.0001);
         
-        if (GetSecs - startRT) > phaseCfg.match_response
-          break
-        end
+        % % proceed if time is up, regardless of whether key is held
+        % if (GetSecs - startRT) > phaseCfg.match_response
+        %   break
+        % end
       end
       % if cfg.text.printTrialInfo
       %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
@@ -709,6 +726,10 @@ for i = 1:length(stim2Tex)
     end
   end % useNS
   
+  % mark that we finished this trial
+  trialComplete(i) = true;
+  % save progress after each trial
+  save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
 
 %% cleanup
@@ -722,11 +743,18 @@ end
 % reset the KbCheck
 RestrictKeysForKbCheck([]);
 
+% release any remaining textures
+Screen('Close');
+
 % record the end time for this session
 endTime = fix(clock);
 endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
 % put it in the log file
-fprintf(logFile,'End of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,endTime);
+fprintf(logFile,'End of %s %s (match) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+
+% save progress after finishing phase
+phaseComplete = true; %#ok<NASGU>
+save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','endTime');
 
 end % function

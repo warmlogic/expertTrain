@@ -1,5 +1,5 @@
-function [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
-% function [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+function [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
+% function [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount)
 %
 % Description:
 %  This function runs the recognition study and test tasks.
@@ -43,15 +43,23 @@ function [expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,ph
 % cfg.stim.(sesName).(phaseName).recog_test_stim = 1.5;
 % cfg.stim.(sesName).(phaseName).recog_response = 10.0;
 
-fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
+fprintf('Running %s %s (recog) (%d)...\n',sesName,phaseName,phaseCount);
 
-% record the starting date and time for this phase
-expParam.session.(sesName).(phaseName)(phaseCount).date = date;
+%% record the starting date and time for this phase
+thisDate = date;
+expParam.session.(sesName).(phaseName)(phaseCount).date = thisDate;
 startTime = fix(clock);
 startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
 % put it in the log file
-fprintf(logFile,'Start of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,startTime);
+fprintf(logFile,'Start of %s %s (recog) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,startTime);
+
+% set up progress file, to resume this phase in case of a crash, etc.
+phaseProgressFile_overall = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,phaseCount));
+if ~exist(phaseProgressFile_overall,'file')
+  phaseComplete = false; %#ok<NASGU>
+  save(phaseProgressFile_overall,'thisDate','startTime','phaseComplete');
+end
 
 %% general preparation for recognition study and test
 
@@ -148,217 +156,284 @@ for b = 1:phaseCfg.nBlocks
   respKeyImgOn{b} = nan(1,length(allStims{b}));
   endRT{b} = nan(1,length(allStims{b}));
   
-  %% do an impedance check before the block begins
-  if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
-    % run the impedance break
-    et_impedanceCheck(w, cfg, true);
+  %% determine the starting trial, useful for resuming
+  
+  % set up progress file, to resume this phase in case of a crash, etc.
+  phaseProgressFile_study = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recogstudy_%d.mat',sesName,phaseName,phaseCount));
+  if exist(phaseProgressFile_study,'file')
+    load(phaseProgressFile_study);
+  else
+    trialComplete = false(1,length(targStims{b}));
+    phaseComplete = false; %#ok<NASGU>
+    save(phaseProgressFile_study,'thisDate','startTime','trialComplete','phaseComplete','study_preStimFixOn','study_imgOn');
+  end
+  
+  % find the starting trial
+  incompleteTrials = find(~trialComplete);
+  if ~isempty(incompleteTrials)
+    trialNum = incompleteTrials(1);
+    runRecogStudy = true;
+  else
+    fprintf('All trials for %s %s (recogstudy) (%d) have been completed. Moving on...\n',sesName,phaseName,phaseCount);
+    % release any remaining textures
+    Screen('Close');
+    runRecogStudy = false;
   end
   
   %% prepare the recognition study task
   
-  % load up the stimuli for this block
-  blockStimTex = nan(1,length(targStims{b}));
-  for i = 1:length(targStims{b})
-    % this image
-    stimImgFile = fullfile(stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName);
-    if exist(stimImgFile,'file')
-      stimImg = imread(stimImgFile);
-      blockStimTex(i) = Screen('MakeTexture',w,stimImg);
-      % TODO: optimized?
-      %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
-    else
-      error('Study stimulus %s does not exist!',stimImgFile);
+  if runRecogStudy
+    
+    % load up the stimuli for this block
+    blockStimTex = nan(1,length(targStims{b}));
+    for i = 1:length(targStims{b})
+      % this image
+      stimImgFile = fullfile(stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName);
+      if exist(stimImgFile,'file')
+        stimImg = imread(stimImgFile);
+        blockStimTex(i) = Screen('MakeTexture',w,stimImg);
+        % TODO: optimized?
+        %blockStims(i) = Screen('MakeTexture',w,stimImg,[],1);
+      else
+        error('Study stimulus %s does not exist!',stimImgFile);
+      end
     end
-  end
-  
-  % get the width and height of the final stimulus image
-  stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
-  stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
-  % set the stimulus image rectangle
-  stimImgRect = [0 0 stimImgWidth stimImgHeight];
-  stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
-  
-  % text location for error (e.g., "too fast") text
-  [~,errorTextY] = RectCenter(cfg.screen.wRect);
-  errorTextY = errorTextY + (stimImgHeight / 2);
-  
-  %% show the study instructions
-  
-  for i = 1:length(phaseCfg.instruct.recogIntro)
+    
+    % get the width and height of the final stimulus image
+    stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
+    stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
+    % set the stimulus image rectangle
+    stimImgRect = [0 0 stimImgWidth stimImgHeight];
+    stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
+    
+    % text location for error (e.g., "too fast") text
+    [~,errorTextY] = RectCenter(cfg.screen.wRect);
+    errorTextY = errorTextY + (stimImgHeight / 2);
+    
+    %% do an impedance check before the block begins
+    if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
+      % run the impedance break
+      et_impedanceCheck(w, cfg, true);
+    end
+    
+    %% show the study instructions
+    
+    for i = 1:length(phaseCfg.instruct.recogIntro)
+      WaitSecs(1.000);
+      et_showTextInstruct(w,phaseCfg.instruct.recogIntro(i),cfg.keys.instructContKey,...
+        cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+        {'blockNum'},{num2str(b)});
+    end
+    
+    for i = 1:length(phaseCfg.instruct.recogStudy)
+      WaitSecs(1.000);
+      et_showTextInstruct(w,phaseCfg.instruct.recogStudy(i),cfg.keys.instructContKey,...
+        cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+        {'blockNum'},{num2str(b)});
+    end
+    
+    % Wait a second before starting trial
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct.recogIntro(i),cfg.keys.instructContKey,...
-      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
-      {'blockNum'},{num2str(b)});
-  end
-  
-  for i = 1:length(phaseCfg.instruct.recogStudy)
-    WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct.recogStudy(i),cfg.keys.instructContKey,...
-      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
-      {'blockNum'},{num2str(b)});
-  end
-  
-  % Wait a second before starting trial
-  WaitSecs(1.000);
-  
-  %% run the recognition study task
-  
-  % start the blink break timer
-  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
-    blinkTimerStart = GetSecs;
-  end
-
-  for i = 1:length(blockStimTex)
-    % Do a blink break if specified time has passed
-    if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
-      Screen('TextSize', w, cfg.text.basicTextSize);
-      pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
-      % just draw straight into the main window since we don't need speed here
-      DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
-      Screen('Flip', w);
-      
-      % wait for kb release in case subject is holding down keys
-      KbReleaseWait;
-      KbWait(-1); % listen for keypress on either keyboard
-      
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-      Screen('Flip',w);
-      WaitSecs(0.5);
-      % reset the timer
+    
+    %% run the recognition study task
+    
+    % start the blink break timer
+    if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
       blinkTimerStart = GetSecs;
     end
     
-    % Is this a subordinate (1) or basic (0) family/species? If subordinate,
-    % get the species number.
-    if phaseCfg.isExp
-      famNumSubord = cfg.stim.practice.famNumSubord;
-      famNumBasic = cfg.stim.practice.famNumBasic;
-    else
-      famNumSubord = cfg.stim.practice.famNumSubord;
-      famNumBasic = cfg.stim.practice.famNumBasic;
-    end
-    if any(targStims{b}(i).familyNum == famNumSubord)
-      isSubord = true;
-      specNum = int32(targStims{b}(i).speciesNum);
-    elseif any(targStims{b}(i).familyNum == famNumBasic)
-      isSubord = false;
-      specNum = int32(0);
-    end
-    
-    % resynchronize netstation before the start of drawing
-    if expParam.useNS
-      [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-    end
-    
-    % draw fixation
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    [study_preStimFixOn{b}(i)] = Screen('Flip',w);
-    
-    % ISI between trials
-    if phaseCfg.recog_study_isi > 0
-      WaitSecs(phaseCfg.recog_study_isi);
-    end
-    
-    % fixation on screen before starting trial
-    if phaseCfg.recog_study_preTarg > 0
-      WaitSecs(phaseCfg.recog_study_preTarg);
-    end
-    
-    % draw the stimulus
-    Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
-    % and fixation on top of it
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    
-    % Show stimulus on screen at next possible display refresh cycle,
-    % and record stimulus onset time in 'startrt':
-    [study_imgOn{b}(i), study_stimOnset] = Screen('Flip', w);
-    
-    if cfg.text.printTrialInfo
-      fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),targStims{b}(i).fileName);
-    end
-    
-    % while loop to show stimulus until subjects response or until
-    % "duration" seconds elapsed.
-    while (GetSecs - study_stimOnset) <= phaseCfg.recog_study_targ
-      % Wait <1 ms before checking the keyboard again to prevent
-      % overload of the machine at elevated Priority():
-      WaitSecs(0.0001);
-    end
-    
-    % draw fixation
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    
-    % Clear screen to background color after fixed 'duration'
-    Screen('Flip', w);
-    
-    % close this stimulus before next trial
-    Screen('Close', blockStimTex(i));
-    
-    % Write study stimulus presentation to file:
-    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\t%i\t%i\t%s\t%s\t%i\t%i\t%i\t%i\n',...
-      study_imgOn{b}(i),...
-      expParam.subject,...
-      sesName,...
-      phaseName,...
-      phaseCfg.isExp,...
-      'RECOGSTUDY_TARG',...
-      b,...
-      i,...
-      targStims{b}(i).familyStr,...
-      targStims{b}(i).speciesStr,...
-      targStims{b}(i).exemplarName,...
-      isSubord,...
-      specNum,...
-      targStims{b}(i).targ);
-    
-    % Write netstation logs for nontargets only (this might not occur)
-    if expParam.useNS
-      if ~targStims{b}(i).targ
-        % Write trial info to et_NetStation
-        % mark every event with the following key code/value pairs
-        % 'subn', subject number
-        % 'sess', session type
-        % 'phase', session phase name
-        % 'expt', whether this is the experiment (1) or practice (0)
-        % 'bloc', block number (training day 1 only)
-        % 'part', whether this is a 'study' or 'test' trial
-        % 'trln', trial number
-        % 'stmn', stimulus name (family, species, exemplar)
-        % 'spcn', species number (corresponds to keyboard)
-        % 'sord', whether this is a subordinate (1) or basic (0) level family
-        % 'targ', whether this is a target (always 1 for study)
+    for i = trialNum:length(blockStimTex)
+      % Do a blink break if specified time has passed
+      if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
+        Screen('TextSize', w, cfg.text.basicTextSize);
+        pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
+        % just draw straight into the main window since we don't need speed here
+        DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+        Screen('Flip', w);
         
-        % write out the stimulus name
-        stimName = sprintf('%s%s%d',...
-          targStims{b}(i).familyStr,...
-          targStims{b}(i).speciesStr,...
-          targStims{b}(i).exemplarName);
+        % wait for kb release in case subject is holding down keys
+        KbReleaseWait;
+        KbWait(-1); % listen for keypress on either keyboard
         
-        % pretrial fixation
-        [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', study_preStimFixOn{b}(i), .001,...
-          'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
-          'expt',phaseCfg.isExp,...
-          'bloc', b,...
-          'part','study',...
-          'trln', int32(i), 'stmn', stimName, 'spcn', specNum, 'sord', isSubord,...
-          'targ', targStims{b}(i).targ); %#ok<NASGU,ASGLU>
-        
-        % img presentation
-        [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', study_imgOn{b}(i), .001,...
-          'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
-          'expt',phaseCfg.isExp,...
-          'bloc', b,...
-          'part','study',...
-          'trln', int32(i), 'stmn', stimName, 'spcn', specNum, 'sord', isSubord,...
-          'targ', targStims{b}(i).targ); %#ok<NASGU,ASGLU>
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        Screen('Flip',w);
+        WaitSecs(0.5);
+        % reset the timer
+        blinkTimerStart = GetSecs;
       end
-    end % useNS
+      
+      % Is this a subordinate (1) or basic (0) family/species? If subordinate,
+      % get the species number.
+      if phaseCfg.isExp
+        famNumSubord = cfg.stim.practice.famNumSubord;
+        famNumBasic = cfg.stim.practice.famNumBasic;
+      else
+        famNumSubord = cfg.stim.practice.famNumSubord;
+        famNumBasic = cfg.stim.practice.famNumBasic;
+      end
+      if any(targStims{b}(i).familyNum == famNumSubord)
+        isSubord = true;
+        specNum = int32(targStims{b}(i).speciesNum);
+      elseif any(targStims{b}(i).familyNum == famNumBasic)
+        isSubord = false;
+        specNum = int32(0);
+      end
+      
+      % resynchronize netstation before the start of drawing
+      if expParam.useNS
+        [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
+      end
+      
+      % draw fixation
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      [study_preStimFixOn{b}(i)] = Screen('Flip',w);
+      
+      % ISI between trials
+      if phaseCfg.recog_study_isi > 0
+        WaitSecs(phaseCfg.recog_study_isi);
+      end
+      
+      % fixation on screen before starting trial
+      if phaseCfg.recog_study_preTarg > 0
+        WaitSecs(phaseCfg.recog_study_preTarg);
+      end
+      
+      % draw the stimulus
+      Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+      % and fixation on top of it
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      
+      % Show stimulus on screen at next possible display refresh cycle,
+      % and record stimulus onset time in 'startrt':
+      [study_imgOn{b}(i), study_stimOnset] = Screen('Flip', w);
+      
+      if cfg.text.printTrialInfo
+        fprintf('Trial %d of %d: %s.\n',i,length(blockStimTex),targStims{b}(i).fileName);
+      end
+      
+      % while loop to show stimulus until subjects response or until
+      % "duration" seconds elapsed.
+      while (GetSecs - study_stimOnset) <= phaseCfg.recog_study_targ
+        % Wait <1 ms before checking the keyboard again to prevent
+        % overload of the machine at elevated Priority():
+        WaitSecs(0.0001);
+      end
+      
+      % draw fixation
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      
+      % Clear screen to background color after fixed 'duration'
+      Screen('Flip', w);
+      
+      % close this stimulus before next trial
+      Screen('Close', blockStimTex(i));
+      
+      % Write study stimulus presentation to file:
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\t%i\t%i\t%s\t%s\t%i\t%i\t%i\t%i\n',...
+        study_imgOn{b}(i),...
+        expParam.subject,...
+        sesName,...
+        phaseName,...
+        phaseCfg.isExp,...
+        'RECOGSTUDY_TARG',...
+        b,...
+        i,...
+        targStims{b}(i).familyStr,...
+        targStims{b}(i).speciesStr,...
+        targStims{b}(i).exemplarName,...
+        isSubord,...
+        specNum,...
+        targStims{b}(i).targ);
+      
+      % Write netstation logs for nontargets only (this might not occur)
+      if expParam.useNS
+        if ~targStims{b}(i).targ
+          % Write trial info to et_NetStation
+          % mark every event with the following key code/value pairs
+          % 'subn', subject number
+          % 'sess', session type
+          % 'phase', session phase name
+          % 'expt', whether this is the experiment (1) or practice (0)
+          % 'bloc', block number (training day 1 only)
+          % 'part', whether this is a 'study' or 'test' trial
+          % 'trln', trial number
+          % 'stmn', stimulus name (family, species, exemplar)
+          % 'spcn', species number (corresponds to keyboard)
+          % 'sord', whether this is a subordinate (1) or basic (0) level family
+          % 'targ', whether this is a target (always 1 for study)
+          
+          % write out the stimulus name
+          stimName = sprintf('%s%s%d',...
+            targStims{b}(i).familyStr,...
+            targStims{b}(i).speciesStr,...
+            targStims{b}(i).exemplarName);
+          
+          % pretrial fixation
+          [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', study_preStimFixOn{b}(i), .001,...
+            'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
+            'expt',phaseCfg.isExp,...
+            'bloc', b,...
+            'part','study',...
+            'trln', int32(i), 'stmn', stimName, 'spcn', specNum, 'sord', isSubord,...
+            'targ', targStims{b}(i).targ); %#ok<NASGU,ASGLU>
+          
+          % img presentation
+          [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', study_imgOn{b}(i), .001,...
+            'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
+            'expt',phaseCfg.isExp,...
+            'bloc', b,...
+            'part','study',...
+            'trln', int32(i), 'stmn', stimName, 'spcn', specNum, 'sord', isSubord,...
+            'targ', targStims{b}(i).targ); %#ok<NASGU,ASGLU>
+        end
+      end % useNS
+      
+      % mark that we finished this trial
+      trialComplete(i) = true;
+      % save progress after each trial
+      save(phaseProgressFile_study,'thisDate','startTime','trialComplete','phaseComplete','study_preStimFixOn','study_imgOn');
+    end % for stimuli
     
-  end % for stimuli
+    % record the end time for this session
+    endTime = fix(clock);
+    endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
+    % put it in the log file
+    fprintf(logFile,'End of %s %s (recogstudy) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+    
+    % save progress after finishing phase
+    phaseComplete = true; %#ok<NASGU>
+    save(phaseProgressFile_study,'thisDate','startTime','trialComplete','phaseComplete','study_preStimFixOn','study_imgOn','endTime');
+  end % runRecogStudy
+  
+  %% determine the starting trial, useful for resuming
+  
+  startTime = fix(clock);
+  startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6)); %#ok<NASGU>
+  
+  % set up progress file, to resume this phase in case of a crash, etc.
+  phaseProgressFile_test = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recogtest_%d.mat',sesName,phaseName,phaseCount));
+  if exist(phaseProgressFile_test,'file')
+    load(phaseProgressFile_test);
+  else
+    trialComplete = false(1,length(allStims{b}));
+    phaseComplete = false; %#ok<NASGU>
+    save(phaseProgressFile_test,'thisDate','startTime','trialComplete','phaseComplete','test_preStimFixOn','test_imgOn','respKeyImgOn','endRT');
+  end
+  
+  % find the starting trial
+  incompleteTrials = find(~trialComplete);
+  if ~isempty(incompleteTrials)
+    trialNum = incompleteTrials(1);
+  else
+    fprintf('All trials for %s %s (recogtest) (%d) have been completed. Moving on...\n',sesName,phaseName,phaseCount);
+    % release any remaining textures
+    Screen('Close');
+    continue
+  end
   
   %% Prepare the recognition test task
   
@@ -408,8 +483,8 @@ for b = 1:phaseCfg.nBlocks
   if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
     blinkTimerStart = GetSecs;
   end
-
-  for i = 1:length(blockStimTex)
+  
+  for i = trialNum:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
     if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
       Screen('TextSize', w, cfg.text.basicTextSize);
@@ -525,9 +600,10 @@ for b = 1:phaseCfg.nBlocks
         while KbCheck(-1)
           WaitSecs(0.0001);
           
-          if (GetSecs - startRT) > phaseCfg.recog_response
-            break
-          end
+          % % proceed if time is up, regardless of whether key is held
+          % if (GetSecs - startRT) > phaseCfg.recog_response
+          %   break
+          % end
         end
         % if cfg.text.printTrialInfo
         %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
@@ -804,11 +880,24 @@ for b = 1:phaseCfg.nBlocks
       end
     end % useNS
     
+    % mark that we finished this trial
+    trialComplete(i) = true;
+    % save progress after each trial
+    save(phaseProgressFile_test,'thisDate','startTime','trialComplete','phaseComplete','test_preStimFixOn','test_imgOn','respKeyImgOn','endRT');
   end % for stimuli
   
   % reset the KbCheck
   RestrictKeysForKbCheck([]);
   
+  % record the end time for this session
+  endTime = fix(clock);
+  endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
+  % put it in the log file
+  fprintf(logFile,'End of %s %s (recogtest) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+  
+  % save progress after finishing phase
+  phaseComplete = true; %#ok<NASGU>
+  save(phaseProgressFile_test,'thisDate','startTime','trialComplete','phaseComplete','test_preStimFixOn','test_imgOn','respKeyImgOn','endRT','endTime');
 end % for nBlocks
 
 %% cleanup
@@ -827,6 +916,9 @@ endTime = fix(clock);
 endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
 % put it in the log file
-fprintf(logFile,'End of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,endTime);
+fprintf(logFile,'End of %s %s (recog) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+
+phaseComplete = true; %#ok<NASGU>
+save(phaseProgressFile_overall,'thisDate','startTime','phaseComplete','endTime');
 
 end % function

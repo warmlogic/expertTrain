@@ -93,6 +93,8 @@ Running the experiment
    - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `dbup` and then `ME` to see the error stack trace.
    - A mat file with the error information gets saved to the session directory. Load it and examine the `ME` variable to find your bug.
    - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
+- Resuming
+   - The experiment can be resumed from (approximately) where it left off if it crashes. This happens automatically.
 
 Important notes
 ====

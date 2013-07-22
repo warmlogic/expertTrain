@@ -1,5 +1,5 @@
-function [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
-% function [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
+function [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
+% function [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b)
 %
 % Description:
 %  This function runs the naming task.
@@ -29,17 +29,9 @@ function [expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCo
 % % keys
 % cfg.keys.sXX, where XX is an integer, buffered with a zero if i <= 9
 
-fprintf('Running %s %s (%d)...\n',sesName,phaseName,phaseCount);
+fprintf('Running %s %s (name) (%d)...\n',sesName,phaseName,phaseCount);
 
-% record the starting date and time for this phase
-expParam.session.(sesName).(phaseName)(phaseCount).date = date;
-startTime = fix(clock);
-startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
-expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
-% put it in the log file
-fprintf(logFile,'Start of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,startTime);
-
-%% preparation
+%% set up blocks
 
 % Small hack. Because training day 1 uses blocks, those stims are stored in
 % cells. However, all other training days do not use blocks, and do not use
@@ -55,6 +47,17 @@ if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
 else
   runInBlocks = true;
 end
+
+%% record the starting date and time for this phase
+thisDate = date;
+expParam.session.(sesName).(phaseName)(phaseCount).date{b} = thisDate;
+startTime = fix(clock);
+startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+expParam.session.(sesName).(phaseName)(phaseCount).startTime{b} = startTime;
+% put it in the log file
+fprintf(logFile,'Start of %s %s (name) (%d) (block %d)\t%s\t%s\n',sesName,phaseName,phaseCount,b,thisDate,startTime);
+
+%% preparation
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 nameStims = expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b};
@@ -98,6 +101,29 @@ if phaseCfg.playSound
   if ~isfield(phaseCfg,'incorrectVol')
     cfg.incorrectVol = 0.6;
   end
+end
+
+%% determine the starting trial, useful for resuming
+
+% set up progress file, to resume this phase in case of a crash, etc.
+phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_%d_name_b%d.mat',sesName,phaseName,phaseCount,b));
+if exist(phaseProgressFile,'file')
+  load(phaseProgressFile);
+else
+  trialComplete = false(1,length(nameStims));
+  phaseComplete = false; %#ok<NASGU>
+  save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
+end
+
+% find the starting trial
+incompleteTrials = find(~trialComplete);
+if ~isempty(incompleteTrials)
+  trialNum = incompleteTrials(1);
+else
+  fprintf('All trials for %s %s (name) (%d) (block %d) have been completed. Moving on to next phase...\n',sesName,phaseName,phaseCount,b);
+  % release any remaining textures
+  Screen('Close');
+  return
 end
 
 %% preload all stimuli for presentation
@@ -213,7 +239,7 @@ end
 trialAcc = false(length(stimTex),1);
 trialRT = zeros(length(stimTex),1,'int32');
 
-for i = 1:length(stimTex)
+for i = trialNum:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
@@ -346,9 +372,10 @@ for i = 1:length(stimTex)
       while KbCheck(-1)
         WaitSecs(0.0001);
         
-        if (GetSecs - startRT) > phaseCfg.name_response
-          break
-        end
+        % % proceed if time is up, regardless of whether key is held
+        % if (GetSecs - startRT) > phaseCfg.name_response
+        %   break
+        % end
       end
       % if cfg.text.printTrialInfo
       %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
@@ -601,6 +628,10 @@ for i = 1:length(stimTex)
     end
   end % useNS
   
+  % mark that we finished this trial
+  trialComplete(i) = true;
+  % save progress after each trial
+  save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
 
 % print accuracy and correct trial RT
@@ -631,8 +662,12 @@ RestrictKeysForKbCheck([]);
 % record the end time for this session
 endTime = fix(clock);
 endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
-expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
+expParam.session.(sesName).(phaseName)(phaseCount).endTime{b} = endTime;
 % put it in the log file
-fprintf(logFile,'End of %s %s (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,date,endTime);
+fprintf(logFile,'End of %s %s (name) (%d) (block %d)\t%s\t%s\n',sesName,phaseName,phaseCount,b,thisDate,endTime);
+
+% save progress after finishing phase
+phaseComplete = true; %#ok<NASGU>
+save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','endTime');
 
 end % function
