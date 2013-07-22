@@ -15,8 +15,6 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 % set up configuration structures to keep track of what day and phase we're
 % on.
 
-% do we want to record EEG using Net Station?
-expParam.useNS = true;
 % what host is netstation running on?
 if expParam.useNS
   expParam.NSPort = 55513;

@@ -78,9 +78,9 @@ Running the experiment
 ----
 
 - In Matlab, `cd` into the expertTrain directory.
-- Run the experiment: `expertTrain('EXPNAME',subNum);` (where `'EXPNAME'` is a string and `subNum` is an integer)
-   - e.g., `expertTrain('EBUG',1);`
-   - You can also run the experiment by just running the command `expertTrain;` and entering experiment and subject information in the dialogue box.
+- Run the experiment: `expertTrain('EXPNAME',subNum,useNS);` (where `'EXPNAME'` is a string, `subNum` is an integer, and `useNS` is 1 or 0 (for either using Net Station to record EEG or not))
+   - e.g., `expertTrain('EBUG',1,1);` runs EBUG subject 1 (called EBUG001 in the data directory) and recording with Net Station.
+   - You can also run the experiment by just running the command `expertTrain;`. You are then required to enter the experiment details in a dialogue box.
    - NB: You must have `config_EXPNAME.m` set up ahead of time. See "Preparing the experiment" above.
    - Run each successive session using the same command. The experiment will pick up at the next session.
 - If you just want to try out different sessions or phases of the EBUG experiment without running through the entire thing, you can edit the top of `config_EBUG.m` so that one of the debug code chunks is uncommented.

@@ -1,18 +1,19 @@
-function expertTrain(expName,subNum)
+function expertTrain(expName,subNum,useNS)
 
-% function expertTrain(expName,subNum)
+% function expertTrain(expName,subNum,useNS)
 %
 % expertise training experiment
 %
-% 4 potential phases:
+% 5 potential phases:
 %  - Subordinate matching task
-%  - Old/new recognition (example: OldNewRecogExp)
-%  - Passive viewing (with confirmatory button press. what happens if they
-%    press the wrong button?)
+%  - Old/new recognition
+%  - Name training
+%  - Passive viewing (with confirmatory button press.)
 %  - Active naming
 %
-% Controlled by a cfg struct
 %
+%
+% See the file README.md for more information
 %
 % see also: et_saveStimList, config_EBUG, et_processStims_EBUG,
 % et_matching, et_viewing, et_naming, et_recognition
@@ -46,40 +47,53 @@ end
 
 %% process experiment name and subject number
 
-if nargin < 2
+if nargin < 3
   if nargin == 1
     % cannot proceed with one argument
-    error('You provided one argument, but you need either zero or two! Must provide either no inputs (%s;) or provide both experiment name (as a string) and subject number (as an integer), e.g. %s(''%s'', 9);',mfilename,mfilename,expName);
+    error('You provided one argument, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
+  elseif nargin == 2
+    % cannot proceed with one argument
+    error('You provided two arguments, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
   elseif nargin == 0
     % if no variables are provided, use an input dialogue
     repeat = 1;
     while repeat
-      prompt = {'Experiment name (alphanumerics only, no quotes)', 'Subject number (number(s) only)'};
-      defaultAnswer = {'', ''};
+      prompt = {'Experiment name (alphanumerics only, no quotes)', 'Subject number (number(s) only)', 'Use Net Station? (1 = yes, 0 = no)'};
+      defaultAnswer = {'', '', ''};
       options.Resize = 'on';
       answer = inputdlg(prompt,'Subject Information', 1, defaultAnswer, options);
-      [expName, subNum] = deal(answer{:});
+      [expName, subNum, useNS] = deal(answer{:});
       if isempty(expName) || ~ischar(expName)
         h = errordlg('Experiment name must consist of characters. Try again.', 'Input Error');
         repeat = 1;
         uiwait(h);
-      elseif isempty(str2double(subNum)) || ~isnumeric(str2double(subNum)) || mod(str2double(subNum),1) ~= 0 || str2double(subNum) <= 0
+        continue
+      end
+      if isempty(str2double(subNum)) || ~isnumeric(str2double(subNum)) || mod(str2double(subNum),1) ~= 0 || str2double(subNum) <= 0
         h = errordlg('Subject number must be an integer (e.g., 9) and greater than zero. Try again.', 'Input Error');
         repeat = 1;
         uiwait(h);
+        continue
+      end
+      if isempty(str2double(useNS)) || ~isnumeric(str2double(useNS)) || (str2double(useNS) ~= 0 && str2double(useNS) ~= 1)
+        h = errordlg('useNS must be either 1 or 0. Try again.', 'Input Error');
+        repeat = 1;
+        uiwait(h);
+        continue
+      end
+      if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
+        h = errordlg(sprintf('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName), 'Input Error');
+        repeat = 1;
+        uiwait(h);
+        continue
       else
-        if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
-          h = errordlg(sprintf('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName), 'Input Error');
-          repeat = 1;
-          uiwait(h);
-        else
-          subNum = str2double(subNum);
-          repeat = 0;
-        end
+        subNum = str2double(subNum);
+        useNS = logical(str2double(useNS));
+        repeat = 0;
       end
     end
   end
-elseif nargin == 2
+elseif nargin == 3
   % the correct number of arguments
   
   % check the experiment name make sure the configuration file exists
@@ -87,22 +101,36 @@ elseif nargin == 2
     if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
       error('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName);
     end
-  elseif isempty(expName) || ~ischar(expName)
+  end
+  if isempty(expName) || ~ischar(expName)
     error('Experiment name must consist of characters.');
   end
   
   % check the subject number
   if isempty(subNum)
     error('No subject number provided.');
-  elseif ~isnumeric(subNum) || mod(subNum,1) ~= 0 || subNum <= 0
+  end
+  if ~isnumeric(subNum) || mod(subNum,1) ~= 0 || subNum <= 0
     fprintf('As subject number (variable: ''subNum''), you entered: ');
     disp(subNum);
     error('Subject number must be an integer (e.g., 9) and greater than zero, and not a string or anything else.');
   end
   
-elseif nargin > 2
-  % cannot proceed with more than two arguments
-  error('More than two arguments provided. This function only accetps two arguments: experiment name (as a string) and subject number (as an integer).');
+  % check on using Net Station
+  if isempty(useNS)
+    error('Must provide whether to use Net Station (variable: ''useNS'', 1 or 0).');
+  end
+  if ~isnumeric(useNS) || (useNS ~= 0 && useNS ~= 1)
+    fprintf('For whether to use Net Station (variable: ''useNS''), you entered: ');
+    disp(useNS);
+    error('useNS must be either 1 or 0.');
+  else
+    useNS = logical(useNS);
+  end
+  
+elseif nargin > 3
+  % cannot proceed with more than three arguments
+  error('More than three arguments provided. This function only accetps three arguments: experiment name (as a string), subject number (as an integer), and whether to use Net Station (1=yes, 0=no).');
 end
 
 %% Experiment database struct preparation
@@ -113,6 +141,8 @@ cfg = struct;
 % store the experiment name
 expParam.expName = expName;
 expParam.subject = sprintf('%s%.3d',expParam.expName,subNum);
+
+expParam.useNS = useNS;
 
 % set the current directory as the experiment directory
 cfg.files.expDir = pwd;
@@ -181,7 +211,20 @@ cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.txt');
 % % debug - comment out exist sesLogFile check
 if exist(cfg.files.sesLogFile,'file')
   %error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
-  warning('Log file for this session already exists (%s). Attempting to resume...',cfg.files.sesLogFile);
+  warning('Log file for this session already exists (%s).',cfg.files.sesLogFile);
+  resumeUnanswered = 1;
+  while resumeUnanswered
+    resumeSession = input(sprintf('Do you want to resume %s session %d? (type 1 or 0 and press enter). ',expParam.subject,expParam.sessionNum));
+    if isnumeric(resumeSession) && (resumeSession == 1 || resumeSession == 0)
+      if resumeSession
+        fprintf('Attempting to resume session %d (%s)...\n',expParam.sessionNum,cfg.files.sesLogFile);
+        resumeUnanswered = 0;
+      else
+        fprintf('Exiting...\n');
+        return
+      end
+    end
+  end
 end
 
 %% Save the current experiment data
@@ -282,17 +325,28 @@ try
     
     % connect
     [NSConnectStatus, NSConnectError] = et_NetStation('Connect', expParam.NSHost, expParam.NSPort); %#ok<NASGU>
-    % synchronize
-    [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU>
-    % start recording
-    [NSStartStatus, NSStartError] = et_NetStation('StartRecording'); %#ok<NASGU>
     
-    if NSConnectStatus || NSSyncStatus || NSStartStatus
-      error('!!! ERROR: Problem with Net Station connect/sync/start. Check error messages for more information !!!');
+    if NSConnectStatus
+      error('!!! ERROR: Problem with Net Station connection. Check error messages for more information !!!');
     else
       fprintf('\nConnected to Net Station @ %s\n', expParam.NSHost);
+      % synchronize
+      [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU>
+      if NSSyncStatus
+        error('!!! ERROR: Problem with Net Station syncronization. Check error messages for more information !!!');
+      end
+      
+      % start recording
+      [NSStartStatus, NSStartError] = et_NetStation('StartRecording'); %#ok<NASGU>
+      if NSStartStatus
+        error('!!! ERROR: Problem with Net Station starting the recording. Check error messages for more information !!!');
+      end
+      
       % stop recording
-      [NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+      [NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU>
+      if NSStopStatus
+        error('!!! ERROR: Problem with Net Station stopping the recording. Check error messages for more information !!!');
+      end
     end
   end
   
@@ -544,7 +598,7 @@ try
   
   %% Session is done
   
-  fprintf('Done with session %d.\n',expParam.sessionNum);
+  fprintf('Done with session %d (%s).\n',expParam.sessionNum,sesName);
   
   % record the end time for this session
   endTime = fix(clock);
@@ -605,7 +659,8 @@ catch ME
   % catch error: This is executed in case something goes wrong in the
   % 'try' part due to programming error etc.:
   
-  fprintf('\nError during session %d. Exiting gracefully (saving experimentParams.mat).\n',expParam.sessionNum);
+  sesName = expParam.sesTypes{expParam.sessionNum};
+  fprintf('\nError during session %d (%s). Exiting gracefully (saving experimentParams.mat). You should restart Matlab before continuing.\n',expParam.sessionNum,sesName);
   
   % record the error date and time for this session
   errorDate = date;

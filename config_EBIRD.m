@@ -15,8 +15,6 @@ function [cfg,expParam] = config_EBIRD(cfg,expParam)
 % set up configuration structures to keep track of what day and phase we're
 % on.
 
-% do we want to record EEG using Net Station?
-expParam.useNS = true;
 % what host is netstation running on?
 if expParam.useNS
   expParam.NSPort = 55513;
@@ -62,18 +60,18 @@ expParam.session.train6.phases = {'name','name','name','name'};
 expParam.session.posttest.phases = {'prac_match','match'};
 expParam.session.posttest_delay.phases = {'prac_match','match'};
 
-% % demo - debug
-% expParam.nSessions = 2;
-% expParam.sesTypes = {'pretest','train1'};
-% % expParam.session.pretest.phases = {'prac_match','prac_match'};
-% % expParam.session.pretest.phases = {'prac_match','prac_match','match'};
-% expParam.session.train1.phases = {'prac_name','name'};
+% demo - debug
+expParam.nSessions = 2;
+expParam.sesTypes = {'pretest','train1'};
+expParam.session.pretest.phases = {'prac_match','prac_match'};
+% expParam.session.pretest.phases = {'prac_match','prac_match','match'};
+expParam.session.train1.phases = {'prac_name','name'};
 
 % % debug
 % expParam.nSessions = 1;
 % expParam.sesTypes = {'train1'};
 % expParam.session.train1.phases = {'prac_name','nametrain','name'};
-% expParam.session.train1.phases = {'name'};
+% % expParam.session.train1.phases = {'name'};
 
 %% do some error checking
 
