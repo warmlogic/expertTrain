@@ -142,8 +142,6 @@ cfg = struct;
 expParam.expName = expName;
 expParam.subject = sprintf('%s%.3d',expParam.expName,subNum);
 
-expParam.useNS = useNS;
-
 % set the current directory as the experiment directory
 cfg.files.expDir = pwd;
 
@@ -194,6 +192,10 @@ else
     error('Configuration file for %s experiment does not exist: %s',fullfile(pwd,sprintf('config_%s.m',expParam.expName)));
   end
 end
+
+% re-set whether to use Net Station, in case it is different for this
+% session
+expParam.useNS = useNS;
 
 %% Make sure the session number is in order and directories/files exist
 
