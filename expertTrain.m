@@ -437,6 +437,16 @@ try
         % Subordinate Matching task (same/different)
         matchCount = matchCount + 1;
         
+        if ~isfield(expParam.session.(sesName).(phaseName)(matchCount),'date')
+          expParam.session.(sesName).(phaseName)(matchCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(matchCount),'startTime')
+          expParam.session.(sesName).(phaseName)(matchCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(matchCount),'endTime')
+          expParam.session.(sesName).(phaseName)(matchCount).endTime = [];
+        end
+        
         phaseIsComplete = false;
         phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,matchCount));
         if exist(phaseProgressFile,'file')
@@ -453,6 +463,16 @@ try
       case {'name'}
         % Naming task
         nameCount = nameCount + 1;
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(nameCount),'date')
+          expParam.session.(sesName).(phaseName)(nameCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(nameCount),'startTime')
+          expParam.session.(sesName).(phaseName)(nameCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(nameCount),'endTime')
+          expParam.session.(sesName).(phaseName)(nameCount).endTime = [];
+        end
         
         phaseIsComplete = false;
         phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,nameCount));
@@ -471,6 +491,16 @@ try
         % Recognition (old/new) task
         recogCount = recogCount + 1;
         
+        if ~isfield(expParam.session.(sesName).(phaseName)(recogCount),'date')
+          expParam.session.(sesName).(phaseName)(recogCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(recogCount),'startTime')
+          expParam.session.(sesName).(phaseName)(recogCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(recogCount),'endTime')
+          expParam.session.(sesName).(phaseName)(recogCount).endTime = [];
+        end
+        
         phaseIsComplete = false;
         phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,recogCount));
         if exist(phaseProgressFile,'file')
@@ -487,6 +517,16 @@ try
       case {'nametrain'}
         % Name training task
         nametrainCount = nametrainCount + 1;
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(nametrainCount),'date')
+          expParam.session.(sesName).(phaseName)(nametrainCount).date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(nametrainCount),'startTime')
+          expParam.session.(sesName).(phaseName)(nametrainCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(nametrainCount),'endTime')
+          expParam.session.(sesName).(phaseName)(nametrainCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
         
         % for each name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
@@ -508,6 +548,26 @@ try
         % Viewing task, with category response; intermixed with
         % Naming task
         viewnameCount = viewnameCount + 1;
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).view,'date')
+          expParam.session.(sesName).(phaseName)(viewnameCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).view,'startTime')
+          expParam.session.(sesName).(phaseName)(viewnameCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).view,'endTime')
+          expParam.session.(sesName).(phaseName)(viewnameCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).name,'date')
+          expParam.session.(sesName).(phaseName)(viewnameCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).name,'startTime')
+          expParam.session.(sesName).(phaseName)(viewnameCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).name,'endTime')
+          expParam.session.(sesName).(phaseName)(viewnameCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        end
         
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
@@ -544,6 +604,16 @@ try
         % Subordinate Matching task (same/different)
         prac_matchCount = prac_matchCount + 1;
         
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_matchCount),'date')
+          expParam.session.(sesName).(phaseName)(prac_matchCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_matchCount),'startTime')
+          expParam.session.(sesName).(phaseName)(prac_matchCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_matchCount),'endTime')
+          expParam.session.(sesName).(phaseName)(prac_matchCount).endTime = [];
+        end
+        
         phaseIsComplete = false;
         phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,prac_matchCount));
         if exist(phaseProgressFile,'file')
@@ -561,6 +631,16 @@ try
         % Naming task
         prac_nameCount = prac_nameCount + 1;
         
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_nameCount),'date')
+          expParam.session.(sesName).(phaseName)(prac_nameCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_nameCount),'startTime')
+          expParam.session.(sesName).(phaseName)(prac_nameCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_nameCount),'endTime')
+          expParam.session.(sesName).(phaseName)(prac_nameCount).endTime = [];
+        end
+        
         phaseIsComplete = false;
         phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,prac_nameCount));
         if exist(phaseProgressFile,'file')
@@ -577,6 +657,16 @@ try
       case {'prac_recog'}
         % Recognition (old/new) task
         prac_recogCount = prac_recogCount + 1;
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_recogCount),'date')
+          expParam.session.(sesName).(phaseName)(prac_recogCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_recogCount),'startTime')
+          expParam.session.(sesName).(phaseName)(prac_recogCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(prac_recogCount),'endTime')
+          expParam.session.(sesName).(phaseName)(prac_recogCount).endTime = [];
+        end
         
         phaseIsComplete = false;
         phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,prac_recogCount));
