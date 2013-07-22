@@ -16,7 +16,7 @@ function [cfg,expParam] = config_EBIRD(cfg,expParam)
 % on.
 
 % do we want to record EEG using Net Station?
-expParam.useNS = false;
+expParam.useNS = true;
 % what host is netstation running on?
 if expParam.useNS
   expParam.NSPort = 55513;
@@ -66,13 +66,14 @@ expParam.session.posttest_delay.phases = {'prac_match','match'};
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
 % % expParam.session.pretest.phases = {'prac_match','prac_match'};
-% expParam.session.pretest.phases = {'prac_match','prac_match','match'};
-% expParam.session.train1.phases = {'prac_name','nametrain'};
+% % expParam.session.pretest.phases = {'prac_match','prac_match','match'};
+% expParam.session.train1.phases = {'prac_name','name'};
 
 % % debug
 % expParam.nSessions = 1;
 % expParam.sesTypes = {'train1'};
 % expParam.session.train1.phases = {'prac_name','nametrain','name'};
+% expParam.session.train1.phases = {'name'};
 
 %% do some error checking
 
@@ -502,6 +503,10 @@ if expParam.sessionNum == 1
             fullfile(cfg.files.instructDir,sprintf('%s_match_2_practice_intro.txt',expParam.expName)),...
             {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
         end
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -570,6 +575,10 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match_3_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
   end
@@ -617,6 +626,10 @@ if expParam.sessionNum == 1
           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -752,6 +765,10 @@ if expParam.sessionNum == 1
           cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseNum).blockSpeciesOrder));
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseNum).blockSpeciesOrder));
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseNum).blockSpeciesOrder));
       end
     end
     
@@ -797,6 +814,10 @@ if expParam.sessionNum == 1
           cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
   end
@@ -855,6 +876,10 @@ if expParam.sessionNum == 1
             {num2str(length(cfg.stim.(sesName).(phaseName)(phaseNum).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
           cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.image = cfg.files.speciesNumKeyImg;
           cfg.stim.(sesName).(phaseName)(phaseNum).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
+          
+          expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+          expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+          expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
         end
       end
     end
@@ -877,6 +902,10 @@ if expParam.sessionNum == 1
         % cell if not.
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_match',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -945,6 +974,10 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match_3_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
   end
@@ -967,6 +1000,10 @@ if expParam.sessionNum == 1
         % cell if not.
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_match',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -1035,6 +1072,10 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match_3_exp_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+        
+        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
   end
