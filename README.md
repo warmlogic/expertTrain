@@ -103,10 +103,41 @@ Important notes
    - For example, do not let participants rest their hand(s) on the Control key, as the double key press will crash the experiment. You may want to physically remove the Control key and other modifier keys (e.g., Alt and Windows keys) from the participant keyboard.
    - This issue does not seem to exist on Mac OS X.
 
+Convenient functions
+====
+
+Windows RunExp batch file
+----
+
+- On Windows (only tested on XP), you can make a batch file for easily running the experiment in Matlab from, e.g., the desktop.
+   1. Make a file in Notepad called `RunExpertTrain.bat` with this inside (but modify the path as appropriate for your setup):
+      - `matlab -sd "C:\Documents and Settings\curranlab\My Documents\My Experiments\expertTrain" -r "expertTrain"`
+   1. Save it in the `expertTrain` directory.
+   1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
+
+Windows rsync data
+----
+
+- It is easy to use rsync on a Mac to backup local data to a remote server. However, this is not the case on Windows. Here's how to do it (only tested on XP):
+   1. Install `rsync` (and probably `Cygwin`?)
+      - http://www.rsync.net/resources/howto/windows_rsync.html
+   1. Make a file in Notepad called `BackupEBIRD.cmd` with this inside (but modify the paths as appropriate):
+      - <pre><code>
+      SET CWRSYNCHOME=%PROGRAMFILES%\CWRSYNC
+      SET CYGWIN=nontsec
+      SET CWOLDPATH=%PATH%
+      SET PATH=%CWRSYNCHOME%\BIN
+      rsync -a --perms --update --max-delete=0 --verbose '/cygdrive/c/Documents and Settings/curranlab/My Documents/My Experiments/expertTrain/data/' /cygdrive/z/Data/EBIRD/Behavioral/Sessions/
+      cd c:\WINDOWS\system32
+      attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\*.*
+      pause
+      </code></pre>
+   1. Save it in `C:\Program Files\cwRsync`
+   1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
+
 TODO
 ====
 
-- Resume in case of session crash.
 - Initial Eyelink eye tracking support: http://psychtoolbox.org/EyelinkToolbox
 
 Links
