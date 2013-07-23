@@ -100,9 +100,8 @@ Running the experiment
 Important notes
 ====
 
-- If you're running on Windows XP, it seems that you should not allow participants to push other keys along with the response key.
+- I think this has been resolved (meaning it is no longer an issue), but you're better safe than sorry. If you're running on Windows XP, it seems that you should not allow participants to push other keys along with the response key.
    - For example, do not let participants rest their hand(s) on the Control key, as the double key press will crash the experiment. You may want to physically remove the Control key and other modifier keys (e.g., Alt and Windows keys) from the participant keyboard.
-   - This issue does not seem to exist on Mac OS X.
 
 Convenient functions
 ====
