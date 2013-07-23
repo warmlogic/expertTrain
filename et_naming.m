@@ -248,7 +248,7 @@ trialRT = zeros(length(stimTex),1,'int32');
 for i = trialNum:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
-    if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
+    if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && i == 1
       % run the impedance break
       et_impedanceCheck(w, cfg, true);
       
