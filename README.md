@@ -40,7 +40,7 @@ Installation
    - All species exemplar images should be stored flat in a single family directory, within `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/`
       - e.g., `expertTrain/images/Creatures/a/` (for family "a" images)
    - There is a creature set located on curran-lab:
-      - <code><pre>/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip</code></pre>
+      - <pre><code>/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip</code></pre>
       - NB: If you use this stimulus set and the provided config files (see "Preparing the experiment", below), you must rename the family 1 directory to "a" and the family 2 directory to "s".
    - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt/Final Bird Stimuli` (email me or `tclab@colorado` if you need help)
 
