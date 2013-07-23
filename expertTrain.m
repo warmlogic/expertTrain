@@ -207,10 +207,9 @@ if ~exist(cfg.files.sesSaveDir,'dir')
     error(saveDataMsgID,'Cannot write in directory %s due to the following error: %s',pwd,saveDataMsg);
   end
 end
+
 % set name of the session log file
 cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.txt');
-%cfg.files.sesLogFile = fullfile(cfg.files.sesSaveDir,'session.log');
-% % debug - comment out exist sesLogFile check
 if exist(cfg.files.sesLogFile,'file')
   %error('Log file for this session already exists (%s). Resuming a session is not yet supported.',cfg.files.sesLogFile);
   warning('Log file for this session already exists (%s).',cfg.files.sesLogFile);
@@ -747,7 +746,7 @@ try
   % End of experiment:
   return
   
-catch ME
+catch ME %#ok<NASGU>
   % catch error: This is executed in case something goes wrong in the
   % 'try' part due to programming error etc.:
   
@@ -765,7 +764,7 @@ catch ME
   % save the experiment info in its current state
   save(cfg.files.expParamFile,'cfg','expParam');
   
-  % close out the log file
+  % close out the session log file
   fclose(logFile);
   
   % save out the error information
