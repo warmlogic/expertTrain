@@ -220,15 +220,27 @@ Screen('Flip', w);
 
 %% show the instructions
 
-for i = 1:length(phaseCfg.instruct.name)
-  WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct.name(i),cfg.keys.instructContKey,...
-    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
-    {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
+if runInBlocks
+  % don't show the instructions on the block with impedance break
+  if b == 1 || mod((b - 1),phaseCfg.impedanceAfter_nBlocks) ~= 0
+    showInstruct = true;
+  elseif b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
+    showInstruct = false;
+  end
+else
+  showInstruct = true;
 end
 
-% Wait a second before starting trial
-WaitSecs(1.000);
+if showInstruct
+  for inst = 1:length(phaseCfg.instruct.name)
+    WaitSecs(1.000);
+    et_showTextInstruct(w,phaseCfg.instruct.name(inst),cfg.keys.instructContKey,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+      {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
+  end
+  % Wait a second before starting trial
+  WaitSecs(1.000);
+end
 
 %% run the naming task
 
@@ -249,8 +261,18 @@ for i = trialNum:length(stimTex)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && i == 1
-      % run the impedance break
+      % run the impedance break before trial 1 of this block starts
       et_impedanceCheck(w, cfg, true);
+      
+      % show the instructions after the impedance check
+      for inst = 1:length(phaseCfg.instruct.name)
+        WaitSecs(1.000);
+        et_showTextInstruct(w,phaseCfg.instruct.name(inst),cfg.keys.instructContKey,...
+          cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+          {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
+      end
+      % Wait a second before starting trial
+      WaitSecs(1.000);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
