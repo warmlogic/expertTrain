@@ -106,7 +106,7 @@ Important notes
 Convenient functions
 ====
 
-Windows RunExp batch file
+Windows run-experiment batch file
 ----
 
 - On Windows (only tested on XP), you can make a batch file for easily running the experiment in Matlab from, e.g., the desktop.
@@ -115,15 +115,14 @@ Windows RunExp batch file
    1. Save it in the `expertTrain` directory.
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
 
-Windows rsync data
+Windows backup-data rsync function
 ----
 
 - It is easy to use rsync on a Mac to backup local data to a remote server. However, this is not the case on Windows. Here's how to do it (only tested on XP):
-   1. Install `rsync` (and probably `Cygwin`?)
-      - http://www.rsync.net/resources/howto/windows_rsync.html
+   1. Install `cwRsync` (and maybe `Cygwin`??)
+      - http://www.rsync.net/resources/howto/windows_rsync.html (second link down, not Windows Backup Agent)
    1. Make a file in Notepad called `BackupEBIRD.cmd` with this inside (but modify the paths as appropriate):
-      - <pre><code>
-      SET CWRSYNCHOME=%PROGRAMFILES%\CWRSYNC
+      - <pre><code>SET CWRSYNCHOME=%PROGRAMFILES%\CWRSYNC
       SET CYGWIN=nontsec
       SET CWOLDPATH=%PATH%
       SET PATH=%CWRSYNCHOME%\BIN
@@ -132,7 +131,7 @@ Windows rsync data
       attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\*.*
       pause
       </code></pre>
-   1. Save it in `C:\Program Files\cwRsync`
+   1. Save it in `c:\Program Files\cwRsync`
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
 
 TODO
