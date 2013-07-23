@@ -39,7 +39,8 @@ Installation
          - Family names can also contain digits (e.g., `fam1`), but species names must not contain digits and exemplar numbers can only consist of digits (because any numbers in the `species+exemplarNumber` string will be read as part of the exemplar number).
    - All species exemplar images should be stored flat in a single family directory, within `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/`
       - e.g., `expertTrain/images/Creatures/a/` (for family "a" images)
-   - There is a creature set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip``Í
+   - There is a creature set located on curran-lab:
+      - <code><pre>/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip</code></pre>
       - NB: If you use this stimulus set and the provided config files (see "Preparing the experiment", below), you must rename the family 1 directory to "a" and the family 2 directory to "s".
    - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt/Final Bird Stimuli` (email me or `tclab@colorado` if you need help)
 
@@ -111,7 +112,7 @@ Windows run-experiment batch file
 
 - On Windows (only tested on XP), you can make a batch file for easily running the experiment in Matlab from, e.g., the desktop.
    1. Make a file in Notepad called `RunExpertTrain.bat` with this inside (but modify the path as appropriate for your setup):
-      - `matlab -sd "C:\Documents and Settings\curranlab\My Documents\My Experiments\expertTrain" -r "expertTrain"`
+      - <pre><code>matlab -sd "C:\Documents and Settings\curranlab\My Documents\My Experiments\expertTrain" -r "expertTrain"</code></pre>
    1. Save it in the `expertTrain` directory.
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
 
