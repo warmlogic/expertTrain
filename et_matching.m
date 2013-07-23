@@ -49,20 +49,47 @@ function [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,p
 
 fprintf('Running %s %s (match) (%d)...\n',sesName,phaseName,phaseCount);
 
+%% set the starting date and time for this phase
+thisDate = date;
+startTime = fix(clock);
+startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+
+%% determine the starting trial, useful for resuming
+
+% set up progress file, to resume this phase in case of a crash, etc.
+phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,phaseCount));
+if exist(phaseProgressFile,'file')
+  load(phaseProgressFile);
+else
+  trialComplete = false(1,length(expParam.session.(sesName).(phaseName)(phaseCount).allStims([expParam.session.(sesName).(phaseName)(phaseCount).allStims.matchStimNum] == 2)));
+  phaseComplete = false; %#ok<NASGU>
+  save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
+end
+
+% find the starting trial
+incompleteTrials = find(~trialComplete);
+if ~isempty(incompleteTrials)
+  trialNum = incompleteTrials(1);
+else
+  fprintf('All trials for %s %s (match) (%d) have been completed. Moving on to next phase...\n',sesName,phaseName,phaseCount);
+  % release any remaining textures
+  Screen('Close');
+  return
+end
+
 %% start the log file for this phase
 
 phaseLogFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseLog_%s_%s_match_%d.txt',sesName,phaseName,phaseCount));
 plf = fopen(phaseLogFile,'at');
 
 %% record the starting date and time for this phase
-thisDate = date;
+
 expParam.session.(sesName).(phaseName)(phaseCount).date = thisDate;
-startTime = fix(clock);
-startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
+
 % put it in the log file
-fprintf(logFile,'Start of %s %s (match) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,startTime);
-fprintf(plf,'Start of %s %s (match) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,startTime);
+fprintf(logFile,'%%% Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+fprintf(plf,'%%% Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 
 %% preparation
 
@@ -120,29 +147,6 @@ if phaseCfg.playSound
   if ~isfield(phaseCfg,'incorrectVol')
     cfg.incorrectVol = 0.6;
   end
-end
-
-%% determine the starting trial, useful for resuming
-
-% set up progress file, to resume this phase in case of a crash, etc.
-phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,phaseCount));
-if exist(phaseProgressFile,'file')
-  load(phaseProgressFile);
-else
-  trialComplete = false(1,length(allStims([allStims.matchStimNum] == 2)));
-  phaseComplete = false; %#ok<NASGU>
-  save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
-end
-
-% find the starting trial
-incompleteTrials = find(~trialComplete);
-if ~isempty(incompleteTrials)
-  trialNum = incompleteTrials(1);
-else
-  fprintf('All trials for %s %s (match) (%d) have been completed. Moving on to next phase...\n',sesName,phaseName,phaseCount);
-  % release any remaining textures
-  Screen('Close');
-  return
 end
 
 %% preload all stimuli for presentation
@@ -815,8 +819,8 @@ endTime = fix(clock);
 endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
 % put it in the log file
-fprintf(logFile,'End of %s %s (match) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
-fprintf(plf,'End of %s %s (match) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+fprintf(logFile,'%%% End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+fprintf(plf,'%%% End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
 
 % close the phase log file
 fclose(plf);

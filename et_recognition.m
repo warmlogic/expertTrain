@@ -45,20 +45,25 @@ function [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseNam
 
 fprintf('Running %s %s (recog) (%d)...\n',sesName,phaseName,phaseCount);
 
+%% set the starting date and time for this phase
+
+thisDate = date;
+startTime = fix(clock);
+startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+
 %% start the log file for this phase
 
 phaseLogFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseLog_%s_%s_recog_%d.txt',sesName,phaseName,phaseCount));
 plf = fopen(phaseLogFile,'at');
 
 %% record the starting date and time for this phase
-thisDate = date;
+
 expParam.session.(sesName).(phaseName)(phaseCount).date = thisDate;
-startTime = fix(clock);
-startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
+
 % put it in the log file
-fprintf(logFile,'Start of %s %s (recog) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,startTime);
-fprintf(plf,'Start of %s %s (recog) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,startTime);
+fprintf(logFile,'%%% Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+fprintf(plf,'%%% Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 
 % set up progress file, to resume this phase in case of a crash, etc.
 phaseProgressFile_overall = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,phaseCount));
@@ -430,8 +435,8 @@ for b = 1:phaseCfg.nBlocks
     endTime = fix(clock);
     endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
     % put it in the log file
-    fprintf(logFile,'End of %s %s (recogstudy) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
-    fprintf(plf,'End of %s %s (recogstudy) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+    fprintf(logFile,'%%% End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+    fprintf(plf,'%%% End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
     
     % save progress after finishing phase
     phaseComplete = true; %#ok<NASGU>
@@ -982,8 +987,8 @@ for b = 1:phaseCfg.nBlocks
   endTime = fix(clock);
   endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
   % put it in the log file
-  fprintf(logFile,'End of %s %s (recogtest) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
-  fprintf(plf,'End of %s %s (recogtest) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+  fprintf(logFile,'%%% End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+  fprintf(plf,'%%% End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
   
   % save progress after finishing phase
   phaseComplete = true; %#ok<NASGU>
@@ -1006,8 +1011,8 @@ endTime = fix(clock);
 endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
 % put it in the log file
-fprintf(logFile,'End of %s %s (recog) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
-fprintf(plf,'End of %s %s (recog) (%d)\t%s\t%s\n',sesName,phaseName,phaseCount,thisDate,endTime);
+fprintf(logFile,'%%% End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+fprintf(plf,'%%% End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
 
 % close the phase log file
 fclose(plf);
