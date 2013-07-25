@@ -35,6 +35,15 @@ for sesNum = 1:length(expParam.sesTypes)
               % filter the events that we want
               matchResp = events.(sesName).(fn)(strcmp({events.(sesName).(fn).type},'MATCH_RESP'));
               
+              % % debug
+              % noResp = sum(strcmp({matchResp.resp},'none'));
+              % if noResp > 0
+              %   fprintf('Excluding %d events due to no response.\n',noResp);
+              % end
+              
+              % exclude missed responses ('none')
+              matchResp = matchResp(~strcmp({matchResp.resp},'none'));
+              
               if length(matchResp) == length([matchResp.acc])
                 matchAcc = mean([matchResp.acc]);
               else
@@ -54,6 +63,15 @@ for sesNum = 1:length(expParam.sesTypes)
               
               % filter the events that we want
               nameResp = events.(sesName).(fn)(strcmp({events.(sesName).(fn).type},'NAME_RESP'));
+              
+              % % debug
+              % noResp = sum([nameResp.resp] == -1);
+              % if noResp > 0
+              %   fprintf('Excluding %d events due to no response.\n',noResp);
+              % end
+              
+              % exclude missed responses ('none')
+              nameResp = nameResp([nameResp.resp] ~= -1);
               
               if length(nameResp) == length([nameResp.acc])
                 nameAcc = mean([nameResp.acc]);
@@ -98,4 +116,4 @@ for sesNum = 1:length(expParam.sesTypes)
   
 end % for ses
 
-
+end % function
