@@ -91,8 +91,9 @@ expParam.session.(sesName).(phaseName)(phaseCount).startTime{b} = startTime;
 fprintf(logFile,'!!! Start of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
 fprintf(plf,'!!! Start of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
 
+thisGetSecs = GetSecs;
 fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
@@ -100,7 +101,7 @@ fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
   'PHASE_START');
 
 fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
@@ -215,7 +216,13 @@ end
 
 if expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
   et_impedanceCheck(w, cfg, false);
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
 end
 
 %% start NS recording, if desired
@@ -228,6 +235,10 @@ if expParam.useNS
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = 'Starting data acquisition for naming phase...';
+  
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_START');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_START');
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
@@ -283,7 +294,13 @@ for i = trialNum:length(stimTex)
   if runInBlocks
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && i == 1
       % run the impedance break before trial 1 of this block starts
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
       et_impedanceCheck(w, cfg, true);
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
       
       % show the instructions after the impedance check
       for inst = 1:length(phaseCfg.instruct.name)
@@ -302,8 +319,15 @@ for i = trialNum:length(stimTex)
     end
   else
     if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stimTex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
+      
       % run the impedance break
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
       et_impedanceCheck(w, cfg, true);
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -314,6 +338,9 @@ for i = trialNum:length(stimTex)
   
   % Do a blink break if recording EEG and specified time has passed
   if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(stimTex) - 3)
+    thisGetSecs = GetSecs;
+    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_START');
+    fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_START');
     Screen('TextSize', w, cfg.text.basicTextSize);
     pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
     % just draw straight into the main window since we don't need speed here
@@ -323,6 +350,9 @@ for i = trialNum:length(stimTex)
     % wait for kb release in case subject is holding down keys
     KbReleaseWait;
     KbWait(-1); % listen for keypress on either keyboard
+    thisGetSecs = GetSecs;
+    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
+    fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
     
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -331,13 +361,6 @@ for i = trialNum:length(stimTex)
     % reset the timer
     blinkTimerStart = GetSecs;
   end
-  
-  % resynchronize netstation before the start of drawing
-  if expParam.useNS
-    [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  end
-  
-  % TODO: practice fam numbers
   
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
@@ -354,6 +377,11 @@ for i = trialNum:length(stimTex)
   elseif any(nameStims(i).familyNum == famNumBasic)
     isSubord = false;
     specNum = int32(0);
+  end
+  
+  % resynchronize netstation before the start of drawing
+  if expParam.useNS
+    [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   end
   
   % ISI between trials
@@ -746,6 +774,10 @@ Screen('Flip', w);
 if expParam.useNS
   WaitSecs(5.0);
   [NSSyncStatus, NSSyncError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+  
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_STOP');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_STOP');
 end
 
 % reset the KbCheck
@@ -754,8 +786,9 @@ RestrictKeysForKbCheck([]);
 % release any remaining textures
 Screen('Close');
 
+thisGetSecs = GetSecs;
 fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
@@ -763,7 +796,7 @@ fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
   'PHASE_END');
 
 fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...

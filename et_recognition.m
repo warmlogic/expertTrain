@@ -65,8 +65,9 @@ expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
 fprintf(logFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 fprintf(plf,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 
+thisGetSecs = GetSecs;
 fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
@@ -74,7 +75,7 @@ fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
   'PHASE_START');
 
 fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
@@ -140,7 +141,13 @@ end
 
 if expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
   et_impedanceCheck(w, cfg, false);
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
 end
 
 %% start NS recording, if desired
@@ -153,6 +160,10 @@ if expParam.useNS
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = 'Starting data acquisition for recognition phase...';
+  
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_START');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_START');
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
@@ -240,7 +251,13 @@ for b = 1:phaseCfg.nBlocks
     %% do an impedance check before the block begins
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < phaseCfg.nBlocks && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0
       % run the impedance break
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
       et_impedanceCheck(w, cfg, true);
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
     end
     
     %% show the study instructions
@@ -272,6 +289,9 @@ for b = 1:phaseCfg.nBlocks
     for i = trialNum:length(blockStimTex)
       % Do a blink break if specified time has passed
       if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
+        thisGetSecs = GetSecs;
+        fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_START');
+        fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_START');
         Screen('TextSize', w, cfg.text.basicTextSize);
         pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
         % just draw straight into the main window since we don't need speed here
@@ -281,6 +301,9 @@ for b = 1:phaseCfg.nBlocks
         % wait for kb release in case subject is holding down keys
         KbReleaseWait;
         KbWait(-1); % listen for keypress on either keyboard
+        thisGetSecs = GetSecs;
+        fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
+        fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
         
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -537,6 +560,9 @@ for b = 1:phaseCfg.nBlocks
   for i = trialNum:length(blockStimTex)
     % Do a blink break if recording EEG and specified time has passed
     if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_START');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_START');
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
@@ -546,6 +572,9 @@ for b = 1:phaseCfg.nBlocks
       % wait for kb release in case subject is holding down keys
       KbReleaseWait;
       KbWait(-1); % listen for keypress on either keyboard
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
+      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
       
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -1017,6 +1046,10 @@ end % for nBlocks
 if expParam.useNS
   WaitSecs(5.0);
   [NSSyncStatus, NSSyncError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+  
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_STOP');
+  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'NS_REC_STOP');
 end
 
 % Close the response key image
@@ -1025,8 +1058,9 @@ Screen('Close',respKeyImg);
 % release any remaining textures
 Screen('Close');
 
+thisGetSecs = GetSecs;
 fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
@@ -1034,7 +1068,7 @@ fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',...
   'PHASE_END');
 
 fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',...
-  GetSecs,...
+  thisGetSecs,...
   expParam.subject,...
   sesName,...
   phaseName,...
