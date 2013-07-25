@@ -901,10 +901,6 @@ if expParam.sessionNum == 1
         % cell if not.
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_match',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
-        
-        % expParam.session.(sesName).(phaseName)(phaseNum).date = [];
-        % expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
-        % expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -999,10 +995,6 @@ if expParam.sessionNum == 1
         % cell if not.
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_match',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
-        
-        % expParam.session.(sesName).(phaseName)(phaseNum).date = [];
-        % expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
-        % expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
