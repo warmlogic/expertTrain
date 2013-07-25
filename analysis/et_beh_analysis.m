@@ -1,5 +1,5 @@
 function et_beh_analysis(cfg,expParam,events)
-
+% basic analysis cript for expertTrain experiments
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
