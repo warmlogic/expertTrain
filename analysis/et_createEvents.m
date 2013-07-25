@@ -161,6 +161,10 @@ switch phaseName
     
   case {'name', 'nametrain', 'prac_name'}
     
+    if strcmp(sesName,'train2')
+      keyboard
+    end
+    
     if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
       nBlocks = 1;
     else
@@ -173,7 +177,7 @@ switch phaseName
       
       if exist(logFile,'file')
         fid = fopen(logFile);
-        logData = textscan(fid,'%.6f%s%s%s%d%s%d%d%s%s%d%d%d%d%s%s%d%d', 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle','%%%');
+        logData = textscan(fid,'%.6f%s%s%s%d%s%d%d%s%s%d%d%d%d%s%s%d%d', 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle','!!!');
         fclose(fid);
       else
         %error('Log file file not found: %s',logFile);

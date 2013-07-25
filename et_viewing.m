@@ -90,8 +90,8 @@ expParam.session.(sesName).(phaseName)(phaseCount).date{b} = thisDate;
 expParam.session.(sesName).(phaseName)(phaseCount).startTime{b} = startTime;
 
 % put it in the log file
-fprintf(logFile,'%%% Start of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
-fprintf(plf,'%%% Start of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
+fprintf(logFile,'!!! Start of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
+fprintf(plf,'!!! Start of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
 
 %% preparation
 
@@ -703,8 +703,8 @@ endTime = fix(clock);
 endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).endTime{b} = endTime;
 % put it in the log file
-fprintf(logFile,'%%% End of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
-fprintf(plf,'%%% End of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
+fprintf(logFile,'!!! End of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
+fprintf(plf,'!!! End of %s %s (%d) (block %d) (%s) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
 
 % close phase log file
 fclose(plf);
