@@ -121,7 +121,7 @@ Windows backup-data rsync function
 - It is easy to use rsync on a Mac to backup local data to a remote server. However, this is not the case on Windows. Here's how to do it (only tested on XP):
    1. Install `cwRsync` (and maybe `Cygwin`??)
       - http://www.rsync.net/resources/howto/windows_rsync.html (second link down, not Windows Backup Agent)
-   1. Make a file in Notepad called `BackupEBIRD.cmd` with this inside (but modify the paths as appropriate):
+   1. Make a file in Notepad called `BackupEXPNAME.cmd` with this inside, but change EXPNAME to your experiment name (e.g., EBUG or EBIRD) and modify the paths below as appropriate:
       - <pre><code>SET CWRSYNCHOME=%PROGRAMFILES%\CWRSYNC
       SET CYGWIN=nontsec
       SET CWOLDPATH=%PATH%
@@ -129,7 +129,6 @@ Windows backup-data rsync function
       rsync -a --perms --update --max-delete=0 --verbose '/cygdrive/c/Documents and Settings/curranlab/My Documents/My Experiments/expertTrain/data/' /cygdrive/z/Data/EBIRD/Behavioral/Sessions/
       cd c:\WINDOWS\system32
       attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\*.*
-      pause
       </code></pre>
    1. Save it in `c:\Program Files\cwRsync`
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
