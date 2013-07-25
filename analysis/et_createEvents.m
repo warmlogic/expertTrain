@@ -162,20 +162,18 @@ switch phaseName
   case {'name', 'nametrain', 'prac_name'}
     
     if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-      %runInBlocks = false;
       nBlocks = 1;
     else
-      %runInBlocks = true;
       nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
     end
-
+    
     for b = 1:nBlocks
       %logFile = fullfile(dataroot,subject,sesDir,'session.txt');
       logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_name_%d_b%d.txt',sesName,phaseName,phaseCount,b));
       
       if exist(logFile,'file')
         fid = fopen(logFile);
-        logData = textscan(fid,'%.6f%s%s%s%d%s%d%d%s%s%d%d%d%d%d%s%d%d', 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle','%%%');
+        logData = textscan(fid,'%.6f%s%s%s%d%s%d%d%s%s%d%d%d%d%s%s%d%d', 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle','%%%');
         fclose(fid);
       else
         %error('Log file file not found: %s',logFile);
@@ -192,13 +190,18 @@ switch phaseName
         'isSubord',num2cell(logical(logData{12})),...
         'resp',[], 'acc',[], 'rt',[]);
       
-      for i = 1:length(logData)
+      
+      for i = 1:length(log)
         switch log(i).type
           % case {'NAME_STIM'}
           
           case {'NAME_RESP'}
             % unique to MATCH_RESP
-            log(i).resp = logData{15}(i);
+            if strcmp(logData{15}(i),'none')
+              log(i).resp = single(-1);
+            elseif ~strcmp(logData{15}(i),'none')
+              log(i).resp = single(str2double(logData{15}(i)));
+            end
             log(i).acc = logical(logData{17}(i));
             log(i).rt = single(logData{18}(i));
             
@@ -209,7 +212,7 @@ switch phaseName
         end
       end
       
-      % events.(sesName).(sprintf('%s_%d_b%d',phaseName,phaseCount,b)) = log;
+      % store the log struct in the events struct
       if b == 1
         events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = log;
       else

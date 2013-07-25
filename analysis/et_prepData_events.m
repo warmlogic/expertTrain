@@ -79,7 +79,7 @@ for sub = 1:length(subjects)
   end
   
   eventsOutfile_sub = fullfile(eventsOutdir_sub,'events.mat');
-  if ~exist(eventsOutfile_sub,'file')
+  %if ~exist(eventsOutfile_sub,'file')
     % initialize the events struct
     events = struct;
     
@@ -87,22 +87,31 @@ for sub = 1:length(subjects)
     for sesNum = 1:length(expParam.sesTypes)
       % set the subject events file
       sesName = expParam.sesTypes{sesNum};
+      
+      uniquePhaseNames = unique(expParam.session.(sesName).phases);
+      uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+      
       for pha = 1:length(expParam.session.(sesName).phases)
         phaseName = expParam.session.(sesName).phases{pha};
-        for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+        
+        % find out where this phase occurs in the list of unique phases
+        uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
+        % increase the phase count for that phase
+        uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
+        % set the phase count
+        phaseCount = uniquePhaseCounts(uniquePhaseInd);
+        
+        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+          %if ~lockFile(eventsOutfile_sub)
+          %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum-1,phaseName,phaseCount);
           
-          if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-            %if ~lockFile(eventsOutfile_sub)
-            %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum-1,phaseName,phaseCount);
-            
-            % create the events
-            events = et_createEvents(events,cfg,expParam,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
-            
-            % release the lockFile
-            %releaseFile(eventsOutfile_sub);
-          end
+          % create the events
+          events = et_createEvents(events,cfg,expParam,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
           
+          % release the lockFile
+          %releaseFile(eventsOutfile_sub);
         end
+        
       end
     end
 %   else
@@ -110,11 +119,14 @@ for sub = 1:length(subjects)
 %     %continue
 %     fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
 %     continue
-  end % if exist
+  %end % if exist
   
-  fprintf('Saving %s...\n',eventsOutfile_sub);
+  fprintf('Saving %s...',eventsOutfile_sub);
   % save each subject's events
   saveEvents(events,eventsOutfile_sub);
+  fprintf('Done.\n');
+  
+  et_beh_analysis(cfg,expParam,events);
   
   %% prep the EEG data
   if prep_eeg == 1
@@ -149,7 +161,7 @@ for sub = 1:length(subjects)
     end % ses
     
   end % prep_eeg
-  fprintf('Done.\n');
+  fprintf('Done processing %s.\n',subjects{sub});
 end % sub
 
 %matlabpool close
