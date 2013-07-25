@@ -42,6 +42,7 @@ if nargin == 0
   subjects = {
     'EBIRD049';
     'EBIRD002';
+    'EBIRD003';
     };
   
   prep_eeg = 0;
@@ -78,12 +79,7 @@ for sub = 1:length(subjects)
   end
   
   eventsOutfile_sub = fullfile(eventsOutdir_sub,'events.mat');
-  if exist(eventsOutfile_sub,'file')
-    %fprintf('%s already exists! Skipping this subject!\n',eventsOutfile_sub);
-    %continue
-    fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
-    continue
-  else
+  if ~exist(eventsOutfile_sub,'file')
     % initialize the events struct
     events = struct;
     
@@ -97,14 +93,10 @@ for sub = 1:length(subjects)
           
           if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
             %if ~lockFile(eventsOutfile_sub)
-            fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum,phaseName,phaseCount);
+            %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum-1,phaseName,phaseCount);
             
             % create the events
             events = et_createEvents(events,cfg,expParam,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
-            
-            fprintf('Saving %s...\n',eventsOutfile_sub);
-            % save each subject's events
-            saveEvents(events,eventsOutfile_sub);
             
             % release the lockFile
             %releaseFile(eventsOutfile_sub);
@@ -113,7 +105,16 @@ for sub = 1:length(subjects)
         end
       end
     end
+%   else
+%     %fprintf('%s already exists! Skipping this subject!\n',eventsOutfile_sub);
+%     %continue
+%     fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
+%     continue
   end % if exist
+  
+  fprintf('Saving %s...\n',eventsOutfile_sub);
+  % save each subject's events
+  saveEvents(events,eventsOutfile_sub);
   
   %% prep the EEG data
   if prep_eeg == 1

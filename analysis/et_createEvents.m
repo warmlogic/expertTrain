@@ -88,6 +88,8 @@ function [events] = et_createEvents(events,cfg,expParam,dataroot,subject,sesNum,
 
 %% expertTrain
 
+fprintf('Processing %s %s (session_%d) %s (%d)...\n',subject,sesName,sesNum-1,phaseName,phaseCount);
+
 sesDir = sprintf('session_%d',sesNum);
 
 switch phaseName
@@ -190,13 +192,13 @@ switch phaseName
         'isSubord',num2cell(logical(logData{12})),...
         'resp',[], 'acc',[], 'rt',[]);
       
-      for i = 1:length(log)
+      for i = 1:length(logData)
         switch log(i).type
           % case {'NAME_STIM'}
           
           case {'NAME_RESP'}
             % unique to MATCH_RESP
-            log(i).resp = logData{16}{i};
+            log(i).resp = logData{15}(i);
             log(i).acc = logical(logData{17}(i));
             log(i).rt = single(logData{18}(i));
             
@@ -207,9 +209,15 @@ switch phaseName
         end
       end
       
+      % events.(sesName).(sprintf('%s_%d_b%d',phaseName,phaseCount,b)) = log;
+      if b == 1
+        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = log;
+      else
+        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = cat(1,events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)),log);
+      end
+      
     end % nBlocks
     
-    events.(sesName).(sprintf('%s_%d_b%d',phaseName,phaseCount,b)) = log;
     
   case {'recog', 'prac_recog'}
     
@@ -282,4 +290,5 @@ switch phaseName
     % blockSpeciesOrder
 end
 
+fprintf('Done with %s %s (session_%d) %s (%d).\n',subject,sesName,sesNum-1,phaseName,phaseCount);
 
