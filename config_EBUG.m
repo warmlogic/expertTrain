@@ -1327,9 +1327,9 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_recog',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
         
-        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -1420,9 +1420,9 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_match',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
         
-        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
@@ -1510,9 +1510,9 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).usePrevPhase = {'pretest','prac_recog',1};
         cfg.stim.(sesName).(phaseName)(phaseNum).reshuffleStims = true;
         
-        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).date = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
+        % expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
       end
     end
     
