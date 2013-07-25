@@ -100,7 +100,7 @@ switch phaseName
 
     if exist(logFile,'file')
       fid = fopen(logFile);
-      logData = textscan(fid,'%.6f%s%s%s%d%s%d%s%s%s%s%s%s%s%s','Delimiter','\t','emptyvalue',NaN, 'CommentStyle','%%%');
+      logData = textscan(fid,'%.6f%s%s%s%d%s%d%s%s%s%s%s%d%d%d','Delimiter','\t','emptyvalue',NaN, 'CommentStyle','!!!');
       fclose(fid);
     else
       %error('Log file file not found: %s',logFile);
@@ -126,9 +126,9 @@ switch phaseName
           
           log(i).isSubord = logical(str2double(logData{11}{i}));
           log(i).familyNum = single(str2double(logData{12}{i}));
-          log(i).speciesNum = single(str2double(logData{13}{i}));
-          log(i).trained = logical(str2double(logData{14}{i}));
-          log(i).sameSpecies = logical(str2double(logData{15}{i}));
+          log(i).speciesNum = single(logData{13}(i));
+          log(i).trained = logical(logData{14}(i));
+          log(i).sameSpecies = logical(logData{15}(i));
           
         case {'MATCH_RESP'}
           log(i).isSubord = logical(str2double(logData{8}{i}));
@@ -137,8 +137,8 @@ switch phaseName
           
           % unique to MATCH_RESP
           log(i).resp = logData{11}{i};
-          log(i).acc = logical(str2double(logData{13}{i}));
-          log(i).rt = single(str2double(logData{14}{i}));
+          log(i).acc = logical(logData{13}(i));
+          log(i).rt = single(logData{14}(i));
           
           % get info from stimulus presentations
           log(i).familyStr = log(i-1).familyStr;
@@ -160,10 +160,6 @@ switch phaseName
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = log;
     
   case {'name', 'nametrain', 'prac_name'}
-    
-    if strcmp(sesName,'train2')
-      keyboard
-    end
     
     if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
       nBlocks = 1;
