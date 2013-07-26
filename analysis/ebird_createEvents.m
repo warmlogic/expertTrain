@@ -6,7 +6,7 @@ function [events] = ebird_createEvents(events,cfg,expParam,dataroot,subject,sesN
 
 % expertTrain - EBIRD
 
-fprintf('Processing %s %s (session_%d) %s (%d)...\n',subject,sesName,sesNum-1,phaseName,phaseCount);
+fprintf('Processing %s %s (session_%d) %s (%d)...\n',subject,sesName,sesNum,phaseName,phaseCount);
 
 sesDir = sprintf('session_%d',sesNum);
 
@@ -237,5 +237,5 @@ switch phaseName
     % blockSpeciesOrder
 end
 
-fprintf('Done with %s %s (session_%d) %s (%d).\n',subject,sesName,sesNum-1,phaseName,phaseCount);
+fprintf('Done with %s %s (session_%d) %s (%d).\n',subject,sesName,sesNum,phaseName,phaseCount);
 
