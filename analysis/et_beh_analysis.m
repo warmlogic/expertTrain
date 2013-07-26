@@ -1,5 +1,5 @@
 function et_beh_analysis(cfg,expParam,events)
-% basic analysis cript for expertTrain experiments
+% basic analysis script for expertTrain experiments
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
@@ -93,7 +93,7 @@ for sesNum = 1:length(expParam.sesTypes)
                     keyboard
                   end
                   
-                  fprintf('%s, %s, %s: Block %d accuracy:\t%.3f (%d/%d)\n',expParam.subject,sesName,fn,b,nameBlockAcc,sum([nameRespBlock.acc]),length([nameRespBlock.acc]));
+                  fprintf('\t%s, %s, %s: Block %d accuracy:\t%.3f (%d/%d)\n',expParam.subject,sesName,fn,b,nameBlockAcc,sum([nameRespBlock.acc]),length([nameRespBlock.acc]));
                 end
               end
               
