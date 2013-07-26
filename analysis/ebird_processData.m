@@ -1,5 +1,7 @@
-function [results] = ebird_beh_analysis(subjects)
-% basic analysis script for expertTrain experiments
+function [results] = ebird_processData(subjects)
+% function [results] = ebird_processData(subjects)
+%
+% Processes data into basic measures like accuracy, response time, and d-prime
 
 if nargin == 0
   subjects = {
