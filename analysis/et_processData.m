@@ -1,5 +1,5 @@
-function et_beh_analysis(cfg,expParam,events)
-% basic analysis script for expertTrain experiments
+function et_processData(cfg,expParam,events)
+% very basic analysis script for expertTrain experiments
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
