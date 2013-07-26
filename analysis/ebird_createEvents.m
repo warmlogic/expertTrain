@@ -4,8 +4,6 @@ function [events] = ebird_createEvents(events,cfg,expParam,dataroot,subject,sesN
 % create event struct for EBIRD
 %
 
-% expertTrain - EBIRD
-
 fprintf('Processing %s %s (session_%d) %s (%d)...\n',subject,sesName,sesNum,phaseName,phaseCount);
 
 sesDir = sprintf('session_%d',sesNum);
@@ -20,9 +18,14 @@ switch phaseName
       fid = fopen(logFile);
       logData = textscan(fid,'%.6f%s%s%s%d%s%d%s%s%s%s%s%d%d%d','Delimiter','\t','emptyvalue',NaN, 'CommentStyle','!!!');
       fclose(fid);
+      
+      if isempty(logData{1})
+        error('Log file seems to be empty, something is wrong: %s',logFile);
+      end
     else
       %error('Log file file not found: %s',logFile);
       warning('Log file file not found: %s',logFile);
+      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = false;
       return
     end
     
@@ -88,7 +91,12 @@ switch phaseName
       end
     end
     
-    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = log;
+    % only keep certain types of events
+    log = log(ismember({log.type},{'MATCH_STIM1','MATCH_STIM2','MATCH_RESP'}));
+    
+    % store the log struct in the events struct
+    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
+    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = true;
     
   case {'name', 'nametrain', 'prac_name'}
     
@@ -106,9 +114,14 @@ switch phaseName
         fid = fopen(logFile);
         logData = textscan(fid,'%.6f%s%s%s%d%s%d%d%s%s%d%d%d%d%s%s%d%d', 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle','!!!');
         fclose(fid);
+        
+        if isempty(logData{1})
+          error('Log file seems to be empty, something is wrong: %s',logFile);
+        end
       else
         %error('Log file file not found: %s',logFile);
         warning('Log file file not found: %s',logFile);
+        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = false;
         return
       end
       
@@ -156,17 +169,22 @@ switch phaseName
         end
       end
       
+      % only keep certain types of events
+      log = log(ismember({log.type},{'NAME_STIM','NAME_RESP'}));
+      
       % store the log struct in the events struct
       if b == 1
-        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = log;
+        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
       else
-        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = cat(1,events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)),log);
+        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = cat(1,events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data,log);
       end
+      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = true;
       
     end % nBlocks
     
     
   case {'recog', 'prac_recog'}
+    keyboard
     
 %         study_imgOn{b}(i),...
 %         expParam.subject,...
@@ -234,6 +252,7 @@ switch phaseName
 
     
   case {'viewname'}
+    keyboard
     % blockSpeciesOrder
 end
 
