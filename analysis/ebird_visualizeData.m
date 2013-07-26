@@ -23,15 +23,15 @@ rt.basic = nan(length(subjects),nTrainSes,length(phases));
 rt.subord = nan(length(subjects),nTrainSes,length(phases));
 
 % dataField = 'rt';
-dataField = 'rt_cor';
+dataMeasure = 'rt_cor';
 
 for t = 1:nTrainSes
   sesName = sprintf('train%d',t);
   for p = 1:length(phases)
     if isfield(results.(sesName),phases{p})
-      rt.overall(:,t,p) = results.(sesName).(phases{p}).overall.(dataField);
-      rt.basic(:,t,p) = results.(sesName).(phases{p}).basic.(dataField);
-      rt.subord(:,t,p) = results.(sesName).(phases{p}).subord.(dataField);
+      rt.overall(:,t,p) = results.(sesName).(phases{p}).overall.(dataMeasure);
+      rt.basic(:,t,p) = results.(sesName).(phases{p}).basic.(dataMeasure);
+      rt.subord(:,t,p) = results.(sesName).(phases{p}).subord.(dataMeasure);
     end
   end
 end
@@ -58,7 +58,7 @@ for p = 1:length(phases)
   
   %axis([0.5 6.5 0 round(max(rt.overall(:))/100)*100]);
   axis([0.5 6.5 0 600]);
-  title(sprintf('Naming phase %d: %s',p,strrep(dataField,'_','\_')));
+  title(sprintf('Naming phase %d: %s',p,strrep(dataMeasure,'_','\_')));
   xlabel('Training Day');
   ylabel('Response Time (ms)');
   
@@ -77,15 +77,15 @@ acc.overall = nan(length(subjects),nTrainSes,length(phases));
 acc.basic = nan(length(subjects),nTrainSes,length(phases));
 acc.subord = nan(length(subjects),nTrainSes,length(phases));
 
-dataField = 'acc';
+dataMeasure = 'acc';
 
 for t = 1:nTrainSes
   sesName = sprintf('train%d',t);
   for p = 1:length(phases)
     if isfield(results.(sesName),phases{p})
-      acc.overall(:,t,p) = results.(sesName).(phases{p}).overall.(dataField);
-      acc.basic(:,t,p) = results.(sesName).(phases{p}).basic.(dataField);
-      acc.subord(:,t,p) = results.(sesName).(phases{p}).subord.(dataField);
+      acc.overall(:,t,p) = results.(sesName).(phases{p}).overall.(dataMeasure);
+      acc.basic(:,t,p) = results.(sesName).(phases{p}).basic.(dataMeasure);
+      acc.subord(:,t,p) = results.(sesName).(phases{p}).subord.(dataMeasure);
     end
   end
 end
@@ -112,7 +112,7 @@ for p = 1:length(phases)
   
   %axis([0.5 6.5 0 round(max(acc.overall(:))/100)*100]);
   axis([0.5 6.5 0.5 1]);
-  title(sprintf('Naming phase %d: %s',p,strrep(dataField,'_','\_')));
+  title(sprintf('Naming phase %d: %s',p,strrep(dataMeasure,'_','\_')));
   xlabel('Training Day');
   ylabel('Accuracy');
   
@@ -122,18 +122,26 @@ for p = 1:length(phases)
   publishfig(gcf,0);
 end
 
-%% plot basic and subordinate d' for pretest, poststest, posttest_delayed
+%% collapse across image conditions
+
+% plot basic and subordinate data for pretest, posttest, posttest_delay
+
+dataMeasure = 'dp';
+dataLabel = 'd''';
+ylimits = [0 3];
+
+% dataMeasure = 'acc';
+% dataLabel = 'Accuracy';
+% ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
 phases = {'match_1'};
 training = {'trained','untrained'};
 naming = {'basic','subord'};
 
-dataField = 'dp';
-
-dp = struct;
+data.(dataMeasure) = struct;
 for n = 1:length(naming)
-  dp.(naming{n}) = nan(length(subjects),length(sessions),length(phases),length(training));
+  data.(dataMeasure).(naming{n}) = nan(length(subjects),length(sessions),length(phases),length(training));
 end
 
 for s = 1:length(sessions)
@@ -141,7 +149,7 @@ for s = 1:length(sessions)
   for p = 1:length(phases)
     for t = 1:length(training)
       for n = 1:length(naming)
-        dp.(naming{n})(:,s,p,t) = results.(sesName).(phases{p}).(training{t}).(naming{n}).(dataField);
+        data.(dataMeasure).(naming{n})(:,s,p,t) = results.(sesName).(phases{p}).(training{t}).(naming{n}).(dataMeasure);
       end
     end
   end
@@ -150,13 +158,13 @@ end
 for p = 1:length(phases)
   for n = 1:length(naming)
     figure
-    bdp_mean = nan(length(sessions),length(training));
-    bdp_sem = nan(length(sessions),length(training));
+    data_mean = nan(length(sessions),length(training));
+    data_sem = nan(length(sessions),length(training));
     
     for t = 1:length(training)
       for s = 1:length(sessions)
-        bdp_mean(s,t) = nanmean(dp.(naming{n})(:,s,p,t),1);
-        bdp_sem(s,t) = nanstd(dp.(naming{n})(:,s,p,t),1) ./ sqrt(sum(~isnan(dp.(naming{n})(:,s,p,t))));
+        data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t),1);
+        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
       end
     end
     
@@ -165,18 +173,28 @@ for p = 1:length(phases)
     bw_legend = {'Trained','Untrained'};
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
-    bw_ylabel = 'd''';
+    bw_ylabel = dataLabel;
     bw_colormap = 'gray';
-    bw_data = bdp_mean;
-    bw_errors = bdp_sem;
+    bw_data = data_mean;
+    bw_errors = data_sem;
     h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend);
     set(h.legend,'Location','NorthEast');
-    axis([0.5 3.5 0 3]);
+    axis([0.5 3.5 ylimits(1) ylimits(2)]);
     publishfig(gcf,0);
   end
 end
 
 %% image manipulation conditions
+
+% plot basic and subordinate data for pretest, posttest, posttest_delay
+
+dataMeasure = 'dp';
+dataLabel = 'd''';
+ylimits = [0 4];
+
+% dataMeasure = 'acc';
+% dataLabel = 'Accuracy';
+% ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
 phases = {'match_1'};
@@ -184,11 +202,9 @@ training = {'trained','untrained'};
 naming = {'basic','subord'};
 imgConds = {'normal','color','g','g_hi8','g_lo8'};
 
-dataField = 'dp';
-
-dp = struct;
+data.(dataMeasure) = struct;
 for n = 1:length(naming)
-  dp.(naming{n}) = nan(length(subjects),length(sessions),length(phases),length(training),length(imgConds));
+  data.(dataMeasure).(naming{n}) = nan(length(subjects),length(sessions),length(phases),length(training),length(imgConds));
 end
 
 for s = 1:length(sessions)
@@ -197,7 +213,7 @@ for s = 1:length(sessions)
     for t = 1:length(training)
       for i = 1:length(imgConds)
         for n = 1:length(naming)
-          dp.(naming{n})(:,s,p,t,i) = results.(sesName).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataField);
+          data.(dataMeasure).(naming{n})(:,s,p,t,i) = results.(sesName).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasure);
         end
       end
     end
@@ -208,13 +224,13 @@ for i = 1:length(imgConds)
   for p = 1:length(phases)
     for n = 1:length(naming)
       figure
-      bdp_mean = nan(length(sessions),length(training));
-      bdp_sem = nan(length(sessions),length(training));
+      data_mean = nan(length(sessions),length(training));
+      data_sem = nan(length(sessions),length(training));
       
       for t = 1:length(training)
         for s = 1:length(sessions)
-          bdp_mean(s,t) = nanmean(dp.(naming{n})(:,s,p,t,i),1);
-          bdp_sem(s,t) = nanstd(dp.(naming{n})(:,s,p,t,i),1) ./ sqrt(sum(~isnan(dp.(naming{n})(:,s,p,t,i))));
+          data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t,i),1);
+          data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
         end
       end
       
@@ -223,13 +239,13 @@ for i = 1:length(imgConds)
       bw_legend = {'Trained','Untrained'};
       %bw_xlabel = 'Test day';
       bw_xlabel = [];
-      bw_ylabel = 'd''';
+      bw_ylabel = dataLabel;
       bw_colormap = 'gray';
-      bw_data = bdp_mean;
-      bw_errors = bdp_sem;
+      bw_data = data_mean;
+      bw_errors = data_sem;
       h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend);
       set(h.legend,'Location','NorthEast');
-      axis([0.5 3.5 0 4]);
+      axis([0.5 3.5 ylimits(1) ylimits(2)]);
       publishfig(gcf,0);
     end
   end
