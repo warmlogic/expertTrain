@@ -1,4 +1,4 @@
-function ebird_beh_analysis(subjects)
+function [results] = ebird_beh_analysis(subjects)
 % basic analysis script for expertTrain experiments
 
 if nargin == 0
