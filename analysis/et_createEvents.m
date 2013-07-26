@@ -1,5 +1,5 @@
 function [events] = et_createEvents(events,cfg,expParam,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
-% function [events] = et_createEvents(events,cfg,expParam,dataroot,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
+% function [events] = et_createEvents(events,cfg,expParam,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
 %
 % create event structure for a particular phase of expertTrain
 %
@@ -73,6 +73,10 @@ switch phaseName
       end
     end
     
+    % only keep certain types of events
+    log = log(ismember({log.type},{'MATCH_STIM1','MATCH_STIM2','MATCH_RESP'}));
+    
+    % store the log struct in the events struct
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)) = log;
     
   case {'name', 'nametrain', 'prac_name'}
@@ -139,7 +143,7 @@ switch phaseName
     
     
   case {'recog', 'prac_recog'}
-    
+    keyboard
 %         study_imgOn{b}(i),...
 %         expParam.subject,...
 %         sesName,...
@@ -206,6 +210,7 @@ switch phaseName
 
     
   case {'viewname'}
+    keyboard
     % blockSpeciesOrder
 end
 
