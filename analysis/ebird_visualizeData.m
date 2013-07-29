@@ -11,7 +11,7 @@ subjects = {
   'EBIRD003';
   };
 
-[results] = ebird_beh_analysis(subjects);
+[results] = ebird_processData(subjects,true);
 
 %% plot basic and subordinate RTs across training days
 
