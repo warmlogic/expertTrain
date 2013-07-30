@@ -1,11 +1,7 @@
-function [results] = ebird_processData(subjects,printResults)
+function [results] = ebird_processData(subjects,printResults,saveResults)
 % function [results] = ebird_processData(subjects,printResults)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
-
-if ~exist('printResults','var') || isempty(printResults)
-  printResults = true;
-end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
@@ -13,6 +9,14 @@ if ~exist('subjects','var') || isempty(subjects)
     'EBIRD002';
     'EBIRD003';
     };
+end
+
+if ~exist('printResults','var') || isempty(printResults)
+  printResults = true;
+end
+
+if ~exist('saveResults','var') || isempty(saveResults)
+  saveResults = true;
 end
 
 zs = strfind(subjects{1},'0');
@@ -38,12 +42,12 @@ end
 
 %% some constants
 
-%trainedConds = {0, 1, [0 1]};
-trainedConds = {0, 1};
+%trainedConds = {1, 0, [1 0]};
+trainedConds = {1, 0};
 
 results = struct;
 
-resFields = {'nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
+dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
 mainFields = {'overall','basic','subord'};
 
 %% initialize to store the data
@@ -100,18 +104,18 @@ for sesNum = 1:length(expParam.sesTypes)
               trainStr = 'all';
             end
             
-            for mc = 1:length(mainFields)
-              for rf = 1:length(resFields)
-                results.(sesName).(fn).(trainStr).(mainFields{mc}).(resFields{rf}) = nan(length(subjects),1);
+            for mf = 1:length(mainFields)
+              for df = 1:length(dataFields)
+                results.(sesName).(fn).(trainStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
               end
             end
             
             imgConds = unique({events.(sesName).(fn).data.imgCond});
             if length(imgConds) > 1
               for im = 1:length(imgConds)
-                for mc = 1:length(mainFields)
-                  for rf = 1:length(resFields)
-                    results.(sesName).(fn).(trainStr).(imgConds{im}).(mainFields{mc}).(resFields{rf}) = nan(length(subjects),1);
+                for mf = 1:length(mainFields)
+                  for df = 1:length(dataFields)
+                    results.(sesName).(fn).(trainStr).(imgConds{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
                   end
                 end
               end
@@ -125,16 +129,16 @@ for sesNum = 1:length(expParam.sesTypes)
             nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
           end
           
-          for mc = 1:length(mainFields)
-            for rf = 1:length(resFields)
-              results.(sesName).(fn).(mainFields{mc}).(resFields{rf}) = nan(length(subjects),1);
+          for mf = 1:length(mainFields)
+            for df = 1:length(dataFields)
+              results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
             end
           end
           if nBlocks > 1
             for b = 1:nBlocks
-              for mc = 1:length(mainFields)
-                for rf = 1:length(resFields)
-                  results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mc}).(resFields{rf}) = nan(length(subjects),1);
+              for mf = 1:length(mainFields)
+                for df = 1:length(dataFields)
+                  results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
                 end
               end
             end
@@ -261,6 +265,8 @@ for sub = 1:length(subjects)
                 
                 % accuracy for the different image manipulation conditions
                 imgConds = unique({matchResp.imgCond});
+                % if there's only 1 image manipulation condition, the
+                % results were printed above
                 if length(imgConds) > 1
                   fprintf('\n');
                   for im = 1:length(imgConds)
@@ -346,6 +352,7 @@ for sub = 1:length(subjects)
                 fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameSubordResults.rt(sub),nameSubordResults.rt_cor(sub),nameSubordResults.rt_inc(sub));
               end
               
+              % if there's only 1 block, the results were printed above
               if nBlocks > 1
                 fprintf('\n');
                 for b = 1:nBlocks
@@ -364,9 +371,9 @@ for sub = 1:length(subjects)
                     fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockResults.rt(sub),nameBlockResults.rt_cor(sub),nameBlockResults.rt_inc(sub));
                   end
                   
-                  % basic and subordinate for this manipulation
-                  nameBlockBasic = matchResp([nameBlock.isSubord] == 0);
-                  nameBlockSubord = matchResp([nameBlock.isSubord] == 1);
+                  % basic and subordinate for this block
+                  nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
+                  nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
                   
                   thisField = 'basic';
                   results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
@@ -398,7 +405,237 @@ for sub = 1:length(subjects)
 end % for sub
 fprintf('Done processing data for experiment %s.\n\n',expName);
 
+if saveResults
+  fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
+  printResultsToFile(dataroot,subjects,trainedConds,results,fileName);
+end
+
 end % function
+
+%% print to file
+
+function printResultsToFile(dataroot,subjects,trainedConds,results,fileName)
+
+fprintf('Saving results to file: %s.\n',fileName);
+
+fid = fopen(fileName,'wt');
+
+mainToPrint = {'basic','subord'};
+dataToPrint = {'nTrials','nCor','acc','dp','rt','rt_cor','rt_inc'};
+
+% use subject 1's files for initialization
+sub = 1;
+subDir = fullfile(dataroot,subjects{sub});
+expParamFile = fullfile(subDir,'experimentParams.mat');
+if exist(expParamFile,'file')
+  load(expParamFile)
+else
+  error('experiment parameter file does not exist: %s',expParamFile);
+end
+eventsFile = fullfile(subDir,'events','events.mat');
+if exist(eventsFile,'file')
+  load(eventsFile,'events');
+else
+  error('events file does not exist: %s',eventsFile);
+end
+
+for sesNum = 1:length(expParam.sesTypes)
+  % set the subject events file
+  sesName = expParam.sesTypes{sesNum};
+  
+  uniquePhaseNames = unique(expParam.session.(sesName).phases);
+  uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+  
+  fprintf(fid,'session\t%s\n',sesName);
+  
+  for pha = 1:length(expParam.session.(sesName).phases)
+    phaseName = expParam.session.(sesName).phases{pha};
+    
+    % find out where this phase occurs in the list of unique phases
+    uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
+    % increase the phase count for that phase
+    uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
+    % set the phase count
+    phaseCount = uniquePhaseCounts(uniquePhaseInd);
+    
+    if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+      
+      % set the phase name with phase count
+      fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+      
+      fprintf(fid,'phase\t%s\n',fn);
+      
+      switch phaseName
+        case {'match', 'prac_match'}
+          for t = 1:length(trainedConds)
+            
+            % choose the training condition
+            if length(trainedConds{t}) == 1
+              if trainedConds{t} == 1
+                trainStr = 'trained';
+              elseif trainedConds{t} == 0
+                trainStr = 'untrained';
+              end
+            elseif length(trainedConds{t}) > 1
+              trainStr = 'all';
+            end
+            
+            matchResp = events.(sesName).(fn).data(strcmp({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+            
+            imgConds = unique({matchResp.imgCond});
+            if length(imgConds) > 1
+              headerCell = {{trainStr},imgConds,mainToPrint};
+              [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+              fprintf(fid,sprintf('\t%s\n',headerStr));
+              [headerStr] = setHeaderStr({dataToPrint},1);
+              headerStr = sprintf('\t%s',headerStr);
+              headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+              fprintf(fid,sprintf('%s\n',headerStr));
+              
+              for sub = 1:length(subjects)
+                dataStr = subjects{sub};
+                for im = 1:length(imgConds)
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,imgConds{im},mainToPrint{mf}},results,sub,dataToPrint);
+                  end
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
+              
+            else
+              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              keyboard
+              
+              headerCell = {{trainStr},mainToPrint};
+              [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+              fprintf(fid,sprintf('\t%s\n',headerStr));
+              [headerStr] = setHeaderStr({dataToPrint},1);
+              headerStr = sprintf('\t%s',headerStr);
+              headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+              fprintf(fid,sprintf('%s\n',headerStr));
+              
+              for sub = 1:length(subjects)
+                dataStr = subjects{sub};
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
+            end
+            fprintf(fid,'\n');
+          end
+          
+        case {'name', 'nametrain', 'prac_name'}
+          if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+            nBlocks = 1;
+          else
+            nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+          end
+          
+          if nBlocks > 1
+            blockStr = cell(1,nBlocks);
+            for b = 1:nBlocks
+              blockStr{b} = sprintf('b%d',b);
+            end
+            headerCell = {blockStr,mainToPrint};
+            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            fprintf(fid,sprintf('\t%s\n',headerStr));
+            [headerStr] = setHeaderStr({dataToPrint},1);
+            headerStr = sprintf('\t%s',headerStr);
+            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+            fprintf(fid,sprintf('%s\n',headerStr));
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            for sub = 1:length(subjects)
+              dataStr = subjects{sub};
+              for b = 1:nBlocks
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
+                end
+              end
+              fprintf(fid,sprintf('%s\n',dataStr));
+            end
+          else
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            headerCell = {mainToPrint};
+            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            fprintf(fid,sprintf('\t%s\n',headerStr));
+            [headerStr] = setHeaderStr({dataToPrint},1);
+            headerStr = sprintf('\t%s',headerStr);
+            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+            fprintf(fid,sprintf('%s\n',headerStr));
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            for sub = 1:length(subjects)
+              dataStr = subjects{sub};
+              for mf = 1:length(mainToPrint)
+                [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+              end
+              fprintf(fid,sprintf('%s\n',dataStr));
+            end
+            
+          end
+      end % switch phaseName
+    end
+    fprintf(fid,'\n');
+  end
+  fprintf(fid,'\n');
+end
+
+% close out the results file
+fprintf('Saving %s...',fileName);
+fclose(fid);
+fprintf('Done.\n');
+
+end
+
+%% create the header string
+
+function [headerStr] = setHeaderStr(headerCell,nTabs)
+
+% borrowed from http://stackoverflow.com/questions/8492277/matlab-combinations-of-an-arbitrary-number-of-cell-arrays
+sizeVec = cellfun('prodofsize', headerCell);
+indices = fliplr(arrayfun(@(n) {1:n}, sizeVec));
+[indices{:}] = ndgrid(indices{:});
+headerMat = cellfun(@(c,i) {reshape(c(i(:)), [], 1)}, headerCell, fliplr(indices));
+headerMat = [headerMat{:}];
+
+headerStr = headerMat{1,1};
+if size(headerMat,2) > 1
+  for j = 2:size(headerMat,2)
+    headerStr = cat(2,headerStr,' ',headerMat{1,j});
+  end
+end
+
+for i = 2:size(headerMat,1)
+  thisStr = [];
+  for j = 1:size(headerMat,2)
+    thisStr = cat(2,thisStr,' ',headerMat{i,j});
+  end
+  thisStr = thisStr(2:end);
+  if ~isempty(nTabs) && nTabs > 0
+    thisStr = sprintf('%s%s',repmat('\t',1,nTabs),thisStr);
+  end
+  headerStr = sprintf('%s%s',headerStr,thisStr);
+end
+
+end
+
+%% create the data string
+
+function [dataStr] = setDataStr(dataStr,structFields,results,sub,dataToPrint) %#ok<INUSL>
+
+theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,size(structFields)),structFields{:})));
+
+for i = 1:length(dataToPrint)
+  if ~isnan(theseResults.(dataToPrint{i})(sub))
+    dataStr = sprintf('%s\t%.4f',dataStr,theseResults.(dataToPrint{i})(sub));
+  else
+    dataStr = sprintf('%s\t',dataStr);
+  end
+end
+
+end
 
 %% Calculate accuracy and reaction time
 
@@ -413,6 +650,7 @@ inputStruct.(destField).nCor(sub) = sum([inputData.acc] == 1);
 inputStruct.(destField).nInc(sub) = sum([inputData.acc] == 0);
 
 nTrials = sum([inputData.acc] == 1 | [inputData.acc] == 0);
+inputStruct.(destField).nTrials(sub) = nTrials;
 
 % accuracy
 inputStruct.(destField).acc(sub) = inputStruct.(destField).nCor(sub) / nTrials;
