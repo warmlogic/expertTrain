@@ -11,7 +11,9 @@ subjects = {
   'EBIRD003';
   };
 
-[results] = ebird_processData(subjects,true);
+printResults = true;
+saveResults = true;
+[results] = ebird_processData(subjects,printResults,saveResults);
 
 %% plot basic and subordinate RTs across training days
 
@@ -41,18 +43,18 @@ for p = 1:length(phases)
   
   bRT_mean = nanmean(rt.basic(:,:,p),1);
   bRT_sem = nanstd(rt.basic(:,:,p),1) ./ sqrt(sum(~isnan(rt.basic(:,:,p))));
-  %plot(1:nTrainDays,bRT_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
+  %plot(1:nTrainSes,bRT_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
   errorbar(bRT_mean,bRT_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
   hold on
   
   sRT_mean = nanmean(rt.subord(:,:,p),1);
   sRT_sem = nanstd(rt.subord(:,:,p),1) ./ sqrt(sum(~isnan(rt.subord(:,:,p))));
-  %plot(1:nTrainDays,sRT_mean,'ks-','LineWidth',2);
+  %plot(1:nTrainSes,sRT_mean,'ks-','LineWidth',2);
   errorbar(sRT_mean,sRT_sem,'ks-','LineWidth',2);
   
   % oRT_mean = nanmean(rt.overall(:,:,p),1);
   % oRT_sem = nanstd(rt.overall(:,:,p),1) ./ sqrt(sum(~isnan(rt.overall(:,:,p))));
-  % % plot(1:nTrainDays,oRT_mean,'ro-','LineWidth',2);
+  % % plot(1:nTrainSes,oRT_mean,'ro-','LineWidth',2);
   % errorbar(oRT_mean,oRT_sem,'ro-','LineWidth',2);
   hold off
   
@@ -95,18 +97,18 @@ for p = 1:length(phases)
   
   bAcc_mean = nanmean(acc.basic(:,:,p),1);
   bAcc_sem = nanstd(acc.basic(:,:,p),1) ./ sqrt(sum(~isnan(acc.basic(:,:,p))));
-  %plot(1:nTrainDays,bAcc_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
+  %plot(1:nTrainSes,bAcc_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
   errorbar(bAcc_mean,bAcc_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
   hold on
   
   sAcc_mean = nanmean(acc.subord(:,:,p),1);
   sAcc_sem = nanstd(acc.subord(:,:,p),1) ./ sqrt(sum(~isnan(acc.subord(:,:,p))));
-  %plot(1:nTrainDays,sAcc_mean,'ks-','LineWidth',2);
+  %plot(1:nTrainSes,sAcc_mean,'ks-','LineWidth',2);
   errorbar(sAcc_mean,sAcc_sem,'ks-','LineWidth',2);
   
   % oAcc_mean = nanmean(acc.overall(:,:,p),1);
   % oAcc_sem = nanstd(acc.overall(:,:,p),1) ./ sqrt(sum(~isnan(acc.overall(:,:,p))));
-  % % plot(1:nTrainDays,oAcc_mean,'ro-','LineWidth',2);
+  % % plot(1:nTrainSes,oAcc_mean,'ro-','LineWidth',2);
   % errorbar(oAcc_mean,oAcc_sem,'ro-','LineWidth',2);
   hold off
   
