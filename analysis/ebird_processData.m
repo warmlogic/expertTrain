@@ -1,7 +1,23 @@
-function [results] = ebird_processData(subjects,printResults,saveResults)
-% function [results] = ebird_processData(subjects,printResults)
+function [results] = ebird_processData(dataroot,subjects,printResults,saveResults)
+% function [results] = ebird_processData(dataroot,subjects,printResults,saveResults)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
+
+if ~exist('dataroot','var') || isempty(dataroot)
+  serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
+  serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
+  localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
+  if exist(serverDir,'dir')
+    dataroot = serverDir;
+  elseif exist(serverLocalDir,'dir')
+    dataroot = serverLocalDir;
+  elseif exist(localDir,'dir')
+    dataroot = localDir;
+  else
+    error('No data directory found.');
+  end
+  %saveDir = dataroot;
+end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
@@ -25,20 +41,6 @@ if ~isempty(zs)
 else
   error('Cannot determine experiment name.');
 end
-
-serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
-serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
-localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
-if exist(serverDir,'dir')
-  dataroot = serverDir;
-elseif exist(serverLocalDir,'dir')
-  dataroot = serverLocalDir;
-elseif exist(localDir,'dir')
-  dataroot = localDir;
-else
-  error('No data directory found.');
-end
-%saveDir = dataroot;
 
 %% some constants
 
