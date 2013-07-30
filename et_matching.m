@@ -434,20 +434,59 @@ for i = trialNum:length(stim2Tex)
     fprintf('Trial %d of %d: stim2 (%s): family %d (%s), species %d (%s), exemplar %d (%d). Same (1) or diff (0): %d.\n',i,length(stim2Tex),stim2(i).fileName,stim2(i).familyNum,stim2(i).familyStr,stim2(i).speciesNum,stim2(i).speciesStr,stim2(i).exemplarNum,stim2(i).exemplarName,stim2(i).same);
   end
   
-  % while loop to show stimulus until subjects response or until
-  % "duration" seconds elapsed.
+  % while loop to show stimulus until subject response or until
+  % "match_stim2" seconds elapse.
   while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
-    % check for too-fast response in practice only
-    if ~phaseCfg.isExp
+    % check for too-fast response
+    if ~phaseCfg.respDuringStim
       [keyIsDown] = KbCheck;
       % if they press a key too early, tell them they responded too fast
       if keyIsDown
+        % draw the stimulus
         Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
-        Screen('TextSize', w, cfg.text.instructTextSize);
-        DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        % and fixation on top of it
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        % and the "too fast" text
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
         Screen('Flip', w);
+        
+        keyIsDown = 0;
+      end
+    else
+      [keyIsDown, endRT, keyCode] = KbCheck;
+      % if they push more than one key, don't accept it
+      if keyIsDown && sum(keyCode) == 1
+        % wait for key to be released
+        while KbCheck(-1)
+          WaitSecs(0.0001);
+          
+          % % proceed if time is up, regardless of whether key is held
+          % if (GetSecs - startRT) > phaseCfg.match_response
+          %   break
+          % end
+        end
+        % if cfg.text.printTrialInfo
+        %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+        % end
+        if (keyCode(cfg.keys.matchSame) == 1 && all(keyCode(~cfg.keys.matchSame) == 0)) ||...
+            (keyCode(cfg.keys.matchDiff) == 1 && all(keyCode(~cfg.keys.matchDiff) == 0))
+          break
+        end
+      elseif keyIsDown && sum(keyCode) > 1
+        % draw the stimulus
+        Screen('DrawTexture', w, stim2Tex(i), [], stimImgRect);
+        % and fixation on top of it
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        % don't push multiple keys
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        % put them on the screen
+        Screen('Flip', w);
+        
+        keyIsDown = 0;
       end
     end
     
@@ -456,62 +495,78 @@ for i = trialNum:length(stim2Tex)
     WaitSecs(0.0001);
   end
   
-  % draw response prompt
-  Screen('TextSize', w, cfg.text.fixSize);
-  if phaseCfg.matchTextPrompt
-    responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
-    DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  else
-    DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  end
-  [respPromptOn, startRT] = Screen('Flip',w);
+  keyIsDown = logical(keyIsDown);
   
-  % poll for a resp
-  while 1
-    if (GetSecs - startRT) > phaseCfg.match_response
-      break
+  if keyIsDown
+    % if they hit a key while the stimulus was on the screen (the only way
+    % keyIsDown==1), wait out any remaining stimulus time
+    
+    % code that follows this if statement block will take the stimulus off
+    % screen and give feedback if this is a practice phase
+    
+    % wait out any remaining time
+    while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
+      % Wait <1 ms before checking the keyboard again to prevent
+      % overload of the machine at elevated Priority():
+      WaitSecs(0.0001);
     end
     
-    [keyIsDown, endRT, keyCode] = KbCheck;
-    % if they push more than one key, don't accept it
-    if keyIsDown && sum(keyCode) == 1
-      % wait for key to be released, or time limit
-      while KbCheck(-1)
-        WaitSecs(0.0001);
-        
-        % % proceed if time is up, regardless of whether key is held
-        % if (GetSecs - startRT) > phaseCfg.match_response
-        %   break
-        % end
-      end
-      % if cfg.text.printTrialInfo
-      %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
-      % end
-      if (keyCode(cfg.keys.matchSame) == 1 && all(keyCode(~cfg.keys.matchSame) == 0)) ||...
-          (keyCode(cfg.keys.matchDiff) == 1 && all(keyCode(~cfg.keys.matchDiff) == 0))
-        break
-      end
-    elseif keyIsDown && sum(keyCode) > 1
-      % draw response prompt
-      Screen('TextSize', w, cfg.text.fixSize);
-      if phaseCfg.matchTextPrompt
-        responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
-        DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-      else
-        DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-      end
-      % don't push multiple keys
-      Screen('TextSize', w, cfg.text.instructTextSize);
-      DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
-      % put them on the screen
-      Screen('Flip', w);
-      
-      keyIsDown = 0;
+  else
+    % draw response prompt
+    Screen('TextSize', w, cfg.text.fixSize);
+    if phaseCfg.matchTextPrompt
+      responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
+      DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    else
+      DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
-    % wait so we don't overload the system
-    WaitSecs(0.0001);
+    [respPromptOn, startRT] = Screen('Flip',w);
+    
+    % poll for a resp
+    while (GetSecs - startRT) <= phaseCfg.match_response
+      
+      [keyIsDown, endRT, keyCode] = KbCheck;
+      % if they push more than one key, don't accept it
+      if keyIsDown && sum(keyCode) == 1
+        % wait for key to be released
+        while KbCheck(-1)
+          WaitSecs(0.0001);
+          
+          % % proceed if time is up, regardless of whether key is held
+          % if (GetSecs - startRT) > phaseCfg.match_response
+          %   break
+          % end
+        end
+        % if cfg.text.printTrialInfo
+        %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+        % end
+        if (keyCode(cfg.keys.matchSame) == 1 && all(keyCode(~cfg.keys.matchSame) == 0)) ||...
+            (keyCode(cfg.keys.matchDiff) == 1 && all(keyCode(~cfg.keys.matchDiff) == 0))
+          break
+        end
+      elseif keyIsDown && sum(keyCode) > 1
+        % draw response prompt
+        Screen('TextSize', w, cfg.text.fixSize);
+        if phaseCfg.matchTextPrompt
+          responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
+          DrawFormattedText(w,responsePromptText,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        else
+          DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        end
+        % don't push multiple keys
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        % put them on the screen
+        Screen('Flip', w);
+        
+        keyIsDown = 0;
+      end
+      % wait so we don't overload the system
+      WaitSecs(0.0001);
+    end
+    
+    keyIsDown = logical(keyIsDown);
   end
-  keyIsDown = logical(keyIsDown);
   
   % determine response and compute accuracy
   if keyIsDown
@@ -519,6 +574,7 @@ for i = trialNum:length(stim2Tex)
       resp = 'same';
       if stim1(i).same
         acc = true;
+        % only give feedback during practice
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',correctFeedback,sameFeedback);
           if phaseCfg.playSound
@@ -529,6 +585,7 @@ for i = trialNum:length(stim2Tex)
         feedbackColor = correctColor;
       else
         acc = false;
+        % only give feedback during practice
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',incorrectFeedback,diffFeedback);
           if phaseCfg.playSound
@@ -542,6 +599,7 @@ for i = trialNum:length(stim2Tex)
       resp = 'diff';
       if ~stim1(i).same
         acc = true;
+        % only give feedback during practice
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',correctFeedback,diffFeedback);
           if phaseCfg.playSound
@@ -552,6 +610,7 @@ for i = trialNum:length(stim2Tex)
         feedbackColor = correctColor;
       else
         acc = false;
+        % only give feedback during practice
         if ~phaseCfg.isExp
           message = sprintf('%s\n%s',incorrectFeedback,sameFeedback);
           if phaseCfg.playSound
@@ -572,6 +631,7 @@ for i = trialNum:length(stim2Tex)
       resp = 'ERROR_OTHER';
     end
     if ~phaseCfg.isExp
+      % only give feedback during practice
       feedbackTime = cfg.text.respondFasterFeedbackTime;
     else
       message = '';
@@ -595,14 +655,16 @@ for i = trialNum:length(stim2Tex)
     end
   end
   
-  if phaseCfg.playSound && (~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown))
-    Beeper(respSound,respVol);
+  if ~isempty(message)
+    if phaseCfg.playSound && (~phaseCfg.isExp || (phaseCfg.isExp && ~keyIsDown))
+      Beeper(respSound,respVol);
+    end
+    Screen('TextSize', w, cfg.text.instructTextSize);
+    DrawFormattedText(w,message,'center','center',feedbackColor, cfg.text.instructCharWidth);
+    Screen('Flip', w);
+    % wait to let them view the feedback
+    WaitSecs(feedbackTime);
   end
-  Screen('TextSize', w, cfg.text.instructTextSize);
-  DrawFormattedText(w,message,'center','center',feedbackColor, cfg.text.instructCharWidth);
-  Screen('Flip', w);
-  % wait to let them view the feedback
-  WaitSecs(feedbackTime);
   
   % get key pressed by subject
   if keyIsDown
@@ -616,7 +678,9 @@ for i = trialNum:length(stim2Tex)
     respKey = 'none';
   end
   
-  % Clear screen to background color after response
+  % draw fixation after response
+  Screen('TextSize', w, cfg.text.fixSize);
+  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   Screen('Flip', w);
   
   % Close this stimulus before next trial
@@ -624,10 +688,15 @@ for i = trialNum:length(stim2Tex)
   Screen('Close', stim2Tex(i));
   
   % compute response time
-  rt = int32(round(1000 * (endRT - startRT)));
+  if phaseCfg.respDuringStim
+    measureRTfromHere = stim2Onset;
+  else
+    measureRTfromHere = startRT;
+  end
+  rt = int32(round(1000 * (endRT - measureRTfromHere)));
   
   if cfg.text.printTrialInfo
-    fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc);
+    fprintf('Trial %d of %d: same (1) or diff (0): %d. response: %s (key: %s; acc = %d; rt = %d)\n',i,length(stim2Tex),stim1(i).same,resp,respKey,acc,rt);
   end
   
   fNum1 = int32(stim1(i).familyNum);

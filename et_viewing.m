@@ -421,14 +421,12 @@ for i = trialNum:length(stimTex)
   % "duration" seconds elapse.
   %
   % if we get a keyhit, change the color of the species number
-  while 1
-    if (GetSecs - stimOnset) > phaseCfg.view_stim
-      break
-    end
+  while (GetSecs - stimOnset) <= phaseCfg.view_stim
+    
     [keyIsDown, endRT, keyCode] = KbCheck;
     % if they push more than one key, don't accept it
     if keyIsDown && sum(keyCode) == 1
-      % wait for key to be released, or time limit
+      % wait for key to be released
       while KbCheck(-1)
         WaitSecs(0.0001);
         
@@ -499,7 +497,7 @@ for i = trialNum:length(stimTex)
     WaitSecs(0.0001);
   end
   
-  % if they didn't make a response, give incorrect feedback
+  % if they didn't make a response, give "incorrect" feedback
   if ~keyIsDown
     % draw the stimulus
     Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
@@ -586,7 +584,7 @@ for i = trialNum:length(stimTex)
   end
   
   if cfg.text.printTrialInfo
-    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),viewStims(i).fileName,specNum,resp,respKey,acc);
+    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s; acc = %d; rt = %d)\n',i,length(stimTex),viewStims(i).fileName,specNum,resp,respKey,acc,rt);
   end
   
   fNum = int32(viewStims(i).familyNum);

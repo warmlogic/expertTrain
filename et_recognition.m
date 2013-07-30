@@ -642,17 +642,59 @@ for b = 1:phaseCfg.nBlocks
     
     % while loop to show stimulus until "duration" seconds elapsed.
     while (GetSecs - test_stimOnset) <= phaseCfg.recog_test_stim
-      % check for too-fast response in practice only
-      if ~phaseCfg.isExp
+      % check for too-fast response
+      if ~phaseCfg.respDuringStim
         [keyIsDown] = KbCheck;
         % if they press a key too early, tell them they responded too fast
         if keyIsDown
+          % draw the stimulus
           Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
-          Screen('TextSize', w, cfg.text.instructTextSize);
-          DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          % and the "too fast" text
+          Screen('TextSize', w, cfg.text.instructTextSize);
+          DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
           Screen('Flip', w);
+          
+          keyIsDown = 0;
+        end
+      else
+        [keyIsDown, endRT{b}(i), keyCode] = KbCheck;
+        % if they push more than one key, don't accept it
+        if keyIsDown && sum(keyCode) == 1
+          % wait for key to be released
+          while KbCheck(-1)
+            WaitSecs(0.0001);
+            
+            % % proceed if time is up, regardless of whether key is held
+            % if (GetSecs - startRT) > phaseCfg.recog_response
+            %   break
+            % end
+          end
+          % if cfg.text.printTrialInfo
+          %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+          % end
+          if (keyCode(cfg.keys.recogDefUn) == 1 && all(keyCode(~cfg.keys.recogDefUn) == 0)) ||...
+              (keyCode(cfg.keys.recogMayUn) == 1 && all(keyCode(~cfg.keys.recogMayUn) == 0)) ||...
+              (keyCode(cfg.keys.recogMayF) == 1 && all(keyCode(~cfg.keys.recogMayF) == 0)) ||...
+              (keyCode(cfg.keys.recogDefF) == 1 && all(keyCode(~cfg.keys.recogDefF) == 0)) ||...
+              (keyCode(cfg.keys.recogRecoll) == 1 && all(keyCode(~cfg.keys.recogRecoll) == 0))
+            break
+          end
+        elseif keyIsDown && sum(keyCode) > 1
+          % draw the stimulus
+          Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+          % and fixation on top of it
+          Screen('TextSize', w, cfg.text.fixSize);
+          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          % don't push multiple keys
+          Screen('TextSize', w, cfg.text.instructTextSize);
+          DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          % put them on the screen
+          Screen('Flip', w);
+          
+          keyIsDown = 0;
         end
       end
       
@@ -661,64 +703,77 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(0.0001);
     end
     
-    % draw the stimulus
-    Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
-    % with the response key image
-    Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
-    % and fixation on top of it
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    % put them on the screen; measure RT from when response key img appears
-    [respKeyImgOn{b}(i), startRT] = Screen('Flip', w);
-    
-    % poll for a resp
-    while 1
-      if (GetSecs - startRT) > phaseCfg.recog_response
-        break
+    if keyIsDown
+      % if they hit a key while the stimulus was on the screen (the only way
+      % keyIsDown==1), wait out any remaining stimulus time
+      
+      % code that follows this if statement block will take the stimulus
+      % off screen
+      
+      % wait out any remaining time
+      while (GetSecs - test_stimOnset) <= phaseCfg.recog_test_stim
+        % Wait <1 ms before checking the keyboard again to prevent
+        % overload of the machine at elevated Priority():
+        WaitSecs(0.0001);
+      end
+    else
+      % draw the stimulus
+      Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+      % with the response key image
+      Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
+      % and fixation on top of it
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      % put them on the screen; measure RT from when response key img appears
+      [respKeyImgOn{b}(i), startRT] = Screen('Flip', w);
+      
+      % poll for a resp
+      while (GetSecs - startRT) <= phaseCfg.recog_response
+        
+        [keyIsDown, endRT{b}(i), keyCode] = KbCheck;
+        % if they push more than one key, don't accept it
+        if keyIsDown && sum(keyCode) == 1
+          % wait for key to be released
+          while KbCheck(-1)
+            WaitSecs(0.0001);
+            
+            % % proceed if time is up, regardless of whether key is held
+            % if (GetSecs - startRT) > phaseCfg.recog_response
+            %   break
+            % end
+          end
+          % if cfg.text.printTrialInfo
+          %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
+          % end
+          if (keyCode(cfg.keys.recogDefUn) == 1 && all(keyCode(~cfg.keys.recogDefUn) == 0)) ||...
+              (keyCode(cfg.keys.recogMayUn) == 1 && all(keyCode(~cfg.keys.recogMayUn) == 0)) ||...
+              (keyCode(cfg.keys.recogMayF) == 1 && all(keyCode(~cfg.keys.recogMayF) == 0)) ||...
+              (keyCode(cfg.keys.recogDefF) == 1 && all(keyCode(~cfg.keys.recogDefF) == 0)) ||...
+              (keyCode(cfg.keys.recogRecoll) == 1 && all(keyCode(~cfg.keys.recogRecoll) == 0))
+            break
+          end
+        elseif keyIsDown && sum(keyCode) > 1
+          % draw the stimulus
+          Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
+          % with the response key image
+          Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
+          % and fixation on top of it
+          Screen('TextSize', w, cfg.text.fixSize);
+          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          % don't push multiple keys
+          Screen('TextSize', w, cfg.text.instructTextSize);
+          DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          % put them on the screen
+          Screen('Flip', w);
+          
+          keyIsDown = 0;
+        end
+        % wait so we don't overload the system
+        WaitSecs(0.0001);
       end
       
-      [keyIsDown, endRT{b}(i), keyCode] = KbCheck;
-      % if they push more than one key, don't accept it
-      if keyIsDown && sum(keyCode) == 1
-        % wait for key to be released, or time limit
-        while KbCheck(-1)
-          WaitSecs(0.0001);
-          
-          % % proceed if time is up, regardless of whether key is held
-          % if (GetSecs - startRT) > phaseCfg.recog_response
-          %   break
-          % end
-        end
-        % if cfg.text.printTrialInfo
-        %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
-        % end
-        if (keyCode(cfg.keys.recogDefUn) == 1 && all(keyCode(~cfg.keys.recogDefUn) == 0)) ||...
-            (keyCode(cfg.keys.recogMayUn) == 1 && all(keyCode(~cfg.keys.recogMayUn) == 0)) ||...
-            (keyCode(cfg.keys.recogMayF) == 1 && all(keyCode(~cfg.keys.recogMayF) == 0)) ||...
-            (keyCode(cfg.keys.recogDefF) == 1 && all(keyCode(~cfg.keys.recogDefF) == 0)) ||...
-            (keyCode(cfg.keys.recogRecoll) == 1 && all(keyCode(~cfg.keys.recogRecoll) == 0))
-          break
-        end
-      elseif keyIsDown && sum(keyCode) > 1
-        % draw the stimulus
-        Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
-        % with the response key image
-        Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
-        % and fixation on top of it
-        Screen('TextSize', w, cfg.text.fixSize);
-        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-        % don't push multiple keys
-        Screen('TextSize', w, cfg.text.instructTextSize);
-        DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
-        % put them on the screen
-        Screen('Flip', w);
-        
-        keyIsDown = 0;
-      end
-      % wait so we don't overload the system
-      WaitSecs(0.0001);
+      keyIsDown = logical(keyIsDown);
     end
-    keyIsDown = logical(keyIsDown);
     
     if ~keyIsDown
       if phaseCfg.playSound
@@ -728,7 +783,6 @@ for b = 1:phaseCfg.nBlocks
       % "need to respond faster"
       Screen('TextSize', w, cfg.text.instructTextSize);
       DrawFormattedText(w,cfg.text.respondFaster,'center','center',cfg.text.respondFasterColor, cfg.text.instructCharWidth);
-      
       Screen('Flip', w);
       
       % need a new endRT
@@ -738,18 +792,21 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(cfg.text.respondFasterFeedbackTime);
     end
     
-    % draw fixation
+    % draw fixation after response
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    
-    % Clear screen to background color after response
     Screen('Flip', w);
     
     % Close this stimulus before next trial
     Screen('Close', blockStimTex(i));
     
     % compute response time
-    rt = int32(round(1000 * (endRT{b}(i) - startRT)));
+    if phaseCfg.respDuringStim
+      measureRTfromHere = test_stimOnset;
+    else
+      measureRTfromHere = startRT;
+    end
+    rt = int32(round(1000 * (endRT{b}(i) - measureRTfromHere)));
     
     % compute accuracy
     if keyIsDown
@@ -807,7 +864,7 @@ for b = 1:phaseCfg.nBlocks
     end
     
     if cfg.text.printTrialInfo
-      fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d. response: %s (key: %s) (acc = %d)\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ,resp,respKey,acc);
+      fprintf('Trial %d of %d: %s, targ (1) or lure (0): %d. response: %s (key: %s; acc = %d; rt = %d)\n',i,length(blockStimTex),allStims{b}(i).fileName,allStims{b}(i).targ,resp,respKey,acc,rt);
     end
     
     %% session log file
