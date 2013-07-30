@@ -141,17 +141,22 @@ end
 if phaseCfg.playSound
   Beeper(1,0);
   if ~isfield(phaseCfg,'correctSound')
-    cfg.correctSound = 1000;
+    phaseCfg.correctSound = 1000;
   end
   if ~isfield(phaseCfg,'incorrectSound')
-    cfg.incorrectSound = 300;
+    phaseCfg.incorrectSound = 300;
   end
   if ~isfield(phaseCfg,'correctVol')
-    cfg.correctVol = 0.4;
+    phaseCfg.correctVol = 0.4;
   end
   if ~isfield(phaseCfg,'incorrectVol')
-    cfg.incorrectVol = 0.6;
+    phaseCfg.incorrectVol = 0.6;
   end
+end
+
+% are they allowed to respond while the stimulus is on the screen?
+if ~isfield(phaseCfg,'respDuringStim')
+  phaseCfg.respDuringStim = false;
 end
 
 %% preload all stimuli for presentation
