@@ -24,6 +24,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'EBIRD049';
     'EBIRD002';
     'EBIRD003';
+    'EBIRD004';
     };
 end
 
