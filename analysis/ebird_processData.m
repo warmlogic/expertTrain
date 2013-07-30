@@ -522,7 +522,9 @@ for sesNum = 1:length(expParam.sesTypes)
                 fprintf(fid,sprintf('%s\n',dataStr));
               end
             end
-            fprintf(fid,'\n');
+            if t ~= length(trainedConds)
+              fprintf(fid,'\n');
+            end
           end
           
         case {'name', 'nametrain', 'prac_name'}
@@ -576,10 +578,9 @@ for sesNum = 1:length(expParam.sesTypes)
             
           end
       end % switch phaseName
+      fprintf(fid,'\n');
     end
-    fprintf(fid,'\n');
   end
-  fprintf(fid,'\n');
 end
 
 % close out the results file
