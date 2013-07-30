@@ -259,8 +259,7 @@ if expParam.useNS && phaseCfg.impedanceBeforePhase
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
   fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
-  et_impedanceCheck(w, cfg, false);
-  thisGetSecs = GetSecs;
+  thisGetSecs = et_impedanceCheck(w, cfg, false);
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
   fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
 end
@@ -318,10 +317,13 @@ for i = trialNum:length(stim2Tex)
     thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
     fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
-    et_impedanceCheck(w, cfg, true);
-    thisGetSecs = GetSecs;
+    thisGetSecs = et_impedanceCheck(w, cfg, true);
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
-    fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');    
+    fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
+    
+    % only check these keys
+    RestrictKeysForKbCheck([cfg.keys.matchSame, cfg.keys.matchDiff]);
+    
     % reset the blink timer
     if cfg.stim.secUntilBlinkBreak > 0
       blinkTimerStart = GetSecs;
@@ -339,12 +341,14 @@ for i = trialNum:length(stim2Tex)
     DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
-    % wait for kb release in case subject is holding down keys
-    KbReleaseWait;
-    KbWait(-1); % listen for keypress on either keyboard
-    thisGetSecs = GetSecs;
+    % listen for any keypress on any keyboard
+    RestrictKeysForKbCheck([]);
+    thisGetSecs = KbWait(-1,2);
+    %thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
     fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
+    % only check these keys
+    RestrictKeysForKbCheck([cfg.keys.matchSame, cfg.keys.matchDiff]);
     
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);

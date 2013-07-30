@@ -149,8 +149,7 @@ if expParam.useNS && phaseCfg.impedanceBeforePhase
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
   fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
-  et_impedanceCheck(w, cfg, false);
-  thisGetSecs = GetSecs;
+  thisGetSecs = et_impedanceCheck(w, cfg, false);
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
   fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
 end
@@ -265,8 +264,7 @@ for b = 1:phaseCfg.nBlocks
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
       fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_START');
-      et_impedanceCheck(w, cfg, true);
-      thisGetSecs = GetSecs;
+      thisGetSecs = et_impedanceCheck(w, cfg, true);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
       fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'IMPEDANCE_END');
     end
@@ -309,10 +307,8 @@ for b = 1:phaseCfg.nBlocks
         DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
         Screen('Flip', w);
         
-        % wait for kb release in case subject is holding down keys
-        KbReleaseWait;
-        KbWait(-1); % listen for keypress on either keyboard
-        thisGetSecs = GetSecs;
+        % listen for any keypress on any keyboard
+        thisGetSecs = KbWait(-1,2);
         fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
         fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
         
@@ -586,12 +582,13 @@ for b = 1:phaseCfg.nBlocks
       DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
       Screen('Flip', w);
       
-      % wait for kb release in case subject is holding down keys
-      KbReleaseWait;
-      KbWait(-1); % listen for keypress on either keyboard
-      thisGetSecs = GetSecs;
+      % listen for any keypress on any keyboard
+      RestrictKeysForKbCheck([]);
+      thisGetSecs = KbWait(-1,2);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
       fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCfg.isExp,'BLINK_END');
+      % only check these keys
+      RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
       
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
