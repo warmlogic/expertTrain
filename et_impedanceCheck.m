@@ -1,5 +1,5 @@
-function et_impedanceCheck(w, cfg, talkToNS)
-% function et_impedanceCheck(w, cfg, talkToNS)
+function [secs] = et_impedanceCheck(w, cfg, talkToNS)
+% function [secs] = et_impedanceCheck(w, cfg, talkToNS)
 %
 % Run an impedance check.
 %
@@ -30,7 +30,7 @@ end
 % KbCheckHold(1000, {cfg.keys.expContinue}, -1);
 % wait until g key is pressed
 RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
-KbWait(-1,2);
+secs = KbWait(-1,2);
 RestrictKeysForKbCheck([]);
 
 if talkToNS
