@@ -462,7 +462,7 @@ for i = trialNum:length(stimTex)
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
         % put them on the screen
-        Screen('Flip',w);
+        Screen('Flip', w);
         
         keyIsDown = 0;
       end
@@ -473,19 +473,20 @@ for i = trialNum:length(stimTex)
     WaitSecs(0.0001);
   end
   
-  % wait out any remaining time
-  while (GetSecs - stimOnset) <= phaseCfg.name_stim
-    % Wait <1 ms before checking the keyboard again to prevent
-    % overload of the machine at elevated Priority():
-    WaitSecs(0.0001);
-  end
-  
   keyIsDown = logical(keyIsDown);
   
   if keyIsDown
     % if they hit a key while the stimulus was on the screen (the only way
-    % keyIsDown==1), take the stimulus off screen and give feedback
-    % (species number)
+    % keyIsDown==1), wait out any remaining stimulus time, take the
+    % stimulus off screen, and give feedback (species number)
+    
+    % wait out any remaining time
+    while (GetSecs - stimOnset) <= phaseCfg.name_stim
+      % Wait <1 ms before checking the keyboard again to prevent
+      % overload of the machine at elevated Priority():
+      WaitSecs(0.0001);
+    end
+    
     if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
       sNumColor = correct_sNumColor;
       if phaseCfg.playSound
@@ -687,7 +688,7 @@ for i = trialNum:length(stimTex)
   end
   
   if cfg.text.printTrialInfo
-    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s) (acc = %d)\n',i,length(stimTex),nameStims(i).fileName,specNum,resp,respKey,trialAcc(i));
+    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s; acc = %d; rt = %d)\n',i,length(stimTex),nameStims(i).fileName,specNum,resp,respKey,trialAcc(i),trialRT(i));
   end
   
   fNum = int32(nameStims(i).familyNum);
