@@ -1,5 +1,5 @@
-function et_prepData_events(subjects,prep_eeg)
-% et_prepData_events(subjects,prep_eeg)
+function ebird_prepData_events(subjects,prep_eeg)
+% ebird_prepData_events(subjects,prep_eeg)
 %
 % Purpose
 %   Create behavioral events; if prep_eeg == 1: export Net Station events
@@ -43,6 +43,7 @@ if nargin == 0
     'EBIRD049';
     'EBIRD002';
     'EBIRD003';
+    'EBIRD004';
     };
   
   prep_eeg = 0;
