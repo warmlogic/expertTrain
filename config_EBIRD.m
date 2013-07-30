@@ -63,7 +63,8 @@ expParam.session.posttest_delay.phases = {'prac_match','match'};
 % % demo - debug
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
-% expParam.session.pretest.phases = {'prac_match','prac_match'};
+% expParam.session.pretest.phases = {'prac_match','match'};
+% % expParam.session.pretest.phases = {'prac_match','prac_match'};
 % % expParam.session.pretest.phases = {'prac_match','prac_match','match'};
 % expParam.session.train1.phases = {'prac_name','nametrain'};
 % % expParam.session.train1.phases = {'prac_name','name'};
