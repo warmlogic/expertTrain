@@ -87,13 +87,15 @@ Running the experiment
 - If you just want to try out different sessions or phases of the EBUG experiment without running through the entire thing, you can edit the top of `config_EBUG.m` so that one of the debug code chunks is uncommented.
    - NB: Need to delete the subject folder every time you change `config_EBUG.m` in order to apply the changes.
 - If you need to break out of the experiment while it's running, press `control-c` (might need to press it twice).
-   - **IMPORTANT**: If you break out of a session, the experiment currently does not have the capability to resume where you were. If you start it again, it will launch at the beginning of the current session.
-   - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
+   - **IMPORTANT**: If you break out of a session, the experiment has the capability of resuming where you left off. However, it is not advisable to break out unless it can't be avoided. There is a bug with the recognition portion where the response key image gets messed up.
+   - To get back to the Matlab command window:
+      - If you're on Mac OS X, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
+      - If you're on Windows, first alt-tab to the Matlab application, then type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 - Debugging
    - PTB seems bad at showing actual error messages, so using multiple monitors is a good way to debug.
    - If you're running multiple monitors and you have turned on `dbstop if error`, if the experiment encounters an error you can type `dbup` and then `ME` to see the error stack trace.
-   - A mat file with the error information gets saved to the session directory. Load it and examine the `ME` variable to find your bug.
-   - To get back to the Matlab command window, type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
+   - A mat file with this same error information gets saved to the session directory in case you have not turned on `dbstop if error`. Load it and examine the `ME` variable to find your bug.
+   - To get back to the Matlab command window, (Windows users: first alt-tab to Matlab) type `control-c` again and enter the command `sca` (blindly if you have to) to clear any remaining PTB windows.
 - Resuming
    - The experiment can be resumed from (approximately) where it left off if it crashes. This happens automatically.
 
