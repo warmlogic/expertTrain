@@ -4,7 +4,7 @@
 
 % TODO: is there a better kind of plot to use, e.g., box and whisker?
 
-%% set the subjects and run the data processing script
+%% set the subjects and other variables
 
 expName = 'EBIRD';
 
@@ -27,10 +27,6 @@ subjects = {
   'EBIRD003';
   };
 
-printResults = true;
-saveResults = true;
-[results] = ebird_processData(dataroot,subjects,printResults,saveResults);
-
 saveFigs = true;
 if saveFigs
   figsDir = fullfile(dataroot,'figs');
@@ -38,6 +34,12 @@ if saveFigs
     mkdir(figsDir);
   end
 end
+
+%% run the data processing script
+
+printResults = false;
+saveResults = true;
+[results] = ebird_processData(dataroot,subjects,printResults,saveResults);
 
 %% Plot basic and subordinate RTs across training days, all phases on one figure
 
