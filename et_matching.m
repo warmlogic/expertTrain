@@ -170,7 +170,7 @@ end
 
 % are they allowed to respond while the stimulus is on the screen?
 if ~isfield(phaseCfg,'respDuringStim')
-  phaseCfg.respDuringStim = false;
+  phaseCfg.respDuringStim = true;
 end
 
 %% preload all stimuli for presentation

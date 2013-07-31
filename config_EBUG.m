@@ -434,7 +434,7 @@ if expParam.sessionNum == 1
       for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.practice.familyNames;
@@ -503,7 +503,7 @@ if expParam.sessionNum == 1
       for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -772,6 +772,7 @@ if expParam.sessionNum == 1
 %       for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
 %         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
 %         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
+%         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
 %         
 %         % only use stimuli from particular families
 %         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1044,7 +1045,7 @@ if expParam.sessionNum == 1
       for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = true;
-        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1131,7 +1132,7 @@ if expParam.sessionNum == 1
           else
             cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
           end
-          cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+          cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
           
           % only use stimuli from particular families
           cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1262,7 +1263,7 @@ if expParam.sessionNum == 1
       for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1439,7 +1440,7 @@ if expParam.sessionNum == 1
       for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
