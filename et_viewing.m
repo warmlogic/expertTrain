@@ -38,9 +38,10 @@ fprintf('Running %s %s (view) (%d)...\n',sesName,phaseName,phaseCount);
 % Small hack. Because training day 1 uses blocks, those stims are stored in
 % cells. However, all other training days do not use blocks, and do not use
 % cells, but we need to put them in a cell to access the stimuli correctly.
-if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).viewStims)
+viewStims = expParam.session.(sesName).(phaseName)(phaseCount).viewStims;
+if ~iscell(viewStims)
   runInBlocks = false;
-  expParam.session.(sesName).(phaseName)(phaseCount).viewStims = {expParam.session.(sesName).(phaseName)(phaseCount).viewStims};
+  viewStims = {viewStims};
   if ~exist('b','var') || isempty(b)
     b = 1;
   else
@@ -63,7 +64,7 @@ phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_%
 if exist(phaseProgressFile,'file')
   load(phaseProgressFile);
 else
-  trialComplete = false(1,length(expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b}));
+  trialComplete = false(1,length(viewStims{b}));
   phaseComplete = false; %#ok<NASGU>
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
@@ -113,7 +114,7 @@ fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%s\n',...
 %% preparation
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
-viewStims = expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b};
+viewStims = viewStims{b};
 
 if phaseCfg.isExp
   stimDir = cfg.files.stimDir;
