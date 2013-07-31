@@ -73,8 +73,8 @@ expParam.session.posttest_delay.phases = {'prac_match','match'};
 % % debug
 % expParam.nSessions = 1;
 % expParam.sesTypes = {'train1'};
-% expParam.session.train1.phases = {'prac_name','nametrain','name'};
-% % expParam.session.train1.phases = {'name'};
+% % expParam.session.train1.phases = {'prac_name','nametrain','name'};
+% expParam.session.train1.phases = {'name'};
 
 %% do some error checking
 
