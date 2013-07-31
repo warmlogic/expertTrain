@@ -457,6 +457,7 @@ for i = trialNum:length(stim2Tex)
         Screen('Flip', w);
         
         keyIsDown = 0;
+        break
       end
     else
       [keyIsDown, endRT, keyCode] = KbCheck;
@@ -499,6 +500,13 @@ for i = trialNum:length(stim2Tex)
     WaitSecs(0.0001);
   end
   
+  % wait out any remaining time
+  while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
+    % Wait <1 ms before checking the keyboard again to prevent
+    % overload of the machine at elevated Priority():
+    WaitSecs(0.0001);
+  end
+  
   keyIsDown = logical(keyIsDown);
   
   if keyIsDown
@@ -508,13 +516,14 @@ for i = trialNum:length(stim2Tex)
     % code that follows this if statement block will take the stimulus off
     % screen and give feedback if this is a practice phase
     
-    % wait out any remaining time
-    while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
-      % Wait <1 ms before checking the keyboard again to prevent
-      % overload of the machine at elevated Priority():
-      WaitSecs(0.0001);
-    end
+    % % wait out any remaining time
+    % while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
+    %   % Wait <1 ms before checking the keyboard again to prevent
+    %   % overload of the machine at elevated Priority():
+    %   WaitSecs(0.0001);
+    % end
     
+    respPromptOn = NaN;
   else
     % draw response prompt
     Screen('TextSize', w, cfg.text.fixSize);
@@ -888,14 +897,16 @@ for i = trialNum:length(stim2Tex)
       'sord', isSubord, 'trai', stim2(i).trained, 'same', stim1(i).same,...
       'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
-    % response prompt
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
-      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
-      'expt',phaseCfg.isExp,...
-      'trln', int32(i),...
-      'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
-      'sord', isSubord, 'trai', stim2(i).trained, 'same', stim2(i).same,...
-      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+    if ~isnan(respPromptOn)
+      % response prompt
+      [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
+        'expt',phaseCfg.isExp,...
+        'trln', int32(i),...
+        'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
+        'sord', isSubord, 'trai', stim2(i).trained, 'same', stim2(i).same,...
+        'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+    end
     
     % did they make a response?
     if keyIsDown

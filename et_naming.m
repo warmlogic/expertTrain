@@ -494,12 +494,12 @@ for i = trialNum:length(stimTex)
     % keyIsDown==1), wait out any remaining stimulus time, take the
     % stimulus off screen, and give feedback (species number)
     
-    % wait out any remaining time
-    while (GetSecs - stimOnset) <= phaseCfg.name_stim
-      % Wait <1 ms before checking the keyboard again to prevent
-      % overload of the machine at elevated Priority():
-      WaitSecs(0.0001);
-    end
+    % % wait out any remaining time
+    % while (GetSecs - stimOnset) <= phaseCfg.name_stim
+    %   % Wait <1 ms before checking the keyboard again to prevent
+    %   % overload of the machine at elevated Priority():
+    %   WaitSecs(0.0001);
+    % end
     
     if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
       sNumColor = correct_sNumColor;
