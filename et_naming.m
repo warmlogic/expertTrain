@@ -439,6 +439,7 @@ for i = trialNum:length(stimTex)
         Screen('Flip', w);
         
         keyIsDown = 0;
+        break
       end
     else
       [keyIsDown, endRT, keyCode] = KbCheck;
@@ -474,6 +475,13 @@ for i = trialNum:length(stimTex)
       end
     end
     
+    % Wait <1 ms before checking the keyboard again to prevent
+    % overload of the machine at elevated Priority():
+    WaitSecs(0.0001);
+  end
+  
+  % wait out any remaining time
+  while (GetSecs - stimOnset) <= phaseCfg.name_stim
     % Wait <1 ms before checking the keyboard again to prevent
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);
@@ -518,6 +526,8 @@ for i = trialNum:length(stimTex)
     if phaseCfg.playSound
       Beeper(respSound,respVol);
     end
+    
+    respPromptOn = NaN;
     
   else
     % draw response prompt
@@ -822,13 +832,15 @@ for i = trialNum:length(stimTex)
       'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
       'rsps', resp, 'rspk', respKey, 'rspt', trialRT(i), 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
-    % response prompt
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
-      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
-      'expt',phaseCfg.isExp,...
-      'bloc', b,...
-      'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
-      'rsps', resp, 'rspk', respKey, 'rspt', trialRT(i), 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+    if ~isnan(respPromptOn)
+      % response prompt
+      [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName,...
+        'expt',phaseCfg.isExp,...
+        'bloc', b,...
+        'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
+        'rsps', resp, 'rspk', respKey, 'rspt', trialRT(i), 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+    end
     
     % did they make a response?
     if keyIsDown
