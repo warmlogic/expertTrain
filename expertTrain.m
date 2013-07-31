@@ -248,6 +248,21 @@ try
   
   %% Begin PTB display setup
   
+  % set some font display options
+  if ispc
+    Screen('Preference','DefaultFontName','Courier New');
+    Screen('Preference','DefaultFontStyle',1);
+    Screen('Preference','DefaultFontSize',18);
+  elseif ismac
+    Screen('Preference','DefaultFontName','Courier New');
+    Screen('Preference','DefaultFontStyle',1);
+    Screen('Preference','DefaultFontSize',18);
+  elseif isunix
+    Screen('Preference','DefaultFontName','Courier New');
+    Screen('Preference','DefaultFontStyle',1);
+    Screen('Preference','DefaultFontSize',18);
+  end
+  
   % Get screenNumber of stimulation display. We choose the display with
   % the maximum index, which is usually the right one, e.g., the external
   % display on a Laptop:
@@ -283,21 +298,6 @@ try
   Screen('FillRect', w, cfg.screen.gray);
   % put on a grey screen
   Screen('Flip',w);
-  
-  % set some font display options
-  if ispc
-    Screen('Preference','DefaultFontName','Courier New');
-    Screen('Preference','DefaultFontStyle',1);
-    Screen('Preference','DefaultFontSize',18);
-  elseif ismac
-    Screen('Preference','DefaultFontName','Courier New');
-    Screen('Preference','DefaultFontStyle',0);
-    Screen('Preference','DefaultFontSize',18);
-  elseif isunix
-    Screen('Preference','DefaultFontName','Courier New');
-    Screen('Preference','DefaultFontStyle',1);
-    Screen('Preference','DefaultFontSize',18);
-  end
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
   % they are loaded and ready when we need them - without delays
