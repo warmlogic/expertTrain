@@ -3,6 +3,27 @@ function [results] = ebird_processData(dataroot,subjects,printResults,saveResult
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 
+if ~exist('subjects','var') || isempty(subjects)
+  subjects = {
+    'EBIRD049';
+    'EBIRD002';
+    'EBIRD003';
+    'EBIRD004';
+    'EBIRD005';
+    };
+end
+
+if ~isempty(subjects)
+  zs = strfind(subjects{1},'0');
+  if ~isempty(zs)
+    expName = subjects{1}(1:zs(1)-1);
+  else
+    error('Cannot determine experiment name, subject name ''%s'' not parseable.',subjects{1});
+  end
+else
+  error('Cannot determine experiment name, no subjects provided.');
+end
+
 if ~exist('dataroot','var') || isempty(dataroot)
   serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
   serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
@@ -19,28 +40,12 @@ if ~exist('dataroot','var') || isempty(dataroot)
   %saveDir = dataroot;
 end
 
-if ~exist('subjects','var') || isempty(subjects)
-  subjects = {
-    'EBIRD049';
-    'EBIRD002';
-    'EBIRD003';
-    'EBIRD004';
-    };
-end
-
 if ~exist('printResults','var') || isempty(printResults)
   printResults = true;
 end
 
 if ~exist('saveResults','var') || isempty(saveResults)
   saveResults = true;
-end
-
-zs = strfind(subjects{1},'0');
-if ~isempty(zs)
-  expName = subjects{1}(1:zs(1)-1);
-else
-  error('Cannot determine experiment name.');
 end
 
 %% some constants
