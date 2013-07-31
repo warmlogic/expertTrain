@@ -491,15 +491,8 @@ for i = trialNum:length(stimTex)
   
   if keyIsDown
     % if they hit a key while the stimulus was on the screen (the only way
-    % keyIsDown==1), wait out any remaining stimulus time, take the
-    % stimulus off screen, and give feedback (species number)
-    
-    % % wait out any remaining time
-    % while (GetSecs - stimOnset) <= phaseCfg.name_stim
-    %   % Wait <1 ms before checking the keyboard again to prevent
-    %   % overload of the machine at elevated Priority():
-    %   WaitSecs(0.0001);
-    % end
+    % keyIsDown==1), take the stimulus off screen, and give feedback
+    % (species number)
     
     if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
       sNumColor = correct_sNumColor;
@@ -528,7 +521,6 @@ for i = trialNum:length(stimTex)
     end
     
     respPromptOn = NaN;
-    
   else
     % draw response prompt
     Screen('TextSize', w, cfg.text.basicTextSize);

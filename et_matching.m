@@ -511,17 +511,10 @@ for i = trialNum:length(stim2Tex)
   
   if keyIsDown
     % if they hit a key while the stimulus was on the screen (the only way
-    % keyIsDown==1), wait out any remaining stimulus time
+    % keyIsDown==1)
     
     % code that follows this if statement block will take the stimulus off
     % screen and give feedback if this is a practice phase
-    
-    % % wait out any remaining time
-    % while (GetSecs - stim2Onset) <= phaseCfg.match_stim2
-    %   % Wait <1 ms before checking the keyboard again to prevent
-    %   % overload of the machine at elevated Priority():
-    %   WaitSecs(0.0001);
-    % end
     
     respPromptOn = NaN;
   else

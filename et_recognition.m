@@ -722,19 +722,6 @@ for b = 1:phaseCfg.nBlocks
     
     keyIsDown = logical(keyIsDown);
     
-%     if keyIsDown
-%       % if they hit a key while the stimulus was on the screen (the only way
-%       % keyIsDown==1), wait out any remaining stimulus time
-%       
-%       % code that follows this if statement block will take the stimulus
-%       % off screen
-%       
-%       % wait out any remaining time
-%       while (GetSecs - test_stimOnset) <= phaseCfg.recog_test_stim
-%         % Wait <1 ms before checking the keyboard again to prevent
-%         % overload of the machine at elevated Priority():
-%         WaitSecs(0.0001);
-%       end
     if ~keyIsDown
       % draw the stimulus
       Screen('DrawTexture', w, blockStimTex(i), [], stimImgRect);
