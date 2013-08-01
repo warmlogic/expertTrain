@@ -54,7 +54,7 @@ startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
 %% start the log file for this phase
 
 phaseLogFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseLog_%s_%s_recog_%d.txt',sesName,phaseName,phaseCount));
-plf = fopen(phaseLogFile,'at');
+phLFile = fopen(phaseLogFile,'at');
 
 %% record the starting date and time for this phase
 
@@ -63,7 +63,7 @@ expParam.session.(sesName).(phaseName)(phaseCount).startTime = startTime;
 
 % put it in the log file
 fprintf(logFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-fprintf(plf,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+fprintf(phLFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 
 thisGetSecs = GetSecs;
 fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
@@ -75,7 +75,7 @@ fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
   cfg.stim.(sesName).(phaseName)(phaseCount).isExp,...
   'PHASE_START');
 
-fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
+fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
   thisGetSecs,...
   expParam.subject,...
   sesName,...
@@ -150,10 +150,10 @@ if expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
   thisGetSecs = et_impedanceCheck(w, cfg, false);
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
-  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
 end
 
 %% start NS recording, if desired
@@ -169,7 +169,7 @@ if expParam.useNS
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
-  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
 end
 Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
@@ -232,7 +232,7 @@ for b = 1:phaseCfg.nBlocks
     startTime = fix(clock);
     startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
     fprintf(logFile,'!!! Start of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-    fprintf(plf,'!!! Start of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+    fprintf(phLFile,'!!! Start of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
     
     % load up the stimuli for this block
     blockStimTex = nan(1,length(targStims{b}));
@@ -265,10 +265,10 @@ for b = 1:phaseCfg.nBlocks
       % run the impedance break
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
       thisGetSecs = et_impedanceCheck(w, cfg, true);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
-      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     end
     
     %% show the study instructions
@@ -302,7 +302,7 @@ for b = 1:phaseCfg.nBlocks
       if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
         thisGetSecs = GetSecs;
         fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
-        fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
+        fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
         Screen('TextSize', w, cfg.text.basicTextSize);
         pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
         % just draw straight into the main window since we don't need speed here
@@ -312,7 +312,7 @@ for b = 1:phaseCfg.nBlocks
         % listen for any keypress on any keyboard
         thisGetSecs = KbWait(-1,2);
         fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
-        fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
+        fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
         
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -414,7 +414,7 @@ for b = 1:phaseCfg.nBlocks
       %% phase log file
       
       % Write study stimulus presentation to file:
-      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\n',...
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\n',...
         study_imgOn{b}(i),...
         expParam.subject,...
         sesName,...
@@ -487,7 +487,7 @@ for b = 1:phaseCfg.nBlocks
     endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
     % put it in the log file
     fprintf(logFile,'!!! End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
-    fprintf(plf,'!!! End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+    fprintf(phLFile,'!!! End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
     
     % save progress after finishing phase
     phaseComplete = true; %#ok<NASGU>
@@ -526,7 +526,7 @@ for b = 1:phaseCfg.nBlocks
   startTime = fix(clock);
   startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
   fprintf(logFile,'!!! Start of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-  fprintf(plf,'!!! Start of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+  fprintf(phLFile,'!!! Start of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
   
   % load up the stimuli for this block
   blockStimTex = nan(1,length(allStims{b}));
@@ -580,7 +580,7 @@ for b = 1:phaseCfg.nBlocks
     if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(blockStimTex) - 3)
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
-      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
       Screen('TextSize', w, cfg.text.basicTextSize);
       pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(blockStimTex));
       % just draw straight into the main window since we don't need speed here
@@ -591,7 +591,7 @@ for b = 1:phaseCfg.nBlocks
       RestrictKeysForKbCheck([]);
       thisGetSecs = KbWait(-1,2);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
-      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
       
@@ -943,7 +943,7 @@ for b = 1:phaseCfg.nBlocks
     %% phase log file
     
     % Write test stimulus presentation to file:
-    fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\n',...
+    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\n',...
       test_imgOn{b}(i),...
       expParam.subject,...
       sesName,...
@@ -962,7 +962,7 @@ for b = 1:phaseCfg.nBlocks
     
     if ~isnan(respKeyImgOn{b}(i))
       % Write test key image presentation to file:
-      fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\n',...
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\n',...
         respKeyImgOn{b}(i),...
         expParam.subject,...
         sesName,...
@@ -981,7 +981,7 @@ for b = 1:phaseCfg.nBlocks
     end
     
     % Write trial result to file:
-    fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\t%d\n',...
+    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\t%d\n',...
       endRT{b}(i),...
       expParam.subject,...
       sesName,...
@@ -1119,7 +1119,7 @@ for b = 1:phaseCfg.nBlocks
   endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
   % put it in the log file
   fprintf(logFile,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
-  fprintf(plf,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+  fprintf(phLFile,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
   
   % save progress after finishing phase
   phaseComplete = true; %#ok<NASGU>
@@ -1135,7 +1135,7 @@ if expParam.useNS
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_STOP');
-  fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_STOP');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_STOP');
 end
 
 % Close the response key image
@@ -1154,7 +1154,7 @@ fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
   cfg.stim.(sesName).(phaseName)(phaseCount).isExp,...
   'PHASE_END');
 
-fprintf(plf,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
+fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
   thisGetSecs,...
   expParam.subject,...
   sesName,...
@@ -1169,10 +1169,10 @@ endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
 expParam.session.(sesName).(phaseName)(phaseCount).endTime = endTime;
 % put it in the log file
 fprintf(logFile,'!!! End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
-fprintf(plf,'!!! End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+fprintf(phLFile,'!!! End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
 
 % close the phase log file
-fclose(plf);
+fclose(phLFile);
 
 phaseComplete = true; %#ok<NASGU>
 save(phaseProgressFile_overall,'thisDate','startTime','phaseComplete','endTime');
