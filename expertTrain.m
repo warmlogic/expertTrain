@@ -176,9 +176,28 @@ if exist(cfg.files.expParamFile,'file')
   % session number is incremented after the run, so after the final
   % session has been run it will be 1 greater than expParam.nSessions
   if expParam.sessionNum <= expParam.nSessions
-    fprintf('Starting session %d (%s).\n',expParam.sessionNum,expParam.sesTypes{expParam.sessionNum});
+    % make sure we want to start this session
+    startUnanswered = 1;
+    if expParam.useNS
+      NSstr = 'with Net Station enabled';
+    else
+      NSstr = 'WITHOUT Net Station enabled';
+    end
+    while startUnanswered
+      startSession = input(sprintf('Do you want to start %s session %d (%s) %s? (type 1 or 0 and press enter). ',expParam.subject,expParam.sessionNum,expParam.sesTypes{expParam.sessionNum},NSstr));
+      if isnumeric(startSession) && (startSession == 1 || startSession == 0)
+        if startSession
+          fprintf('Starting %s session %d (%s).\n',expParam.subject,expParam.sessionNum,expParam.sesTypes{expParam.sessionNum});
+          startUnanswered = 0;
+        else
+          fprintf('Not starting %s session %d (%s)! If you typed the wrong subject number, exit Matlab and try again.\n',expParam.subject,expParam.sessionNum,expParam.sesTypes{expParam.sessionNum});
+          return
+        end
+      end
+    end
   else
-    error('All %s sessions have already been run!',expParam.nSessions);
+    fprintf('All %s sessions for %s have already been run! Exiting...\n',expParam.nSessions,expParam.subject);
+    return
   end
   
   % override whether to use Net Station, in case it is different for this
@@ -190,6 +209,26 @@ else
   
   % whether to use Net Station
   expParam.useNS = useNS;
+  
+  % make sure we want to start this session
+  startUnanswered = 1;
+  if expParam.useNS
+    NSstr = 'with Net Station enabled';
+  else
+    NSstr = 'WITHOUT Net Station enabled';
+  end
+  while startUnanswered
+    startSession = input(sprintf('Do you want to start %s session %d %s? (type 1 or 0 and press enter). ',expParam.subject,expParam.sessionNum,NSstr));
+    if isnumeric(startSession) && (startSession == 1 || startSession == 0)
+      if startSession
+        fprintf('Starting %s session %d.\n',expParam.subject,expParam.sessionNum);
+        startUnanswered = 0;
+      else
+        fprintf('Not starting %s session %d! If you typed the wrong subject number, exit Matlab and try again.\n',expParam.subject,expParam.sessionNum);
+        return
+      end
+    end
+  end
   
   % Load the experiment's config file. Must create this for each experiment.
   if exist(fullfile(pwd,sprintf('config_%s.m',expParam.expName)),'file')
@@ -220,7 +259,7 @@ if exist(cfg.files.sesLogFile,'file')
     resumeSession = input(sprintf('Do you want to resume %s session %d? (type 1 or 0 and press enter). ',expParam.subject,expParam.sessionNum));
     if isnumeric(resumeSession) && (resumeSession == 1 || resumeSession == 0)
       if resumeSession
-        fprintf('Attempting to resume session %d (%s)...\n',expParam.sessionNum,cfg.files.sesLogFile);
+        fprintf('Attempting to resume %s session %d (%s)...\n',expParam.subject,expParam.sessionNum,cfg.files.sesLogFile);
         resumeUnanswered = 0;
       else
         fprintf('Exiting...\n');
@@ -685,13 +724,13 @@ try
         end
 
       otherwise
-        warning('%s is not a configured phase in this session (%s)!\n',phaseName,sesName);
+        warning('%s is not a configured phase for %s session (%s)!\n',phaseName,expParam.subject,sesName);
     end
   end
   
   %% Session is done
   
-  fprintf('Done with session %d (%s).\n',expParam.sessionNum,sesName);
+  fprintf('Done with %s session %d (%s).\n',expParam.subject,expParam.sessionNum,sesName);
   
   % record the end time for this session
   endTime = fix(clock);
@@ -753,7 +792,7 @@ catch ME %#ok<NASGU>
   % 'try' part due to programming error etc.:
   
   sesName = expParam.sesTypes{expParam.sessionNum};
-  fprintf('\nError during session %d (%s). Exiting gracefully (saving experimentParams.mat). You should restart Matlab before continuing.\n',expParam.sessionNum,sesName);
+  fprintf('\nError during %s session %d (%s). Exiting gracefully (saving experimentParams.mat). You should restart Matlab before continuing.\n',expParam.subject,expParam.sessionNum,sesName);
   
   % record the error date and time for this session
   errorDate = date;
