@@ -39,9 +39,11 @@ end
 
 %% run the data processing script
 
-printResults = false;
+onlyCompleteSub = false;
+printResults = true;
 saveResults = true;
-[results] = ebird_processData(dataroot,subjects,printResults,saveResults);
+
+[results] = ebird_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
 
 %% Plot basic and subordinate RTs across training days, all phases on one figure
 

@@ -11,6 +11,11 @@ sesDir = sprintf('session_%d',sesNum);
 commentStyle = '!!!';
 oldNewFormatMaxCheck = 10;
 
+% mark that this subject has not completed the experiment
+if ~isfield(events,'isComplete')
+  events.isComplete = false;
+end
+
 switch phaseName
   case {'match', 'prac_match'}
     
@@ -122,7 +127,7 @@ switch phaseName
     else
       %error('Log file file not found: %s',logFile);
       warning('Log file file not found: %s',logFile);
-      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = false;
+      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = false;
       return
     end
     
@@ -193,13 +198,12 @@ switch phaseName
     
     % store the log struct in the events struct
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
-    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = true;
+    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
     
+    % if they've finished the last session, mark the subject as complete
     if strcmp(sesName,'posttest_delay') && strcmp(phaseName,'match')
-      if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete
-        events.complete = true;
-      else
-        events.complete = true;
+      if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
+        events.isComplete = true;
       end
     end
     
@@ -311,7 +315,7 @@ switch phaseName
       else
         %error('Log file file not found: %s',logFile);
         warning('Log file file not found: %s',logFile);
-        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = false;
+        events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = false;
         return
       end
       
@@ -370,7 +374,7 @@ switch phaseName
       else
         events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = cat(1,events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data,log);
       end
-      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = true;
+      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
       
     end % nBlocks
     
