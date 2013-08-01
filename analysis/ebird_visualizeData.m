@@ -39,9 +39,13 @@ end
 
 %% run the data processing script
 
-onlyCompleteSub = false;
+% onlyCompleteSub = false;
+% printResults = true;
+% saveResults = true;
+
+onlyCompleteSub = true;
 printResults = true;
-saveResults = true;
+saveResults = false;
 
 [results] = ebird_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
 
@@ -94,12 +98,12 @@ xlabel('Training Day');
 if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_cor') || strcmp(dataMeasure,'rt_inc')
   ylabel('Response Time (ms)');
   
-  %axis([0.5 (size(data.subord,2) + 0.5) 0 round(max(data.overall(:))/100)*100]);
-  if ~strcmp(dataMeasure,'rt_inc')
-    axis([0.5 (size(data.subord,2) + 0.5) 0 600]);
-  else
-    axis([0.5 (size(data.subord,2) + 0.5) 0 1500]);
-  end
+  axis([0.5 (size(data.subord,2) + 0.5) 800 round(max(data.overall(:))/100)*100 + 200]);
+  %if ~strcmp(dataMeasure,'rt_inc')
+  %  axis([0.5 (size(data.subord,2) + 0.5) 0 600]);
+  %else
+  %  axis([0.5 (size(data.subord,2) + 0.5) 0 1500]);
+  %end
   
   legendLoc = 'NorthEast';
 elseif strcmp(dataMeasure,'acc')
