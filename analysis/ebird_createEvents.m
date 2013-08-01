@@ -195,6 +195,14 @@ switch phaseName
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete = true;
     
+    if strcmp(sesName,'posttest_delay') && strcmp(phaseName,'match')
+      if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).complete
+        events.complete = true;
+      else
+        events.complete = true;
+      end
+    end
+    
   case {'name', 'nametrain', 'prac_name'}
     
     if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
