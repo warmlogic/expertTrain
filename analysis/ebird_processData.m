@@ -278,30 +278,30 @@ for sub = 1:length(subjects)
                     fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchSubordResults.rt(sub),matchSubordResults.rt_cor(sub),matchSubordResults.rt_inc(sub));
                   end
                   
-                  % check out the RT distribution
-                  distrib = 0:100:2000;
-                  
-                  figure;hist([matchResp.rt],distrib);
-                  axis([min(distrib) max(distrib) 0 150]);
-                  title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
-                  ylabel('Number of trials');
-                  xlabel('RT (ms) measured from ''?'' prompt');
-                  
-                  figure;hist([matchBasic.rt],distrib);
-                  axis([min(distrib) max(distrib) 0 150]);
-                  title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
-                  ylabel('Number of trials');
-                  xlabel('RT (ms) measured from ''?'' prompt');
-                  
-                  figure;hist([matchSubord.rt],distrib);
-                  axis([min(distrib) max(distrib) 0 150]);
-                  title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
-                  ylabel('Number of trials');
-                  xlabel('RT (ms) measured from ''?'' prompt');
-                  
-                  keyboard
-                  close all
-                  % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
+%                   % check out the RT distribution
+%                   distrib = 0:100:2000;
+%                   
+%                   figure;hist([matchResp.rt],distrib);
+%                   axis([min(distrib) max(distrib) 0 150]);
+%                   title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
+%                   ylabel('Number of trials');
+%                   xlabel('RT (ms) measured from ''?'' prompt');
+%                   
+%                   figure;hist([matchBasic.rt],distrib);
+%                   axis([min(distrib) max(distrib) 0 150]);
+%                   title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
+%                   ylabel('Number of trials');
+%                   xlabel('RT (ms) measured from ''?'' prompt');
+%                   
+%                   figure;hist([matchSubord.rt],distrib);
+%                   axis([min(distrib) max(distrib) 0 150]);
+%                   title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
+%                   ylabel('Number of trials');
+%                   xlabel('RT (ms) measured from ''?'' prompt');
+%                   
+%                   keyboard
+%                   close all
+%                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
                   
                   % accuracy for the different image manipulation conditions
                   imgConds = unique({matchResp.imgCond});
