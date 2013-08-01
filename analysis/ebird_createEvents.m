@@ -11,6 +11,11 @@ sesDir = sprintf('session_%d',sesNum);
 commentStyle = '!!!';
 oldNewFormatMaxCheck = 10;
 
+subjectsWithMatchDelay = {'EBIRD049','EBIRD002','EBIRD003','EBIRD004','EBIRD005'};
+matchDelay = 800;
+subjectsWithNameDelay = {'EBIRD049','EBIRD002','EBIRD003'};
+nameDelay = 1000;
+
 % mark that this subject has not completed the experiment
 if ~isfield(events,'isComplete')
   events.isComplete = false;
@@ -173,7 +178,11 @@ switch phaseName
           % unique to MATCH_RESP
           log(i).resp = logData{matchS.r_resp}{i};
           log(i).acc = logical(logData{matchS.r_acc}(i));
-          log(i).rt = single(logData{matchS.r_rt}(i));
+          if ismember(subject,subjectsWithMatchDelay)
+            log(i).rt = single(logData{matchS.r_rt}(i)) + matchDelay;
+          else
+            log(i).rt = single(logData{matchS.r_rt}(i));
+          end
           
           % get info from stimulus presentations
           log(i).familyStr = log(i-1).familyStr;
@@ -355,7 +364,11 @@ switch phaseName
               log(i).resp = single(str2double(logData{nameS.r_resp}(i)));
             end
             log(i).acc = logical(logData{nameS.r_acc}(i));
-            log(i).rt = single(logData{nameS.r_rt}(i));
+            if ismember(subject,subjectsWithNameDelay)
+              log(i).rt = single(logData{nameS.r_rt}(i)) + nameDelay;
+            else
+              log(i).rt = single(logData{nameS.r_rt}(i));
+            end
             
             % put info in stimulus presentations
             log(i-1).resp = log(i).resp;
