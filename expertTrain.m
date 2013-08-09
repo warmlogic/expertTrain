@@ -365,29 +365,30 @@ try
     KbWait(-1,2);
     RestrictKeysForKbCheck([]);
     
+    fprintf('\nTrying to connect to Net Station @ %s, port %d...\n', expParam.NSHost, expParam.NSPort);
     % connect
-    [NSConnectStatus, NSConnectError] = et_NetStation('Connect', expParam.NSHost, expParam.NSPort); %#ok<NASGU>
+    [NSConnectStatus, NSConnectError] = et_NetStation('Connect', expParam.NSHost, expParam.NSPort);
     
     if NSConnectStatus
-      error('!!! ERROR: Problem with Net Station connection. Check error messages for more information !!!');
+      error('!!! ERROR: Problem with Net Station connection because of error: %s !!!',NSConnectError);
     else
-      fprintf('\nConnected to Net Station @ %s\n', expParam.NSHost);
+      fprintf('\nConnected to Net Station @ %s, port %d.\n', expParam.NSHost, expParam.NSPort);
       % synchronize
-      [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU>
+      [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize');
       if NSSyncStatus
-        error('!!! ERROR: Problem with Net Station syncronization. Check error messages for more information !!!');
+        error('!!! ERROR: Problem with Net Station syncronization. because of error: %s !!!',NSSyncError);
       end
       
       % start recording
-      [NSStartStatus, NSStartError] = et_NetStation('StartRecording'); %#ok<NASGU>
+      [NSStartStatus, NSStartError] = et_NetStation('StartRecording');
       if NSStartStatus
-        error('!!! ERROR: Problem with Net Station starting the recording. Check error messages for more information !!!');
+        error('!!! ERROR: Problem with Net Station starting the recording because of error: %s !!!',NSStartError);
       end
       
       % stop recording
-      [NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU>
+      [NSStopStatus, NSStopError] = et_NetStation('StopRecording');
       if NSStopStatus
-        error('!!! ERROR: Problem with Net Station stopping the recording. Check error messages for more information !!!');
+        error('!!! ERROR: Problem with Net Station stopping the recording because of error: %s !!!',NSStopError);
       end
     end
   end
@@ -410,7 +411,10 @@ try
     
     % start recording
     Screen('TextSize', w, cfg.text.basicTextSize);
-    [NSStartStatus, NSStartError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+    [NSStartStatus, NSStartError] = et_NetStation('StartRecording');
+    if NSStartStatus
+      error('!!! ERROR: Problem with Net Station starting the recording because of error: %s !!!',NSStartError);
+    end
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     WaitSecs(5.0);
@@ -432,7 +436,10 @@ try
     [NSEventStatus, NSEventError] = et_NetStation('Event', 'REND', GetSecs, .001); %#ok<NASGU,ASGLU>
     
     % stop recording
-    [NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+    [NSStopStatus, NSStopError] = et_NetStation('StopRecording');
+    if NSStopStatus
+      error('!!! ERROR: Problem with Net Station stopping the recording because of error: %s !!!',NSStopError);
+    end
   end
   
 %   %% Start Net Station recording for the experiment
