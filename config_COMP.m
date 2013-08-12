@@ -38,9 +38,6 @@ incorrectVol = 0.6;
 % whether to print trial details to the command window
 cfg.text.printTrialInfo = true;
 
-% matching task defaults
-matchTextPrompt = true;
-
 %% Experiment session information
 
 % Set the number of sessions
@@ -169,8 +166,18 @@ if expParam.sessionNum == 1
   % the experimenter's secret key to continue the experiment
   cfg.keys.expContinue = 'g';
   
-  % how similar the two stimuli are
-  cfg.keys.compareKeyNames = {'1','2','3','4','5'};
+  % how similar the two stimuli are (1 is least similar, 5 is most similar)
+  keysToUse = 'row'; % 'row' or 'keypad'; sorry, 'both' is not implemented
+  if strcmp(keysToUse,'row')
+    % use the number row above the letter keys
+    cfg.keys.compareKeyNames = {'1!','2@','3#','4$','5%'};
+  elseif strcmp(keysToUse,'keypad')
+    % use the keypad to the side of the keyboard
+    cfg.keys.compareKeyNames = {'1','2','3','4','5'};
+  % elseif strcmp(keysToUse,'both')
+  %   % use either row or keypad
+  %   cfg.keys.compareKeyNames = {'1!','2@','3#','4$','5%','1','2','3','4','5'};
+  end
   
   % set the comparison keys
   for i = 1:length(cfg.keys.compareKeyNames)
@@ -284,11 +291,9 @@ if expParam.sessionNum == 1
         % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
         % if rmStims_orig=false)
         
-        % minimum number of trials needed between exact repeats of a given
-        % stimulus as stim2
-        cfg.stim.(sesName).(phaseName)(phaseNum).stim2MinRepeatSpacing = 2;
-        % whether to have "same" and "diff" text with the response prompt
-        cfg.stim.(sesName).(phaseName)(phaseNum).matchTextPrompt = matchTextPrompt;
+%         % minimum number of trials needed between exact repeats of a given
+%         % stimulus as stim2
+%         cfg.stim.(sesName).(phaseName)(phaseNum).stim2MinRepeatSpacing = 2;
         
         if expParam.useNS
           %cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 240;
@@ -320,15 +325,15 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compView.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_comp_1_exp_view.txt',expParam.expName)),...
-          {'partNum'},{'1'});
+          {'partNum','contKey'},{'1',cfg.keys.instructContKey});
         
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compBt.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_comp_2_exp_bt.txt',expParam.expName)),...
-          {'partNum','leastSimKey','mostSimKey','contKey'},{'2',cfg.keys.compareKeyNames{1},cfg.keys.compareKeyNames{end},cfg.keys.instructContKey});
+          {'partNum','leastSimKey','mostSimKey','contKey'},{'2',cfg.keys.compareKeyNames{1}(1),cfg.keys.compareKeyNames{end}(1),cfg.keys.instructContKey});
         
         [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compWi.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_comp_3_exp_wi.txt',expParam.expName)),...
-          {'partNum','leastSimKey','mostSimKey','contKey'},{'3',cfg.keys.compareKeyNames{1},cfg.keys.compareKeyNames{end},cfg.keys.instructContKey});
+          {'partNum','leastSimKey','mostSimKey','contKey'},{'3',cfg.keys.compareKeyNames{1}(1),cfg.keys.compareKeyNames{end}(1),cfg.keys.instructContKey});
         
         expParam.session.(sesName).(phaseName)(phaseNum).date = [];
         expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
