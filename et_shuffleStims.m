@@ -16,8 +16,8 @@ function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 % Output:
 %  shuffledStims: Stimuli in shuffled order.
 %
-% NB: Makes 1,000,000 shuffle attempts before erroring because it counldn't
-%     find a solution.
+% NB: Makes 1,000,000 shuffle attempts before erroring due to not finding a
+%     solution.
 %
 
 if ~exist('valueField','var') || isempty(valueField)
