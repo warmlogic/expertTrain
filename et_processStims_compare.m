@@ -1,10 +1,6 @@
 function [cfg,expParam] = et_processStims_compare(cfg,expParam,sesName,phaseName,phaseCount)
 % function [cfg,expParam] = et_processStims_compare(cfg,expParam,sesName,phaseName,phaseCount)
 
-% TODO: don't need to store expParam.session.(sesName).match.same and
-% expParam.session.(sesName).match.diff because allStims gets created and
-% is all we need. Instead, replace them with sameStims and diffStims.
-
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
@@ -153,7 +149,7 @@ else
 
   % within species comparisons
   fprintf('Shuffling %s compare within species (%d) prep stimuli.\n',sesName,phaseCount);
-  [withinStims] = et_shuffleStims(withinStims,'familyNum',5);
+  [withinStims] = et_shuffleStims(withinStims,'familyNum',phaseCfg.wiMaxConsecFamily);
   
   withinS1 = withinStims([withinStims.compStimNum] == 1);
   withinS2 = withinStims([withinStims.compStimNum] == 2);
@@ -190,16 +186,6 @@ fprintf('Shuffling %s compare viewing (%d) task stimuli.\n',sesName,phaseCount);
 [expParam.session.(sesName).(phaseName)(phaseCount).viewStims] = et_shuffleStims(...
   expParam.session.(sesName).(phaseName)(phaseCount).viewStims,'familyNum',phaseCfg.viewMaxConsecFamily);
 
-% % give the between stims a good shuffle
-% fprintf('Shuffling %s compare between species (%d) task stimuli.\n',sesName,phaseCount);
-% [expParam.session.(sesName).(phaseName)(phaseCount).btSpeciesStims] = et_shuffleStims(...
-%   expParam.session.(sesName).(phaseName)(phaseCount).btSpeciesStims,'familyNum',5);
-% 
-% % give the within stims a good shuffle
-% fprintf('Shuffling %s compare within species (%d) task stimuli.\n',sesName,phaseCount);
-% [expParam.session.(sesName).(phaseName)(phaseCount).wiSpeciesStims] = et_shuffleStims(...
-%   expParam.session.(sesName).(phaseName)(phaseCount).wiSpeciesStims,'familyNum',5);
-  
 fprintf('Done.\n');
 
 end % function

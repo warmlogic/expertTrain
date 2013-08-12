@@ -109,10 +109,6 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
-% % set feedback colors
-% correctColor = uint8((rgb('Green') * 255) + 0.5);
-% incorrectColor = uint8((rgb('Red') * 255) + 0.5);
-
 % default is to not print out trial details
 if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
   cfg.text.printTrialInfo = false;
@@ -139,7 +135,6 @@ if phaseCfg.playSound
   end
 end
 
-% TODO - always?
 % are they allowed to respond while the stimulus is on the screen?
 if ~isfield(phaseCfg,'respDuringStim')
   phaseCfg.respDuringStim = true;
@@ -203,8 +198,6 @@ incompleteTrials = find(~trialComplete);
 if ~isempty(incompleteTrials)
   trialNum = incompleteTrials(1);
   runView = true;
-  % debug
-  runView = false;
 else
   fprintf('All trials for %s %s (comp) (%d) have been completed. Moving on to next phase...\n',sesName,phaseName,phaseCount);
   % release any remaining textures
@@ -218,7 +211,7 @@ if runView
   
   viewStims = expParam.session.(sesName).(phaseName)(phaseCount).viewStims;
   
-  message = sprintf('Preparing images, please wait...');
+  message = sprintf('Preparing part 1 images, please wait...');
   Screen('TextSize', w, cfg.text.basicTextSize);
   % put the instructions on the screen
   DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
@@ -246,10 +239,6 @@ if runView
   stimImgWidth = size(vStimImg,2) * cfg.stim.stimScale;
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
-  
-%   % text location for error (e.g., "too fast") text
-%   [~,errorTextY] = RectCenter(cfg.screen.wRect);
-%   errorTextY = errorTextY + (stimImgHeight / 2);
   
   %% show the instructions - view
   
@@ -408,6 +397,7 @@ if runView
       % 'phas', session phase name
       % 'pcou', phase count
       % 'expt', whether this is the experiment (1) or practice (0)
+      % 'part', which part of the experiment we're in
       % 'trln', trial number
       % 'stmn', stimulus name (family, species, exemplar)
       % 'famn', family number
@@ -422,14 +412,14 @@ if runView
       % pretrial fixation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-        'expt',phaseCfg.isExp,...
-        'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum); %#ok<NASGU,ASGLU>
+        'expt',phaseCfg.isExp, 'part', 'view', 'trln', int32(i),...
+        'stmn', stimName, 'famn', fNum, 'spcn', specNum); %#ok<NASGU,ASGLU>
       
       % img presentation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-        'expt',phaseCfg.isExp,...
-        'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum); %#ok<NASGU,ASGLU>
+        'expt',phaseCfg.isExp, 'part', 'view', 'trln', int32(i),...
+        'stmn', stimName, 'famn', fNum, 'spcn', specNum); %#ok<NASGU,ASGLU>
     end % useNS
     
     % mark that we finished this trial
@@ -488,7 +478,7 @@ if runBt
   btStim1Tex = nan(1,length(btStim2));
   btStim2Tex = nan(1,length(btStim2));
   
-  message = sprintf('Preparing images, please wait...');
+  message = sprintf('Preparing part 2 images, please wait...');
   Screen('TextSize', w, cfg.text.basicTextSize);
   % put the "preparing" message on the screen
   DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
@@ -500,13 +490,6 @@ if runBt
     btStim1(i) = btSpeciesStims(...
       ([btSpeciesStims.compPairNum] == btStim2(i).compPairNum) &...
       ([btSpeciesStims.compStimNum] ~= btStim2(i).compStimNum));
-    
-    % TODO - make sure there's only 1 btStim1
-    if length(btSpeciesStims(...
-        ([btSpeciesStims.compPairNum] == btStim2(i).compPairNum) &...
-        ([btSpeciesStims.compStimNum] ~= btStim2(i).compStimNum))) > 1
-      keyboard
-    end
     
     % load up btStim2's texture
     btStim2ImgFile = fullfile(stimDir,btStim2(i).familyStr,btStim2(i).fileName);
@@ -951,6 +934,7 @@ if runBt
       % 'phas', session phase name
       % 'pcou', phase count
       % 'expt', whether this is the experiment (1) or practice (0)
+      % 'part', which part of the experiment we're in
       % 'trln', trial number
       % 'stm1', stimulus 1 name (family, species, exemplar)
       % 'stm2', stimulus 2 name (family, species, exemplar)
@@ -976,14 +960,14 @@ if runBt
       % pre-stim fixation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-        'expt',phaseCfg.isExp,'trln', int32(i),...
+        'expt',phaseCfg.isExp, 'part', 'between', 'trln', int32(i),...
         'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1, 'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % stim presentation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-        'expt',phaseCfg.isExp,'trln', int32(i),...
+        'expt',phaseCfg.isExp, 'part', 'between', 'trln', int32(i),...
         'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1, 'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
@@ -991,8 +975,7 @@ if runBt
         % response prompt
         [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
           'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-          'expt',phaseCfg.isExp,...
-          'trln', int32(i),...
+          'expt',phaseCfg.isExp, 'part', 'between', 'trln', int32(i),...
           'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
           'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end
@@ -1002,7 +985,7 @@ if runBt
         % button push
         [NSEventStatus, NSEventError] = et_NetStation('Event', 'RESP', endRT, .001,...
           'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-          'expt',phaseCfg.isExp,'trln', int32(i),...
+          'expt',phaseCfg.isExp, 'part', 'between', 'trln', int32(i),...
           'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1, 'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
           'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end
@@ -1064,7 +1047,7 @@ if runWi
   wiStim1Tex = nan(1,length(wiStim2));
   wiStim2Tex = nan(1,length(wiStim2));
   
-  message = sprintf('Preparing images, please wait...');
+  message = sprintf('Preparing part 3 images, please wait...');
   Screen('TextSize', w, cfg.text.basicTextSize);
   % put the "preparing" message on the screen
   DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
@@ -1520,6 +1503,7 @@ if runWi
       % 'phas', session phase name
       % 'pcou', phase count
       % 'expt', whether this is the experiment (1) or practice (0)
+      % 'part', which part of the experiment we're in
       % 'trln', trial number
       % 'stm1', stimulus 1 name (family, species, exemplar)
       % 'stm2', stimulus 2 name (family, species, exemplar)
@@ -1545,14 +1529,14 @@ if runWi
       % pre-stim fixation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-        'expt',phaseCfg.isExp,'trln', int32(i),...
+        'expt',phaseCfg.isExp, 'part', 'within', 'trln', int32(i),...
         'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1, 'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
       % stim presentation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-        'expt',phaseCfg.isExp,'trln', int32(i),...
+        'expt',phaseCfg.isExp, 'part', 'within', 'trln', int32(i),...
         'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1, 'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       
@@ -1560,8 +1544,7 @@ if runWi
         % response prompt
         [NSEventStatus, NSEventError] = et_NetStation('Event', 'PROM', respPromptOn, .001,...
           'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-          'expt',phaseCfg.isExp,...
-          'trln', int32(i),...
+          'expt',phaseCfg.isExp, 'part', 'within', 'trln', int32(i),...
           'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1,'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
           'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end
@@ -1571,7 +1554,7 @@ if runWi
         % button push
         [NSEventStatus, NSEventError] = et_NetStation('Event', 'RESP', endRT, .001,...
           'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-          'expt',phaseCfg.isExp,'trln', int32(i),...
+          'expt',phaseCfg.isExp, 'part', 'within', 'trln', int32(i),...
           'stm1', stim1Name, 'fam1', fNum1, 'spc1', specNum1, 'stm2', stim2Name, 'fam2', fNum2, 'spc2', specNum2,...
           'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
       end

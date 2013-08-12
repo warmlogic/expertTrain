@@ -275,6 +275,7 @@ if expParam.sessionNum == 1
         % cfg.stim.(sesName).(phaseName)(phaseNum).rmStims_orig = false;
         
         cfg.stim.(sesName).(phaseName)(phaseNum).viewMaxConsecFamily = 3;
+        cfg.stim.(sesName).(phaseName)(phaseNum).wiMaxConsecFamily = 5;
         
         % number per species per family (half because each stimulus is
         % presented first or second)
@@ -291,10 +292,6 @@ if expParam.sessionNum == 1
         % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
         % if rmStims_orig=false)
         
-%         % minimum number of trials needed between exact repeats of a given
-%         % stimulus as stim2
-%         cfg.stim.(sesName).(phaseName)(phaseNum).stim2MinRepeatSpacing = 2;
-        
         if expParam.useNS
           %cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 240;
           cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 0;
@@ -303,16 +300,16 @@ if expParam.sessionNum == 1
         % durations, in seconds - viewing
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_isi = 0.0;
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_stim = 0.8;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_stim = 1.0;
         % durations, in seconds - between
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_isi = 0.0;
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_stim = 0.8;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_response = 2.0;
         % durations, in seconds - within
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_isi = 0.0;
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_stim = 0.8;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_response = 2.0;
         
         % do we want to play feedback beeps for no response?
