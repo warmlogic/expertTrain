@@ -291,7 +291,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).matchTextPrompt = matchTextPrompt;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 240;
+          %cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 240;
+          cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 0;
         end
         
         % durations, in seconds
