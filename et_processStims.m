@@ -279,6 +279,7 @@ for s = 1:expParam.nSessions
   recogCount = 0;
   nametrainCount = 0;
   viewnameCount = 0;
+  compareCount = 0;
   
   prac_matchCount = 0;
   prac_nameCount = 0;
@@ -459,6 +460,28 @@ for s = 1:expParam.nSessions
           end
         else
           [cfg,expParam] = et_processStims_recog(cfg,expParam,sesName,phaseName,phaseCount);
+        end
+      
+      case {'compare'}
+        compareCount = compareCount + 1;
+        phaseCount = compareCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+        
+        if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
+            [expParam.session.(sesName).(phaseName)(phaseCount).allStims] = et_shuffleStims_match(...
+              expParam.session.(sesName).(phaseName)(phaseCount).same,...
+              expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+              cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).stim2MinRepeatSpacing);
+          end
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
+        else
+          [cfg,expParam] = et_processStims_compare(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
     end % switch
