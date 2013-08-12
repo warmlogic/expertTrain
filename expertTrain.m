@@ -470,6 +470,7 @@ try
   recogCount = 0;
   nametrainCount = 0;
   viewnameCount = 0;
+  compareCount = 0;
   
   prac_matchCount = 0;
   prac_nameCount = 0;
@@ -647,6 +648,33 @@ try
           if ~phaseIsComplete
             [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
           end
+        end
+        
+      case{'compare'}
+        % Comparison task
+        compareCount = compareCount + 1;
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(compareCount),'date')
+          expParam.session.(sesName).(phaseName)(compareCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(compareCount),'startTime')
+          expParam.session.(sesName).(phaseName)(compareCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(compareCount),'endTime')
+          expParam.session.(sesName).(phaseName)(compareCount).endTime = [];
+        end
+        
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_comp_%d.mat',sesName,phaseName,compareCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = et_compare(w,cfg,expParam,logFile,sesName,phaseName,compareCount);
         end
         
       case{'prac_match'}
