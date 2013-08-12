@@ -295,12 +295,20 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 0;
         end
         
-        % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_isi = 0.0;
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_stim = 0.8;
-        % random intervals are generated on the fly
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_response = 2.0;
+        % durations, in seconds - viewing
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_stim = 0.8;
+        % durations, in seconds - between
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_stim = 0.8;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_response = 2.0;
+        % durations, in seconds - within
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_stim = 0.8;
+        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_response = 2.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
@@ -310,9 +318,17 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
         
         % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.comp.text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_comp_1_exp_intro.txt',expParam.expName)),...
-          {'leastSimKey','mostSimKey','contKey'},{cfg.keys.compareKeyNames{1},cfg.keys.compareKeyNames{end},cfg.keys.instructContKey});
+        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compView.text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_comp_1_exp_view.txt',expParam.expName)),...
+          {'partNum'},{'1'});
+        
+        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compBt.text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_comp_2_exp_bt.txt',expParam.expName)),...
+          {'partNum','leastSimKey','mostSimKey','contKey'},{'2',cfg.keys.compareKeyNames{1},cfg.keys.compareKeyNames{end},cfg.keys.instructContKey});
+        
+        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compWi.text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_comp_3_exp_wi.txt',expParam.expName)),...
+          {'partNum','leastSimKey','mostSimKey','contKey'},{'3',cfg.keys.compareKeyNames{1},cfg.keys.compareKeyNames{end},cfg.keys.instructContKey});
         
         expParam.session.(sesName).(phaseName)(phaseNum).date = [];
         expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
