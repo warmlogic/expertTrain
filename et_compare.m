@@ -55,6 +55,17 @@ thisDate = date;
 startTime = fix(clock);
 startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
 
+%% main phase progress file
+
+% set up progress file, to resume this phase in case of a crash, etc.
+mainPhaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_comp_%d.mat',sesName,phaseName,phaseCount));
+if exist(mainPhaseProgressFile,'file')
+  load(mainPhaseProgressFile);
+else
+  phaseComplete = false; %#ok<NASGU>
+  save(mainPhaseProgressFile,'thisDate','startTime','phaseComplete');
+end
+
 %% start the log file for this phase
 
 phaseLogFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseLog_%s_%s_comp_%d.txt',sesName,phaseName,phaseCount));
@@ -182,7 +193,7 @@ phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_c
 if exist(phaseProgressFile,'file')
   load(phaseProgressFile);
 else
-  trialComplete = false(1,length(expParam.session.(sesName).(phaseName)(phaseCount).viewStims([expParam.session.(sesName).(phaseName)(phaseCount).allStims.compStimNum] == 2)));
+  trialComplete = false(1,length(expParam.session.(sesName).(phaseName)(phaseCount).viewStims));
   phaseComplete = false; %#ok<NASGU>
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
@@ -234,15 +245,15 @@ if runView
   stimImgRect = [0 0 stimImgWidth stimImgHeight];
   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
   
-  % text location for error (e.g., "too fast") text
-  [~,errorTextY] = RectCenter(cfg.screen.wRect);
-  errorTextY = errorTextY + (stimImgHeight / 2);
+%   % text location for error (e.g., "too fast") text
+%   [~,errorTextY] = RectCenter(cfg.screen.wRect);
+%   errorTextY = errorTextY + (stimImgHeight / 2);
   
   %% show the instructions - view
   
-  for i = 1:length(phaseCfg.instruct.comp)
+  for i = 1:length(phaseCfg.instruct.compView)
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct.comp(i),cfg.keys.instructContKey,...
+    et_showTextInstruct(w,phaseCfg.instruct.compView(i),cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   end
   
@@ -301,6 +312,9 @@ if runView
       [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
     end
     
+    fNum = int32(viewStims(i).familyNum);
+    specNum = int32(viewStims(i).speciesNum);
+    
     % ISI between trials
     if phaseCfg.comp_view_isi > 0
       WaitSecs(phaseCfg.comp_view_isi);
@@ -313,7 +327,8 @@ if runView
     
     % fixation on screen before stim
     if phaseCfg.comp_view_preStim > 0
-      WaitSecs(phaseCfg.comp_view_preStim);
+      %WaitSecs(phaseCfg.comp_view_preStim);
+      WaitSecs(phaseCfg.comp_view_preStim(1) + ((phaseCfg.comp_view_preStim(2) - phaseCfg.comp_view_preStim(1)).*rand(1,1)));
     end
     
     % draw the stimulus
@@ -337,13 +352,13 @@ if runView
       WaitSecs(0.0001);
     end
     
-    % Clear screen to background color after response
+    % Clear screen to background color after response, with fixation
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
     
     % Close this stimulus before next trial
     Screen('Close', vStimTex(i));
-    
-    fNum = int32(viewStims(i).familyNum);
     
     %% session log file
     
@@ -485,7 +500,11 @@ end
 %       ([btSpeciesStims.compStimNum] ~= btStim2(i).compStimNum));
 %     
 %     % TODO - make sure there's only 1 btStim1
-%     keyboard
+%     if length(btSpeciesStims(...
+%         ([btSpeciesStims.compPairNum] == btStim2(i).compPairNum) &...
+%         ([btSpeciesStims.compStimNum] ~= btStim2(i).compStimNum))) > 1
+%       keyboard
+%     end
 %     
 %     % load up btStim2's texture
 %     btStim2ImgFile = fullfile(stimDir,btStim2(i).familyStr,btStim2(i).fileName);
@@ -526,7 +545,14 @@ end
 %   
 %   %% show the instructions - between
 %   
-%   % TODO
+%   for i = 1:length(phaseCfg.instruct.compBt)
+%     WaitSecs(1.000);
+%     et_showTextInstruct(w,phaseCfg.instruct.compBt(i),cfg.keys.instructContKey,...
+%       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+%   end
+%   
+%   % Wait a second before starting trial
+%   WaitSecs(1.000);
 %   
 %   %% run the comparison - between task
 %   
@@ -595,9 +621,6 @@ if runWi
       ([wiSpeciesStims.compPairNum] == wiStim2(i).compPairNum) &...
       ([wiSpeciesStims.compStimNum] ~= wiStim2(i).compStimNum));
     
-    % TODO - make sure there's only 1 wiStim1
-    keyboard
-    
     % load up wiStim2's texture
     wiStim2ImgFile = fullfile(stimDir,wiStim2(i).familyStr,wiStim2(i).fileName);
     if exist(wiStim2ImgFile,'file')
@@ -637,7 +660,14 @@ if runWi
   
   %% show the instructions - within
   
-  % TODO
+  for i = 1:length(phaseCfg.instruct.compWi)
+    WaitSecs(1.000);
+    et_showTextInstruct(w,phaseCfg.instruct.compWi(i),cfg.keys.instructContKey,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  end
+  
+  % Wait a second before starting trial
+  WaitSecs(1.000);
   
   %% run the comparison - within task
   
@@ -1161,5 +1191,9 @@ fprintf(phLFile,'!!! End of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCoun
 
 % close the phase log file
 fclose(phLFile);
+
+% save progress after finishing phase
+phaseComplete = true; %#ok<NASGU>
+save(mainPhaseProgressFile,'thisDate','startTime','phaseComplete','endTime');
 
 end % function
