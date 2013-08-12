@@ -1,0 +1,7 @@
+This is the Comparison experiment, part partNum.
+
+You will see a number of creatures presented on the screen, one at a time.
+
+Please examine them, as you will see them again in the next part.
+
+Press "contKey" to begin the comparison task.

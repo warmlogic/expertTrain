@@ -1,0 +1,7 @@
+This is the Comparison experiment, part partNum.
+
+On each trial you will see two creatures, just like before.
+
+Press a key, leastSimKey-mostSimKey, to rate how similar they are. leastSimKey is the least similar and mostSimKey is the most similar.
+
+Press "contKey" to begin the comparison task.
