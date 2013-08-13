@@ -27,6 +27,7 @@ subjects = {
   'EBIRD003';
   'EBIRD004';
   'EBIRD005';
+  'EBIRD006';
   };
 
 saveFigs = true;

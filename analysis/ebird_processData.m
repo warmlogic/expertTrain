@@ -10,6 +10,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'EBIRD003';
     'EBIRD004';
     'EBIRD005';
+    'EBIRD006';
     };
 end
 
@@ -240,17 +241,17 @@ for sub = 1:length(subjects)
                   end
                   
                   % filter the events that we want
-                  matchResp = events.(sesName).(fn).data(strcmp({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+                  matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
                   
-                  % % exclude missed responses ('none')
-                  % matchResp = matchResp(~strcmp({matchResp.resp},'none'));
-                  % % % set missing responses to incorrect
-                  % % noRespInd = find(strcmp({matchResp.resp},'none'));
-                  % % if ~isempty(noRespInd)
-                  % %   for nr = 1:length(noRespInd)
-                  % %     matchResp(noRespInd(nr)).acc = 0;
-                  % %   end
-                  % % end
+                  % exclude missed responses ('none')
+                  matchResp = matchResp(~ismember({matchResp.resp},'none'));
+                  % % set missing responses to incorrect
+                  % noRespInd = find(ismember({matchResp.resp},'none'));
+                  % if ~isempty(noRespInd)
+                  %   for nr = 1:length(noRespInd)
+                  %     matchResp(noRespInd(nr)).acc = 0;
+                  %   end
+                  % end
                   
                   % overall
                   thisField = 'overall';
@@ -311,7 +312,7 @@ for sub = 1:length(subjects)
                     fprintf('\n');
                     for im = 1:length(imgConds)
                       % overall for this manipulation
-                      matchCond = matchResp(strcmp({matchResp.imgCond},imgConds{im}));
+                      matchCond = matchResp(ismember({matchResp.imgCond},imgConds{im}));
                       
                       thisField = 'overall';
                       results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCond,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),thisField);
@@ -354,17 +355,17 @@ for sub = 1:length(subjects)
                 end
                 
                 % filter the events that we want
-                nameResp = events.(sesName).(fn).data(strcmp({events.(sesName).(fn).data.type},'NAME_RESP'));
+                nameResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'NAME_RESP'));
                 
-                % % exclude missed responses (-1)
-                % nameResp = nameResp([nameResp.resp] ~= -1);
-                % % set missing response to incorrect
-                % % noRespInd = find([nameResp.resp] == -1);
-                % % if ~isempty(noRespInd)
-                % %   for nr = 1:length(noRespInd)
-                % %     nameResp(noRespInd(nr)).acc = 0;
-                % %   end
-                % % end
+                % exclude missed responses (-1)
+                nameResp = nameResp([nameResp.resp] ~= -1);
+                % set missing response to incorrect
+                % noRespInd = find([nameResp.resp] == -1);
+                % if ~isempty(noRespInd)
+                %   for nr = 1:length(noRespInd)
+                %     nameResp(noRespInd(nr)).acc = 0;
+                %   end
+                % end
                 
                 % overall
                 thisField = 'overall';
@@ -523,7 +524,7 @@ for sesNum = 1:length(expParam.sesTypes)
               trainStr = 'all';
             end
             
-            matchResp = events.(sesName).(fn).data(strcmp({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+            matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
             
             imgConds = unique({matchResp.imgCond});
             if length(imgConds) > 1

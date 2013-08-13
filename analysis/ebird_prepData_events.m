@@ -45,6 +45,7 @@ if nargin == 0
     'EBIRD003';
     'EBIRD004';
     'EBIRD005';
+    'EBIRD006';
     };
   
   prep_eeg = 0;
