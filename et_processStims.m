@@ -3,12 +3,13 @@ function [cfg,expParam] = et_processStims(cfg,expParam)
 %
 % Description:
 %  Prepares the stimuli, mostly in experiment presentation order. This
-%  function is run by config_EBUG.
+%  function is run by any config_EXPNAME file.
 %
-% see also: config_EBUG, et_divvyStims, et_divvyStims_match,
-% et_shuffleStims, et_shuffleStims_match, et_processStims_match,
-% et_processStims_recog, et_processStims_viewname,
-% et_processStims_nametrain, et_processStims_name
+% see also: config_EBUG, config_EBIRD, config_COMP, et_divvyStims,
+%           et_divvyStims_match, et_shuffleStims, et_shuffleStims_match,
+%           et_processStims_match, et_processStims_recog,
+%           et_processStims_viewname, et_processStims_nametrain,
+%           et_processStims_name, et_processStims_compare
 
 %% Initial processing of the stimuli
 

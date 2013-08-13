@@ -1,22 +1,31 @@
 function expertTrain(expName,subNum,useNS)
-
 % function expertTrain(expName,subNum,useNS)
 %
 % expertise training experiment
 %
-% 5 potential phases:
+% 6 potential phases:
 %  - Subordinate matching task
 %  - Old/new recognition
 %  - Name training
 %  - Passive viewing (with confirmatory button press.)
 %  - Active naming
+%  - Comparison (similarity of two stimuli)
 %
+% Input:
+%  expName: the name of the experiment (as a string). You must set up a
+%           config_EXPNAME.m file describing the experiment configuration.
+%  subNum:  the subject number (integer). This will get transformed into
+%           the full subject name EXPNAMEXXX; e.g., subNum=1 = EXPNAME001.
+%  useNS:   whether to use Net Station (logical, 1 for yes or 0 for no).
 %
+% NB: You can also launch the experiment by just running the command
+%     expertTrain; and an popup window will prompt for the above info.
 %
-% See the file README.md for more information
+% See the file README.md for more information.
 %
-% see also: et_saveStimList, config_EBUG, et_processStims_EBUG,
-% et_matching, et_viewing, et_naming, et_recognition
+% see also: et_saveStimList, config_EBUG, config_EBIRD, config_COMP,
+%           et_processStims, et_matching, et_viewing, et_naming,
+%           et_recognition, et_compare
 %
 
 %% any preliminary stuff
