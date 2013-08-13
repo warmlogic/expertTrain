@@ -379,8 +379,8 @@ for i = trialNum:length(stimTex)
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
   if phaseCfg.isExp
-    famNumSubord = cfg.stim.practice.famNumSubord;
-    famNumBasic = cfg.stim.practice.famNumBasic;
+    famNumSubord = cfg.stim.famNumSubord;
+    famNumBasic = cfg.stim.famNumBasic;
   else
     famNumSubord = cfg.stim.practice.famNumSubord;
     famNumBasic = cfg.stim.practice.famNumBasic;
