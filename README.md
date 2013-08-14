@@ -4,13 +4,13 @@ expertTrain README
 Purpose
 ----
 
-expertTrain is a visual category expertise training experiment written in Matlab using Psychtoolbox.
+expertTrain is a visual category expertise training environment written in Matlab using Psychtoolbox.
 
 About
 ----
 
-- The experiment supports running multiple sessions, and each session is divided into phases.
-- There are four main phases for each session:
+- The environment supports running experiments with multiple sessions, where each session is divided into phases. Configuration files for the experiments called `EBIRD` and `EBUG` are included.
+- There are four potential phases for each session:
    1. Old/New recognition (`recog`): study a list of targets, tested on recognizing targets and lures.
    1. Subordinate matching (`match`): decide whether two stimuli are from the same species.
    1. Naming (`name`): must press corresponding species key, and the species number is not displayed on screen.
@@ -18,8 +18,9 @@ About
 - There are two additional augmented introductory training phases (typically to be used on Training Day 1):
    1. Nametrain (`nametrain`): Just like the `name` phase, but species are introduced a one or two at a time (as defined in `config_EXPNAME.m`) and subjects have to name the species even if no exposure has occurred. The idea is that this will force subjects to learn the species labels quickly.
    1. Viewname (`viewname`): intermixed viewing and naming blocks (described above) for introducing the subject to different species. **This phase is not being used.**
-- expertTrain has been developed tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3. It has also been used on Windows XP and Debian 7 with Matlab 2013a, but to a lesser extent.
-- You must use a USB keyboard with this experiment.
+- Additionally, there is another phase that could be used for stimulus similarity normalization (`compare`). A configuration file for a separate experiment called `COMP` is included, though the comparison task could easily be implemented in a training experiment with the correct configuration setup.
+- `expertTrain` has been developed and tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3. It has been used extensively on Windows XP with Matlab 2013a, and to a lesser extent on Debian 7.
+- **You must use a USB keyboard with this experiment.**
 
 Installation
 ----
@@ -27,7 +28,7 @@ Installation
 - Download and install Psychtoolbox (PTB) version 3
    - http://psychtoolbox.org/PsychtoolboxDownload
    - Make sure to add it to your Matlab path
-- Download expertTrain to a reasonable location on your computer (e.g., `~/Documents/experiments/`)
+- Download `expertTrain` to a reasonable location on your computer (e.g., `~/Documents/experiments/`)
    - You can clone with the GitHub app or regular git in Terminal, or download the zip.
    - https://github.com/warmlogic/expertTrain
    - It is **not** recommended that you add it to your Matlab path
@@ -78,7 +79,7 @@ Preparing the experiment
 Running the experiment
 ----
 
-- In Matlab, `cd` into the expertTrain directory.
+- In Matlab, `cd` into the `expertTrain` directory.
 - Run the experiment: `expertTrain('EXPNAME',subNum,useNS);` (where `'EXPNAME'` is a string, `subNum` is an integer, and `useNS` is 1 or 0 (for either using Net Station to record EEG or not))
    - e.g., `expertTrain('EBUG',1,1);` runs EBUG subject 1 (called EBUG001 in the data directory) and recording with Net Station.
    - You can also run the experiment by just running the command `expertTrain;`. You are then required to enter the experiment details in a dialogue box.
