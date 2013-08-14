@@ -853,7 +853,17 @@ catch ME %#ok<NASGU>
   fclose(logFile);
   
   % save out the error information
-  save(fullfile(cfg.files.sesSaveDir,sprintf('error_%s_ses%d_%s_%.2d%.2d%.2d.mat',expParam.subject,expParam.sessionNum,errorDate,errorTime(4),errorTime(5),errorTime(6))),'ME');
+  errorFile = fullfile(cfg.files.sesSaveDir,sprintf('error_%s_ses%d_%s_%.2d%.2d%.2d.mat',expParam.subject,expParam.sessionNum,errorDate,errorTime(4),errorTime(5),errorTime(6)));
+  fprintf('Saving error file %s.\n',errorFile);
+  save(errorFile,'ME');
+  errorReport = ME.getReport;
+  if ~isempty(errorReport)
+    fprintf('The error probably occurred because:\n');
+    fprintf('%s',errorReport);
+  end
+  fprintf('To manually inspect the error, load the file with this command:\nload(''%s'');.\n',errorFile);
+  fprintf('\tType ME and look at the ''message'' field to see why the error occured.\n');
+  fprintf('\tType ME.stack(1), ME.stack(2), etc to see where the error occurred.\n');
   
   % end of EEG recording, hang up with netstation
   if expParam.useNS
