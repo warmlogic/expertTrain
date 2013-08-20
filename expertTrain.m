@@ -831,7 +831,7 @@ try
   % End of experiment:
   return
   
-catch ME %#ok<NASGU>
+catch ME
   % catch error: This is executed in case something goes wrong in the
   % 'try' part due to programming error etc.:
   
