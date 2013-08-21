@@ -230,6 +230,11 @@ if expParam.sessionNum == 1
   cfg.text.respSymbol = '?';
   cfg.text.fixationColor = uint8((rgb('Black') * 255) + 0.5);
   
+  % fixation defaults; change in phases if you want other behavior
+  fixDuringISI = true;
+  fixDuringPreStim = true;
+  fixDuringStim = true;
+  
   % "respond faster" text
   cfg.text.respondFaster = 'No response recorded!\nRespond faster!';
   cfg.text.respondFasterColor = uint8((rgb('Red') * 255) + 0.5);
@@ -263,6 +268,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;

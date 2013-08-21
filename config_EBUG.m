@@ -397,6 +397,11 @@ if expParam.sessionNum == 1
   cfg.text.respSymbol = '?';
   cfg.text.fixationColor = uint8((rgb('Black') * 255) + 0.5);
   
+  % fixation defaults; change in phases if you want other behavior
+  fixDuringISI = true;
+  fixDuringPreStim = true;
+  fixDuringStim = true;
+  
   if matchTextPrompt
     cfg.text.matchSame = 'Same';
     cfg.text.matchDiff = 'Diff';
@@ -435,6 +440,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.practice.familyNames;
@@ -504,6 +513,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -577,6 +590,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.practice.familyNames;
@@ -652,6 +669,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -729,6 +750,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+        
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.practice.familyNames;
         
@@ -773,6 +798,10 @@ if expParam.sessionNum == 1
 %         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
 %         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
 %         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+%         
+%         cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+%         cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+%         cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
 %         
 %         % only use stimuli from particular families
 %         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -907,6 +936,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+        
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
         
@@ -998,6 +1031,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+        
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
         
@@ -1046,6 +1083,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1134,6 +1175,10 @@ if expParam.sessionNum == 1
           end
           cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
           
+          cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+          cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+          cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+          
           % only use stimuli from particular families
           cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
           
@@ -1207,6 +1252,10 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = true;
           cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
           
+          cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+          cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+          cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+          
           % only use stimuli from particular families
           cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
           
@@ -1264,6 +1313,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1351,6 +1404,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
@@ -1442,6 +1499,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
         
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+        
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
         
@@ -1528,6 +1589,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = false;
+        
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
