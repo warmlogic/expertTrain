@@ -168,8 +168,8 @@ if ~isfield(phaseCfg,'fixDuringPreStim')
   phaseCfg.fixDuringPreStim = true;
 end
 % default is to show fixation with the stimulus
-if ~isfield(phaseCfg,'fixWithStim')
-  phaseCfg.fixWithStim = true;
+if ~isfield(phaseCfg,'fixDuringStim')
+  phaseCfg.fixDuringStim = true;
 end
 
 %% preload all stimuli for presentation
@@ -408,9 +408,11 @@ for i = trialNum:length(viewStims)
   
   % ISI between trials
   if phaseCfg.view_isi > 0
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    Screen('Flip',w);
+    if phaseCfg.fixDuringISI
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip',w);
+    end
     WaitSecs(phaseCfg.view_isi);
   end
   
@@ -453,7 +455,7 @@ for i = trialNum:length(viewStims)
   
   % draw the stimulus
   Screen('DrawTexture', w, viewStimTex(i), [], stimImgRect);
-  if phaseCfg.fixWithStim
+  if phaseCfg.fixDuringStim
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -512,7 +514,7 @@ for i = trialNum:length(viewStims)
       end
       % draw the stimulus
       Screen('DrawTexture', w, viewStimTex(i), [], stimImgRect);
-      if phaseCfg.fixWithStim
+      if phaseCfg.fixDuringStim
         % and fixation on top of it
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -560,7 +562,7 @@ for i = trialNum:length(viewStims)
   if ~keyIsDown
     % draw the stimulus
     Screen('DrawTexture', w, viewStimTex(i), [], stimImgRect);
-    if phaseCfg.fixWithStim
+    if phaseCfg.fixDuringStim
       % and fixation on top of it
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);

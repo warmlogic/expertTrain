@@ -171,8 +171,8 @@ if ~isfield(phaseCfg,'fixDuringPreStim')
   phaseCfg.fixDuringPreStim = true;
 end
 % default is to show fixation with the stimulus
-if ~isfield(phaseCfg,'fixWithStim')
-  phaseCfg.fixWithStim = true;
+if ~isfield(phaseCfg,'fixDuringStim')
+  phaseCfg.fixDuringStim = true;
 end
 
 %% preload all stimuli for presentation
@@ -415,9 +415,11 @@ for i = trialNum:length(nameStims)
   
   % ISI between trials
   if phaseCfg.name_isi > 0
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    Screen('Flip',w);
+    if phaseCfg.fixDuringISI
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip',w);
+    end
     WaitSecs(phaseCfg.name_isi);
   end
   
@@ -464,7 +466,7 @@ for i = trialNum:length(nameStims)
   
   % draw the stimulus
   Screen('DrawTexture', w, nameStimTex(i), [], stimImgRect);
-  if phaseCfg.fixWithStim
+  if phaseCfg.fixDuringStim
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -487,7 +489,7 @@ for i = trialNum:length(nameStims)
       if keyIsDown
         % draw the stimulus
         Screen('DrawTexture', w, nameStimTex(i), [], stimImgRect);
-        if phaseCfg.fixWithStim
+        if phaseCfg.fixDuringStim
           % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -521,7 +523,7 @@ for i = trialNum:length(nameStims)
       elseif keyIsDown && sum(keyCode) > 1
         % draw the stimulus
         Screen('DrawTexture', w, nameStimTex(i), [], stimImgRect);
-        if phaseCfg.fixWithStim
+        if phaseCfg.fixDuringStim
           % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);

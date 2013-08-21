@@ -860,10 +860,11 @@ catch ME
   if ~isempty(errorReport)
     fprintf('The error probably occurred because:\n');
     fprintf('%s',errorReport);
+    fprintf('\n');
   end
-  fprintf('To manually inspect the error, load the file with this command:\nload(''%s'');.\n',errorFile);
-  fprintf('\tType ME and look at the ''message'' field to see why the error occured.\n');
-  fprintf('\tType ME.stack(1), ME.stack(2), etc to see where the error occurred.\n');
+  fprintf('To manually inspect the error, load the file with this command:\nload(''%s'');\n',errorFile);
+  fprintf('\n\tType ME and look at the ''message'' field (i.e., ME.message) to see WHY the error occured.\n');
+  fprintf('\tType ME.stack(1), ME.stack(2), etc. to see WHERE the error occurred.\n');
   
   % end of EEG recording, hang up with netstation
   if expParam.useNS

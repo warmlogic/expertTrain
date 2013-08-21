@@ -149,8 +149,8 @@ if ~isfield(phaseCfg,'fixDuringPreStim')
   phaseCfg.fixDuringPreStim = true;
 end
 % default is to show fixation with the stimulus
-if ~isfield(phaseCfg,'fixWithStim')
-  phaseCfg.fixWithStim = true;
+if ~isfield(phaseCfg,'fixDuringStim')
+  phaseCfg.fixDuringStim = true;
 end
 
 %% do an impedance check before the phase begins, if desired
@@ -361,9 +361,11 @@ for b = 1:phaseCfg.nBlocks
       
       % ISI between trials
       if phaseCfg.recog_study_isi > 0
-        Screen('TextSize', w, cfg.text.fixSize);
-        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-        Screen('Flip',w);
+        if phaseCfg.fixDuringISI
+          Screen('TextSize', w, cfg.text.fixSize);
+          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          Screen('Flip',w);
+        end
         WaitSecs(phaseCfg.recog_study_isi);
       end
       
@@ -411,7 +413,7 @@ for b = 1:phaseCfg.nBlocks
       
       % draw the stimulus
       Screen('DrawTexture', w, blockStudyStimTex(i), [], stimImgRect);
-      if phaseCfg.fixWithStim
+      if phaseCfg.fixDuringStim
         % and fixation on top of it
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -685,9 +687,11 @@ for b = 1:phaseCfg.nBlocks
     
     % ISI between trials
     if phaseCfg.recog_test_isi > 0
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-      Screen('Flip',w);
+      if phaseCfg.fixDuringISI
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        Screen('Flip',w);
+      end
       WaitSecs(phaseCfg.recog_test_isi);
     end
     
@@ -735,7 +739,7 @@ for b = 1:phaseCfg.nBlocks
     
     % draw the stimulus
     Screen('DrawTexture', w, blockTestStimTex(i), [], stimImgRect);
-    if phaseCfg.fixWithStim
+    if phaseCfg.fixDuringStim
       % and fixation on top of it
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -758,7 +762,7 @@ for b = 1:phaseCfg.nBlocks
         if keyIsDown
           % draw the stimulus
           Screen('DrawTexture', w, blockTestStimTex(i), [], stimImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation on top of it
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -797,7 +801,7 @@ for b = 1:phaseCfg.nBlocks
         elseif keyIsDown && sum(keyCode) > 1
           % draw the stimulus
           Screen('DrawTexture', w, blockTestStimTex(i), [], stimImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation on top of it
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -831,7 +835,7 @@ for b = 1:phaseCfg.nBlocks
       Screen('DrawTexture', w, blockTestStimTex(i), [], stimImgRect);
       % with the response key image
       Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
-      if phaseCfg.fixWithStim
+      if phaseCfg.fixDuringStim
         % and fixation on top of it
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -869,7 +873,7 @@ for b = 1:phaseCfg.nBlocks
           Screen('DrawTexture', w, blockTestStimTex(i), [], stimImgRect);
           % with the response key image
           Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation on top of it
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);

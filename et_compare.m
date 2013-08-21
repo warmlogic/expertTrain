@@ -149,8 +149,8 @@ if ~isfield(phaseCfg,'fixDuringPreStim')
   phaseCfg.fixDuringPreStim = true;
 end
 % default is to show fixation with the stimulus
-if ~isfield(phaseCfg,'fixWithStim')
-  phaseCfg.fixWithStim = true;
+if ~isfield(phaseCfg,'fixDuringStim')
+  phaseCfg.fixDuringStim = true;
 end
 
 %% do an impedance check before the phase begins, if desired
@@ -323,9 +323,11 @@ if runView
     
     % ISI between trials
     if phaseCfg.comp_view_isi > 0
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-      Screen('Flip',w);
+      if phaseCfg.fixDuringISI
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        Screen('Flip',w);
+      end
       WaitSecs(phaseCfg.comp_view_isi);
     end
     
@@ -374,7 +376,7 @@ if runView
     
     % draw the stimulus
     Screen('DrawTexture', w, vStimTex(i), [], stimImgRect);
-    if phaseCfg.fixWithStim
+    if phaseCfg.fixDuringStim
       % and fixation on top of it
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -712,7 +714,7 @@ if runBt
     % draw the stimuli
     Screen('DrawTexture', w, btStim1Tex(i), [], stim1ImgRect);
     Screen('DrawTexture', w, btStim2Tex(i), [], stim2ImgRect);
-    if phaseCfg.fixWithStim
+    if phaseCfg.fixDuringStim
       % and fixation
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -738,7 +740,7 @@ if runBt
           % draw the stimuli
           Screen('DrawTexture', w, btStim1Tex(i), [], stim1ImgRect);
           Screen('DrawTexture', w, btStim2Tex(i), [], stim2ImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -778,7 +780,7 @@ if runBt
           % draw the stimuli
           Screen('DrawTexture', w, btStim1Tex(i), [], stim1ImgRect);
           Screen('DrawTexture', w, btStim2Tex(i), [], stim2ImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -1330,7 +1332,7 @@ if runWi
     % draw the stimuli
     Screen('DrawTexture', w, wiStim1Tex(i), [], stim1ImgRect);
     Screen('DrawTexture', w, wiStim2Tex(i), [], stim2ImgRect);
-    if phaseCfg.fixWithStim
+    if phaseCfg.fixDuringStim
       % and fixation
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -1356,7 +1358,7 @@ if runWi
           % draw the stimuli
           Screen('DrawTexture', w, wiStim1Tex(i), [], stim1ImgRect);
           Screen('DrawTexture', w, wiStim2Tex(i), [], stim2ImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -1396,7 +1398,7 @@ if runWi
           % draw the stimuli
           Screen('DrawTexture', w, wiStim1Tex(i), [], stim1ImgRect);
           Screen('DrawTexture', w, wiStim2Tex(i), [], stim2ImgRect);
-          if phaseCfg.fixWithStim
+          if phaseCfg.fixDuringStim
             % and fixation
             Screen('TextSize', w, cfg.text.fixSize);
             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
