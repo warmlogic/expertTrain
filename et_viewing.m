@@ -159,6 +159,19 @@ if phaseCfg.playSound
   end
 end
 
+% default is to show fixation during ISI
+if ~isfield(phaseCfg,'fixDuringISI')
+  phaseCfg.fixDuringISI = true;
+end
+% default is to show fixation during preStim
+if ~isfield(phaseCfg,'fixDuringPreStim')
+  phaseCfg.fixDuringPreStim = true;
+end
+% default is to show fixation with the stimulus
+if ~isfield(phaseCfg,'fixWithStim')
+  phaseCfg.fixWithStim = true;
+end
+
 %% preload all stimuli for presentation
 
 message = sprintf('Preparing images, please wait...');
@@ -169,16 +182,16 @@ DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.te
 Screen('Flip', w);
 
 % initialize
-stimTex = nan(1,length(viewStims));
+viewStimTex = nan(1,length(viewStims));
 
 for i = 1:length(viewStims)
   % load up this stim's texture
   stimImgFile = fullfile(stimDir,viewStims(i).familyStr,viewStims(i).fileName);
   if exist(stimImgFile,'file')
     stimImg = imread(stimImgFile);
-    stimTex(i) = Screen('MakeTexture',w,stimImg);
+    viewStimTex(i) = Screen('MakeTexture',w,stimImg);
     % TODO: optimized?
-    %stimtex(i) = Screen('MakeTexture',w,stimImg,[],1);
+    %viewStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
   else
     error('Study stimulus %s does not exist!',stimImgFile);
   end
@@ -289,7 +302,7 @@ if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
-for i = trialNum:length(stimTex)
+for i = trialNum:length(viewStims)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
     if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && i == 1
@@ -321,7 +334,7 @@ for i = trialNum:length(stimTex)
       end
     end
   else
-    if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(stimTex) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
+    if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(viewStims) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
       % run the impedance break
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -342,12 +355,12 @@ for i = trialNum:length(stimTex)
   end
   
   % Do a blink break if recording EEG and specified time has passed
-  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(stimTex) - 3)
+  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(viewStims) - 3)
     thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
     Screen('TextSize', w, cfg.text.basicTextSize);
-    pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stimTex));
+    pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(viewStims));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
@@ -361,8 +374,10 @@ for i = trialNum:length(stimTex)
     RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
       cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
     
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    if phaseCfg.view_isi > 0 && phaseCfg.fixDuringISI
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    end
     Screen('Flip',w);
     WaitSecs(0.5);
     % reset the timer
@@ -393,24 +408,56 @@ for i = trialNum:length(stimTex)
   
   % ISI between trials
   if phaseCfg.view_isi > 0
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    Screen('Flip',w);
     WaitSecs(phaseCfg.view_isi);
   end
   
-  % draw fixation
-  Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  [preStimFixOn] = Screen('Flip',w);
+  % TODO - remove commented
   
-  % fixation on screen before stim
-  if phaseCfg.view_preStim > 0
-    WaitSecs(phaseCfg.view_preStim);
+  % % draw fixation
+  % Screen('TextSize', w, cfg.text.fixSize);
+  % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+  % [preStimFixOn] = Screen('Flip',w);
+  
+  % preStimulus period, with fixation if desired
+  if length(phaseCfg.view_preStim) == 1
+    if phaseCfg.view_preStim > 0
+      if phaseCfg.fixDuringPreStim
+        % draw fixation
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        [preStimFixOn] = Screen('Flip',w);
+      else
+        preStimFixOn = NaN;
+        Screen('Flip',w);
+      end
+      WaitSecs(phaseCfg.view_preStim);
+    end
+  elseif length(phaseCfg.view_preStim) == 2
+    if length(find(phaseCfg.view_preStim == 0)) ~= 2
+      if phaseCfg.fixDuringPreStim
+        % draw fixation
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        [preStimFixOn] = Screen('Flip',w);
+      else
+        preStimFixOn = NaN;
+        Screen('Flip',w);
+      end
+      % fixation on screen before stim for a random amount of time
+      WaitSecs(phaseCfg.view_preStim(1) + ((phaseCfg.view_preStim(2) - phaseCfg.view_preStim(1)).*rand(1,1)));
+    end
   end
   
   % draw the stimulus
-  Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
-  % and fixation on top of it
-  Screen('TextSize', w, cfg.text.fixSize);
-  DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+  Screen('DrawTexture', w, viewStimTex(i), [], stimImgRect);
+  if phaseCfg.fixWithStim
+    % and fixation on top of it
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+  end
   % and species number below it
   Screen('TextSize', w, cfg.text.basicTextSize);
   if specNum > 0
@@ -424,7 +471,7 @@ for i = trialNum:length(stimTex)
   [imgOn, stimOnset] = Screen('Flip', w);
   
   if cfg.text.printTrialInfo
-    fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(stimTex),viewStims(i).fileName,specNum);
+    fprintf('Trial %d of %d: %s, species num: %d.\n',i,length(viewStims),viewStims(i).fileName,specNum);
   end
   
   % while loop to show stimulus until subject response or until
@@ -464,10 +511,12 @@ for i = trialNum:length(stimTex)
         end
       end
       % draw the stimulus
-      Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
-      % and fixation on top of it
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawTexture', w, viewStimTex(i), [], stimImgRect);
+      if phaseCfg.fixWithStim
+        % and fixation on top of it
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
       % and species number below it in the appropriate color
       Screen('TextSize', w, cfg.text.basicTextSize);
       if specNum > 0
@@ -510,10 +559,12 @@ for i = trialNum:length(stimTex)
   % if they didn't make a response, give "incorrect" feedback
   if ~keyIsDown
     % draw the stimulus
-    Screen('DrawTexture', w, stimTex(i), [], stimImgRect);
-    % and fixation on top of it
-    Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    Screen('DrawTexture', w, viewStimTex(i), [], stimImgRect);
+    if phaseCfg.fixWithStim
+      % and fixation on top of it
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    end
     % and species number below it in the appropriate color
     Screen('TextSize', w, cfg.text.basicTextSize);
     if specNum > 0
@@ -536,11 +587,17 @@ for i = trialNum:length(stimTex)
     WaitSecs(cfg.text.respondFasterFeedbackTime);
   end
   
+  if phaseCfg.view_isi > 0 && phaseCfg.fixDuringISI
+    % draw fixation
+    Screen('TextSize', w, cfg.text.fixSize);
+    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+  end
+  
   % Clear screen to background color after response
   Screen('Flip', w);
   
   % Close this stimulus before next trial
-  Screen('Close', stimTex(i));
+  Screen('Close', viewStimTex(i));
   
   % compute response time
   rt = int32(round(1000 * (endRT - stimOnset)));
@@ -594,7 +651,7 @@ for i = trialNum:length(stimTex)
   end
   
   if cfg.text.printTrialInfo
-    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s; acc = %d; rt = %d)\n',i,length(stimTex),viewStims(i).fileName,specNum,resp,respKey,acc,rt);
+    fprintf('Trial %d of %d: %s, species num: %d. response: %s (key: %s; acc = %d; rt = %d)\n',i,length(viewStims),viewStims(i).fileName,specNum,resp,respKey,acc,rt);
   end
   
   fNum = int32(viewStims(i).familyNum);
@@ -710,14 +767,16 @@ for i = trialNum:length(stimTex)
       viewStims(i).familyStr,...
       viewStims(i).speciesStr,...
       viewStims(i).exemplarName);
-  
-    % pretrial fixation
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
-      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-      'expt',phaseCfg.isExp,...
-      'bloc', int32(b),...
-      'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
-      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+    
+    if ~isnan(preStimFixOn)
+      % pretrial fixation
+      [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
+        'expt',phaseCfg.isExp,...
+        'bloc', int32(b),...
+        'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
+        'rsps', resp, 'rspk', respKey, 'rspt', rt, 'corr', acc, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+    end
     
     % img presentation
     [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
