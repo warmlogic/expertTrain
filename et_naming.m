@@ -423,17 +423,6 @@ for i = trialNum:length(nameStims)
     WaitSecs(phaseCfg.name_isi);
   end
   
-  % TODO - remove comments
-  
-  % % draw fixation
-  % Screen('TextSize', w, cfg.text.fixSize);
-  % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  % [preStimFixOn] = Screen('Flip',w);
-  
-  % % fixation on screen before stim for a random amount of time
-  % WaitSecs(phaseCfg.name_preStim(1) + ((phaseCfg.name_preStim(2) - phaseCfg.name_preStim(1)).*rand(1,1)));
-  % preStimulus period, with fixation if desired
-  
   % preStimulus period, with fixation if desired
   if length(phaseCfg.name_preStim) == 1
     if phaseCfg.name_preStim > 0

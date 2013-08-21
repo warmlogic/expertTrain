@@ -416,13 +416,6 @@ for i = trialNum:length(viewStims)
     WaitSecs(phaseCfg.view_isi);
   end
   
-  % TODO - remove commented
-  
-  % % draw fixation
-  % Screen('TextSize', w, cfg.text.fixSize);
-  % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  % [preStimFixOn] = Screen('Flip',w);
-  
   % preStimulus period, with fixation if desired
   if length(phaseCfg.view_preStim) == 1
     if phaseCfg.view_preStim > 0

@@ -331,19 +331,6 @@ if runView
       WaitSecs(phaseCfg.comp_view_isi);
     end
     
-    % TODO - remove commented
-    
-    % % draw fixation
-    % Screen('TextSize', w, cfg.text.fixSize);
-    % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    % [preStimFixOn] = Screen('Flip',w);
-    
-    % % fixation on screen before stim
-    % if phaseCfg.comp_view_preStim > 0
-    %   %WaitSecs(phaseCfg.comp_view_preStim);
-    %   WaitSecs(phaseCfg.comp_view_preStim(1) + ((phaseCfg.comp_view_preStim(2) - phaseCfg.comp_view_preStim(1)).*rand(1,1)));
-    % end
-    
     % preStimulus period, with fixation if desired
     if length(phaseCfg.comp_view_preStim) == 1
       if phaseCfg.comp_view_preStim > 0
@@ -670,16 +657,6 @@ if runBt
       Screen('Flip',w);
       WaitSecs(phaseCfg.comp_bt_isi);
     end
-    
-    % TODO - remove commented
-    
-    % % draw fixation
-    % Screen('TextSize', w, cfg.text.fixSize);
-    % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    % [preStimFixOn] = Screen('Flip',w);
-    
-    % % fixation on screen before stim1 for a random amount of time
-    % WaitSecs(phaseCfg.comp_bt_preStim(1) + ((phaseCfg.comp_bt_preStim(2) - phaseCfg.comp_bt_preStim(1)).*rand(1,1)));
     
     % preStimulus period, with fixation if desired
     if length(phaseCfg.comp_bt_preStim) == 1
@@ -1288,16 +1265,6 @@ if runWi
       Screen('Flip',w);
       WaitSecs(phaseCfg.comp_wi_isi);
     end
-    
-    % TODO - remove commented
-    
-    % % draw fixation
-    % Screen('TextSize', w, cfg.text.fixSize);
-    % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    % [preStimFixOn] = Screen('Flip',w);
-    
-    % % fixation on screen before stim1 for a random amount of time
-    % WaitSecs(phaseCfg.comp_wi_preStim(1) + ((phaseCfg.comp_wi_preStim(2) - phaseCfg.comp_wi_preStim(1)).*rand(1,1)));
     
     % preStimulus period, with fixation if desired
     if length(phaseCfg.comp_wi_preStim) == 1

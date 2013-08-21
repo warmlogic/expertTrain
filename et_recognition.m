@@ -369,18 +369,6 @@ for b = 1:phaseCfg.nBlocks
         WaitSecs(phaseCfg.recog_study_isi);
       end
       
-      % TODO - remove commented
-      
-      % % draw fixation
-      % Screen('TextSize', w, cfg.text.fixSize);
-      % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-      % [study_preStimFixOn{b}(i)] = Screen('Flip',w);
-      
-      % % fixation on screen before starting trial
-      % if phaseCfg.recog_study_preTarg > 0
-      %   WaitSecs(phaseCfg.recog_study_preTarg);
-      % end
-      
       % preStimulus period, with fixation if desired
       if length(phaseCfg.recog_study_preTarg) == 1
         if phaseCfg.recog_study_preTarg > 0
@@ -694,18 +682,6 @@ for b = 1:phaseCfg.nBlocks
       end
       WaitSecs(phaseCfg.recog_test_isi);
     end
-    
-    % TODO - remove commented
-    
-    % % draw fixation
-    % Screen('TextSize', w, cfg.text.fixSize);
-    % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    % [test_preStimFixOn{b}(i)] = Screen('Flip',w);
-    
-    % % fixation on screen before starting trial
-    % if phaseCfg.recog_test_preStim > 0
-    %   WaitSecs(phaseCfg.recog_test_preStim);
-    % end
     
     % preStimulus period, with fixation if desired
     if length(phaseCfg.recog_test_preStim) == 1

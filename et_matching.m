@@ -409,13 +409,6 @@ for i = trialNum:length(stim2)
     WaitSecs(phaseCfg.match_isi);
   end
   
-  % TODO - remove commented
-  
-  % % draw fixation
-  % Screen('TextSize', w, cfg.text.fixSize);
-  % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  % [preStim1FixOn] = Screen('Flip',w);
-  
   % preStimulus period, with fixation if desired
   if length(phaseCfg.match_preStim1) == 1
     if phaseCfg.match_preStim1 > 0
@@ -468,16 +461,6 @@ for i = trialNum:length(stim2)
     % overload of the machine at elevated Priority():
     WaitSecs(0.0001);
   end
-  
-  % TODO - remove commented
-  
-  % % draw fixation
-  % Screen('TextSize', w, cfg.text.fixSize);
-  % DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-  % [preStim2FixOn] = Screen('Flip',w);
-  
-  % % fixation on screen before stim2 for a random amount of time
-  % WaitSecs(phaseCfg.match_preStim2(1) + ((phaseCfg.match_preStim2(2) - phaseCfg.match_preStim2(1)).*rand(1,1)));
   
   % preStimulus period, with fixation if desired
   if length(phaseCfg.match_preStim2) == 1
