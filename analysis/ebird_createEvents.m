@@ -11,6 +11,8 @@ sesDir = sprintf('session_%d',sesNum);
 commentStyle = '!!!';
 oldNewFormatMaxCheck = 10;
 
+% the delay changed part-way through initial subject testing of EBIRD, so
+% denote which subjects are which
 subjectsWithMatchDelay = {'EBIRD049','EBIRD002','EBIRD003','EBIRD004','EBIRD005'};
 matchDelay = 800;
 subjectsWithNameDelay = {'EBIRD049','EBIRD002','EBIRD003'};
@@ -27,6 +29,8 @@ switch phaseName
     %logFile = fullfile(dataroot,subject,sesDir,'session.txt');
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_match_%d.txt',sesName,phaseName,phaseCount));
     
+    % the log file format changed part-way through initial subject testing
+    % of EBIRD, so figure out which log file format to use
     oldFormatStr = '%.6f%s%s%s%d%s%d%s%s%s%s%s%d%d%d';
     newFormatStr = '%.6f%s%s%s%d%d%s%d%s%s%s%s%s%d%d%d';
     formatStr = '';

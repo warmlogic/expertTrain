@@ -31,15 +31,6 @@ function [cfg,expParam] = et_compare(w,cfg,expParam,logFile,sesName,phaseName,ph
 %  to find the corresponding pair member, search for the same compPairNum
 %  and the opposite compStimNum (1 or 2).
 
-% % durations, in seconds
-% cfg.stim.(sesName).(phaseName).comp_isi = 0.0;
-% cfg.stim.(sesName).(phaseName).comp_stim1 = 0.8;
-% cfg.stim.(sesName).(phaseName).comp_stim2 = 0.8;
-% % random intervals are generated on the fly
-% cfg.stim.(sesName).(phaseName).comp_preStim1 = [0.5 0.7];
-% cfg.stim.(sesName).(phaseName).comp_preStim2 = [1.0 1.2];
-% cfg.stim.(sesName).(phaseName).comp_response = 2.0;
-
 % % keys
 % cfg.keys.compareKeyNames, encoded as:
 % cfg.keys.c01
