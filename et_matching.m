@@ -121,6 +121,20 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
+% default is to preload the images
+if ~isfield(cfg.stim,'preloadImages')
+  cfg.stim.preloadImages = true;
+end
+
+% set the basic and subordinate family numbers
+if phaseCfg.isExp
+  famNumSubord = cfg.stim.famNumSubord;
+  famNumBasic = cfg.stim.famNumBasic;
+else
+  famNumSubord = cfg.stim.practice.famNumSubord;
+  famNumBasic = cfg.stim.practice.famNumBasic;
+end
+
 % set feedback text
 correctFeedback = 'Correct!';
 incorrectFeedback = 'Incorrect!';
@@ -200,10 +214,12 @@ end
 matchStim1Tex = nan(1,length(stim2));
 matchStim2Tex = nan(1,length(stim2));
 
-message = sprintf('Preparing images, please wait...');
-Screen('TextSize', w, cfg.text.basicTextSize);
-% put the "preparing" message on the screen
-DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+if cfg.stim.preloadImages
+  message = sprintf('Preparing images, please wait...');
+  Screen('TextSize', w, cfg.text.basicTextSize);
+  % put the "preparing" message on the screen
+  DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+end
 % Update the display to show the message:
 Screen('Flip', w);
 
@@ -229,24 +245,33 @@ for i = 1:length(stim2)
       ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
   end
   
-  % load up stim2's texture
+  % make sure stim2 exists
   stim2ImgFile = fullfile(stimDir,stim2(i).familyStr,stim2(i).fileName);
   if exist(stim2ImgFile,'file')
-    stim2Img = imread(stim2ImgFile);
-    matchStim2Tex(i) = Screen('MakeTexture',w,stim2Img);
-    % TODO: optimized?
-    %matchStim2Tex(i) = Screen('MakeTexture',w,stim2Img,[],1);
+    if cfg.stim.preloadImages
+      % load up stim2's texture
+      stim2Img = imread(stim2ImgFile);
+      matchStim2Tex(i) = Screen('MakeTexture',w,stim2Img);
+      % TODO: optimized?
+      %matchStim2Tex(i) = Screen('MakeTexture',w,stim2Img,[],1);
+    end
   else
     error('Study stimulus %s does not exist!',stim2ImgFile);
   end
   
-  % load up stim1's texture
+  % make sure stim1 exists
   stim1ImgFile = fullfile(stimDir,stim1(i).familyStr,stim1(i).fileName);
   if exist(stim1ImgFile,'file')
-    stim1Img = imread(stim1ImgFile);
-    matchStim1Tex(i) = Screen('MakeTexture',w,stim1Img);
-    % TODO: optimized?
-    %matchStim1Tex(i) = Screen('MakeTexture',w,stim1Img,[],1);
+    if cfg.stim.preloadImages
+      % load up stim1's texture
+      stim1Img = imread(stim1ImgFile);
+      matchStim1Tex(i) = Screen('MakeTexture',w,stim1Img);
+      % TODO: optimized?
+      %matchStim1Tex(i) = Screen('MakeTexture',w,stim1Img,[],1);
+    elseif ~cfg.stim.preloadImages && i == length(stim2)
+      % still need to load the last image to set the rectangle
+      stim1Img = imread(fullfile(stimDir,stim1(i).familyStr,stim1(i).fileName));
+    end
   else
     error('Study stimulus %s does not exist!',stim1ImgFile);
   end
@@ -375,15 +400,16 @@ for i = trialNum:length(stim2)
     blinkTimerStart = GetSecs;
   end
   
+  % load the stimuli now if we didn't load them earlier
+  if ~cfg.stim.preloadImages
+    stim1Img = imread(fullfile(stimDir,stim1(i).familyStr,stim1(i).fileName));
+    stim2Img = imread(fullfile(stimDir,stim2(i).familyStr,stim2(i).fileName));
+    matchStim1Tex(i) = Screen('MakeTexture',w,stim1Img);
+    matchStim2Tex(i) = Screen('MakeTexture',w,stim2Img);
+  end
+  
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if phaseCfg.isExp
-    famNumSubord = cfg.stim.famNumSubord;
-    famNumBasic = cfg.stim.famNumBasic;
-  else
-    famNumSubord = cfg.stim.practice.famNumSubord;
-    famNumBasic = cfg.stim.practice.famNumBasic;
-  end
   if any(stim2(i).familyNum == famNumSubord)
     isSubord = true;
     specNum1 = int32(stim1(i).speciesNum);

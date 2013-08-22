@@ -109,6 +109,11 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
+% default is to preload the images
+if ~isfield(cfg.stim,'preloadImages')
+  cfg.stim.preloadImages = true;
+end
+
 % default is to not print out trial details
 if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
   cfg.text.printTrialInfo = false;
@@ -224,10 +229,12 @@ if runView
   
   viewStims = expParam.session.(sesName).(phaseName)(phaseCount).viewStims;
   
-  message = sprintf('Preparing part 1 images, please wait...');
-  Screen('TextSize', w, cfg.text.basicTextSize);
-  % put the instructions on the screen
-  DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+  if cfg.stim.preloadImages
+    message = sprintf('Preparing part 1 images, please wait...');
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    % put the instructions on the screen
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+  end
   % Update the display to show the message:
   Screen('Flip', w);
   
@@ -235,13 +242,19 @@ if runView
   vStimTex = nan(1,length(viewStims));
   
   for i = 1:length(viewStims)
-    % load up this stim's texture
+    % make sure this stimulus exists
     vStimImgFile = fullfile(stimDir,viewStims(i).familyStr,viewStims(i).fileName);
     if exist(vStimImgFile,'file')
-      vStimImg = imread(vStimImgFile);
-      vStimTex(i) = Screen('MakeTexture',w,vStimImg);
-      % TODO: optimized?
-      %vStimTex(i) = Screen('MakeTexture',w,vStimImg,[],1);
+      if cfg.stim.preloadImages
+        % load up this stim's texture
+        vStimImg = imread(vStimImgFile);
+        vStimTex(i) = Screen('MakeTexture',w,vStimImg);
+        % TODO: optimized?
+        %vStimTex(i) = Screen('MakeTexture',w,vStimImg,[],1);
+      elseif ~cfg.stim.preloadImages && i == length(viewStims)
+        % still need to load the last image to set the rectangle
+        vStimImg = imread(fullfile(stimDir,viewStims(i).familyStr,viewStims(i).fileName));
+      end
     else
       error('Study stimulus %s does not exist!',vStimImgFile);
     end
@@ -311,6 +324,12 @@ if runView
       WaitSecs(0.5);
       % reset the timer
       blinkTimerStart = GetSecs;
+    end
+    
+    % load the stimulus now if we didn't load it earlier
+    if ~cfg.stim.preloadImages
+      vStimImg = imread(fullfile(stimDir,viewStims(i).familyStr,viewStims(i).fileName));
+      vStimTex(i) = Screen('MakeTexture',w,vStimImg);
     end
     
     % resynchronize netstation before the start of drawing
@@ -524,10 +543,12 @@ if runBt
   btStim1Tex = nan(1,length(btStim2));
   btStim2Tex = nan(1,length(btStim2));
   
-  message = sprintf('Preparing part 2 images, please wait...');
-  Screen('TextSize', w, cfg.text.basicTextSize);
-  % put the "preparing" message on the screen
-  DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+  if cfg.stim.preloadImages
+    message = sprintf('Preparing part 2 images, please wait...');
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    % put the "preparing" message on the screen
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+  end
   % Update the display to show the message:
   Screen('Flip', w);
   
@@ -537,24 +558,33 @@ if runBt
       ([btSpeciesStims.compPairNum] == btStim2(i).compPairNum) &...
       ([btSpeciesStims.compStimNum] ~= btStim2(i).compStimNum));
     
-    % load up btStim2's texture
+    % make sure btStim2 exists
     btStim2ImgFile = fullfile(stimDir,btStim2(i).familyStr,btStim2(i).fileName);
     if exist(btStim2ImgFile,'file')
-      btStim2Img = imread(btStim2ImgFile);
-      btStim2Tex(i) = Screen('MakeTexture',w,btStim2Img);
-      % TODO: optimized?
-      %btStim2Tex(i) = Screen('MakeTexture',w,btStim2Img,[],1);
+      if cfg.stim.preloadImages
+        % load up btStim2's texture
+        btStim2Img = imread(btStim2ImgFile);
+        btStim2Tex(i) = Screen('MakeTexture',w,btStim2Img);
+        % TODO: optimized?
+        %btStim2Tex(i) = Screen('MakeTexture',w,btStim2Img,[],1);
+      end
     else
       error('Study stimulus %s does not exist!',btStim2ImgFile);
     end
     
-    % load up btStim1's texture
+    % make sure btStim1 exists
     btStim1ImgFile = fullfile(stimDir,btStim1(i).familyStr,btStim1(i).fileName);
     if exist(btStim1ImgFile,'file')
-      btStim1Img = imread(btStim1ImgFile);
-      btStim1Tex(i) = Screen('MakeTexture',w,btStim1Img);
-      % TODO: optimized?
-      %btStim1Tex(i) = Screen('MakeTexture',w,btStim1Img,[],1);
+      if cfg.stim.preloadImages
+        % load up btStim1's texture
+        btStim1Img = imread(btStim1ImgFile);
+        btStim1Tex(i) = Screen('MakeTexture',w,btStim1Img);
+        % TODO: optimized?
+        %btStim1Tex(i) = Screen('MakeTexture',w,btStim1Img,[],1);
+      elseif ~cfg.stim.preloadImages && i == length(btStim2)
+        % still need to load the last image to set the rectangle
+        btStim1Img = imread(fullfile(stimDir,btStim1(i).familyStr,btStim1(i).fileName));
+      end
     else
       error('Study stimulus %s does not exist!',btStim1ImgFile);
     end
@@ -643,6 +673,14 @@ if runBt
       WaitSecs(0.5);
       % reset the timer
       blinkTimerStart = GetSecs;
+    end
+    
+    % load the stimuli now if we didn't load them earlier
+    if ~cfg.stim.preloadImages
+      btStim1Img = imread(fullfile(stimDir,btStim1(i).familyStr,btStim1(i).fileName));
+      btStim2Img = imread(fullfile(stimDir,btStim2(i).familyStr,btStim2(i).fileName));
+      btStim1Tex(i) = Screen('MakeTexture',w,btStim1Img);
+      btStim2Tex(i) = Screen('MakeTexture',w,btStim2Img);
     end
     
     % resynchronize netstation before the start of drawing
@@ -1132,10 +1170,12 @@ if runWi
   wiStim1Tex = nan(1,length(wiStim2));
   wiStim2Tex = nan(1,length(wiStim2));
   
-  message = sprintf('Preparing part 3 images, please wait...');
-  Screen('TextSize', w, cfg.text.basicTextSize);
-  % put the "preparing" message on the screen
-  DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+  if cfg.stim.preloadImages
+    message = sprintf('Preparing part 3 images, please wait...');
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    % put the "preparing" message on the screen
+    DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+  end
   % Update the display to show the message:
   Screen('Flip', w);
   
@@ -1145,24 +1185,33 @@ if runWi
       ([wiSpeciesStims.compPairNum] == wiStim2(i).compPairNum) &...
       ([wiSpeciesStims.compStimNum] ~= wiStim2(i).compStimNum));
     
-    % load up wiStim2's texture
+    % make sure wiStim2 exists
     wiStim2ImgFile = fullfile(stimDir,wiStim2(i).familyStr,wiStim2(i).fileName);
     if exist(wiStim2ImgFile,'file')
-      wiStim2Img = imread(wiStim2ImgFile);
-      wiStim2Tex(i) = Screen('MakeTexture',w,wiStim2Img);
-      % TODO: optimized?
-      %wiStim2Tex(i) = Screen('MakeTexture',w,wiStim2Img,[],1);
+      if cfg.stim.preloadImages
+        % load up wiStim2's texture
+        wiStim2Img = imread(wiStim2ImgFile);
+        wiStim2Tex(i) = Screen('MakeTexture',w,wiStim2Img);
+        % TODO: optimized?
+        %wiStim2Tex(i) = Screen('MakeTexture',w,wiStim2Img,[],1);
+      end
     else
       error('Study stimulus %s does not exist!',wiStim2ImgFile);
     end
     
-    % load up wiStim1's texture
+    % make sure wiStim1 exists
     wiStim1ImgFile = fullfile(stimDir,wiStim1(i).familyStr,wiStim1(i).fileName);
     if exist(wiStim1ImgFile,'file')
-      wiStim1Img = imread(wiStim1ImgFile);
-      wiStim1Tex(i) = Screen('MakeTexture',w,wiStim1Img);
-      % TODO: optimized?
-      %wiStim1Tex(i) = Screen('MakeTexture',w,wiStim1Img,[],1);
+      if cfg.stim.preloadImages
+        % load up wiStim1's texture
+        wiStim1Img = imread(wiStim1ImgFile);
+        wiStim1Tex(i) = Screen('MakeTexture',w,wiStim1Img);
+        % TODO: optimized?
+        %wiStim1Tex(i) = Screen('MakeTexture',w,wiStim1Img,[],1);
+      elseif ~cfg.stim.preloadImages && i == length(wiStim2)
+        % still need to load the last image to set the rectangle
+        wiStim1Img = imread(fullfile(stimDir,wiStim1(i).familyStr,wiStim1(i).fileName));
+      end
     else
       error('Study stimulus %s does not exist!',wiStim1ImgFile);
     end
@@ -1251,6 +1300,14 @@ if runWi
       WaitSecs(0.5);
       % reset the timer
       blinkTimerStart = GetSecs;
+    end
+    
+    % load the stimuli now if we didn't load them earlier
+    if ~cfg.stim.preloadImages
+      wiStim1Img = imread(fullfile(stimDir,wiStim1(i).familyStr,wiStim1(i).fileName));
+      wiStim2Img = imread(fullfile(stimDir,wiStim2(i).familyStr,wiStim2(i).fileName));
+      wiStim1Tex(i) = Screen('MakeTexture',w,wiStim1Img);
+      wiStim2Tex(i) = Screen('MakeTexture',w,wiStim2Img);
     end
     
     % resynchronize netstation before the start of drawing

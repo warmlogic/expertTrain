@@ -103,6 +103,20 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
+% default is to preload the images
+if ~isfield(cfg.stim,'preloadImages')
+  cfg.stim.preloadImages = true;
+end
+
+% set the basic and subordinate family numbers
+if phaseCfg.isExp
+  famNumSubord = cfg.stim.famNumSubord;
+  famNumBasic = cfg.stim.famNumBasic;
+else
+  famNumSubord = cfg.stim.practice.famNumSubord;
+  famNumBasic = cfg.stim.practice.famNumBasic;
+end
+
 % read the proper response key image
 respKeyImg = imread(cfg.files.recogTestRespKeyImg);
 respKeyImgHeight = size(respKeyImg,1) * cfg.files.recogTestRespKeyImgScale;
@@ -250,13 +264,19 @@ for b = 1:phaseCfg.nBlocks
     % load up the stimuli for this block
     blockStudyStimTex = nan(1,length(targStims{b}));
     for i = 1:length(targStims{b})
-      % this image
+      % make sure this stimulus exists
       stimImgFile = fullfile(stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName);
       if exist(stimImgFile,'file')
-        stimImg = imread(stimImgFile);
-        blockStudyStimTex(i) = Screen('MakeTexture',w,stimImg);
-        % TODO: optimized?
-        %blockStudyStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
+        if cfg.stim.preloadImages
+          % load up this stim's texture
+          stimImg = imread(stimImgFile);
+          blockStudyStimTex(i) = Screen('MakeTexture',w,stimImg);
+          % TODO: optimized?
+          %blockStudyStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
+        elseif ~cfg.stim.preloadImages && i == length(targStims{b})
+          % still need to load the last image to set the rectangle
+          stimImg = imread(fullfile(stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName));
+        end
       else
         error('Study stimulus %s does not exist!',stimImgFile);
       end
@@ -337,15 +357,14 @@ for b = 1:phaseCfg.nBlocks
         blinkTimerStart = GetSecs;
       end
       
+      % load the stimulus now if we didn't load it earlier
+      if ~cfg.stim.preloadImages
+        stimImg = imread(fullfile(stimDir,targStims{b}(i).familyStr,targStims{b}(i).fileName));
+        blockStudyStimTex(i) = Screen('MakeTexture',w,stimImg);
+      end
+      
       % Is this a subordinate (1) or basic (0) family/species? If subordinate,
       % get the species number.
-      if phaseCfg.isExp
-        famNumSubord = cfg.stim.famNumSubord;
-        famNumBasic = cfg.stim.famNumBasic;
-      else
-        famNumSubord = cfg.stim.practice.famNumSubord;
-        famNumBasic = cfg.stim.practice.famNumBasic;
-      end
       if any(targStims{b}(i).familyNum == famNumSubord)
         isSubord = true;
         specNum = int32(targStims{b}(i).speciesNum);
@@ -577,13 +596,19 @@ for b = 1:phaseCfg.nBlocks
   % load up the stimuli for this block
   blockTestStimTex = nan(1,length(allStims{b}));
   for i = 1:length(allStims{b})
-    % this image
+    % make sure this stimulus exists
     stimImgFile = fullfile(stimDir,allStims{b}(i).familyStr,allStims{b}(i).fileName);
     if exist(stimImgFile,'file')
-      stimImg = imread(stimImgFile);
-      blockTestStimTex(i) = Screen('MakeTexture',w,stimImg);
-      % TODO: optimized?
-      %blockTestStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
+      if cfg.stim.preloadImages
+        % load up this stim's texture
+        stimImg = imread(stimImgFile);
+        blockTestStimTex(i) = Screen('MakeTexture',w,stimImg);
+        % TODO: optimized?
+        %blockTestStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
+      elseif ~cfg.stim.preloadImages && i == length(allStims{b})
+        % still need to load the last image to set the rectangle
+        stimImg = imread(fullfile(stimDir,allStims{b}(i).familyStr,allStims{b}(i).fileName));
+      end
     else
       error('Test stimulus %s does not exist!',stimImgFile);
     end
@@ -651,15 +676,14 @@ for b = 1:phaseCfg.nBlocks
       blinkTimerStart = GetSecs;
     end
     
+    % load the stimulus now if we didn't load it earlier
+    if ~cfg.stim.preloadImages
+      stimImg = imread(fullfile(stimDir,allStims{b}(i).familyStr,allStims{b}(i).fileName));
+      blockTestStimTex(i) = Screen('MakeTexture',w,stimImg);
+    end
+    
     % Is this a subordinate (1) or basic (0) family/species? If subordinate,
     % get the species number.
-    if phaseCfg.isExp
-      famNumSubord = cfg.stim.practice.famNumSubord;
-      famNumBasic = cfg.stim.practice.famNumBasic;
-    else
-      famNumSubord = cfg.stim.practice.famNumSubord;
-      famNumBasic = cfg.stim.practice.famNumBasic;
-    end
     if any(allStims{b}(i).familyNum == famNumSubord)
       isSubord = true;
       specNum = allStims{b}(i).speciesNum;

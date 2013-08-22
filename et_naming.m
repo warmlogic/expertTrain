@@ -122,6 +122,20 @@ else
   stimDir = cfg.files.stimDir_prac;
 end
 
+% default is to preload the images
+if ~isfield(cfg.stim,'preloadImages')
+  cfg.stim.preloadImages = true;
+end
+
+% set the basic and subordinate family numbers
+if phaseCfg.isExp
+  famNumSubord = cfg.stim.famNumSubord;
+  famNumBasic = cfg.stim.famNumBasic;
+else
+  famNumSubord = cfg.stim.practice.famNumSubord;
+  famNumBasic = cfg.stim.practice.famNumBasic;
+end
+
 % set text color for species numbers
 initial_sNumColor = uint8((rgb('Black') * 255) + 0.5);
 correct_sNumColor = uint8((rgb('Green') * 255) + 0.5);
@@ -177,10 +191,12 @@ end
 
 %% preload all stimuli for presentation
 
-message = sprintf('Preparing images, please wait...');
-Screen('TextSize', w, cfg.text.basicTextSize);
-% put the "preparing" message on the screen
-DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+if cfg.stim.preloadImages
+  message = sprintf('Preparing images, please wait...');
+  Screen('TextSize', w, cfg.text.basicTextSize);
+  % put the "preparing" message on the screen
+  DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+end
 % Update the display to show the message:
 Screen('Flip', w);
 
@@ -188,13 +204,19 @@ Screen('Flip', w);
 nameStimTex = nan(1,length(nameStims));
 
 for i = 1:length(nameStims)
-  % load up this stim's texture
+  % make sure this stimulus exists
   stimImgFile = fullfile(stimDir,nameStims(i).familyStr,nameStims(i).fileName);
   if exist(stimImgFile,'file')
-    stimImg = imread(stimImgFile);
-    nameStimTex(i) = Screen('MakeTexture',w,stimImg);
-    % TODO: optimized?
-    %nameStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
+    if cfg.stim.preloadImages
+      % load up this stim's texture
+      stimImg = imread(stimImgFile);
+      nameStimTex(i) = Screen('MakeTexture',w,stimImg);
+      % TODO: optimized?
+      %nameStimTex(i) = Screen('MakeTexture',w,stimImg,[],1);
+    elseif ~cfg.stim.preloadImages && i == length(nameStims)
+      % still need to load the last image to set the rectangle
+      stimImg = imread(fullfile(stimDir,nameStims(i).familyStr,nameStims(i).fileName));
+    end
   else
     error('Study stimulus %s does not exist!',stimImgFile);
   end
@@ -391,15 +413,14 @@ for i = trialNum:length(nameStims)
     blinkTimerStart = GetSecs;
   end
   
+  % load the stimulus now if we didn't load it earlier
+  if ~cfg.stim.preloadImages
+    stimImg = imread(fullfile(stimDir,nameStims(i).familyStr,nameStims(i).fileName));
+    nameStimTex(i) = Screen('MakeTexture',w,stimImg);
+  end
+
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
-  if phaseCfg.isExp
-    famNumSubord = cfg.stim.famNumSubord;
-    famNumBasic = cfg.stim.famNumBasic;
-  else
-    famNumSubord = cfg.stim.practice.famNumSubord;
-    famNumBasic = cfg.stim.practice.famNumBasic;
-  end
   if any(nameStims(i).familyNum == famNumSubord)
     isSubord = true;
     specNum = int32(nameStims(i).speciesNum);
