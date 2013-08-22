@@ -36,7 +36,7 @@ correctVol = 0.4;
 incorrectVol = 0.6;
 
 % whether to print trial details to the command window
-cfg.text.printTrialInfo = true;
+cfg.text.printTrialInfo = false;
 
 %% Experiment session information
 
@@ -104,6 +104,10 @@ if expParam.sessionNum == 1
   
   %% Stimulus parameters
   
+  % whether to preload images; if true, could use a lot of memory
+  cfg.stim.preloadImages = true;
+  
+  % the file extension for your images
   cfg.files.stimFileExt = '.bmp';
   
   % scale stimlus down (< 1) or up (> 1)
