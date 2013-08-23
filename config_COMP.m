@@ -253,6 +253,10 @@ if expParam.sessionNum == 1
   % text for when they push multiple keys
   cfg.text.multiKeyText = 'Do not press multiple keys!\nRelease all keys except your response,\nthen release your response.';
   
+  % response text at bottom of screen
+  cfg.text.respReminder = true;
+  cfg.text.respReminderText = '1=least similar, 5=most similar';
+  
   %% Session/phase configuration
   
   %% pretest configuration
