@@ -149,6 +149,12 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
+if ~isfield(phaseCfg,'respReminder')
+  phaseCfg.respReminder = true;
+end
+respReminderText = '1=least similar, 5=most similar';
+respReminderY = cfg.screen.wRect(RectBottom) - (cfg.screen.wRect(RectBottom) * 0.05);
+
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
@@ -307,7 +313,7 @@ if runView
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
       
-      if phaseCfg.comp_view_isi > 0 && phaseCfg.fixDuringISI
+      if (phaseCfg.comp_view_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_view_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       end
@@ -356,7 +362,7 @@ if runView
         WaitSecs(phaseCfg.comp_view_preStim);
       end
     elseif length(phaseCfg.comp_view_preStim) == 2
-      if length(find(phaseCfg.comp_view_preStim == 0)) ~= 2
+      if ~all(phaseCfg.comp_view_preStim == 0)
         if phaseCfg.fixDuringPreStim
           % draw fixation
           Screen('TextSize', w, cfg.text.fixSize);
@@ -395,7 +401,7 @@ if runView
     end
     
     % Clear screen to background color, with fixation if desired
-    if phaseCfg.comp_view_isi > 0 && phaseCfg.fixDuringISI
+    if (phaseCfg.comp_view_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_view_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
@@ -656,9 +662,13 @@ if runBt
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.c01, cfg.keys.c02, cfg.keys.c03, cfg.keys.c04, cfg.keys.c05]);
       
-      if phaseCfg.comp_bt_isi > 0 && phaseCfg.fixDuringISI
+      if (phaseCfg.comp_bt_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_bt_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
       end
       Screen('Flip',w);
       WaitSecs(0.5);
@@ -681,13 +691,23 @@ if runBt
     
     % ISI between trials
     if phaseCfg.comp_bt_isi > 0
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      if phaseCfg.fixDuringISI
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
       Screen('Flip',w);
       WaitSecs(phaseCfg.comp_bt_isi);
     end
     
     % preStimulus period, with fixation if desired
+    if phaseCfg.respReminder
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+    end
     if length(phaseCfg.comp_bt_preStim) == 1
       if phaseCfg.comp_bt_preStim > 0
         if phaseCfg.fixDuringPreStim
@@ -702,7 +722,7 @@ if runBt
         WaitSecs(phaseCfg.comp_bt_preStim);
       end
     elseif length(phaseCfg.comp_bt_preStim) == 2
-      if length(find(phaseCfg.comp_bt_preStim == 0)) ~= 2
+      if ~all(phaseCfg.comp_bt_preStim == 0)
         if phaseCfg.fixDuringPreStim
           % draw fixation
           Screen('TextSize', w, cfg.text.fixSize);
@@ -724,6 +744,10 @@ if runBt
       % and fixation
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    end
+    if phaseCfg.respReminder
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
     end
     
     % Show stimulus on screen at next possible display refresh cycle,
@@ -754,6 +778,10 @@ if runBt
           % and the "too fast" text
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          if phaseCfg.respReminder
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+          end
           Screen('Flip', w);
           
           keyIsDown = 0;
@@ -794,6 +822,10 @@ if runBt
           % don't push multiple keys
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          if phaseCfg.respReminder
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+          end
           % put them on the screen
           Screen('Flip', w);
           
@@ -827,6 +859,10 @@ if runBt
       % draw response prompt
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
       [respPromptOn, startRT] = Screen('Flip',w);
       
       % poll for a resp
@@ -861,6 +897,10 @@ if runBt
           % don't push multiple keys
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          if phaseCfg.respReminder
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+          end
           % put them on the screen
           Screen('Flip', w);
           
@@ -910,6 +950,10 @@ if runBt
       end
       Screen('TextSize', w, cfg.text.instructTextSize);
       DrawFormattedText(w,message,'center','center',feedbackColor, cfg.text.instructCharWidth);
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
       Screen('Flip', w);
       % wait to let them view the feedback
       WaitSecs(feedbackTime);
@@ -928,12 +972,16 @@ if runBt
       respKey = 'none';
     end
     
-    if phaseCfg.comp_bt_isi > 0 && phaseCfg.fixDuringISI
+    if (phaseCfg.comp_bt_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_bt_isi == 0 && phaseCfg.fixDuringPreStim)
       % draw fixation after response
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
     
+    if phaseCfg.respReminder
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+    end
     % clear the screen
     Screen('Flip', w);
     
@@ -1283,9 +1331,13 @@ if runWi
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.c01, cfg.keys.c02, cfg.keys.c03, cfg.keys.c04, cfg.keys.c05]);
       
-      if phaseCfg.comp_wi_isi > 0 && phaseCfg.fixDuringISI
+      if (phaseCfg.comp_wi_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_wi_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
       end
       Screen('Flip',w);
       WaitSecs(0.5);
@@ -1308,13 +1360,23 @@ if runWi
     
     % ISI between trials
     if phaseCfg.comp_wi_isi > 0
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      if phaseCfg.fixDuringISI
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
       Screen('Flip',w);
       WaitSecs(phaseCfg.comp_wi_isi);
     end
     
     % preStimulus period, with fixation if desired
+    if phaseCfg.respReminder
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+    end
     if length(phaseCfg.comp_wi_preStim) == 1
       if phaseCfg.comp_wi_preStim > 0
         if phaseCfg.fixDuringPreStim
@@ -1329,7 +1391,7 @@ if runWi
         WaitSecs(phaseCfg.comp_wi_preStim);
       end
     elseif length(phaseCfg.comp_wi_preStim) == 2
-      if length(find(phaseCfg.comp_wi_preStim == 0)) ~= 2
+      if ~all(phaseCfg.comp_wi_preStim == 0)
         if phaseCfg.fixDuringPreStim
           % draw fixation
           Screen('TextSize', w, cfg.text.fixSize);
@@ -1351,6 +1413,10 @@ if runWi
       % and fixation
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    end
+    if phaseCfg.respReminder
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
     end
     
     % Show stimulus on screen at next possible display refresh cycle,
@@ -1381,6 +1447,10 @@ if runWi
           % and the "too fast" text
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          if phaseCfg.respReminder
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+          end
           Screen('Flip', w);
           
           keyIsDown = 0;
@@ -1421,6 +1491,10 @@ if runWi
           % don't push multiple keys
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          if phaseCfg.respReminder
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+          end
           % put them on the screen
           Screen('Flip', w);
           
@@ -1454,6 +1528,10 @@ if runWi
       % draw response prompt
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
       [respPromptOn, startRT] = Screen('Flip',w);
       
       % poll for a resp
@@ -1488,6 +1566,10 @@ if runWi
           % don't push multiple keys
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          if phaseCfg.respReminder
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+          end
           % put them on the screen
           Screen('Flip', w);
           
@@ -1537,6 +1619,10 @@ if runWi
       end
       Screen('TextSize', w, cfg.text.instructTextSize);
       DrawFormattedText(w,message,'center','center',feedbackColor, cfg.text.instructCharWidth);
+      if phaseCfg.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
       Screen('Flip', w);
       % wait to let them view the feedback
       WaitSecs(feedbackTime);
@@ -1555,10 +1641,15 @@ if runWi
       respKey = 'none';
     end
     
-    if phaseCfg.comp_wi_isi > 0 && phaseCfg.fixDuringISI
+    if (phaseCfg.comp_wi_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_wi_isi == 0 && phaseCfg.fixDuringPreStim)
       % draw fixation after response
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    end
+    
+    if phaseCfg.respReminder
+      Screen('TextSize', w, cfg.text.instructTextSize);
+      DrawFormattedText(w, respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
     end
     
     % clear the screen
