@@ -390,7 +390,7 @@ for i = trialNum:length(stim2)
     % only check these keys
     RestrictKeysForKbCheck([cfg.keys.matchSame, cfg.keys.matchDiff]);
     
-    if phaseCfg.match_isi > 0 && phaseCfg.fixDuringISI
+    if (phaseCfg.match_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.match_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
@@ -450,7 +450,7 @@ for i = trialNum:length(stim2)
       WaitSecs(phaseCfg.match_preStim1);
     end
   elseif length(phaseCfg.match_preStim1) == 2
-    if length(find(phaseCfg.match_preStim1 == 0)) ~= 2
+    if ~all(phaseCfg.match_preStim1 == 0)
       if phaseCfg.fixDuringPreStim
         % draw fixation
         Screen('TextSize', w, cfg.text.fixSize);
@@ -503,7 +503,7 @@ for i = trialNum:length(stim2)
       WaitSecs(phaseCfg.match_preStim2);
     end
   elseif length(phaseCfg.match_preStim2) == 2
-    if length(find(phaseCfg.match_preStim2 == 0)) ~= 2
+    if ~all(phaseCfg.match_preStim2 == 0)
       if phaseCfg.fixDuringPreStim
         % draw fixation
         Screen('TextSize', w, cfg.text.fixSize);
@@ -784,7 +784,7 @@ for i = trialNum:length(stim2)
     respKey = 'none';
   end
   
-  if phaseCfg.match_isi > 0 && phaseCfg.fixDuringISI
+  if (phaseCfg.match_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.match_isi == 0 && phaseCfg.fixDuringPreStim)
     % draw fixation after response
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);

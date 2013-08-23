@@ -347,7 +347,7 @@ for b = 1:phaseCfg.nBlocks
         fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
         fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
         
-        if phaseCfg.recog_study_isi > 0 && phaseCfg.fixDuringISI
+        if (phaseCfg.recog_study_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.recog_study_isi == 0 && phaseCfg.fixDuringPreStim)
           Screen('TextSize', w, cfg.text.fixSize);
           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         end
@@ -403,7 +403,7 @@ for b = 1:phaseCfg.nBlocks
           WaitSecs(phaseCfg.recog_study_preTarg);
         end
       elseif length(phaseCfg.recog_study_preTarg) == 2
-        if length(find(phaseCfg.recog_study_preTarg == 0)) ~= 2
+        if ~all(phaseCfg.recog_study_preTarg == 0)
           if phaseCfg.fixDuringPreStim
             % draw fixation
             Screen('TextSize', w, cfg.text.fixSize);
@@ -442,7 +442,7 @@ for b = 1:phaseCfg.nBlocks
         WaitSecs(0.0001);
       end
       
-      if phaseCfg.recog_study_isi > 0 && phaseCfg.fixDuringISI
+      if (phaseCfg.recog_study_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.recog_study_isi == 0 && phaseCfg.fixDuringPreStim)
         % draw fixation
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -666,7 +666,7 @@ for b = 1:phaseCfg.nBlocks
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.recogDefUn, cfg.keys.recogMayUn, cfg.keys.recogMayF, cfg.keys.recogDefF, cfg.keys.recogRecoll]);
       
-      if phaseCfg.recog_test_isi > 0 && phaseCfg.fixDuringISI
+      if (phaseCfg.recog_test_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.recog_test_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       end
@@ -722,7 +722,7 @@ for b = 1:phaseCfg.nBlocks
         WaitSecs(phaseCfg.recog_test_preStim);
       end
     elseif length(phaseCfg.recog_test_preStim) == 2
-      if length(find(phaseCfg.recog_test_preStim == 0)) ~= 2
+      if ~all(phaseCfg.recog_test_preStim == 0)
         if phaseCfg.fixDuringPreStim
           % draw fixation
           Screen('TextSize', w, cfg.text.fixSize);
@@ -910,7 +910,7 @@ for b = 1:phaseCfg.nBlocks
       WaitSecs(cfg.text.respondFasterFeedbackTime);
     end
     
-    if phaseCfg.recog_test_isi > 0 && phaseCfg.fixDuringISI
+    if (phaseCfg.recog_test_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.recog_test_isi == 0 && phaseCfg.fixDuringPreStim)
       % draw fixation after response
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);

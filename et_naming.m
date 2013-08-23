@@ -403,7 +403,7 @@ for i = trialNum:length(nameStims)
     RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
       cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
     
-    if phaseCfg.name_isi > 0 && phaseCfg.fixDuringISI
+    if (phaseCfg.name_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.name_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
@@ -459,7 +459,7 @@ for i = trialNum:length(nameStims)
       WaitSecs(phaseCfg.name_preStim);
     end
   elseif length(phaseCfg.name_preStim) == 2
-    if length(find(phaseCfg.name_preStim == 0)) ~= 2
+    if ~all(phaseCfg.name_preStim == 0)
       if phaseCfg.fixDuringPreStim
         % draw fixation
         Screen('TextSize', w, cfg.text.fixSize);
@@ -702,7 +702,7 @@ for i = trialNum:length(nameStims)
   % wait to let them view the feedback
   WaitSecs(phaseCfg.name_feedback);
   
-  if phaseCfg.name_isi > 0 && phaseCfg.fixDuringISI
+  if (phaseCfg.name_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.name_isi == 0 && phaseCfg.fixDuringPreStim)
     % draw fixation
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
