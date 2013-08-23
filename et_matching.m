@@ -376,7 +376,12 @@ for i = trialNum:length(stim2)
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
     Screen('TextSize', w, cfg.text.basicTextSize);
-    pauseMsg = sprintf('Blink now.\n\nReady for trial %d of %d.\nPress any key to continue.', i, length(stim2));
+    if expParam.useNS
+      pauseMsg = 'Blink now.\n\n';
+    else
+      pauseMsg = '';
+    end
+    pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(stim2));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
