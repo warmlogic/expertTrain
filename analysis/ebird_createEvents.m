@@ -1,8 +1,11 @@
 function [events] = ebird_createEvents(events,cfg,expParam,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
-% function [events] = ebird_createEvents(events,cfg,expParam,dataroot,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
+% function [events] = ebird_createEvents(events,cfg,expParam,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
 %
 % create event struct for EBIRD
 %
+% ebird_prepData_events runs ebird_createEvents, and then ebird_processData
+% puts it all in a summary spreadsheet and ebird_visualizeData makes some
+% plots
 
 fprintf('Processing %s %s (session_%d) %s (%d)...',subject,sesName,sesNum,phaseName,phaseCount);
 
