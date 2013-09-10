@@ -19,11 +19,11 @@ function [cfg,expParam] = config_EBUG(cfg,expParam)
 if expParam.useNS
   expParam.NSPort = 55513;
   
-  % % D458
-  % expParam.NSHost = '128.138.223.251';
+  % D458
+  expParam.NSHost = '128.138.223.251';
   
-  % D464
-  expParam.NSHost = '128.138.223.26';
+  % % D464
+  % expParam.NSHost = '128.138.223.26';
   
   expParam.baselineRecordSecs = 20.0;
 end
@@ -63,8 +63,9 @@ expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','rec
 % % demo - debug
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
+% expParam.session.pretest.phases = {'match','prac_recog'};
 % % expParam.session.pretest.phases = {'prac_match','prac_recog'};
-% expParam.session.pretest.phases = {'prac_recog','recog'};
+% % expParam.session.pretest.phases = {'prac_recog','recog'};
 % expParam.session.train1.phases = {'prac_name','nametrain','name'};
 
 % % debug
@@ -128,7 +129,7 @@ if expParam.sessionNum == 1
   %% Stimulus parameters
   
   % whether to preload images; if true, could use a lot of memory
-  cfg.stim.preloadImages = true;
+  cfg.stim.preloadImages = false;
   
   % the file extension for your images
   cfg.files.stimFileExt = '.bmp';
