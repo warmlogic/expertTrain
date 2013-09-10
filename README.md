@@ -56,9 +56,9 @@ Preparing the experiment
    - For the config structures in `config_EBUG.m`, each entry in `expParam.sesTypes` is a separate session (e.g., different days of the experiment). The phases for each session are configured below that in the `expParam.session` field. The requirement is that `expParam.session` has a field for each `expParam.sesTypes` entry.
 - For Net Station integration:
    1. Set up your Net Station acquisition template to have a Multi-Port ECI device between the Source device and the Recorder device, and connect the blue STIM tube through them all the way to the Display device.
-   1. Set `expParam.useNS = true;` in the config file.
    1. Connect the behavioral testing computer and the Net Station computer together with an ethernet cable.
    1. Find the IP address of the Net Station computer (`System Prefs > Network > Ethernet`, or it's listed in the Multi-Port ECI panel in Net Station) and put the IP address in the top of the config file as the variable `expParam.NSHost` as a string.
+   1. When you run the experiment, be sure to include the proper argument in the experiment command or popup window to use Net Station. (See "Running the experiment" below for more information.)
    1. When Net Station is open and the experiment runs, the experiment will automatically start and stop recording EEG.
 - Less well described/organized features (see examples in `config_EBUG.m` for now):
    - `et_calcExpDuration()` is a function to determine how long your experiment will be.
@@ -75,6 +75,7 @@ Preparing the experiment
    - Resize image stimuli using the field `cfg.stim.stimScale` in in `config_EBUG.m`. Set equal to the proportion of image; e.g., 1.0 = full-size image. Instruction images can be scaled as well.
    - There are multiple versions of the recognition and naming/viewing response key images (in `expertTrain/images/resources/`).
    - Net Station support (sending tags to NS) is fully implemented (http://docs.psychtoolbox.org/NetStation) but the NetStation function has been improved. Use `et_NetStation.m` instead of PTB's implementation.
+   - If your computer doesn't have much memory, you can choose to not preload all stimulus images by setting cfg.stim.preloadImages to `false` in the config file.
 
 Running the experiment
 ----
