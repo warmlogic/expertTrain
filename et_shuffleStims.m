@@ -1,5 +1,5 @@
-function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
-% function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
+function [shuffledStims,randind] = et_shuffleStims(stims,valueField,maxConsec)
+% function [shuffledStims,randind] = et_shuffleStims(stims,valueField,maxConsec)
 %
 % Description:
 %  Shuffle stimuli until there are no more than X consecutive stimuli of a
@@ -15,6 +15,7 @@ function [shuffledStims] = et_shuffleStims(stims,valueField,maxConsec)
 %
 % Output:
 %  shuffledStims: Stimuli in shuffled order.
+%  randind:       The shuffled indices.
 %
 % NB: Makes 1,000,000 shuffle attempts before erroring due to not finding a
 %     solution.
@@ -87,7 +88,7 @@ while not_good
   end
   
   if shuffleCount == maxShuffle && not_good
-    error('\nPerformed %d shuffle attempts. That is too many.',maxShuffle);
+    error('\nUnsuccessful. Performed %d shuffle attempts. That is too many.',maxShuffle);
   end
 end % while
 
