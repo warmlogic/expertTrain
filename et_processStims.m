@@ -13,11 +13,6 @@ function [cfg,expParam] = et_processStims(cfg,expParam)
 
 %% Initial processing of the stimuli
 
-% familyNum is field 3
-familyNumFieldNum = 3;
-% speciesNum is field 5
-speciesNumFieldNum = 5;
-
 % read in the stimulus list
 fprintf('Loading stimulus list: %s...',cfg.stim.stimListFile);
 fid = fopen(cfg.stim.stimListFile);
@@ -26,6 +21,11 @@ stim_fieldnames = regexp(fgetl(fid),'\t','split');
 stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t');
 fclose(fid);
 fprintf('Done.\n');
+
+% find which field is familyNum (normally is field 3)
+familyNumFieldNum = find(ismember(stim_fieldnames,'familyNum'));
+% find which field is speciesNum (normally is field 5)
+speciesNumFieldNum = find(ismember(stim_fieldnames,'speciesNum'));
 
 % stimuli needed per family for all phases except recognition
 phaseFamilyStimNeeded = cfg.stim.nSpecies * (cfg.stim.nTrained + cfg.stim.nUntrained);
