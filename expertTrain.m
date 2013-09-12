@@ -228,7 +228,7 @@ else
   end
   while startUnanswered
     startSession = input(sprintf('Do you want to start %s session %d %s? (type 1 or 0 and press enter). ',expParam.subject,expParam.sessionNum,NSstr));
-    if isnumeric(startSession) && (startSession == 1 || startSession == 0)
+    if ~isempty(startSession) && isnumeric(startSession) && (startSession == 1 || startSession == 0)
       if startSession
         fprintf('Starting %s session %d.\n',expParam.subject,expParam.sessionNum);
         startUnanswered = 0;
