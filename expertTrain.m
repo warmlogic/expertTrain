@@ -485,6 +485,15 @@ try
   prac_nameCount = 0;
   prac_recogCount = 0;
   
+  % spacing
+  msCount = 0;
+  distCount = 0;
+  crCount = 0;
+  
+  prac_msCount = 0;
+  prac_distCount = 0;
+  prac_crCount = 0;
+  
   % for each phase in this session, run the correct function
   for p = 1:length(expParam.session.(sesName).phases)
     
@@ -776,6 +785,105 @@ try
           [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
 
+      case {'multistudy','prac_multistudy'}
+        % Spacing study task
+        if strcmp(phaseName,'multistudy')
+          msCount = msCount + 1;
+          phaseCount = msCount;
+        elseif strcmp(phaseName,'prac_multistudy')
+          prac_msCount = prac_msCount + 1;
+          phaseCount = prac_msCount;
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+        end
+        
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_multistudy_%d.mat',sesName,phaseName,phaseCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = space_multistudy(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
+        end
+        
+      case {'distract_math','prac_distract_math'}
+        % Spacing math distractor task
+        if strcmp(phaseName,'multistudy')
+          msCount = msCount + 1;
+          phaseCount = msCount;
+        elseif strcmp(phaseName,'prac_multistudy')
+          prac_msCount = prac_msCount + 1;
+          phaseCount = prac_msCount;
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+        end
+        
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_distMath_%d.mat',sesName,phaseName,phaseCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = space_distract_math(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
+        end
+        
+      case {'cued_recall','prac_cued_recall'}
+        % Spacing cued recall task
+        if strcmp(phaseName,'cued_recall')
+          crCount = crCount + 1;
+          phaseCount = crCount;
+        elseif strcmp(phaseName,'prac_cued_recall')
+          prac_crCount = prac_crCount + 1;
+          phaseCount = prac_crCount;
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+        end
+        
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_cuedRecall_%d.mat',sesName,phaseName,phaseCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = space_cued_recall(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
+        end
+        
       otherwise
         warning('%s is not a configured phase for %s session (%s)!\n',phaseName,expParam.subject,sesName);
     end
