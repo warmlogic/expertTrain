@@ -1,12 +1,12 @@
-function [shuffledStims,randind] = et_shuffleStims(stims,valueField,maxConsec)
-% function [shuffledStims,randind] = et_shuffleStims(stims,valueField,maxConsec)
+function [shuffledStims,randind] = et_shuffleStims(origStims,valueField,maxConsec)
+% function [shuffledStims,randind] = et_shuffleStims(origStims,valueField,maxConsec)
 %
 % Description:
 %  Shuffle stimuli until there are no more than X consecutive stimuli of a
 %  given type in a row.
 %
 % Input:
-%  stims:      Struct. Stimuli to shuffle. Assumes that the field
+%  origStims:  Struct. Stimuli to shuffle. Assumes that the field
 %              stims.(valueField) consists of integers.
 %  valueField: String. Name of the field on which the order is contingent.
 %              (default = '')
@@ -36,12 +36,12 @@ if maxConsec > 0
 end
 while not_good
   % shuffle the stimuli
-  randind = randperm(length(stims));
+  randind = randperm(length(origStims));
   % debug
   %randind = 1:length(stims);
   %fprintf('%s, NB: Debug code. Not actually randomizing!\n',mfilename);
   % shuffle the exemplars
-  stims = stims(randind);
+  stims = origStims(randind);
   
   if maxConsec > 0
     fprintf(1,[repmat('\b',1,length(num2str(shuffleCount))),'%d'],shuffleCount);
