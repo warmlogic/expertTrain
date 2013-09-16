@@ -1,0 +1,1 @@
+matlab -sd "C:\Documents and Settings\curranlab\My Documents\My Experiments\expertTrain" -r "expertTrain"
