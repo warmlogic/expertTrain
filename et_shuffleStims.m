@@ -46,27 +46,34 @@ while not_good
   if maxConsec > 0
     fprintf(1,[repmat('\b',1,length(num2str(shuffleCount))),'%d'],shuffleCount);
     
-    stimValues = [stims.(valueField)];
+    % pull the contents out
+    if isnumeric(stims(1).(valueField))
+      stimValues = [stims.(valueField)];
+    elseif ischar(stims(1).(valueField))
+      stimValues = {stims.(valueField)};
+    end
+    
     possibleValues = unique(stimValues);
     % initialize to count how many of each value we find
     consecCount = zeros(1,length(possibleValues));
     
     % increment the value for the first stimulus
-    consecCount(stimValues(1) == possibleValues) = 1;
+    consecCount(ismember(possibleValues,stimValues(1))) = 1;
     
     for i = 2:length(stimValues)
-      if stimValues(i) == stimValues(i-1)
+      if ismember(stimValues(i),stimValues(i-1))
         % if we found a repeat, add 1 to the count
-        consecCount(stimValues(i) == possibleValues) = consecCount(stimValues(i) == possibleValues) + 1;
-        if consecCount(stimValues(i) == possibleValues) > maxConsec
+        consecCount(ismember(possibleValues,stimValues(i))) = consecCount(ismember(possibleValues,stimValues(i))) + 1;
+        if consecCount(ismember(possibleValues,stimValues(i))) > maxConsec
           % if we hit the maximum number, break out
           break
         end
       else
         % if it's not a repeat, reset the count
         consecCount = zeros(1,length(possibleValues));
-        consecCount(stimValues(i) == possibleValues) = 1;
+        consecCount(ismember(possibleValues,stimValues(i))) = 1;
       end
+      
     end
   else
     consecCount = 0;
