@@ -582,17 +582,17 @@ try
         phaseCount = nametrainCount;
         
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
-          expParam.session.(sesName).(phaseName)(phaseCount).date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         
         % for each name block
-        for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
+        for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
           phaseIsComplete = false;
           phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,phaseCount,b));
           if exist(phaseProgressFile,'file')
@@ -614,27 +614,27 @@ try
         phaseCount = viewnameCount;
         
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'date')
-          expParam.session.(sesName).(phaseName)(phaseCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'startTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'endTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'date')
-          expParam.session.(sesName).(phaseName)(phaseCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'startTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'endTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         
         % for each view/name block
-        for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
+        for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
           % run the viewing task
           phaseIsComplete = false;
           phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,phaseCount,b));
