@@ -47,7 +47,7 @@ while not_good
     fprintf(1,[repmat('\b',1,length(num2str(shuffleCount))),'%d'],shuffleCount);
     
     % pull the contents out
-    if isnumeric(stims(1).(valueField))
+    if isnumeric(stims(1).(valueField)) || islogical(stims(1).(valueField))
       stimValues = [stims.(valueField)];
     elseif ischar(stims(1).(valueField))
       stimValues = {stims.(valueField)};
