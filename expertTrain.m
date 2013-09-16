@@ -821,11 +821,11 @@ try
       case {'distract_math','prac_distract_math'}
         % Spacing math distractor task
         if strcmp(phaseName,'multistudy')
-          msCount = msCount + 1;
-          phaseCount = msCount;
+          distCount = distCount + 1;
+          phaseCount = distCount;
         elseif strcmp(phaseName,'prac_multistudy')
-          prac_msCount = prac_msCount + 1;
-          phaseCount = prac_msCount;
+          prac_distCount = prac_distCount + 1;
+          phaseCount = prac_distCount;
         end
         
         if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
