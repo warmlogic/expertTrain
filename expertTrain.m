@@ -495,19 +495,20 @@ try
       case{'match'}
         % Subordinate Matching task (same/different)
         matchCount = matchCount + 1;
+        phaseCount = matchCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(matchCount),'date')
-          expParam.session.(sesName).(phaseName)(matchCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(matchCount),'startTime')
-          expParam.session.(sesName).(phaseName)(matchCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(matchCount),'endTime')
-          expParam.session.(sesName).(phaseName)(matchCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,matchCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -516,25 +517,26 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,matchCount);
+          [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
         
       case {'name'}
         % Naming task
         nameCount = nameCount + 1;
+        phaseCount = nameCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(nameCount),'date')
-          expParam.session.(sesName).(phaseName)(nameCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(nameCount),'startTime')
-          expParam.session.(sesName).(phaseName)(nameCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(nameCount),'endTime')
-          expParam.session.(sesName).(phaseName)(nameCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,nameCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -543,25 +545,26 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nameCount);
+          [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
         
       case {'recog'}
         % Recognition (old/new) task
         recogCount = recogCount + 1;
+        phaseCount = recogCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(recogCount),'date')
-          expParam.session.(sesName).(phaseName)(recogCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(recogCount),'startTime')
-          expParam.session.(sesName).(phaseName)(recogCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(recogCount),'endTime')
-          expParam.session.(sesName).(phaseName)(recogCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,recogCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -570,27 +573,28 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,recogCount);
+          [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
 
       case {'nametrain'}
         % Name training task
         nametrainCount = nametrainCount + 1;
+        phaseCount = nametrainCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(nametrainCount),'date')
-          expParam.session.(sesName).(phaseName)(nametrainCount).date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(nametrainCount),'startTime')
-          expParam.session.(sesName).(phaseName)(nametrainCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(nametrainCount),'endTime')
-          expParam.session.(sesName).(phaseName)(nametrainCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
         
         % for each name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           phaseIsComplete = false;
-          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,nametrainCount,b));
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,phaseCount,b));
           if exist(phaseProgressFile,'file')
             load(phaseProgressFile);
             if exist('phaseComplete','var') && phaseComplete
@@ -599,7 +603,7 @@ try
           end
           
           if ~phaseIsComplete
-            [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,nametrainCount,b);
+            [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
           end
         end
         
@@ -607,32 +611,33 @@ try
         % Viewing task, with category response; intermixed with
         % Naming task
         viewnameCount = viewnameCount + 1;
+        phaseCount = viewnameCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).view,'date')
-          expParam.session.(sesName).(phaseName)(viewnameCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).view,'startTime')
-          expParam.session.(sesName).(phaseName)(viewnameCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).view,'endTime')
-          expParam.session.(sesName).(phaseName)(viewnameCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).name,'date')
-          expParam.session.(sesName).(phaseName)(viewnameCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).name,'startTime')
-          expParam.session.(sesName).(phaseName)(viewnameCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(viewnameCount).name,'endTime')
-          expParam.session.(sesName).(phaseName)(viewnameCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder));
         end
         
         % for each view/name block
         for b = 1:length(cfg.stim.(sesName).(phaseName).blockSpeciesOrder)
           % run the viewing task
           phaseIsComplete = false;
-          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,viewnameCount,b));
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,phaseCount,b));
           if exist(phaseProgressFile,'file')
             load(phaseProgressFile);
             if exist('phaseComplete','var') && phaseComplete
@@ -641,12 +646,12 @@ try
           end
           
           if ~phaseIsComplete
-            [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+            [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
           end
           
           % then run the naming task
           phaseIsComplete = false;
-          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,viewnameCount,b));
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d_b%d.mat',sesName,phaseName,phaseCount,b));
           if exist(phaseProgressFile,'file')
             load(phaseProgressFile);
             if exist('phaseComplete','var') && phaseComplete
@@ -655,26 +660,27 @@ try
           end
           
           if ~phaseIsComplete
-            [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,viewnameCount,b);
+            [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
           end
         end
         
       case{'compare'}
         % Comparison task
         compareCount = compareCount + 1;
+        phaseCount = compareCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(compareCount),'date')
-          expParam.session.(sesName).(phaseName)(compareCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(compareCount),'startTime')
-          expParam.session.(sesName).(phaseName)(compareCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(compareCount),'endTime')
-          expParam.session.(sesName).(phaseName)(compareCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_comp_%d.mat',sesName,phaseName,compareCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_comp_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -683,25 +689,26 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_compare(w,cfg,expParam,logFile,sesName,phaseName,compareCount);
+          [cfg,expParam] = et_compare(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
         
       case{'prac_match'}
         % Subordinate Matching task (same/different)
         prac_matchCount = prac_matchCount + 1;
+        phaseCount = prac_matchCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_matchCount),'date')
-          expParam.session.(sesName).(phaseName)(prac_matchCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_matchCount),'startTime')
-          expParam.session.(sesName).(phaseName)(prac_matchCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_matchCount),'endTime')
-          expParam.session.(sesName).(phaseName)(prac_matchCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,prac_matchCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_match_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -710,25 +717,26 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,prac_matchCount);
+          [cfg,expParam] = et_matching(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
         
       case {'prac_name'}
         % Naming task
         prac_nameCount = prac_nameCount + 1;
+        phaseCount = prac_nameCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_nameCount),'date')
-          expParam.session.(sesName).(phaseName)(prac_nameCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_nameCount),'startTime')
-          expParam.session.(sesName).(phaseName)(prac_nameCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_nameCount),'endTime')
-          expParam.session.(sesName).(phaseName)(prac_nameCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,prac_nameCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_name_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -737,25 +745,26 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,prac_nameCount);
+          [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
         
       case {'prac_recog'}
         % Recognition (old/new) task
         prac_recogCount = prac_recogCount + 1;
+        phaseCount = prac_recogCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_recogCount),'date')
-          expParam.session.(sesName).(phaseName)(prac_recogCount).date = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_recogCount),'startTime')
-          expParam.session.(sesName).(phaseName)(prac_recogCount).startTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(prac_recogCount),'endTime')
-          expParam.session.(sesName).(phaseName)(prac_recogCount).endTime = [];
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,prac_recogCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recog_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
@@ -764,7 +773,7 @@ try
         end
         
         if ~phaseIsComplete
-          [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,prac_recogCount);
+          [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
 
       otherwise
