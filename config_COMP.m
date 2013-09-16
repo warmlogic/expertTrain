@@ -272,86 +272,86 @@ if expParam.sessionNum == 1
     phaseName = 'compare';
     
     if ismember(phaseName,expParam.session.(sesName).phases)
-      for phaseNum = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        cfg.stim.(sesName).(phaseName)(phaseNum).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseNum).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseNum).respDuringStim = true;
+      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
         
-        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringISI = fixDuringISI;
-        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringPreStim = fixDuringPreStim;
-        cfg.stim.(sesName).(phaseName)(phaseNum).fixDuringStim = fixDuringStim;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseNum).familyNames = cfg.stim.familyNames;
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
         % % every stimulus is in both the same and the different condition.
-        % cfg.stim.(sesName).(phaseName)(phaseNum).nSame = cfg.stim.nTrained;
-        % cfg.stim.(sesName).(phaseName)(phaseNum).nDiff = cfg.stim.nTrained;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
         % % rmStims_orig is false because all stimuli are used in both "same"
         % % and "diff" conditions
-        % cfg.stim.(sesName).(phaseName)(phaseNum).rmStims_orig = false;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
         
-        cfg.stim.(sesName).(phaseName)(phaseNum).viewMaxConsecFamily = 3;
-        cfg.stim.(sesName).(phaseName)(phaseNum).wiMaxConsecFamily = 5;
+        cfg.stim.(sesName).(phaseName)(phaseCount).viewMaxConsecFamily = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).wiMaxConsecFamily = 5;
         
         % number per species per family (half because each stimulus is
         % presented first or second)
-        cfg.stim.(sesName).(phaseName)(phaseNum).nSame = cfg.stim.nTrained / 2;
-        cfg.stim.(sesName).(phaseName)(phaseNum).nDiff = cfg.stim.nTrained / 2;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
         % rmStims_orig is true because half of stimuli are in "same" cond and
         % half are in "diff"
-        cfg.stim.(sesName).(phaseName)(phaseNum).rmStims_orig = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
         
         % rmStims_pair is true because pairs are removed after they're added
-        cfg.stim.(sesName).(phaseName)(phaseNum).rmStims_pair = true;
-        cfg.stim.(sesName).(phaseName)(phaseNum).shuffleFirst = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
         % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
         % if rmStims_orig=false)
         
         if expParam.useNS
-          %cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 240;
-          cfg.stim.(sesName).(phaseName)(phaseNum).impedanceAfter_nTrials = 0;
+          %cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
         end
         
         % durations, in seconds - viewing
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_isi = 0.0;
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_view_stim = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_view_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_view_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_view_stim = 1.0;
         % durations, in seconds - between
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_isi = 0.0;
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_stim = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_bt_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_bt_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_bt_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_bt_stim = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_bt_response = 2.0;
         % durations, in seconds - within
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_isi = 0.0;
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_stim = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseNum).comp_wi_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_wi_isi = 0.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_wi_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_wi_stim = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).comp_wi_response = 2.0;
         
         % do we want to play feedback beeps for no response?
-        cfg.stim.(sesName).(phaseName)(phaseNum).playSound = playSound;
-        cfg.stim.(sesName).(phaseName)(phaseNum).correctSound = correctSound;
-        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectSound = incorrectSound;
-        cfg.stim.(sesName).(phaseName)(phaseNum).correctVol = correctVol;
-        cfg.stim.(sesName).(phaseName)(phaseNum).incorrectVol = incorrectVol;
+        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
         
         % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compView.text] = et_processTextInstruct(...
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.compView.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_comp_1_exp_view.txt',expParam.expName)),...
           {'partNum','contKey'},{'1',cfg.keys.instructContKey});
         
-        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compBt.text] = et_processTextInstruct(...
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.compBt.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_comp_2_exp_bt.txt',expParam.expName)),...
           {'partNum','leastSimKey','mostSimKey','contKey'},{'2',cfg.keys.compareKeyNames{1}(1),cfg.keys.compareKeyNames{end}(1),cfg.keys.instructContKey});
         
-        [cfg.stim.(sesName).(phaseName)(phaseNum).instruct.compWi.text] = et_processTextInstruct(...
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.compWi.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_comp_3_exp_wi.txt',expParam.expName)),...
           {'partNum','leastSimKey','mostSimKey','contKey'},{'3',cfg.keys.compareKeyNames{1}(1),cfg.keys.compareKeyNames{end}(1),cfg.keys.instructContKey});
         
-        expParam.session.(sesName).(phaseName)(phaseNum).date = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseNum).endTime = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
       end
     end
   end
