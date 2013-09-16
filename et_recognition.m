@@ -230,7 +230,7 @@ for b = 1:phaseCfg.nBlocks
   %% determine the starting trial, useful for resuming
   
   % set up progress file, to resume this phase in case of a crash, etc.
-  phaseProgressFile_study = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recogstudy_%d.mat',sesName,phaseName,phaseCount));
+  phaseProgressFile_study = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recogstudy_%d_b%d.mat',sesName,phaseName,phaseCount,b));
   if exist(phaseProgressFile_study,'file')
     load(phaseProgressFile_study);
   else
@@ -245,7 +245,7 @@ for b = 1:phaseCfg.nBlocks
     trialNum = incompleteTrials(1);
     runRecogStudy = true;
   else
-    fprintf('All trials for %s %s (recogstudy) (%d) have been completed. Moving on...\n',sesName,phaseName,phaseCount);
+    fprintf('All trials for %s %s (recogstudy) (%d) (block %d) have been completed. Moving on...\n',sesName,phaseName,phaseCount,b);
     % release any remaining textures
     Screen('Close');
     runRecogStudy = false;
@@ -258,8 +258,8 @@ for b = 1:phaseCfg.nBlocks
     % put it in the log file
     startTime = fix(clock);
     startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
-    fprintf(logFile,'!!! Start of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-    fprintf(phLFile,'!!! Start of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+    fprintf(logFile,'!!! Start of %s %s (%d) (block %d) (%s study) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
+    fprintf(phLFile,'!!! Start of %s %s (%d) (block %d) (%s study) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
     
     % load up the stimuli for this block
     blockStudyStimTex = nan(1,length(targStims{b}));
@@ -556,8 +556,8 @@ for b = 1:phaseCfg.nBlocks
     endTime = fix(clock);
     endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
     % put it in the log file
-    fprintf(logFile,'!!! End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
-    fprintf(phLFile,'!!! End of %s %s (%d) (%s study) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+    fprintf(logFile,'!!! End of %s %s (%d) (block %d) (%s study) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
+    fprintf(phLFile,'!!! End of %s %s (%d) (block %d) (%s study) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
     
     % save progress after finishing phase
     phaseComplete = true; %#ok<NASGU>
@@ -570,7 +570,7 @@ for b = 1:phaseCfg.nBlocks
   startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6)); %#ok<NASGU>
   
   % set up progress file, to resume this phase in case of a crash, etc.
-  phaseProgressFile_test = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recogtest_%d.mat',sesName,phaseName,phaseCount));
+  phaseProgressFile_test = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_recogtest_%d_b%d.mat',sesName,phaseName,phaseCount,b));
   if exist(phaseProgressFile_test,'file')
     load(phaseProgressFile_test);
   else
@@ -584,9 +584,10 @@ for b = 1:phaseCfg.nBlocks
   if ~isempty(incompleteTrials)
     trialNum = incompleteTrials(1);
   else
-    fprintf('All trials for %s %s (recogtest) (%d) have been completed. Moving on...\n',sesName,phaseName,phaseCount);
+    fprintf('All trials for %s %s (recogtest) (%d) (block %d) have been completed. Moving on...\n',sesName,phaseName,phaseCount,b);
     % release any remaining textures
     Screen('Close');
+    % go to the next block
     continue
   end
   
@@ -595,8 +596,8 @@ for b = 1:phaseCfg.nBlocks
   % put it in the log file
   startTime = fix(clock);
   startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
-  fprintf(logFile,'!!! Start of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-  fprintf(phLFile,'!!! Start of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+  fprintf(logFile,'!!! Start of %s %s (%d) (block %d) (%s test) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
+  fprintf(phLFile,'!!! Start of %s %s (%d) (block %d) (%s test) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,startTime);
   
   % load up the stimuli for this block
   blockTestStimTex = nan(1,length(allStims{b}));
@@ -1243,8 +1244,8 @@ for b = 1:phaseCfg.nBlocks
   endTime = fix(clock);
   endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
   % put it in the log file
-  fprintf(logFile,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
-  fprintf(phLFile,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+  fprintf(logFile,'!!! End of %s %s (%d) (block %d) (%s test) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
+  fprintf(phLFile,'!!! End of %s %s (%d) (block %d) (%s test) %s %s\n',sesName,phaseName,phaseCount,b,mfilename,thisDate,endTime);
   
   % save progress after finishing phase
   phaseComplete = true; %#ok<NASGU>
@@ -1263,10 +1264,10 @@ if expParam.useNS
   fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_STOP');
 end
 
-% Close the response key image
-Screen('Close',respKeyImg);
+% % Close the response key image
+% Screen('Close',respKeyImg);
 
-% release any remaining textures
+% release any remaining textures, including the response key image
 Screen('Close');
 
 thisGetSecs = GetSecs;
