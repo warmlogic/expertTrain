@@ -51,6 +51,8 @@ while not_good
       stimValues = [stims.(valueField)];
     elseif ischar(stims(1).(valueField))
       stimValues = {stims.(valueField)};
+    else
+      error('%s is not set up to handle data of class ''%s''.',mfilename,class(stims(1).(valueField)));
     end
     
     possibleValues = unique(stimValues);
