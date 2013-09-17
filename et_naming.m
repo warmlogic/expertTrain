@@ -124,7 +124,7 @@ end
 
 % default is to preload the images
 if ~isfield(cfg.stim,'preloadImages')
-  cfg.stim.preloadImages = true;
+  cfg.stim.preloadImages = false;
 end
 
 % set the basic and subordinate family numbers
