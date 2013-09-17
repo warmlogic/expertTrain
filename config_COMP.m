@@ -105,7 +105,7 @@ if expParam.sessionNum == 1
   %% Stimulus parameters
   
   % whether to preload images; if true, could use a lot of memory
-  cfg.stim.preloadImages = true;
+  cfg.stim.preloadImages = false;
   
   % the file extension for your images
   cfg.files.stimFileExt = '.bmp';
