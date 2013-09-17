@@ -820,10 +820,10 @@ try
         
       case {'distract_math','prac_distract_math'}
         % Spacing math distractor task
-        if strcmp(phaseName,'multistudy')
+        if strcmp(phaseName,'distract_math')
           distCount = distCount + 1;
           phaseCount = distCount;
-        elseif strcmp(phaseName,'prac_multistudy')
+        elseif strcmp(phaseName,'prac_distract_math')
           prac_distCount = prac_distCount + 1;
           phaseCount = prac_distCount;
         end
