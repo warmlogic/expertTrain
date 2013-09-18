@@ -786,6 +786,10 @@ try
         end
 
       case {'multistudy','prac_multistudy'}
+        
+        % debug
+        %continue
+        
         % Spacing study task
         if strcmp(phaseName,'multistudy')
           msCount = msCount + 1;
