@@ -137,6 +137,11 @@ Windows backup-data rsync function
    1. Save it in `c:\Program Files\cwRsync`
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
 
+Known Issues
+====
+
+- Resuming a partially run recognition phase (`et_recognition.m`) will cause a squashed version of the stimulus image to be presented where the response key image should be.
+
 TODO
 ====
 
