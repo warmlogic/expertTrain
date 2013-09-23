@@ -126,7 +126,8 @@ for sub = 1:length(subjects)
   
   fprintf('Saving %s...',eventsOutfile_sub);
   % save each subject's events
-  saveEvents(events,eventsOutfile_sub);
+  save(eventsOutfile_sub,'events');
+  %saveEvents(events,eventsOutfile_sub);
   fprintf('Done.\n');
   
   %% prep the EEG data
