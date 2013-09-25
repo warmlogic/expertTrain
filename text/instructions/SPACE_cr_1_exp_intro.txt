@@ -1,7 +1,9 @@
-Test
+You will now see "old" images that you learned earlier mixed with "new" images you have not seen before.
 
-Press sameKey if this
+Your first job is to decide whether the image is old or new. If it is an old image, press the "recogOldKey" key. Or if it is a new image, press the "recogNewKey" key.
 
-Press diffKey if this
+If you decide it is an old image, you will see "recallPromptText" and you should type the word that was paired with the image earlier. Think about the word-image connection you formed earlier. Please try to spell accurately, however you will not be penalized for spelling mistakes. If you really cannot remember the word, press ENTER.
+
+Otherwise, if you decide it is a new image, you will then say whether you are "sure" about it by pressing the newSureKey key, or that it was "maybe" new by pressing the newMaybeKey.
 
 Press contKey to continue.

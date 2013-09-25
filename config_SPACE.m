@@ -391,6 +391,7 @@ if expParam.sessionNum == 1
     cfg.text.newSure = ' Sure';
     cfg.text.newMaybe = 'Maybe';
   end
+  cfg.text.recallPrompt = '???????';
   
   % "respond faster" text
   cfg.text.respondFaster = 'No response recorded!\nRespond faster!';
@@ -470,7 +471,8 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.study.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_study_1_exp_intro.txt',expParam.expName)),...
-          {'sameKey','diffKey','contKey'},{KbName(cfg.keys.judgeSame),KbName(cfg.keys.judgeDiff),cfg.keys.instructContKey});
+          {'contKey'},{cfg.keys.instructContKey});
+          %{'sameKey','diffKey','contKey'},{KbName(cfg.keys.judgeSame),KbName(cfg.keys.judgeDiff),cfg.keys.instructContKey});
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -522,7 +524,7 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.dist.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_dist_1_exp_intro.txt',expParam.expName)),...
-          {'sameKey','diffKey','contKey'},{KbName(cfg.keys.judgeSame),KbName(cfg.keys.judgeDiff),cfg.keys.instructContKey});
+          {'contKey'},{cfg.keys.instructContKey});
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -578,7 +580,10 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_cr_1_exp_intro.txt',expParam.expName)),...
-          {'sameKey','diffKey','contKey'},{KbName(cfg.keys.judgeSame),KbName(cfg.keys.judgeDiff),cfg.keys.instructContKey});
+          {'recogOldKey','recogNewKey','recallPromptText','newSureKey','newMaybeKey','contKey'},...
+          {KbName(cfg.keys.recogOld),KbName(cfg.keys.recogNew),cfg.text.recallPrompt,...
+          KbName(cfg.keys.newSure),KbName(cfg.keys.newMaybe),...
+          cfg.keys.instructContKey});
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];

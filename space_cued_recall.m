@@ -661,7 +661,7 @@ for i = trialNum:length(testStims_img)
       useKbCheck = false;
       
       % get their answer and type it to the screen
-      dispRecallResp = '???????';
+      dispRecallResp = cfg.text.recallPrompt;
       recallResp = '';
       if ~useKbCheck
         % Flush the keyboard buffer:
@@ -706,7 +706,7 @@ for i = trialNum:length(testStims_img)
               if ~isempty(recallResp)
                 dispRecallResp = recallResp;
               else
-                dispRecallResp = '???????';
+                dispRecallResp = cfg.text.recallPrompt;
               end
             otherwise
               if ismember(char, cfg.keys.recallKeyNames)
@@ -715,7 +715,7 @@ for i = trialNum:length(testStims_img)
               if ~isempty(recallResp)
                 dispRecallResp = recallResp;
               else
-                dispRecallResp = '???????';
+                dispRecallResp = cfg.text.recallPrompt;
               end
           end
           
