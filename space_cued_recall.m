@@ -205,50 +205,7 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
-%% do an impedance check before the phase begins, if desired
-
-if ~isfield(phaseCfg,'impedanceBeforePhase')
-  phaseCfg.impedanceBeforePhase = false;
-end
-
-if expParam.useNS && phaseCfg.impedanceBeforePhase
-  % run the impedance break
-  thisGetSecs = GetSecs;
-  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-  thisGetSecs = et_impedanceCheck(w, cfg, false);
-  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
-  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
-end
-
-%% start NS recording, if desired
-
-% put a message on the screen as experiment phase begins
-message = 'Starting test phase...';
-if expParam.useNS
-  % start recording
-  [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
-  % synchronize
-  [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  message = 'Starting data acquisition for test phase...';
-  
-  thisGetSecs = GetSecs;
-  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
-  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
-end
-Screen('TextSize', w, cfg.text.basicTextSize);
-% draw message to screen
-DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
-% put it on
-Screen('Flip', w);
-% Wait before starting trial
-WaitSecs(5.000);
-% Clear screen to background color (our 'gray' as set at the beginning):
-Screen('Flip', w);
-
 %% Prepare the cued recall test task
-
-%% Run recognition and cued recall test
 
 % initialize
 recogRespPromptOn = nan(1,length(testStims_img));
@@ -273,6 +230,14 @@ responsePromptY_all = nan(length(testStims_img),1);
 
 % load up the stimuli for this block
 testImgTex = nan(1,length(testStims_img));
+
+message = sprintf('Preparing images, please wait...');
+Screen('TextSize', w, cfg.text.basicTextSize);
+% put the "preparing" message on the screen
+DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+% Update the display to show the message:
+Screen('Flip', w);
+
 for i = 1:length(testStims_img)
   % make sure this stimulus exists
   stimImgFile = fullfile(imgStimDir,testStims_img(i).categoryStr,testStims_img(i).fileName);
@@ -326,6 +291,48 @@ end
 %   respKeyImgRect = CenterRect([0 0 respKeyImgWidth respKeyImgHeight], stimImgRect);
 %   respKeyImgRect = AdjoinRect(respKeyImgRect, stimImgRect, RectBottom);
 
+
+%% do an impedance check before the phase begins, if desired
+
+if ~isfield(phaseCfg,'impedanceBeforePhase')
+  phaseCfg.impedanceBeforePhase = false;
+end
+
+if expParam.useNS && phaseCfg.impedanceBeforePhase
+  % run the impedance break
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+  thisGetSecs = et_impedanceCheck(w, cfg, false);
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+end
+
+%% start NS recording, if desired
+
+% put a message on the screen as experiment phase begins
+message = 'Starting test phase...';
+if expParam.useNS
+  % start recording
+  [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+  % synchronize
+  [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
+  message = 'Starting data acquisition for test phase...';
+  
+  thisGetSecs = GetSecs;
+  fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
+  fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
+end
+Screen('TextSize', w, cfg.text.basicTextSize);
+% draw message to screen
+DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
+% put it on
+Screen('Flip', w);
+% Wait before starting trial
+WaitSecs(5.000);
+% Clear screen to background color (our 'gray' as set at the beginning):
+Screen('Flip', w);
+
 %% show the test instructions
 
 for i = 1:length(phaseCfg.instruct.cr)
@@ -337,7 +344,7 @@ end
 % Wait a second before starting trial
 WaitSecs(1.000);
 
-%% Run the cued recall test task
+%% Run recognition and cued recall test
 
 % only check these keys
 RestrictKeysForKbCheck([cfg.keys.recogOld, cfg.keys.recogNew]);
@@ -726,7 +733,7 @@ for i = trialNum:length(testStims_img)
           if phaseCfg.cr_corrSpell
             attemptCounter = attemptCounter + 1;
             
-            if strcmp(recallResp,thisPairedWord)
+            if strcmpi(recallResp,thisPairedWord)
               corrSpell = true;
               madeWordResp = true;
               %break
