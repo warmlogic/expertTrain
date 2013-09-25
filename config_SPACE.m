@@ -37,8 +37,12 @@ incorrectVol = 0.6;
 % whether to print trial details to the command window
 cfg.text.printTrialInfo = true;
 
+% how to present stimuli. 1 = simultaneous. 2 = sequential. 3 = overlap.
+studyPresent = 2;
+
 % judgment task defaults
-studyTextPrompt = true;
+studyJudgment = false;
+studyTextPrompt = false;
 % recognition task defaults
 recogTextPrompt = true;
 % prompt if they response 'new'
@@ -126,7 +130,7 @@ if expParam.sessionNum == 1
   %cfg.files.stimFileExt = '.bmp';
   cfg.files.stimFileExt = '.jpg';
   
-  % resize the image to have this height
+  % resize the image to have a height of this many pixels
   cfg.stim.nRows = 480;
   % then crop the image to have this width (all face images are 3:2 ratio)
   cfg.stim.cropWidth = cfg.stim.nRows * (2/3);% 320;
@@ -186,10 +190,10 @@ if expParam.sessionNum == 1
   
   % number of pairs for each image category
   %
-  % total number of study pairs is: (spaced + dist) * number of categories
-  cfg.stim.nPairs_study_targ_spaced = 24;
+  % number of study pairs: (((spaced + massed)*2) + onePres) * nCategories
+  cfg.stim.nPairs_study_targ_spaced = 20;
   cfg.stim.nPairs_study_targ_massed = 16;
-  cfg.stim.nPairs_study_targ_onePres = 16;
+  cfg.stim.nPairs_study_targ_onePres = 10;
   
   cfg.stim.lags = [4 8 16];
   % cfg.stim.lags = [5 10 20];
@@ -431,17 +435,28 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
         
         %cfg.stim.(sesName).(phaseName)(phaseCount).study_nPairs = 50;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'word','image'}};
+        %cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'word','image'}};
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'word','image'},{'word','image'}};
+        %cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'image','word'}};
+        
+        % stimulus order. 1 = simultaneous. 2 = sequential. 3 = overlap.
+        cfg.stim.(sesName).(phaseName)(phaseCount).studyPresent = studyPresent; 
+        % 1: both stimuli on screen for study_stim1+study_stim2;
+        %
+        % 2: stim1 on for study_stim1, then stim2 on for study_stim2;
+        %
+        % 3: stim1 on for study_stim1, then both on for study_stim2.
         
         % whether to have judgment text with the response prompt
+        cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
         cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).study_isi = 0.0;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [0.6 0.8];
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1only = 1.5;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_stimPair = 1.5;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.5;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.5;
         %cfg.stim.(sesName).(phaseName)(phaseCount).study_postPair = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
         
