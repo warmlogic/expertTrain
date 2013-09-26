@@ -126,11 +126,17 @@ if ~isfield(cfg.stim,'preloadImages')
   cfg.stim.preloadImages = false;
 end
 
-% % read the proper response key image
-% respKeyImg = imread(cfg.files.recogTestRespKeyImg);
-% respKeyImgHeight = size(respKeyImg,1) * cfg.files.recogTestRespKeyImgScale;
-% respKeyImgWidth = size(respKeyImg,2) * cfg.files.recogTestRespKeyImgScale;
-% respKeyImg = Screen('MakeTexture',w,respKeyImg);
+% read the proper old new response key image
+oldNewKeyImg = imread(cfg.files.recogTestOldNewRespKeyImg);
+oldNewKeyImgHeight = size(oldNewKeyImg,1) * cfg.files.respKeyImgScale;
+oldNewKeyImgWidth = size(oldNewKeyImg,2) * cfg.files.respKeyImgScale;
+oldNewKeyImg = Screen('MakeTexture',w,oldNewKeyImg);
+
+% read the proper sure maybe response key image
+sureMaybeKeyImg = imread(cfg.files.recogTestSureMaybeRespKeyImg);
+sureMaybeKeyImgHeight = size(sureMaybeKeyImg,1) * cfg.files.respKeyImgScale;
+sureMaybeKeyImgWidth = size(sureMaybeKeyImg,2) * cfg.files.respKeyImgScale;
+sureMaybeKeyImg = Screen('MakeTexture',w,sureMaybeKeyImg);
 
 % if we're using recogTextPrompt
 if phaseCfg.recogTextPrompt
@@ -204,8 +210,8 @@ end
 test_preStimFixOn = nan(1,length(testStims_img));
 test_imgOn = nan(1,length(testStims_img));
 recogRespPromptOn = nan(1,length(testStims_img));
-recallRespPromptOn = nan(1,length(testStims_img));
 newRespPromptOn = nan(1,length(testStims_img));
+recallRespPromptOn = nan(1,length(testStims_img));
 recogRT = nan(1,length(testStims_img));
 recallRT = nan(1,length(testStims_img));
 newRT = nan(1,length(testStims_img));
@@ -261,6 +267,7 @@ for i = 1:length(testStims_img)
     % put the recall text below the image
     Screen('TextSize', w, cfg.text.fixSize);
     recallRect = Screen('TextBounds', w, cfg.text.recallPrompt);
+    recallRect = CenterRect(recallRect, cfg.screen.wRect);
     recallRect = AdjoinRect(recallRect, stimImgRect_all(i,:), RectBottom);
     recallX_all(i) = recallRect(1);
     recallY_all(i) = recallRect(2);
@@ -290,10 +297,14 @@ end
 %   stimImgRect = [0 0 stimImgWidth stimImgHeight];
 %   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 
-%   % set the response key image rectangle
-%   respKeyImgRect = CenterRect([0 0 respKeyImgWidth respKeyImgHeight], stimImgRect);
-%   respKeyImgRect = AdjoinRect(respKeyImgRect, stimImgRect, RectBottom);
-
+% set the old new response key image rectangle
+oldNewKeyImgRect = SetRect(0, 0, oldNewKeyImgWidth, oldNewKeyImgHeight);
+oldNewKeyImgRect = CenterRect(oldNewKeyImgRect, cfg.screen.wRect);
+oldNewKeyImgRect = AlignRect(oldNewKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
+% set the sure maybe response key image rectangle
+sureMaybeKeyImgRect = SetRect(0, 0, sureMaybeKeyImgWidth, sureMaybeKeyImgHeight);
+sureMaybeKeyImgRect = CenterRect(sureMaybeKeyImgRect, cfg.screen.wRect);
+sureMaybeKeyImgRect = AlignRect(sureMaybeKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
 
 %% do an impedance check before the phase begins, if desired
 
@@ -556,13 +567,14 @@ for i = trialNum:length(testStims_img)
     % draw the stimulus
     Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
     % draw response prompt
-    Screen('TextSize', w, cfg.text.fixSize);
-    if phaseCfg.recogTextPrompt
-      responsePromptText = sprintf('%s  %s  %s',recogLeftKey,cfg.text.respSymbol,recogRightKey);
-      DrawFormattedText(w,responsePromptText,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-    else
-      DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-    end
+    Screen('DrawTexture', w, oldNewKeyImg, [], oldNewKeyImgRect);
+%     Screen('TextSize', w, cfg.text.fixSize);
+%     if phaseCfg.recogTextPrompt
+%       responsePromptText = sprintf('%s  %s  %s',recogLeftKey,cfg.text.respSymbol,recogRightKey);
+%       DrawFormattedText(w,responsePromptText,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+%     else
+%       DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+%     end
     if phaseCfg.fixDuringStim
       % and fixation on top of it
       Screen('TextSize', w, cfg.text.fixSize);
@@ -597,18 +609,19 @@ for i = trialNum:length(testStims_img)
         % draw the stimulus
         Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
         % draw response prompt
-        Screen('TextSize', w, cfg.text.fixSize);
-        if phaseCfg.recogTextPrompt
-          responsePromptText = sprintf('%s  %s  %s',recogLeftKey,cfg.text.respSymbol,recogRightKey);
-          DrawFormattedText(w,responsePromptText,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-        else
-          DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-        end
-        if phaseCfg.fixDuringStim
-          % and fixation on top of it
-          Screen('TextSize', w, cfg.text.fixSize);
-          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-        end
+        Screen('DrawTexture', w, oldNewKeyImg, [], oldNewKeyImgRect);
+%         Screen('TextSize', w, cfg.text.fixSize);
+%         if phaseCfg.recogTextPrompt
+%           responsePromptText = sprintf('%s  %s  %s',recogLeftKey,cfg.text.respSymbol,recogRightKey);
+%           DrawFormattedText(w,responsePromptText,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         else
+%           DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         end
+%         if phaseCfg.fixDuringStim
+%           % and fixation on top of it
+%           Screen('TextSize', w, cfg.text.fixSize);
+%           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         end
         % don't push multiple keys
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
@@ -678,9 +691,17 @@ for i = trialNum:length(testStims_img)
         attemptCounter = 0;
       end
       
+      % draw the stimulus
       Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
+      if phaseCfg.fixDuringStim
+        % and fixation on top of it
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      % draw the recall resonse prompt
       Screen('TextSize', w, cfg.text.fixSize);
       Screen('DrawText', w, sprintf('%s',dispRecallResp), recallX, recallY, cfg.text.basicTextColor);
+      
       Screen('Flip', w);
       
       %while isempty(recogResp)
@@ -702,8 +723,9 @@ for i = trialNum:length(testStims_img)
             case {13, 3, 10}
               % ctrl-C, enter, or return
               break
-            case 8
-              % backspace
+            case {8}
+              % 8 = backspace
+              
               if ~isempty(recallResp)
                 recallResp = recallResp(1:length(recallResp)-1);
               end
@@ -725,11 +747,17 @@ for i = trialNum:length(testStims_img)
           
           % draw the stimulus
           Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
+          if phaseCfg.fixDuringStim
+            % and fixation on top of it
+            Screen('TextSize', w, cfg.text.fixSize);
+            DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          end
+          % draw their text
           Screen('TextSize', w, cfg.text.fixSize);
           Screen('DrawText', w, sprintf('%s',dispRecallResp), recallX, recallY, cfg.text.basicTextColor);
           Screen('Flip', w);
           
-          %WaitSecs(0.0001);
+          WaitSecs(0.0001);
         end
         
         if testStims_img(i).targ
@@ -753,6 +781,10 @@ for i = trialNum:length(testStims_img)
             madeWordResp = true;
             %break
           end
+        else
+          % this was a lure image and they're making a response
+          corrSpell = false;
+          madeWordResp = true;
         end
       end
       %end
@@ -768,13 +800,19 @@ for i = trialNum:length(testStims_img)
       
       % draw the stimulus
       Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
-      % draw the response prompt
-      Screen('TextSize', w, cfg.text.fixSize);
-      if phaseCfg.newTextPrompt
-        newTextPrompt = sprintf('%s  %s  %s',newLeftKey,cfg.text.respSymbol,newRightKey);
-        DrawFormattedText(w,newTextPrompt,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-      else
-        DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+      % draw response prompt
+      Screen('DrawTexture', w, sureMaybeKeyImg, [], sureMaybeKeyImgRect);
+      %       Screen('TextSize', w, cfg.text.fixSize);
+      %       if phaseCfg.newTextPrompt
+      %         newTextPrompt = sprintf('%s  %s  %s',newLeftKey,cfg.text.respSymbol,newRightKey);
+      %         DrawFormattedText(w,newTextPrompt,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %       else
+      %         DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %       end
+      if phaseCfg.fixDuringStim
+        % and fixation on top of it
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       end
       % put them on the screen; measure RT from when response key img appears
       [newRespPromptOn, newRespPromptStartRT] = Screen('Flip', w);
@@ -805,18 +843,19 @@ for i = trialNum:length(testStims_img)
           % draw the stimulus
           Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
           % draw response prompt
-          Screen('TextSize', w, cfg.text.fixSize);
-          if phaseCfg.newTextPrompt
-            newTextPrompt = sprintf('%s  %s  %s',newLeftKey,cfg.text.respSymbol,newRightKey);
-            DrawFormattedText(w,newTextPrompt,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-          else
-            DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
-          end
-          if phaseCfg.fixDuringStim
-            % and fixation on top of it
-            Screen('TextSize', w, cfg.text.fixSize);
-            DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-          end
+          Screen('DrawTexture', w, sureMaybeKeyImg, [], sureMaybeKeyImgRect);
+%           Screen('TextSize', w, cfg.text.fixSize);
+%           if phaseCfg.newTextPrompt
+%             newTextPrompt = sprintf('%s  %s  %s',newLeftKey,cfg.text.respSymbol,newRightKey);
+%             DrawFormattedText(w,newTextPrompt,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+%           else
+%             DrawFormattedText(w,cfg.text.respSymbol,'center',responsePromptY,cfg.text.fixationColor, cfg.text.instructCharWidth);
+%           end
+%           if phaseCfg.fixDuringStim
+%             % and fixation on top of it
+%             Screen('TextSize', w, cfg.text.fixSize);
+%             DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%           end
           % don't push multiple keys
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
