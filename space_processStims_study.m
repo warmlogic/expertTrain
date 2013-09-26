@@ -297,11 +297,10 @@ studyStims_word.all = eval(sprintf('struct(%s)',fn_word_str));
 
 % put p1 and p2 (and single presentations) together in study order
 placedAllStimuli = false;
-
+maxAttempts = 10000;
 while ~placedAllStimuli
   stimIndex = nan(1,length(studyStims_img.p1) + length(studyStims_img.p2) + length(studyStims_img.onePres));
-  
-  [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word);
+  [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxAttempts);
 end
 
 expParam.session.(sesName).(phaseName)(phaseCount).studyStims_img = studyStims_img.all;
@@ -311,7 +310,7 @@ fprintf('Done.\n');
 
 %% function to distribute stims
 
-  function [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word)
+  function [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxAttempts)
     
     printDebug = false;
     
@@ -390,9 +389,9 @@ fprintf('Done.\n');
             end
           end
           
-          if placementCount >= 100000
-            %warning('too many attempts\n');
-            error('too many attempts. delete this subject data directory and try again.');
+          if placementCount >= maxAttempts
+            %warning('made %d attempts. trying again...',maxAttempts);
+            error('made %d attempts. delete this subject data directory and try again.',maxAttempts);
             
             tooManyAttempts = true;
             break
