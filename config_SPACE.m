@@ -57,10 +57,10 @@ expParam.nSessions = 1;
 expParam.sesTypes = {'oneDay'};
 
 % % set up a field for each session type
-expParam.session.oneDay.phases = {'multistudy','distract_math','cued_recall'};
+% expParam.session.oneDay.phases = {'multistudy','distract_math','cued_recall'};
 
 % debug
-% expParam.session.oneDay.phases = {'multistudy','cued_recall'};
+expParam.session.oneDay.phases = {'multistudy','cued_recall'};
 % expParam.session.oneDay.phases = {'distract_math'};
 
 % % debug
@@ -266,7 +266,29 @@ if expParam.sessionNum == 1
 %   % scale image down (< 1) or up (> 1)
 %   cfg.files.speciesNumKeyImgScale = 0.4;
   
-  % matching keys (counterbalanced based on subNum 1-5, 6-0)
+  % exposure ranking keys (counterbalanced based on subNum 1-5, 6-0)
+  if strcmp(cfg.keys.keyRow,'upper')
+    % upper row
+    cfg.keys.exposeKeyNames = {'e','r','u','i'};
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    % middle row
+    cfg.keys.exposeKeyNames = {'d','f','j','k'};
+  end
+  if expParam.is15
+    cfg.keys.exposeKeySet = 1;
+    cfg.keys.expose1 = KbName(cfg.keys.exposeKeyNames{1});
+    cfg.keys.expose2 = KbName(cfg.keys.exposeKeyNames{2});
+    cfg.keys.expose3 = KbName(cfg.keys.exposeKeyNames{3});
+    cfg.keys.expose4 = KbName(cfg.keys.exposeKeyNames{4});
+  else
+    cfg.keys.exposeKeySet = 2;
+    cfg.keys.expose1 = KbName(cfg.keys.exposeKeyNames{4});
+    cfg.keys.expose2 = KbName(cfg.keys.exposeKeyNames{3});
+    cfg.keys.expose3 = KbName(cfg.keys.exposeKeyNames{2});
+    cfg.keys.expose4 = KbName(cfg.keys.exposeKeyNames{1});
+  end
+  
+  % study response keys (counterbalanced based on subNum 1-5, 6-0)
   if strcmp(cfg.keys.keyRow,'upper')
     % upper row
     cfg.keys.studyKeyNames = {'r','u'};
@@ -289,6 +311,7 @@ if expParam.sessionNum == 1
     cfg.keys.distMath(i) = KbName(cfg.keys.distMathKeyNames(i));
   end
   
+  % recognition old new keys
   if strcmp(cfg.keys.keyRow,'upper')
     % upper row
     cfg.keys.recogKeyNames = {'r','u'};
@@ -297,19 +320,22 @@ if expParam.sessionNum == 1
     cfg.keys.recogKeyNames = {'f','j'};
   end
   if expParam.is15
+    cfg.keys.oldNewKeySet = 1;
     cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{1});
     cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{2});
   else
+    cfg.keys.oldNewKeySet = 2;
     cfg.keys.recogOld = KbName(cfg.keys.recogKeyNames{2});
     cfg.keys.recogNew = KbName(cfg.keys.recogKeyNames{1});
   end
   
-  cfg.keys.recallKeyNames = 'a':'z';
+  cfg.keys.recallKeyNames = ['a':'z','A':'Z'];
   cfg.keys.recall = nan(1,length(cfg.keys.recallKeyNames));
   for i = 1:length(cfg.keys.recall)
     cfg.keys.recall(i) = KbName(cfg.keys.recallKeyNames(i));
   end
   
+  % recognition sure maybe keys
   if strcmp(cfg.keys.keyRow,'upper')
     % upper row
     cfg.keys.newKeyNames = {'r','u'};
@@ -318,12 +344,27 @@ if expParam.sessionNum == 1
     cfg.keys.newKeyNames = {'f','j'};
   end
   if expParam.is15
+    cfg.keys.sureMaybeKeySet = 1;
     cfg.keys.newSure = KbName(cfg.keys.newKeyNames{1});
     cfg.keys.newMaybe = KbName(cfg.keys.newKeyNames{2});
   else
+    cfg.keys.sureMaybeKeySet = 2;
     cfg.keys.newSure = KbName(cfg.keys.newKeyNames{2});
     cfg.keys.newMaybe = KbName(cfg.keys.newKeyNames{1});
   end
+  
+  if strcmp(cfg.keys.keyRow,'upper')
+    cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeRank_resp_black_upper_%d.jpg',cfg.keys.exposeKeySet));
+    cfg.files.recogTestOldNewRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_oldNew_resp_black_upper_%d.jpg',cfg.keys.oldNewKeySet));
+    cfg.files.recogTestSureMaybeRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_sureMaybe_resp_black_upper_%d.jpg',cfg.keys.sureMaybeKeySet));
+  elseif strcmp(cfg.keys.keyRow,'middle')
+    cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeRank_resp_black_middle_%d.jpg',cfg.keys.exposeKeySet));
+    cfg.files.recogTestOldNewRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_oldNew_resp_black_middle_%d.jpg',cfg.keys.oldNewKeySet));
+    cfg.files.recogTestSureMaybeRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_sureMaybe_resp_black_middle_%d.jpg',cfg.keys.sureMaybeKeySet));
+  end
+  
+  % scale image down (< 1) or up (> 1)
+  cfg.files.respKeyImgScale = 0.4;
   
   %% Screen, text, and symbol configuration for size and color
   
@@ -578,12 +619,21 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
         
         % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr.text] = et_processTextInstruct(...
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(1).text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_cr_1_exp_intro.txt',expParam.expName)),...
-          {'recogOldKey','recogNewKey','recallPromptText','newSureKey','newMaybeKey','contKey'},...
-          {KbName(cfg.keys.recogOld),KbName(cfg.keys.recogNew),cfg.text.recallPrompt,...
-          KbName(cfg.keys.newSure),KbName(cfg.keys.newMaybe),...
+          {'recogOldKey','recogNewKey','contKey'},...
+          {upper(KbName(cfg.keys.recogOld)),upper(KbName(cfg.keys.recogNew)),cfg.keys.instructContKey});
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(1).image = cfg.files.recogTestOldNewRespKeyImg;
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(1).imageScale = cfg.files.respKeyImgScale;
+        
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_cr_2_exp_intro.txt',expParam.expName)),...
+          {'recallPromptText','newSureKey','newMaybeKey','contKey'},...
+          {cfg.text.recallPrompt,...
+          upper(KbName(cfg.keys.newSure)),upper(KbName(cfg.keys.newMaybe)),...
           cfg.keys.instructContKey});
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).image = cfg.files.recogTestSureMaybeRespKeyImg;
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).imageScale = cfg.files.respKeyImgScale;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
