@@ -788,7 +788,7 @@ try
       case {'multistudy','prac_multistudy'}
         
         % debug
-        continue
+        %continue
         
         % Spacing study task
         if strcmp(phaseName,'multistudy')

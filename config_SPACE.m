@@ -188,28 +188,37 @@ if expParam.sessionNum == 1
 
   end
   
-  % number of pairs for each image category
-  %
-  % number of study pairs: (((spaced + massed)*2) + onePres) * nCategories
-  cfg.stim.nPairs_study_targ_spaced = 20;
-  cfg.stim.nPairs_study_targ_massed = 16;
-  cfg.stim.nPairs_study_targ_onePres = 10;
-  
-  cfg.stim.lags = [4 8 16];
-  % cfg.stim.lags = [5 10 20];
-  
-  
-  % total number of additional lure pairs is: nPairs * number of categories
-  cfg.stim.nPairs_test_lure = 20;
-  
-%   cfg.stim.nPairs_study_targ_spaced = 8;
-%   cfg.stim.nPairs_study_targ_massed = 4;
-%   cfg.stim.nPairs_study_targ_onePres = 4;
+%   % number of pairs for each image category
+%   %
+%   % number of study pairs: (((spaced + massed)*2) + onePres) * nCategories
+%   cfg.stim.nPairs_study_targ_spaced = 20;
+%   cfg.stim.nPairs_study_targ_massed = 16;
+%   cfg.stim.nPairs_study_targ_onePres = 10;
 %   
-%   cfg.stim.lags = [2 4 8];
+%   %cfg.stim.lags = [4 8 16];
+%   %cfg.stim.lags = [8 16];
+%   cfg.stim.lags = [16];
+%   % cfg.stim.lags = [5 10 20];
+%   
 %   
 %   % total number of additional lure pairs is: nPairs * number of categories
-%   cfg.stim.nPairs_test_lure = 10;
+%   cfg.stim.nPairs_test_lure = 20;
+  
+%   cfg.stim.nPairs_study_targ_spaced = 8;
+%   cfg.stim.nPairs_study_targ_massed = 8;
+%   cfg.stim.nPairs_study_targ_onePres = 8;
+%   cfg.stim.nPairs_test_lure = 8;
+  
+  cfg.stim.nPairs_study_targ_spaced = 10;
+  cfg.stim.nPairs_study_targ_massed = 10;
+  cfg.stim.nPairs_study_targ_onePres = 10;
+  cfg.stim.nPairs_test_lure = 10;
+  
+  %cfg.stim.lags = [2 4 8];
+  %cfg.stim.lags = [4 8];
+  cfg.stim.lags = [8];
+  
+  % total number of additional lure pairs is: nPairs * number of categories
   
   %   % even number of pairs
   %   if ~mod(cfg.stim.nPairs_study_targ_spaced,2) == 0
@@ -497,8 +506,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).study_isi = 0.0;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [0.6 0.8];
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.5;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.5;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
         %cfg.stim.(sesName).(phaseName)(phaseCount).study_postPair = 0.8;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
         
@@ -551,7 +560,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_plusMinus = false;
         %cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 30;
         %cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 60.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 10;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 5;
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 20.0;
         %cfg.stim.(sesName).(phaseName)(phaseCount).dist_response = 10.0;
         
@@ -608,8 +617,9 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_recall_response = 10.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_new_response = 5.0;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).cr_nAttempts = 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_corrSpell = false;
+        % if spelling is true, limit to this many attempts
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_nAttempts = 2;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
