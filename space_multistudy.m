@@ -425,7 +425,7 @@ for i = trialNum:length(studyStims_img)
   thisWord = upper(studyStims_word(i).word);
   
   % create a rectangle for the word during simultaneous presentation
-  wordRect = Screen('TextBounds',w, thisWord);
+  wordRect = Screen('TextBounds', w, thisWord);
   % center it in the middle of the screen
   wordRect = CenterRect(wordRect, cfg.screen.wRect);
   
