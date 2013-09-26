@@ -1,0 +1,8 @@
+Response 2:
+If you decide it is an old image, you will see "recallPromptText" and you should type the word that was paired with the image earlier. Think about the word-image connection you formed earlier. Please try to spell accurately, however you will not be penalized for spelling mistakes. If you really cannot remember the word, press ENTER.
+
+Otherwise, if you decide it is a new image, you will then say whether you are "sure" about it by pressing the "newSureKey" key, or that it was "maybe" new by pressing the "newMaybeKey" key.
+
+For the sure/maybe response, the key assignments will be visible as a reminder (see below), but please memorize the keys and avoid looking down at the keyboard or key assignments.
+
+Press contKey to continue to the experiment.
