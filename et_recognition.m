@@ -628,6 +628,9 @@ for b = 1:phaseCfg.nBlocks
   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
   
   % set the response key image rectangle
+  % respKeyImgRect = SetRect(0, 0, respKeyImgWidth, respKeyImgHeight);
+  % respKeyImgRect = CenterRect(respKeyImgRect, cfg.screen.wRect);
+  % % respKeyImgRect = AlignRect(respKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
   respKeyImgRect = CenterRect([0 0 respKeyImgWidth respKeyImgHeight], stimImgRect);
   respKeyImgRect = AdjoinRect(respKeyImgRect, stimImgRect, RectBottom);
   
