@@ -109,13 +109,6 @@ fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',...
   cfg.stim.(sesName).(phaseName)(phaseCount).isExp,...
   'PHASE_START');
 
-% % set up progress file, to resume this phase in case of a crash, etc.
-% phaseProgressFile_overall = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_cr_%d.mat',sesName,phaseName,phaseCount));
-% if ~exist(phaseProgressFile_overall,'file')
-%   phaseComplete = false; %#ok<NASGU>
-%   save(phaseProgressFile_overall,'thisDate','startTime','phaseComplete');
-% end
-
 %% general preparation for recognition study and test
 
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
@@ -208,9 +201,11 @@ end
 %% Prepare the cued recall test task
 
 % initialize
-recogRespPromptOn = nan(1,length(testStims_img));
 test_preStimFixOn = nan(1,length(testStims_img));
 test_imgOn = nan(1,length(testStims_img));
+recogRespPromptOn = nan(1,length(testStims_img));
+recallRespPromptOn = nan(1,length(testStims_img));
+newRespPromptOn = nan(1,length(testStims_img));
 recogRT = nan(1,length(testStims_img));
 recallRT = nan(1,length(testStims_img));
 newRT = nan(1,length(testStims_img));
@@ -222,7 +217,8 @@ fprintf(logFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCo
 fprintf(phLFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 
 stimImgRect_all = nan(length(testStims_img),4);
-wordStimY_all = nan(length(testStims_img),1);
+recallX_all = nan(length(testStims_img),1);
+recallY_all = nan(length(testStims_img),1);
 errorTextY_all = nan(length(testStims_img),1);
 responsePromptY_all = nan(length(testStims_img),1);
 
@@ -262,8 +258,15 @@ for i = 1:length(testStims_img)
     stimImgRect_all(i,:) = [0 0 stimImgWidth stimImgHeight];
     stimImgRect_all(i,:) = CenterRect(stimImgRect_all(i,:), cfg.screen.wRect);
     
+    % put the recall text below the image
+    Screen('TextSize', w, cfg.text.fixSize);
+    recallRect = Screen('TextBounds', w, cfg.text.recallPrompt);
+    recallRect = AdjoinRect(recallRect, stimImgRect_all(i,:), RectBottom);
+    recallX_all(i) = recallRect(1);
+    recallY_all(i) = recallRect(2);
+    %recallY_all(i) = screenCenterY + (stimImgHeight / 2);
+    
     % text location for error (e.g., "too fast") or response text
-    wordStimY_all(i) = screenCenterY + (stimImgHeight / 2);
     errorTextY_all(i) = screenCenterY + (stimImgHeight / 2);
     responsePromptY_all(i) = screenCenterY + (stimImgHeight / 2);
     
@@ -408,7 +411,8 @@ for i = trialNum:length(testStims_img)
     
     % pull out the coordinates we need
     stimImgRect = stimImgRect_all(i,:);
-    wordStimY = wordStimY_all(i);
+    recallX = recallX_all(i);
+    recallY = recallY_all(i);
     errorTextY = errorTextY_all(i);
     responsePromptY = responsePromptY_all(i);
   end
@@ -676,7 +680,7 @@ for i = trialNum:length(testStims_img)
       
       Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
       Screen('TextSize', w, cfg.text.fixSize);
-      Screen('DrawText', w, sprintf('%s',dispRecallResp), screenCenterX, wordStimY, cfg.text.basicTextColor);
+      Screen('DrawText', w, sprintf('%s',dispRecallResp), recallX, recallY, cfg.text.basicTextColor);
       Screen('Flip', w);
       
       %while isempty(recogResp)
@@ -722,7 +726,7 @@ for i = trialNum:length(testStims_img)
           % draw the stimulus
           Screen('DrawTexture', w, testImgTex(i), [], stimImgRect);
           Screen('TextSize', w, cfg.text.fixSize);
-          Screen('DrawText', w, sprintf('%s',dispRecallResp), screenCenterX, wordStimY, cfg.text.basicTextColor);
+          Screen('DrawText', w, sprintf('%s',dispRecallResp), recallX, recallY, cfg.text.basicTextColor);
           Screen('Flip', w);
           
           %WaitSecs(0.0001);
