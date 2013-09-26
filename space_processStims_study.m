@@ -390,7 +390,7 @@ fprintf('Done.\n');
             end
           end
           
-          if placementCount >= 10000
+          if placementCount >= 100000
             %warning('too many attempts\n');
             error('too many attempts. delete this subject data directory and try again.');
             
