@@ -131,34 +131,20 @@ oldNewKeyImg = imread(cfg.files.recogTestOldNewRespKeyImg);
 oldNewKeyImgHeight = size(oldNewKeyImg,1) * cfg.files.respKeyImgScale;
 oldNewKeyImgWidth = size(oldNewKeyImg,2) * cfg.files.respKeyImgScale;
 oldNewKeyImg = Screen('MakeTexture',w,oldNewKeyImg);
-
 % read the proper sure maybe response key image
 sureMaybeKeyImg = imread(cfg.files.recogTestSureMaybeRespKeyImg);
 sureMaybeKeyImgHeight = size(sureMaybeKeyImg,1) * cfg.files.respKeyImgScale;
 sureMaybeKeyImgWidth = size(sureMaybeKeyImg,2) * cfg.files.respKeyImgScale;
 sureMaybeKeyImg = Screen('MakeTexture',w,sureMaybeKeyImg);
 
-% % if we're using recogTextPrompt
-% if phaseCfg.recogTextPrompt
-%   if strcmp(KbName(cfg.keys.recogOld),'f') || strcmp(KbName(cfg.keys.recogOld),'r')
-%     recogLeftKey = cfg.text.recogOld;
-%     recogRightKey = cfg.text.recogNew;
-%   elseif strcmp(KbName(cfg.keys.recogNew),'j') || strcmp(KbName(cfg.keys.recogNew),'u')
-%     recogLeftKey = cfg.text.recogNew;
-%     recogRightKey = cfg.text.recogOld;
-%   end
-% end
-
-% % if we're using newTextPrompt
-% if phaseCfg.newTextPrompt
-%   if strcmp(KbName(cfg.keys.newSure),'f') || strcmp(KbName(cfg.keys.newSure),'r')
-%     newLeftKey = cfg.text.newSure;
-%     newRightKey = cfg.text.newMaybe;
-%   elseif strcmp(KbName(cfg.keys.newMaybe),'j') || strcmp(KbName(cfg.keys.newMaybe),'u')
-%     newLeftKey = cfg.text.newMaybe;
-%     newRightKey = cfg.text.newSure;
-%   end
-% end
+% set the old new response key image rectangle
+oldNewKeyImgRect = SetRect(0, 0, oldNewKeyImgWidth, oldNewKeyImgHeight);
+oldNewKeyImgRect = CenterRect(oldNewKeyImgRect, cfg.screen.wRect);
+oldNewKeyImgRect = AlignRect(oldNewKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
+% set the sure maybe response key image rectangle
+sureMaybeKeyImgRect = SetRect(0, 0, sureMaybeKeyImgWidth, sureMaybeKeyImgHeight);
+sureMaybeKeyImgRect = CenterRect(sureMaybeKeyImgRect, cfg.screen.wRect);
+sureMaybeKeyImgRect = AlignRect(sureMaybeKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
 
 % default is to not print out trial details
 if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
@@ -290,22 +276,6 @@ for i = 1:length(testStims_img)
   end
 end
 
-%   % get the width and height of the final stimulus image
-%   stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
-%   stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
-%   % set the stimulus image rectangle
-%   stimImgRect = [0 0 stimImgWidth stimImgHeight];
-%   stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
-
-% set the old new response key image rectangle
-oldNewKeyImgRect = SetRect(0, 0, oldNewKeyImgWidth, oldNewKeyImgHeight);
-oldNewKeyImgRect = CenterRect(oldNewKeyImgRect, cfg.screen.wRect);
-oldNewKeyImgRect = AlignRect(oldNewKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
-% set the sure maybe response key image rectangle
-sureMaybeKeyImgRect = SetRect(0, 0, sureMaybeKeyImgWidth, sureMaybeKeyImgHeight);
-sureMaybeKeyImgRect = CenterRect(sureMaybeKeyImgRect, cfg.screen.wRect);
-sureMaybeKeyImgRect = AlignRect(sureMaybeKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
-
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
@@ -398,7 +368,7 @@ for i = trialNum:length(testStims_img)
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
     Screen('Flip',w);
-    WaitSecs(0.5);
+    WaitSecs(1.0);
     % reset the timer
     blinkTimerStart = GetSecs;
   end

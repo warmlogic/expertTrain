@@ -81,6 +81,10 @@ if ~cfg.stim.testOnePres
   p1_StudyStims_word = p1_StudyStims_word([p1_StudyStims_word.lag] ~= -1);
 end
 
+% transpose
+p1_StudyStims_img = p1_StudyStims_img';
+p1_StudyStims_word = p1_StudyStims_word';
+
 % if desired, divide study stimuli into ordered groups
 if cfg.stim.testInOrderedGroups > 1
   % targets
@@ -98,21 +102,6 @@ if cfg.stim.testInOrderedGroups > 1
   % put the word stimuli in the same shuffled order
   testStims_word = testStims_word(randind);
   
-%   % initialize to hold the final ordered target and lure groups
-%   fn_img = fieldnames(p1_StudyStims_img);
-%   fn_img_str = sprintf('''%s'',[]',fn_img{1});
-%   fn_img_str = cat(2,fn_img_str,sprintf(repmat(',''%s'',[]',1,length(fn_img) - 1),fn_img{2:end}));
-%   fn_word = fieldnames(p1_StudyStims_word);
-%   fn_word_str = sprintf('''%s'',[]',fn_word{1});
-%   fn_word_str = cat(2,fn_word_str,sprintf(repmat(',''%s'',[]',1,length(fn_word) - 1),fn_word{2:end}));
-%   orderedGroups_img = eval(sprintf('struct(%s)',fn_img_str));
-%   orderedGroups_word = eval(sprintf('struct(%s)',fn_word_str));
-  
-  %orderedGroups_img = struct;
-  %orderedGroups_word = struct;
-  %orderedLureGroups_img = struct;
-  %orderedLureGroups_word = struct;
-  
   for i = 1:(cfg.stim.testInOrderedGroups)
     % set the indices for this group
     targStartInd = (i * targStimsPerGroup) - targStimsPerGroup + 1;
@@ -121,8 +110,8 @@ if cfg.stim.testInOrderedGroups > 1
     lureEndInd = (i * lureStimsPerGroup);
     
     % put this group of targets and lures together
-    thisOrderedGroup_img = cat(1,p1_StudyStims_img(targStartInd:targEndInd)',testStims_img(lureStartInd:lureEndInd));
-    thisOrderedGroup_word = cat(1,p1_StudyStims_word(targStartInd:targEndInd)',testStims_word(lureStartInd:lureEndInd));
+    thisOrderedGroup_img = cat(1,p1_StudyStims_img(targStartInd:targEndInd),testStims_img(lureStartInd:lureEndInd));
+    thisOrderedGroup_word = cat(1,p1_StudyStims_word(targStartInd:targEndInd),testStims_word(lureStartInd:lureEndInd));
     
     % shuffle this group of targets and lures together
     fprintf('Shuffling %s test (%d) task stimuli.\n',sesName,phaseCount);
@@ -142,9 +131,6 @@ if cfg.stim.testInOrderedGroups > 1
     else
       orderedGroups_word = cat(1,orderedGroups_word,thisOrderedGroup_word);
     end
-    
-    %orderedLureGroups_img = cat(1,orderedLureGroups_img,testStims_img(lureStartInd:lureEndInd));
-    %orderedLureGroups_word = cat(1,orderedLureGroups_word,testStims_word(lureStartInd:lureEndInd));
   end
   
   % do the final group if there were remainders
@@ -165,8 +151,8 @@ if cfg.stim.testInOrderedGroups > 1
   end
   
   if targStimsInFinalGroup ~= 0 || lureStimsInFinalGroup ~= 0
-    finalGroup_img = cat(1,finalTargGroup_img',finalLureGroup_img);
-    finalGroup_word = cat(1,finalTargGroup_word',finalLureGroup_word);
+    finalGroup_img = cat(1,finalTargGroup_img,finalLureGroup_img);
+    finalGroup_word = cat(1,finalTargGroup_word,finalLureGroup_word);
     
     [finalGroup_img,randind] = et_shuffleStims(finalGroup_img);
     finalGroup_word = finalGroup_word(randind);
@@ -181,8 +167,8 @@ if cfg.stim.testInOrderedGroups > 1
   
 else
   % combine the study and test stimuli and shuffle again
-  testStims_img = cat(1,p1_StudyStims_img',testStims_img);
-  testStims_word = cat(1,p1_StudyStims_word',testStims_word);
+  testStims_img = cat(1,p1_StudyStims_img,testStims_img);
+  testStims_word = cat(1,p1_StudyStims_word,testStims_word);
   
   % Reshuffle images for the experiment. No more than X conecutive stimuli
   % from the same category
@@ -196,7 +182,6 @@ else
 end
 
 % give them pair numbers
-%for i = 1:((cfg.stim.nPairs_study_targ_spaced + cfg.stim.nPairs_study_targ_massed + cfg.stim.nPairs_study_targ_onePres + cfg.stim.nPairs_test_lure) * length(phaseCfg.categoryNames))
 for i = 1:length(testStims_img)
   testStims_img(i).pairNum = i;
   testStims_word(i).pairNum = i;

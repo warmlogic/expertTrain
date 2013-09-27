@@ -343,7 +343,7 @@ for i = trialNum:phaseCfg.dist_nProbs
   %       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
   %     end
   %     Screen('Flip',w);
-  %     WaitSecs(0.5);
+  %     WaitSecs(1.0);
   %     % reset the timer
   %     blinkTimerStart = GetSecs;
   %   end
@@ -453,36 +453,7 @@ for i = trialNum:phaseCfg.dist_nProbs
       Screen('DrawText', w, sprintf('%s %s',tv_str,resp), screenCenterX, screenCenterY, cfg.text.basicTextColor);
       Screen('Flip', w);
       
-      %     [keyIsDown, endRT, keyCode] = KbCheck;
-      %
-      %     % poll for a resp
-      %     if keyIsDown
-      %       while KbCheck(-1)
-      %         WaitSecs(0.0001);
-      %       end % wait for key to be released
-      %
-      %       %if keyCode(40) == 1 || any(keyCode(KbName('Return')) == 1) || (IsWin && keyCode(13) == 1)
-      %       if any(keyCode(KbName('Return')) == 1) || keyCode(KbName('Enter')) == 1 || (IsWin && keyCode(13) == 1)
-      %         if ~isempty(resp)
-      %           break
-      %         end
-      %       else
-      %         if keyCode(KbName('DELETE')) == 1 || (IsWin && keyCode(8) == 1)
-      %           if ~isempty(resp)
-      %             resp = resp(1:end-1);
-      %           end
-      %         elseif sum(keyCode) == 1 && ismember(KbName(keyCode), cfg.keys.distMathKeyNames)
-      %           thisKey = KbName(keyCode);
-      %           resp = sprintf('%s%s',resp,thisKey(1));
-      %         end
-      %         %DrawFormattedText(w,sprintf('%s %s',tv_str,resp),'center','center',cfg.text.basicTextColor, cfg.text.instructCharWidth);
-      %         Screen('DrawText', w, sprintf('%s %s',tv_str,resp), screenCenterX, screenCenterY, cfg.text.basicTextColor);
-      %         Screen('Flip', w);
-      %
-      %       end
-      %     end
-      
-      %WaitSecs(0.0001);
+      WaitSecs(0.0001);
     end
   end
   if ~isempty(resp)

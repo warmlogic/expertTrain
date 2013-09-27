@@ -312,7 +312,7 @@ fprintf('Done.\n');
 
   function [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxAttempts)
     
-    printDebug = false;
+    %printDebug = false;
     
     %for si = 1:length(stimIndex)
     for si = 1:length(studyStims_img.p1)
@@ -322,21 +322,22 @@ fprintf('Done.\n');
       % get the first presentation of this stimulus
       p1stim_img = studyStims_img.p1(si);
       p1stim_word = studyStims_word.p1(si);
-      if printDebug
-        fprintf('pairNum=%d',p1stim_img.pairNum);
-      end
+      %if printDebug
+      %  fprintf('pairNum=%d',p1stim_img.pairNum);
+      %end
+      
       % if this is not a single presentation item
       if p1stim_img.lag ~= -1
         % get the second presentation of this stimulus
         p2stim_img = studyStims_img.p2([studyStims_img.p2.pairNum] == p1stim_img.pairNum);
         p2stim_word = studyStims_word.p2([studyStims_word.p2.pairNum] == p1stim_word.pairNum);
-        if printDebug
-          fprintf(', %d\n',p2stim_img.pairNum);
-        end
-      else
-        if printDebug
-          fprintf(' (single).\n');
-        end
+        %if printDebug
+        %  fprintf(', %d\n',p2stim_img.pairNum);
+        %end
+      %else
+      %  if printDebug
+      %    fprintf(' (single).\n');
+      %  end
       end
       
       placedStimulus = false;
@@ -349,44 +350,44 @@ fprintf('Done.\n');
         while ~valid_p1 || ~valid_p2
           rand_p1 = randperm(length(remainingValid_p1),1);
           stimLoc_p1 = remainingValid_p1(rand_p1);
-          if printDebug
-            fprintf('\tP1=%d',stimLoc_p1);
-          end
+          %if printDebug
+          %  fprintf('\tP1=%d',stimLoc_p1);
+          %end
           
           if stimLoc_p1 <= length(stimIndex) - p1stim_img.lag - 1
-            if printDebug
-              fprintf(': true (%d).',stimIndex(stimLoc_p1));
-            end
+            %if printDebug
+            %  fprintf(': true (%d).',stimIndex(stimLoc_p1));
+            %end
             valid_p1 = true;
           else
-            if printDebug
-              fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
-            end
+            %if printDebug
+            %  fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
+            %end
             continue
           end
           
           if p1stim_img.lag ~= -1
             stimLoc_p2 = stimLoc_p1 + p1stim_img.lag + 1;
-            if printDebug
-              fprintf(' P2=%d',stimLoc_p2);
-            end
+            %if printDebug
+            %  fprintf(' P2=%d',stimLoc_p2);
+            %end
             if isnan(stimIndex(stimLoc_p2))
-              if printDebug
-                fprintf(': true (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
-              end
+              %if printDebug
+              %  fprintf(': true (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
+              %end
               valid_p2 = true;
             else
               placementCount = placementCount + 1;
-              if printDebug
-                fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p2),placementCount);
-              end
+              %if printDebug
+              %  fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p2),placementCount);
+              %end
             end
           else
             % this is a single presentation item
             valid_p2 = true;
-            if printDebug
-              fprintf('\n');
-            end
+            %if printDebug
+            %  fprintf('\n');
+            %end
           end
           
           if placementCount >= maxAttempts
@@ -438,71 +439,3 @@ fprintf('Done.\n');
   end % function
 
 end % function
-
-
-% % give them metadata: presentation number, pair numbers, and pair order
-% for pn = 1:length(phaseCfg.study_order)
-%   presNum = sprintf('p%d',pn);
-%   for si = 1:length(studyStims_img.(presNum))
-%     % set the presentation number because p1 and p2 will get combined
-%     studyStims_img.(presNum)(si).presNum = pn;
-%     studyStims_word.(presNum)(si).presNum = pn;
-%
-%     % set a pair number to keep image and word stimuli linked
-%     studyStims_img.(presNum)(si).pairNum = si;
-%     studyStims_word.(presNum)(si).pairNum = si;
-%
-%     % set the pair order, which comes first and which comes second
-%     if strcmp(phaseCfg.study_order{pn}{1},'image') && strcmp(phaseCfg.study_order{pn}{2},'word')
-%       studyStims_img.(presNum)(si).pairOrd = 1;
-%       studyStims_word.(presNum)(si).pairOrd = 2;
-%     elseif strcmp(phaseCfg.study_order{pn}{1},'word') && strcmp(phaseCfg.study_order{pn}{2},'image')
-%       studyStims_img.(presNum)(si).pairOrd = 2;
-%       studyStims_word.(presNum)(si).pairOrd = 1;
-%     end
-%   end
-% end
-
-
-%     stimLoc_p1 = randperm((length(stimIndex) - p1stim_img.lag - 1),1);
-%     % get the index of P2
-%     stimLoc_p2 = stimLoc_p1 + p1stim_img.lag + 1;
-%
-%     %remainingValidInds = find(isnan(stimIndex));
-%     %if stimLoc_p2 < remainingValidInds(end)
-%     if (isnan(stimIndex(stimLoc_p1)) && isnan(stimIndex(stimLoc_p2))) %|| stimIndex(stimLoc_p1) ~= -1
-%       %stimIndex(stimLoc_p1) = si;
-%       %stimIndex(stimLoc_p1 + p1stim_img.lag + 1) = si;
-%       stimIndex(stimLoc_p1) = p1stim_img.pairNum;
-%       stimIndex(stimLoc_p2) = p2stim_img.pairNum;
-%
-%       % % studyStims_img.all(si) = p1stim_img;
-%       % % studyStims_img.all(si + p1stim_img.lag + 1) = p2stim_img;
-%       %studyStims_img.all(stimLoc_p1) = p1stim_img;
-%       %studyStims_img.all(stimLoc_p2) = p2stim_img;
-%
-%       foundInd = true;
-%       placementCount = 0;
-%     else
-%       placementCount = placementCount + 1;
-%     end
-%     %else
-%     %  placementCount = placementCount + 1;
-%     %end
-%
-%   end
-%
-%   % add the first stimulus to the list
-%
-%   %studyStims_img.all = cat(1,studyStims_img.all,p1stim_img);
-%
-%   %   if p1stim_img.spaced
-%   %     % this is a spaced presentation
-%   %
-%   %   else
-%   %     % this is a massed presentation
-%   %     studyStims_img.all = cat(1,studyStims_img.all,p2stim_img);
-%   %   end
-%
-% end
-
