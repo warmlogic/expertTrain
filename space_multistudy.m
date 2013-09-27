@@ -123,12 +123,6 @@ if ~isfield(cfg.stim,'preloadImages')
   cfg.stim.preloadImages = false;
 end
 
-% % read the proper response key image
-% respKeyImg = imread(cfg.files.studyRespKeyImg);
-% respKeyImgHeight = size(respKeyImg,1) * cfg.files.studyRespKeyImgScale;
-% respKeyImgWidth = size(respKeyImg,2) * cfg.files.studyRespKeyImgScale;
-% respKeyImg = Screen('MakeTexture',w,respKeyImg);
-
 % if we're using studyTextPrompt
 if phaseCfg.studyJudgment
   if phaseCfg.studyTextPrompt
@@ -186,11 +180,6 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
-% % should the stimuli remain on the screen during the response prompt?
-% if ~isfield(phaseCfg,'stimDuringPrompt')
-%   phaseCfg.stimDuringPrompt = true;
-% end
-
 if ~isfield(phaseCfg,'impedanceAfter_nTrials')
   phaseCfg.impedanceAfter_nTrials = 0;
 end
@@ -208,9 +197,12 @@ Screen('Flip', w);
 
 % initialize to store image stimulus parameters
 stimImgRect_all = nan(length(studyStims_img),4);
+wordRect_all = nan(length(studyStims_img),4);
 errorTextY_all = nan(length(studyStims_img),1);
-wordStimY_all = nan(length(studyStims_img),1);
-responsePromptY_all = nan(length(studyStims_img),1);
+%wordStimY_all = nan(length(studyStims_img),1);
+if phaseCfg.studyJudgment
+  responsePromptY_all = nan(length(studyStims_img),1);
+end
 
 for i = 1:length(studyStims_img)
   % make sure image stimulus exists
@@ -240,12 +232,36 @@ for i = 1:length(studyStims_img)
     [~, screenCenterY] = RectCenter(cfg.screen.wRect);
     errorTextY_all(i) = screenCenterY + (stimImgHeight / 2);
     
-    % text location for word stimulus
-    wordStimY_all(i) = screenCenterY;
+    %wordStimY_all(i) = screenCenterY;
     %wordStimY_all(i) = screenCenterY + (stimImgHeight / 2);
     
-    % text location for response prompt
-    responsePromptY_all(i) = screenCenterY + (stimImgHeight / 2) + (screenCenterY * 0.05);
+    % text location for word stimulus
+    thisWord = upper(studyStims_word(i).word);
+    % create a rectangle for the word
+    wordRect = Screen('TextBounds', w, thisWord);
+    % if this is sequential presentation
+    if phaseCfg.studyPresent == 2
+      % center it in the middle of the screen
+      wordRect = CenterRect(wordRect, cfg.screen.wRect);
+    elseif phaseCfg.studyPresent ~= 2
+      % if this is simultaneous or overlapping presentation
+      
+      % put it at the top of the image
+      wordRect = AlignRect(wordRect, stimImgRect_all(i,:), 'top', 'center');
+      
+      % make the rectangle a little bit wider if will have a background
+      wordRect(1) = wordRect(1) - 5;
+      wordRect(3) = wordRect(3) + 5;
+      if i == 1
+        wordRect(3) = wordRect(3) + 8;
+      end
+    end
+    wordRect_all(i,:) = wordRect;
+    
+    if phaseCfg.studyJudgment
+      % text location for response prompt
+      responsePromptY_all(i) = screenCenterY + (stimImgHeight / 2) + (screenCenterY * 0.05);
+    end
     
     if cfg.stim.preloadImages
       studyImgTex(i) = Screen('MakeTexture',w,stimImg);
@@ -259,23 +275,6 @@ for i = 1:length(studyStims_img)
     error('Study stimulus %s does not exist!',stimImgFile);
   end
 end
-
-% % get the width and height of the final stimulus image
-% stimImgHeight = size(stimImg,1) * cfg.stim.stimScale;
-% stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
-% % set the stimulus image rectangle
-% stimImgRect = [0 0 stimImgWidth stimImgHeight];
-% stimImgRect = CenterRect(stimImgRect, cfg.screen.wRect);
-% 
-% % text location for error (e.g., "too fast") text
-% [~,screenCenter] = RectCenter(cfg.screen.wRect);
-% errorTextY = screenCenter + (stimImgHeight / 2);
-% 
-% % text location for word stimulus
-% wordStimY = screenCenter + (stimImgHeight / 2);
-% 
-% % text location for response prompt
-% responsePromptY = screenCenter + (stimImgHeight / 2) + (screenCenter * 0.05);
 
 %% do an impedance check before the phase begins, if desired
 
@@ -423,7 +422,6 @@ for i = trialNum:length(studyStims_img)
   
   % load the image stimulus now if we didn't load it earlier
   if ~cfg.stim.preloadImages
-    %stim1Img = imread(fullfile(imgStimDir,stim1(i).categoryStr,stim1(i).fileName));
     stimImg = imread(fullfile(imgStimDir,studyStims_img(i).categoryStr,studyStims_img(i).fileName));
     
     % resize the image, if necessary
@@ -438,45 +436,21 @@ for i = trialNum:length(studyStims_img)
     
     % create the texture
     studyImgTex(i) = Screen('MakeTexture',w,stimImg);
-    
-    % pull out the coordinates we need
-    stimImgRect = stimImgRect_all(i,:);
-    errorTextY = errorTextY_all(i);
-    wordStimY = wordStimY_all(i);
+  end
+  
+  % pull out the coordinates we need
+  stimImgRect = stimImgRect_all(i,:);
+  errorTextY = errorTextY_all(i);
+  wordRect = wordRect_all(i,:);
+  if phaseCfg.studyJudgment
     responsePromptY = responsePromptY_all(i);
   end
   
   % get the word stimulus
   thisWord = upper(studyStims_word(i).word);
-  
-  % create a rectangle for the word during simultaneous presentation
-  wordRect = Screen('TextBounds', w, thisWord);
-  % center it in the middle of the screen
-  wordRect = CenterRect(wordRect, cfg.screen.wRect);
-  
-  % get this X coordinate
+  % get X and Y coordinates for the word
   wordStimX = wordRect(1);
-  % make the rectangle a little bit wider
-  wordRect(1) = wordRect(1) - 5;
-  wordRect(3) = wordRect(3) + 5;
-  if i == 1
-    wordRect(3) = wordRect(3) + 8;
-  end
-  
-  % see if we need to move the up or down
-  [~, wordRectCenterY] = RectCenter(wordRect);
-  % debug
-  fprintf('wordStimY = %d\n',wordStimY);
-  fprintf('wordRectCenterY = %d\n',wordRectCenterY);
-  fprintf('%d: ',i);
-  disp(wordRect);
-  if wordStimY ~= wordRectCenterY
-    wordRect = OffsetRect(wordRect,0,(wordStimY - wordRectCenterY));
-    wordStimY = wordRect(2);
-  end
-  % debug
-  fprintf('%d: ',i);
-  disp(wordRect);
+  wordStimY = wordRect(2);
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
@@ -547,6 +521,7 @@ for i = trialNum:length(studyStims_img)
     % put the stimuli on the screen
     [wordOn, stim2Onset] = Screen('Flip', w);
     imgOn = wordOn;
+    %stim1Onset = stim2Onset;
     
     if cfg.text.printTrialInfo
       fprintf('Trial %d of %d: stim (%s): category %d (%s).\n',i,length(studyStims_img),studyStims_img(i).fileName,studyStims_img(i).categoryNum,studyStims_img(i).categoryStr);
@@ -684,8 +659,8 @@ for i = trialNum:length(studyStims_img)
   % while loop to show stimulus until subject response or until
   % "study_stim2" seconds elapse.
   while (GetSecs - stim2Onset) <= phaseCfg.study_stim2
+    
     if phaseCfg.studyJudgment
-      
       % check for too-fast response
       if ~phaseCfg.respDuringStim
         [keyIsDown] = KbCheck;
@@ -864,59 +839,11 @@ for i = trialNum:length(studyStims_img)
     % determine response and compute accuracy
     if keyIsDown
       if (keyCode(cfg.keys.judgeSame) == 1 && all(keyCode(~cfg.keys.judgeSame) == 0))
-        %resp = 'same';
         resp = lower(strtrim(cfg.text.judgeSame));
         message = '';
-        %       if stim1(i).same
-        %         acc = true;
-        %         % only give feedback during practice
-        %         if ~phaseCfg.isExp
-        %           message = sprintf('%s\n%s',correctFeedback,sameFeedback);
-        %           if phaseCfg.playSound
-        %             respSound = phaseCfg.correctSound;
-        %             respVol = phaseCfg.correctVol;
-        %           end
-        %         end
-        %         feedbackColor = correctColor;
-        %       else
-        %         acc = false;
-        %         % only give feedback during practice
-        %         if ~phaseCfg.isExp
-        %           message = sprintf('%s\n%s',incorrectFeedback,diffFeedback);
-        %           if phaseCfg.playSound
-        %             respSound = phaseCfg.incorrectSound;
-        %             respVol = phaseCfg.incorrectVol;
-        %           end
-        %         end
-        %         feedbackColor = incorrectColor;
-        %       end
       elseif (keyCode(cfg.keys.judgeDiff) == 1 && all(keyCode(~cfg.keys.judgeDiff) == 0))
-        %resp = 'diff';
         resp = lower(strtrim(cfg.text.judgeDiff));
         message = '';
-        %       if ~stim1(i).same
-        %         acc = true;
-        %         % only give feedback during practice
-        %         if ~phaseCfg.isExp
-        %           message = sprintf('%s\n%s',correctFeedback,diffFeedback);
-        %           if phaseCfg.playSound
-        %             respSound = phaseCfg.correctSound;
-        %             respVol = phaseCfg.correctVol;
-        %           end
-        %         end
-        %         feedbackColor = correctColor;
-        %       else
-        %         acc = false;
-        %         % only give feedback during practice
-        %         if ~phaseCfg.isExp
-        %           message = sprintf('%s\n%s',incorrectFeedback,sameFeedback);
-        %           if phaseCfg.playSound
-        %             respSound = phaseCfg.incorrectSound;
-        %             respVol = phaseCfg.correctVol;
-        %           end
-        %         end
-        %         feedbackColor = incorrectColor;
-        %       end
       elseif sum(keyCode) > 1
         warning('Multiple keys were pressed.\n');
         resp = 'ERROR_MULTIKEY';
@@ -927,17 +854,9 @@ for i = trialNum:length(studyStims_img)
         warning('Some other error occurred.\n');
         resp = 'ERROR_OTHER';
       end
-      %     if ~phaseCfg.isExp
-      %       % only give feedback during practice
-      %       feedbackTime = cfg.text.respondFasterFeedbackTime;
-      %     else
-      %       message = '';
-      %       feedbackTime = 0.01;
-      %     end
     else
       resp = 'none';
-      %     % did not push a key
-      %     acc = false;
+      % did not push a key
       
       % need a new endRT
       endRT = GetSecs;
