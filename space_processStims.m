@@ -204,7 +204,7 @@ for s = 1:expParam.nSessions
         end
         
         % if there was an exposure phase directly before this phase,
-        % shuffle the stimuli and put them in
+        % shuffle the study stimuli and put them in the exposure struct.
         if strcmp(expParam.session.(sesName).phases{p-1},'expo') || strcmp(expParam.session.(sesName).phases{p-1},'prac_expo')
           if strcmp(expParam.session.(sesName).phases{p-1},'expo')
             expoCount = expoCount + 1;
