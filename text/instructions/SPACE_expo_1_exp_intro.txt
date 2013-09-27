@@ -1,0 +1,7 @@
+You will now see a series of pictures of people and living rooms.
+
+Your job is to judge how much you would want to hang out with the person or hang out in the living room. Your options are "A lot", "Some", "A little", and "Not at all", and you will indicate your response with the keys "expo1Key", "expo2Key", "expo3Key", and "expo4Key", respectively.
+
+The key assignments will be visible during the experiment as a reminder (see below), but please memorize the keys and avoid looking down at the keyboard or key assignments.
+
+Press contKey to continue.
