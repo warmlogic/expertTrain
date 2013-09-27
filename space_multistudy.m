@@ -130,13 +130,15 @@ end
 % respKeyImg = Screen('MakeTexture',w,respKeyImg);
 
 % if we're using studyTextPrompt
-if phaseCfg.studyTextPrompt
-  if strcmp(KbName(cfg.keys.judgeSame),'f') || strcmp(KbName(cfg.keys.judgeSame),'r')
-    leftKey = cfg.text.judgeSame;
-    rightKey = cfg.text.judgeDiff;
-  elseif strcmp(KbName(cfg.keys.judgeSame),'j') || strcmp(KbName(cfg.keys.judgeSame),'u')
-    leftKey = cfg.text.judgeDiff;
-    rightKey = cfg.text.judgeSame;
+if phaseCfg.studyJudgment
+  if phaseCfg.studyTextPrompt
+    if strcmp(KbName(cfg.keys.judgeSame),'f') || strcmp(KbName(cfg.keys.judgeSame),'r')
+      leftKey = cfg.text.judgeSame;
+      rightKey = cfg.text.judgeDiff;
+    elseif strcmp(KbName(cfg.keys.judgeSame),'j') || strcmp(KbName(cfg.keys.judgeSame),'u')
+      leftKey = cfg.text.judgeDiff;
+      rightKey = cfg.text.judgeSame;
+    end
   end
 end
 
