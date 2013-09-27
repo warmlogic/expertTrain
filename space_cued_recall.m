@@ -138,27 +138,27 @@ sureMaybeKeyImgHeight = size(sureMaybeKeyImg,1) * cfg.files.respKeyImgScale;
 sureMaybeKeyImgWidth = size(sureMaybeKeyImg,2) * cfg.files.respKeyImgScale;
 sureMaybeKeyImg = Screen('MakeTexture',w,sureMaybeKeyImg);
 
-% if we're using recogTextPrompt
-if phaseCfg.recogTextPrompt
-  if strcmp(KbName(cfg.keys.recogOld),'f') || strcmp(KbName(cfg.keys.recogOld),'r')
-    recogLeftKey = cfg.text.recogOld;
-    recogRightKey = cfg.text.recogNew;
-  elseif strcmp(KbName(cfg.keys.recogNew),'j') || strcmp(KbName(cfg.keys.recogNew),'u')
-    recogLeftKey = cfg.text.recogNew;
-    recogRightKey = cfg.text.recogOld;
-  end
-end
+% % if we're using recogTextPrompt
+% if phaseCfg.recogTextPrompt
+%   if strcmp(KbName(cfg.keys.recogOld),'f') || strcmp(KbName(cfg.keys.recogOld),'r')
+%     recogLeftKey = cfg.text.recogOld;
+%     recogRightKey = cfg.text.recogNew;
+%   elseif strcmp(KbName(cfg.keys.recogNew),'j') || strcmp(KbName(cfg.keys.recogNew),'u')
+%     recogLeftKey = cfg.text.recogNew;
+%     recogRightKey = cfg.text.recogOld;
+%   end
+% end
 
-% if we're using newTextPrompt
-if phaseCfg.newTextPrompt
-  if strcmp(KbName(cfg.keys.newSure),'f') || strcmp(KbName(cfg.keys.newSure),'r')
-    newLeftKey = cfg.text.newSure;
-    newRightKey = cfg.text.newMaybe;
-  elseif strcmp(KbName(cfg.keys.newMaybe),'j') || strcmp(KbName(cfg.keys.newMaybe),'u')
-    newLeftKey = cfg.text.newMaybe;
-    newRightKey = cfg.text.newSure;
-  end
-end
+% % if we're using newTextPrompt
+% if phaseCfg.newTextPrompt
+%   if strcmp(KbName(cfg.keys.newSure),'f') || strcmp(KbName(cfg.keys.newSure),'r')
+%     newLeftKey = cfg.text.newSure;
+%     newRightKey = cfg.text.newMaybe;
+%   elseif strcmp(KbName(cfg.keys.newMaybe),'j') || strcmp(KbName(cfg.keys.newMaybe),'u')
+%     newLeftKey = cfg.text.newMaybe;
+%     newRightKey = cfg.text.newSure;
+%   end
+% end
 
 % default is to not print out trial details
 if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
