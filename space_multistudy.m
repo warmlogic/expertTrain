@@ -186,9 +186,13 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
-% should the stimuli remain on the screen during the response prompt?
-if ~isfield(phaseCfg,'stimDuringPrompt')
-  phaseCfg.stimDuringPrompt = true;
+% % should the stimuli remain on the screen during the response prompt?
+% if ~isfield(phaseCfg,'stimDuringPrompt')
+%   phaseCfg.stimDuringPrompt = true;
+% end
+
+if ~isfield(phaseCfg,'impedanceAfter_nTrials')
+  phaseCfg.impedanceAfter_nTrials = 0;
 end
 
 %% preload all stimuli for presentation
@@ -337,65 +341,84 @@ if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
+% short circuit break flags so massed items are not split across breaks
+impedanceBreakOnNextTrial = false;
+blinkBreakOnNextTrial = false;
+
 for i = trialNum:length(studyStims_img)
   % do an impedance check after a certain number of trials
-  if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(studyStims_img) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
-    % run the impedance break
-    thisGetSecs = GetSecs;
-    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-    thisGetSecs = et_impedanceCheck(w, cfg, true);
-    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
-    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
-    
-    if phaseCfg.studyJudgment
-      % only check these keys
-      RestrictKeysForKbCheck([cfg.keys.judgeSame, cfg.keys.judgeDiff]);
-    end
-    
-    % reset the blink timer
-    if cfg.stim.secUntilBlinkBreak > 0
-      blinkTimerStart = GetSecs;
+  if (expParam.useNS && phaseCfg.isExp && i > 1 && i < length(studyStims_img) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0) || impedanceBreakOnNextTrial
+    if studyStims_img(i).lag == 0 && studyStims_img(i).presNum == 1
+      impedanceBreakOnNextTrial = true;
+    else
+      % reset the breakOnNextTrial flag
+      impedanceBreakOnNextTrial = false;
+      
+      % run the impedance break
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+      thisGetSecs = et_impedanceCheck(w, cfg, true);
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+      
+      if phaseCfg.studyJudgment
+        % only check these keys
+        RestrictKeysForKbCheck([cfg.keys.judgeSame, cfg.keys.judgeDiff]);
+      end
+      
+      % reset the blink timer
+      if cfg.stim.secUntilBlinkBreak > 0
+        blinkTimerStart = GetSecs;
+      end
     end
   end
   
-  % Do a blink break if recording EEG and specified time has passed
-  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(studyStims_img) - 3)
-    thisGetSecs = GetSecs;
-    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
-    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
-    Screen('TextSize', w, cfg.text.basicTextSize);
-    if expParam.useNS
-      pauseMsg = 'Blink now.\n\n';
+  % Do a blink break if specified time has passed
+  if (phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(studyStims_img) - 3)) || blinkBreakOnNextTrial
+    % if lag=0 and this is pres1, then pres2 is next so don't break yet
+    if studyStims_img(i).lag == 0 && studyStims_img(i).presNum == 1
+      blinkBreakOnNextTrial = true;
     else
-      pauseMsg = '';
+      % reset the breakOnNextTrial flag
+      blinkBreakOnNextTrial = false;
+      
+      thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
+      Screen('TextSize', w, cfg.text.basicTextSize);
+      if expParam.useNS
+        pauseMsg = 'Blink now.\n\n';
+      else
+        pauseMsg = '';
+      end
+      pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(studyStims_img));
+      % just draw straight into the main window since we don't need speed here
+      DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      
+      if phaseCfg.studyJudgment
+        % listen for any keypress on any keyboard
+        RestrictKeysForKbCheck([]);
+      end
+      thisGetSecs = KbWait(-1,2);
+      %thisGetSecs = GetSecs;
+      fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
+      fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
+      if phaseCfg.studyJudgment
+        % only check these keys
+        RestrictKeysForKbCheck([cfg.keys.judgeSame, cfg.keys.judgeDiff]);
+      end
+      
+      if (phaseCfg.study_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.study_isi == 0 && phaseCfg.fixDuringPreStim)
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      Screen('Flip',w);
+      WaitSecs(0.5);
+      % reset the timer
+      blinkTimerStart = GetSecs;
     end
-    pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(studyStims_img));
-    % just draw straight into the main window since we don't need speed here
-    DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
-    Screen('Flip', w);
-    
-    if phaseCfg.studyJudgment
-      % listen for any keypress on any keyboard
-      RestrictKeysForKbCheck([]);
-    end
-    thisGetSecs = KbWait(-1,2);
-    %thisGetSecs = GetSecs;
-    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
-    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
-    if phaseCfg.studyJudgment
-      % only check these keys
-      RestrictKeysForKbCheck([cfg.keys.judgeSame, cfg.keys.judgeDiff]);
-    end
-    
-    if (phaseCfg.study_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.study_isi == 0 && phaseCfg.fixDuringPreStim)
-      Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-    end
-    Screen('Flip',w);
-    WaitSecs(0.5);
-    % reset the timer
-    blinkTimerStart = GetSecs;
   end
   
   % load the image stimulus now if we didn't load it earlier
