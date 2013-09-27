@@ -486,10 +486,12 @@ try
   prac_recogCount = 0;
   
   % spacing
+  expoCount = 0;
   msCount = 0;
   distCount = 0;
   crCount = 0;
   
+  prac_expoCount = 0;
   prac_msCount = 0;
   prac_distCount = 0;
   prac_crCount = 0;
@@ -785,6 +787,43 @@ try
           [cfg,expParam] = et_recognition(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
 
+      case {'expo','prac_expo'}
+        
+        % debug
+        %continue
+        
+        % Spacing study task
+        if strcmp(phaseName,'expo')
+          expoCount = expoCount + 1;
+          phaseCount = expoCount;
+        elseif strcmp(phaseName,'prac_expo')
+          prac_expoCount = prac_expoCount + 1;
+          phaseCount = prac_expoCount;
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+        end
+        
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_expo_%d.mat',sesName,phaseName,phaseCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = space_exposure(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
+        end
+        
       case {'multistudy','prac_multistudy'}
         
         % debug
