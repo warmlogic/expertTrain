@@ -322,7 +322,7 @@ if runView
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       end
       Screen('Flip',w);
-      WaitSecs(0.5);
+      WaitSecs(1.0);
       % reset the timer
       blinkTimerStart = GetSecs;
     end
@@ -680,7 +680,7 @@ if runBt
         DrawFormattedText(w, cfg.text.respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
       end
       Screen('Flip',w);
-      WaitSecs(0.5);
+      WaitSecs(1.0);
       % reset the timer
       blinkTimerStart = GetSecs;
     end
@@ -1354,7 +1354,7 @@ if runWi
         DrawFormattedText(w, cfg.text.respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
       end
       Screen('Flip',w);
-      WaitSecs(0.5);
+      WaitSecs(1.0);
       % reset the timer
       blinkTimerStart = GetSecs;
     end

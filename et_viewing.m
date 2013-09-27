@@ -406,7 +406,7 @@ for i = trialNum:length(viewStims)
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
     Screen('Flip',w);
-    WaitSecs(0.5);
+    WaitSecs(1.0);
     % reset the timer
     blinkTimerStart = GetSecs;
   end
