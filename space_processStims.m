@@ -154,10 +154,12 @@ for s = 1:expParam.nSessions
   
   % counting the phases, in case any sessions have the same phase type
   % multiple times
+  expoCount = 0;
   msCount = 0;
   distCount = 0;
   crCount = 0;
   
+  prac_expoCount = 0;
   prac_msCount = 0;
   prac_distCount = 0;
   prac_crCount = 0;
@@ -199,6 +201,32 @@ for s = 1:expParam.nSessions
           end
         else
           [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_study(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct);
+        end
+        
+        % if there was an exposure phase directly before this phase,
+        % shuffle the stimuli and put them in
+        if strcmp(expParam.session.(sesName).phases{p-1},'expo') || strcmp(expParam.session.(sesName).phases{p-1},'prac_expo')
+          if strcmp(expParam.session.(sesName).phases{p-1},'expo')
+            expoCount = expoCount + 1;
+            thisExpoCount = expoCount;
+          elseif strcmp(expParam.session.(sesName).phases{p-1},'prac_expo')
+            prac_expoCount = prac_expoCount + 1;
+            thisExpoCount = prac_expoCount;
+          end
+          thisExpoName = expParam.session.(sesName).phases{p-1};
+          
+          expoStims = expParam.session.(sesName).(phaseName)(phaseCount).studyStims_img;
+          % only need one exposure of each stimulus
+          expoStims = expoStims([expoStims.presNum] == 1);
+          
+          fprintf('Shuffling %s %s (%d) task stimuli.\n',sesName,thisExpoName,thisExpoCount);
+          [expoStims] = et_shuffleStims(...
+            expoStims,'categoryNum',cfg.stim.(sesName).(thisExpoName)(thisExpoCount).expoMaxConsecCategory);
+          %   studyStims_img.p1,'lag',phaseCfg.studyMaxConsecLag);
+          %   studyStims_img.p1,'categoryStr',phaseCfg.studyMaxConsecCategory);
+          
+          expParam.session.(sesName).(thisExpoName)(thisExpoCount).expoStims_img = expoStims;
+          
         end
         
       case {'distract_math','prac_distract_math'}
