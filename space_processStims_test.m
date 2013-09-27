@@ -17,6 +17,7 @@ end
 expParam.session.(sesName).(phaseName)(phaseCount).testStims_img = [];
 expParam.session.(sesName).(phaseName)(phaseCount).testStims_word = [];
 
+% collect the lure stimuli
 if ~phaseCfg.isExp
   % for the practice
   
@@ -58,6 +59,12 @@ end
 % get the study stimuli
 p1_StudyStims_img = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img([expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img.presNum] == 1);
 p1_StudyStims_word = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word([expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word.presNum] == 1);
+
+% if desired, do not keep the single presentation stimuli
+if ~cfg.stim.testOnePres
+  p1_StudyStims_img = p1_StudyStims_img([p1_StudyStims_img.lag] ~= -1);
+  p1_StudyStims_word = p1_StudyStims_word([p1_StudyStims_word.lag] ~= -1);
+end
 
 % combine the study and test stimuli and shuffle again
 expParam.session.(sesName).(phaseName)(phaseCount).testStims_img = cat(1,p1_StudyStims_img',expParam.session.(sesName).(phaseName)(phaseCount).testStims_img);
