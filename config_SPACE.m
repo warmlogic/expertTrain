@@ -218,6 +218,11 @@ if expParam.sessionNum == 1
   %cfg.stim.lags = [4 8];
   cfg.stim.lags = 8;
   
+  % how to divide the test stimuli (e.g., so they match the study order).
+  % The number denotes how many groups to split stimuli into. 0 = no order.
+  cfg.stim.testInOrderedGroups = 5;
+  
+  % whether to test the single-presentation stimuli
   cfg.stim.testOnePres = true;
   
   % total number of additional lure pairs is: nPairs * number of categories
