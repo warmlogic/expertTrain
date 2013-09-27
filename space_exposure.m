@@ -127,6 +127,10 @@ expoKeyImg = imread(cfg.files.exposureRankRespKeyImg);
 expoKeyImgHeight = size(expoKeyImg,1) * cfg.files.respKeyImgScale;
 expoKeyImgWidth = size(expoKeyImg,2) * cfg.files.respKeyImgScale;
 expoKeyImg = Screen('MakeTexture',w,expoKeyImg);
+% set the expo ranking response key image rectangle
+expoKeyImgRect = SetRect(0, 0, expoKeyImgWidth, expoKeyImgHeight);
+expoKeyImgRect = CenterRect(expoKeyImgRect, cfg.screen.wRect);
+expoKeyImgRect = AlignRect(expoKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
 
 % default is to not print out trial details
 if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
@@ -196,7 +200,7 @@ errorTextY_all = nan(length(expoStims_img),1);
 
 [~, screenCenterY] = RectCenter(cfg.screen.wRect);
 
-% create a rectangle for placing the fixation symbol
+% create a rectangle for placing fixation symbol using Screen('DrawText')
 fixRect = Screen('TextBounds', w, cfg.text.fixSymbol);
 % center it in the middle of the screen
 fixRect = CenterRect(fixRect, cfg.screen.wRect);
@@ -250,11 +254,6 @@ for i = 1:length(expoStims_img)
     error('Study stimulus %s does not exist!',stimImgFile);
   end
 end
-
-% set the expo ranking response key image rectangle
-expoKeyImgRect = SetRect(0, 0, expoKeyImgWidth, expoKeyImgHeight);
-expoKeyImgRect = CenterRect(expoKeyImgRect, cfg.screen.wRect);
-expoKeyImgRect = AlignRect(expoKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
 
 %% do an impedance check before the phase begins, if desired
 
@@ -349,6 +348,11 @@ for i = trialNum:length(expoStims_img)
       pauseMsg = '';
     end
     pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(expoStims_img));
+    
+    if phaseCfg.expoShowRespInBreak
+      % draw response prompt
+      Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+    end
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);
@@ -363,19 +367,22 @@ for i = trialNum:length(expoStims_img)
     
     RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
     
+    if phaseCfg.expoShowRespInBreak
+      % draw response prompt
+      Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+    end
     if (phaseCfg.study_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.study_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
     Screen('Flip',w);
-    WaitSecs(0.5);
+    WaitSecs(1.0);
     % reset the timer
     blinkTimerStart = GetSecs;
   end
   
   % load the image stimulus now if we didn't load it earlier
   if ~cfg.stim.preloadImages
-    %stim1Img = imread(fullfile(imgStimDir,stim1(i).categoryStr,stim1(i).fileName));
     stimImg = imread(fullfile(imgStimDir,expoStims_img(i).categoryStr,expoStims_img(i).fileName));
     
     % resize the image, if necessary
@@ -390,11 +397,11 @@ for i = trialNum:length(expoStims_img)
     
     % create the texture
     expoImgTex(i) = Screen('MakeTexture',w,stimImg);
-    
-    % pull out the coordinates we need
-    stimImgRect = stimImgRect_all(i,:);
-    errorTextY = errorTextY_all(i);
   end
+  
+  % pull out the coordinates we need
+  stimImgRect = stimImgRect_all(i,:);
+  errorTextY = errorTextY_all(i);
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
@@ -403,6 +410,10 @@ for i = trialNum:length(expoStims_img)
   
   % ISI between trials
   if phaseCfg.expo_isi > 0
+    if phaseCfg.expoShowRespBtStim
+      % draw response prompt
+      Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+    end
     if phaseCfg.fixDuringISI
       Screen('TextSize', w, cfg.text.fixSize);
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -411,34 +422,80 @@ for i = trialNum:length(expoStims_img)
     WaitSecs(phaseCfg.expo_isi);
   end
   
+%   % preStimulus period, with fixation if desired
+%   if length(phaseCfg.expo_preStim) == 1
+%     if phaseCfg.expo_preStim > 0
+%       if phaseCfg.fixDuringPreStim
+%         if phaseCfg.expoShowRespBtStim
+%           % draw response prompt
+%           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+%         end
+%         % draw fixation
+%         Screen('TextSize', w, cfg.text.fixSize);
+%         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         [preStimFixOn] = Screen('Flip',w);
+%       else
+%         if phaseCfg.expoShowRespBtStim
+%           % draw response prompt
+%           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+%         end
+%         preStimFixOn = NaN;
+%         Screen('Flip',w);
+%       end
+%       WaitSecs(phaseCfg.expo_preStim);
+%     end
+%   elseif length(phaseCfg.expo_preStim) == 2
+%     if ~all(phaseCfg.expo_preStim == 0)
+%       if phaseCfg.fixDuringPreStim
+%         if phaseCfg.expoShowRespBtStim
+%           % draw response prompt
+%           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+%         end
+%         % draw fixation
+%         Screen('TextSize', w, cfg.text.fixSize);
+%         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         [preStimFixOn] = Screen('Flip',w);
+%       else
+%         if phaseCfg.expoShowRespBtStim
+%           % draw response prompt
+%           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+%         end
+%         preStimFixOn = NaN;
+%         Screen('Flip',w);
+%       end
+%       % fixation on screen before stim for a random amount of time
+%       WaitSecs(phaseCfg.expo_preStim(1) + ((phaseCfg.expo_preStim(2) - phaseCfg.expo_preStim(1)).*rand(1,1)));
+%     end
+%   end
+  
   % preStimulus period, with fixation if desired
-  if length(phaseCfg.expo_preStim) == 1
-    if phaseCfg.expo_preStim > 0
-      if phaseCfg.fixDuringPreStim
-        % draw fixation
-        Screen('TextSize', w, cfg.text.fixSize);
-        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-        [preStim1FixOn] = Screen('Flip',w);
-      else
-        preStim1FixOn = NaN;
-        Screen('Flip',w);
+  if length(phaseCfg.expo_preStim) == 1 && phaseCfg.expo_preStim > 0
+    preStimTime = phaseCfg.expo_preStim;
+  elseif length(phaseCfg.expo_preStim) == 2 && ~all(phaseCfg.expo_preStim == 0)
+    preStimTime = phaseCfg.expo_preStim(1) + ((phaseCfg.expo_preStim(2) - phaseCfg.expo_preStim(1)).*rand(1,1));
+  else
+    preStimTime = 0;
+  end
+  if preStimTime > 0
+    if phaseCfg.fixDuringPreStim
+      if phaseCfg.expoShowRespBtStim
+        % draw response prompt
+        Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
       end
-      WaitSecs(phaseCfg.expo_preStim);
-    end
-  elseif length(phaseCfg.expo_preStim) == 2
-    if ~all(phaseCfg.expo_preStim == 0)
-      if phaseCfg.fixDuringPreStim
-        % draw fixation
-        Screen('TextSize', w, cfg.text.fixSize);
-        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
-        [preStim1FixOn] = Screen('Flip',w);
-      else
-        preStim1FixOn = NaN;
-        Screen('Flip',w);
+      % draw fixation
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      [preStimFixOn] = Screen('Flip',w);
+    else
+      if phaseCfg.expoShowRespBtStim
+        % draw response prompt
+        Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
       end
-      % fixation on screen before stim for a random amount of time
-      WaitSecs(phaseCfg.expo_preStim(1) + ((phaseCfg.expo_preStim(2) - phaseCfg.expo_preStim(1)).*rand(1,1)));
+      preStimFixOn = NaN;
+      Screen('Flip',w);
     end
+    % fixation on screen before stim for a random amount of time
+    WaitSecs(preStimTime);
   end
   
   % draw the image stimulus
@@ -689,6 +746,10 @@ for i = trialNum:length(expoStims_img)
   end
   
   if (phaseCfg.expo_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.expo_isi == 0 && phaseCfg.fixDuringPreStim)
+    if phaseCfg.expoShowRespBtStim
+      % draw response prompt
+      Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
+    end
     % draw fixation after response
     Screen('TextSize', w, cfg.text.fixSize);
     DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -709,7 +770,7 @@ for i = trialNum:length(expoStims_img)
   rt = int32(round(1000 * (endRT - measureRTfromHere)));
   
   if cfg.text.printTrialInfo
-    fprintf('Trial %d of %d. response: %s (key: %s; rt = %d)\n',i,length(expoStims_img),resp,respKey,rt);
+    fprintf('Trial %d of %d: response: %s (key: %s; rt = %d)\n',i,length(expoStims_img),resp,respKey,rt);
   end
   
   % img stimulus properties
@@ -833,14 +894,13 @@ for i = trialNum:length(expoStims_img)
     % 'wstm', word stimulus
     % 'wnum', word stimulus number
     
-    if ~isnan(preStim1FixOn)
+    if ~isnan(preStimFixOn)
       % pre-stim1 fixation
-      [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStim1FixOn, .001,...
+      [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
         'expt',phaseCfg.isExp,...
         'trln', int32(i),...
-        'istm', expoStims_img(i).fileName, 'inum', i_stimNum, 'icts', expoStims_img(i).categoryStr, 'ictn', i_catNum,...
-        'wstm', thisWord, 'wnum', w_stimNum,...
+        'stmn', expoStims_img(i).fileName, 'snum', i_stimNum, 'cstr', expoStims_img(i).categoryStr, 'cnum', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
@@ -849,19 +909,9 @@ for i = trialNum:length(expoStims_img)
     [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
       'expt', phaseCfg.isExp,...
-      'trln', int32(i), 'type', 'image', 'stmn', expoStims_img(i).fileName, 'snum', i_stimNum,...
-      'cstr', expoStims_img(i).categoryStr, 'cnum', i_catNum,...
+      'trln', int32(i), 'type', 'image',...
+      'stmn', expoStims_img(i).fileName, 'snum', i_stimNum, 'cstr', expoStims_img(i).categoryStr, 'cnum', i_catNum,...
       'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-      'pres', int32(expoStims_img(i).presNum), 'pnum', int32(expoStims_img(i).pairNum), 'pord', int32(expoStims_img(i).pairOrd),...
-      'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
-    
-    % word presentation
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
-      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-      'expt',phaseCfg.isExp,...
-      'trln', int32(i), 'type', 'word', 'stmn', thisWord, 'snum', w_stimNum,...
-      'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-      'pres', int32(studyStims_word(i).presNum), 'pnum', int32(studyStims_word(i).pairNum), 'pord', int32(studyStims_word(i).pairOrd),...
       'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     
     if ~isnan(respPromptOn)
@@ -870,8 +920,7 @@ for i = trialNum:length(expoStims_img)
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
         'expt',phaseCfg.isExp,...
         'trln', int32(i),...
-        'istm', expoStims_img(i).fileName, 'inum', i_stimNum, 'icts', expoStims_img(i).categoryStr, 'ictn', i_catNum,...
-        'wstm', thisWord, 'wnum', w_stimNum,...
+        'stmn', expoStims_img(i).fileName, 'snum', i_stimNum, 'cstr', expoStims_img(i).categoryStr, 'cnum', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
@@ -883,8 +932,7 @@ for i = trialNum:length(expoStims_img)
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
         'expt',phaseCfg.isExp,...
         'trln', int32(i),...
-        'istm', expoStims_img(i).fileName, 'inum', i_stimNum, 'icts', expoStims_img(i).categoryStr, 'ictn', i_catNum,...
-        'wstm', thisWord, 'wnum', w_stimNum,...
+        'stmn', expoStims_img(i).fileName, 'snum', i_stimNum, 'cstr', expoStims_img(i).categoryStr, 'cnum', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
         'rsps', resp, 'rspk', respKey, 'rspt', rt, 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
