@@ -483,7 +483,7 @@ if expParam.sessionNum == 1
         
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
         
