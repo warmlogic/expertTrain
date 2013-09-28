@@ -315,9 +315,9 @@ for i = trialNum:phaseCfg.dist_nProbs
       
       % reimplementing GetEchoString to get RT
       if useKbCheck
-        [char, endRT] = GetKbChar; %#ok<UNRCH>
+        [char, GetCharEndRT] = GetKbChar; %#ok<UNRCH>
       else
-        [char, endRT] = GetChar;
+        [char, GetCharEndRT] = GetChar;
       end
       if isempty(char)
         return
@@ -338,8 +338,10 @@ for i = trialNum:phaseCfg.dist_nProbs
           end
       end
       
+      % draw their text
+      Screen('TextSize', w, cfg.text.basicTextSize);
       Screen('DrawText', w, sprintf('%s %s',tv_str,resp), screenCenterX, screenCenterY, cfg.text.basicTextColor);
-      [respMade] = Screen('Flip', w);
+      [respMadeRT] = Screen('Flip', w);
       
       WaitSecs(0.0001);
     end
@@ -347,7 +349,7 @@ for i = trialNum:phaseCfg.dist_nProbs
   if ~isempty(resp)
     % only need the seconds
     %endRT = endRT.secs;
-    endRT = respMade;
+    endRT = respMadeRT;
   end
   
   %if ~keyIsDown
