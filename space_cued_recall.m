@@ -26,13 +26,6 @@ function [cfg,expParam] = space_cued_recall(w,cfg,expParam,logFile,sesName,phase
 %
 
 % % durations, in seconds
-% cfg.stim.(sesName).(phaseName).cr_study_isi = 0.8;
-% cfg.stim.(sesName).(phaseName).cr_study_preTarg = 0.2;
-% cfg.stim.(sesName).(phaseName).cr_study_targ = 2.0;
-% cfg.stim.(sesName).(phaseName).cr_isi = 0.8;
-% cfg.stim.(sesName).(phaseName).cr_preCueStim = 0.2;
-% cfg.stim.(sesName).(phaseName).cr_test_stim = 1.5;
-% cfg.stim.(sesName).(phaseName).cr_response = 10.0;
 
 fprintf('Running %s %s (cr) (%d)...\n',sesName,phaseName,phaseCount);
 
@@ -195,7 +188,6 @@ stimImgRect_all = nan(length(testStims_img),4);
 recallX_all = nan(length(testStims_img),1);
 recallY_all = nan(length(testStims_img),1);
 errorTextY_all = nan(length(testStims_img),1);
-% responsePromptY_all = nan(length(testStims_img),1);
 
 [~, screenCenterY] = RectCenter(cfg.screen.wRect);
 
@@ -836,10 +828,11 @@ for i = trialNum:length(testStims_img)
         end
       elseif keyIsDown && sum(keyCode) > 1
         warning('Multiple keys were pressed.\n');
-        newResp = 'ERROR_MULTIKEY';
+        newAcc = false;
         % get the keys they pressed
-        thisNewResp = KbName(keyCode);
-        newRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisNewResp)),thisNewResp{:}));
+        thisNewRespKey = KbName(keyCode);
+        newRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisNewRespKey)),thisNewRespKey{:}));
+        newResp = 'ERROR_MULTIKEY';
       elseif ~keyIsDown
         newAcc = false;
         newRespKey = 'none';
@@ -848,21 +841,30 @@ for i = trialNum:length(testStims_img)
       
     elseif keyCode(cfg.keys.recogOld) == 0 && keyCode(cfg.keys.recogNew) == 0
       warning('Key other than a recognition response key was pressed. This should not happen.\n');
+      recogAcc = false;
       recogResp = 'ERROR_OTHERKEY';
     else
       warning('Some other error occurred.\n');
+      recogAcc = false;
       recogResp = 'ERROR_OTHER';
     end
   elseif keyIsDown && sum(keyCode) > 1
     warning('Multiple keys were pressed.\n');
-    recogResp = 'ERROR_MULTIKEY';
+    recogAcc = false;
     % get the keys they pressed
-    thisRecogResp = KbName(keyCode);
-    recogRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisRecogResp)),thisRecogResp{:}));
+    thisRecogRespKey = KbName(keyCode);
+    recogRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisRecogRespKey)),thisRecogRespKey{:}));
+    recogResp = 'ERROR_MULTIKEY';
+    
+    newRespPromptOn = nan;
+    recallRespPromptOn = nan;
   elseif ~keyIsDown
     recogAcc = false;
     recogRespKey = 'none';
     recogResp = 'none';
+    
+    newRespPromptOn = nan;
+    recallRespPromptOn = nan;
   end
   
   if (phaseCfg.cr_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.cr_isi == 0 && phaseCfg.fixDuringPreStim)
@@ -898,7 +900,7 @@ for i = trialNum:length(testStims_img)
       % miss
       recogAcc = false;
     end
-    newAcc = NaN;
+    newAcc = false;
   elseif strcmp(recogResp,'new')
     % compute sure/maybe response time
     newRespRT = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
@@ -1344,7 +1346,10 @@ for i = trialNum:length(testStims_img)
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end % for stimuli
 
-% print "continue" screen
+%% print "continue" screen
+
+WaitSecs(2.0);
+
 messageText = sprintf('You have finished the %s phase.\n\nPress "%s" to continue.',...
   phaseNameForParticipant,cfg.keys.instructContKey);
 Screen('TextSize', w, cfg.text.instructTextSize);
