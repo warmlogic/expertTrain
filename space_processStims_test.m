@@ -13,17 +13,42 @@ if ~isfield(phaseCfg,'categoryNames')
   end
 end
 
-if ~isfield(cfg.stim,'testOnePres')
-  cfg.stim.testOnePres = true;
-end
-
-if ~isfield(cfg.stim,'testInOrderedGroups')
-  cfg.stim.testInOrderedGroups = 0;
-end
-
-if cfg.stim.testInOrderedGroups == 1
-  warning('cfg.stim.testInOrderedGroups is set to 1. This does not make sense. Setting to 0.');
-  cfg.stim.testInOrderedGroups = 0;
+if ~phaseCfg.isExp
+  if ~isfield(cfg.stim.practice,'testOnePres')
+    cfg.stim.practice.testOnePres = true;
+  end
+  % single presentation test info
+  testOnePres = cfg.stim.practice.testOnePres;
+  
+  if ~isfield(cfg.stim.practice,'testInOrderedGroups')
+    cfg.stim.practice.testInOrderedGroups = 0;
+  end
+  
+  if cfg.stim.practice.testInOrderedGroups == 1
+    warning('cfg.stim.practice.testInOrderedGroups is set to 1. This does not make sense. Setting to 0.');
+    cfg.stim.practice.testInOrderedGroups = 0;
+  end
+  
+  % ordered group info
+  testInOrderedGroups = cfg.stim.practice.testInOrderedGroups;
+else
+  if ~isfield(cfg.stim,'testOnePres')
+    cfg.stim.testOnePres = true;
+  end
+  % single presentation test info
+  testOnePres = cfg.stim.testOnePres;
+  
+  if ~isfield(cfg.stim,'testInOrderedGroups')
+    cfg.stim.testInOrderedGroups = 0;
+  end
+  
+  if cfg.stim.testInOrderedGroups == 1
+    warning('cfg.stim.testInOrderedGroups is set to 1. This does not make sense. Setting to 0.');
+    cfg.stim.testInOrderedGroups = 0;
+  end
+  
+  % ordered group info
+  testInOrderedGroups = cfg.stim.testInOrderedGroups;
 end
 
 % initialize to hold the test stimuli
@@ -42,7 +67,7 @@ if ~phaseCfg.isExp
       [testStims_img,imgStimStruct(cn).catStims] = space_divvyStims(...
         imgStimStruct(cn).catStims,testStims_img,...
         cfg.stim.practice.nPairs_test_lure,...
-        cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,false,-1,-1,[],[],[]});
+        cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,false,-1,-1,[],[],[]});
     end
   end
   
@@ -50,7 +75,7 @@ if ~phaseCfg.isExp
   [testStims_word,wordStimStruct.wordStims] = space_divvyStims(...
     wordStimStruct.wordStims,testStims_word,...
     cfg.stim.practice.nPairs_test_lure * length(phaseCfg.categoryNames),...
-    cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,false,-1,-1,[],[],[]});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,false,-1,-1,[],[],[]});
 else
   % for the real experiment
   
@@ -76,7 +101,7 @@ p1_StudyStims_img = expParam.session.(sesName).(studyPhaseName)(phaseCount).stud
 p1_StudyStims_word = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word([expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word.presNum] == 1);
 
 % if desired, do not keep the single presentation stimuli
-if ~cfg.stim.testOnePres
+if ~testOnePres
   p1_StudyStims_img = p1_StudyStims_img([p1_StudyStims_img.lag] ~= -1);
   p1_StudyStims_word = p1_StudyStims_word([p1_StudyStims_word.lag] ~= -1);
 end
@@ -86,14 +111,14 @@ p1_StudyStims_img = p1_StudyStims_img';
 p1_StudyStims_word = p1_StudyStims_word';
 
 % if desired, divide study stimuli into ordered groups
-if cfg.stim.testInOrderedGroups > 1
+if testInOrderedGroups > 1
   % targets
-  targStimsPerGroup = floor(length(p1_StudyStims_img) / cfg.stim.testInOrderedGroups);
-  targStimsInFinalGroup = mod(length(p1_StudyStims_img),cfg.stim.testInOrderedGroups);
+  targStimsPerGroup = floor(length(p1_StudyStims_img) / testInOrderedGroups);
+  targStimsInFinalGroup = mod(length(p1_StudyStims_img),testInOrderedGroups);
   
   % lures
-  lureStimsPerGroup = floor(length(testStims_img) / cfg.stim.testInOrderedGroups);
-  lureStimsInFinalGroup = mod(length(testStims_img),cfg.stim.testInOrderedGroups);
+  lureStimsPerGroup = floor(length(testStims_img) / testInOrderedGroups);
+  lureStimsInFinalGroup = mod(length(testStims_img),testInOrderedGroups);
   
   % shuffle the lures before we select from them
   fprintf('Shuffling %s test (%d) task stimuli.\n',sesName,phaseCount);
@@ -102,7 +127,7 @@ if cfg.stim.testInOrderedGroups > 1
   % put the word stimuli in the same shuffled order
   testStims_word = testStims_word(randind);
   
-  for i = 1:(cfg.stim.testInOrderedGroups)
+  for i = 1:(testInOrderedGroups)
     % set the indices for this group
     targStartInd = (i * targStimsPerGroup) - targStimsPerGroup + 1;
     targEndInd = (i * targStimsPerGroup);
