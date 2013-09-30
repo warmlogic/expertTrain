@@ -47,6 +47,9 @@ fprintf('Running %s %s (multistudy) (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseNameForParticipant = 'learning';
 
+wordRectWidthAddition = 5;
+wordRect1WidthAddition = 8;
+
 %% set the starting date and time for this phase
 thisDate = date;
 startTime = fix(clock);
@@ -248,14 +251,18 @@ for i = 1:length(studyStims_img)
     elseif phaseCfg.studyPresent ~= 2
       % if this is simultaneous or overlapping presentation
       
-      % put it at the top of the image
-      wordRect = AlignRect(wordRect, stimImgRect_all(i,:), 'top', 'center');
+      % put it at the center top of the image
+      wordRect = AlignRect(wordRect, stimImgRect_all(i,:), 'center', 'top');
+      % and move it down one rectangle height
+      wordRect = AdjoinRect(wordRect, wordRect, RectBottom);
       
       % make the rectangle a little bit wider if will have a background
-      wordRect(1) = wordRect(1) - 5;
-      wordRect(3) = wordRect(3) + 5;
+      wordRect(1) = wordRect(1) - wordRectWidthAddition;
+      wordRect(3) = wordRect(3) + wordRectWidthAddition;
       if i == 1
-        wordRect(3) = wordRect(3) + 8;
+        % hack: only the first word background is short on the right side,
+        % so make it wider
+        wordRect(3) = wordRect(3) + wordRect1WidthAddition;
       end
     end
     wordRect_all(i,:) = wordRect;
@@ -453,6 +460,9 @@ for i = trialNum:length(studyStims_img)
   % get X and Y coordinates for the word
   wordStimX = wordRect(1);
   wordStimY = wordRect(2);
+  if phaseCfg.studyPresent ~= 2
+    wordStimX = wordStimX + wordRectWidthAddition;
+  end
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
