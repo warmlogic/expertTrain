@@ -1416,4 +1416,24 @@ fclose(phLFile);
 phaseComplete = true; %#ok<NASGU>
 save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','endTime');
 
+%% print "continue into real experiment" screen
+
+if ~phaseCfg.isExp
+  WaitSecs(2.0);
+  
+  messageText = sprintf('You have now finished the practice phases.\n\nPlease let the experimenter know if you have any questions.\n\nPress "%s" to begin the real experiment.',...
+    cfg.keys.instructContKey);
+  Screen('TextSize', w, cfg.text.instructTextSize);
+  DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+  Screen('Flip', w);
+  
+  % wait until the key is pressed
+  RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+  KbWait(-1,2);
+  RestrictKeysForKbCheck([]);
+  
+  % go back to gray
+  Screen('Flip', w);
+end
+
 end % function
