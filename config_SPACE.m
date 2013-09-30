@@ -57,11 +57,12 @@ expParam.nSessions = 1;
 expParam.sesTypes = {'oneDay'};
 
 % % set up a field for each session type
-% expParam.session.oneDay.phases = {'multistudy','distract_math','cued_recall'};
+% expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall','expo','multistudy','distract_math','cued_recall'};
 
 % debug
-expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall','expo','multistudy','distract_math','cued_recall'};
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','expo','multistudy','cued_recall'};
+% expParam.session.oneDay.phases = {'expo','multistudy','distract_math','cued_recall'};
+expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -314,12 +315,22 @@ if expParam.sessionNum == 1
     cfg.keys.expo2 = KbName(cfg.keys.expoKeyNames{2});
     cfg.keys.expo3 = KbName(cfg.keys.expoKeyNames{3});
     cfg.keys.expo4 = KbName(cfg.keys.expoKeyNames{4});
+    
+    cfg.text.expo1 = 'very appealing';
+    cfg.text.expo2 = 'somewhat appealing';
+    cfg.text.expo3 = 'somewhat unappealing';
+    cfg.text.expo4 = 'very unappealing';
   else
     cfg.keys.expoKeySet = 2;
     cfg.keys.expo1 = KbName(cfg.keys.expoKeyNames{4});
     cfg.keys.expo2 = KbName(cfg.keys.expoKeyNames{3});
     cfg.keys.expo3 = KbName(cfg.keys.expoKeyNames{2});
     cfg.keys.expo4 = KbName(cfg.keys.expoKeyNames{1});
+    
+    cfg.text.expo1 = 'very unappealing';
+    cfg.text.expo2 = 'somewhat unappealing';
+    cfg.text.expo3 = 'somewhat appealing';
+    cfg.text.expo4 = 'very appealing';
   end
   
   % study response keys (counterbalanced based on subNum 1-5, 6-0)
@@ -330,7 +341,7 @@ if expParam.sessionNum == 1
     % middle row
     cfg.keys.studyKeyNames = {'f','j'};
   end
-  if expParam.is15
+  if expParam.isEven
     cfg.keys.judgeSame = KbName(cfg.keys.studyKeyNames{1});
     cfg.keys.judgeDiff = KbName(cfg.keys.studyKeyNames{2});
   else
@@ -377,7 +388,7 @@ if expParam.sessionNum == 1
     % middle row
     cfg.keys.newKeyNames = {'f','j'};
   end
-  if expParam.is15
+  if expParam.isEven
     cfg.keys.sureMaybeKeySet = 1;
     cfg.keys.newSure = KbName(cfg.keys.newKeyNames{1});
     cfg.keys.newMaybe = KbName(cfg.keys.newKeyNames{2});
@@ -388,11 +399,13 @@ if expParam.sessionNum == 1
   end
   
   if strcmp(cfg.keys.keyRow,'upper')
-    cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeRank_resp_black_upper_%d.jpg',cfg.keys.expoKeySet));
+    %cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeRank_resp_black_upper_%d.jpg',cfg.keys.expoKeySet));
+    cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeAppeal_resp_black_upper_%d.jpg',cfg.keys.expoKeySet));
     cfg.files.recogTestOldNewRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_oldNew_resp_black_upper_%d.jpg',cfg.keys.oldNewKeySet));
     cfg.files.recogTestSureMaybeRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_sureMaybe_resp_black_upper_%d.jpg',cfg.keys.sureMaybeKeySet));
   elseif strcmp(cfg.keys.keyRow,'middle')
-    cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeRank_resp_black_middle_%d.jpg',cfg.keys.expoKeySet));
+    %cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeRank_resp_black_middle_%d.jpg',cfg.keys.expoKeySet));
+    cfg.files.exposureRankRespKeyImg = fullfile(cfg.files.resDir,sprintf('exposeAppeal_resp_black_middle_%d.jpg',cfg.keys.expoKeySet));
     cfg.files.recogTestOldNewRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_oldNew_resp_black_middle_%d.jpg',cfg.keys.oldNewKeySet));
     cfg.files.recogTestSureMaybeRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_sureMaybe_resp_black_middle_%d.jpg',cfg.keys.sureMaybeKeySet));
   end
@@ -530,7 +543,9 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_expo_1_exp_intro.txt',expParam.expName)),...
-          {'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
+          {'expo1Text','expo2Text','expo3Text','expo4Text',....
+          'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
+          {cfg.text.expo1,cfg.text.expo2,cfg.text.expo3,cfg.text.expo4,...
           {upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
@@ -560,10 +575,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 3;
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
         
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_nPairs = 50;
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'word','image'}};
         cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'word','image'},{'word','image'}};
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'image','word'}};
         
         % stimulus order. 1 = simultaneous. 2 = sequential. 3 = overlap.
         cfg.stim.(sesName).(phaseName)(phaseCount).studyPresent = studyPresent; 
@@ -583,8 +595,6 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_postPair = 0.8;
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
@@ -598,6 +608,117 @@ if expParam.sessionNum == 1
           fullfile(cfg.files.instructDir,sprintf('%s_study_1_exp_intro.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
           %{'sameKey','diffKey','contKey'},{KbName(cfg.keys.judgeSame),KbName(cfg.keys.judgeDiff),cfg.keys.instructContKey});
+        
+        expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+      end
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Practice: Distractor
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_distract_math';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = false;
+        
+        % durations, in seconds
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_isi = 0.0;
+        % random intervals are generated on the fly
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_preStim = [0.25 0.5];
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_nVar = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_minNum = 1;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxNum = 10;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_plusMinus = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 5;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 10.0;
+        
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+        
+        % instructions
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.dist.text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_dist_1_exp_intro.txt',expParam.expName)),...
+          {'contKey'},{cfg.keys.instructContKey});
+        
+        expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+      end
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Practice: Recognition and recall test
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'prac_cued_recall';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 4;
+        
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+        end
+        
+        % whether to have judgment text with the response prompt
+        cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;
+        cfg.stim.(sesName).(phaseName)(phaseCount).newTextPrompt = newTextPrompt;
+        
+        % durations, in seconds
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_isi = 0.0;
+        % random intervals are generated on the fly
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_preCueStim = [1.0 1.2];
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_cueStimOnly = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_recog_response = 3.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_recall_response = 10.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_new_response = 3.0;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_corrSpell = false;
+        % if spelling is true, limit to this many attempts
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_nAttempts = 2;
+        
+        % do we want to play feedback beeps for no response?
+        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+        
+        % instructions
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(1).text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_cr_1_exp_intro.txt',expParam.expName)),...
+          {'recogOldKey','recogNewKey','contKey'},...
+          {upper(KbName(cfg.keys.recogOld)),upper(KbName(cfg.keys.recogNew)),cfg.keys.instructContKey});
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(1).image = cfg.files.recogTestOldNewRespKeyImg;
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(1).imageScale = cfg.files.respKeyImgScale;
+        
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_cr_2_exp_intro.txt',expParam.expName)),...
+          {'recallPromptText','newSureKey','newMaybeKey','contKey'},...
+          {cfg.text.recallPrompt,...
+          upper(KbName(cfg.keys.newSure)),upper(KbName(cfg.keys.newMaybe)),...
+          cfg.keys.instructContKey});
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).image = cfg.files.recogTestSureMaybeRespKeyImg;
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).imageScale = cfg.files.respKeyImgScale;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -644,7 +765,9 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_expo_1_exp_intro.txt',expParam.expName)),...
-          {'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
+          {'expo1Text','expo2Text','expo3Text','expo4Text',....
+          'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
+          {cfg.text.expo1,cfg.text.expo2,cfg.text.expo3,cfg.text.expo4,...
           {upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
