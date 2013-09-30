@@ -546,7 +546,7 @@ if expParam.sessionNum == 1
           {'expo1Text','expo2Text','expo3Text','expo4Text',....
           'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
           {cfg.text.expo1,cfg.text.expo2,cfg.text.expo3,cfg.text.expo4,...
-          {upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
+          upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
         
@@ -688,9 +688,8 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_preCueStim = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_cueStimOnly = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).cr_recog_response = 3.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).cr_recall_response = 10.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).cr_new_response = 3.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_recog_response = 4.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).cr_new_response = 4.0;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_corrSpell = false;
         % if spelling is true, limit to this many attempts
@@ -768,7 +767,7 @@ if expParam.sessionNum == 1
           {'expo1Text','expo2Text','expo3Text','expo4Text',....
           'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
           {cfg.text.expo1,cfg.text.expo2,cfg.text.expo3,cfg.text.expo4,...
-          {upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
+          upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
         
@@ -926,7 +925,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_preCueStim = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_cueStimOnly = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_recog_response = 3.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).cr_recall_response = 10.0;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).cr_recall_response = 10.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_new_response = 3.0;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_corrSpell = false;
