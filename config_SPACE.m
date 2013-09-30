@@ -59,10 +59,11 @@ expParam.sesTypes = {'oneDay'};
 % % set up a field for each session type
 expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall','expo','multistudy','distract_math','cued_recall'};
 
-% debug
+% % debug
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','expo','multistudy','cued_recall'};
 % expParam.session.oneDay.phases = {'expo','multistudy','distract_math','cued_recall'};
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall'};
+% expParam.session.oneDay.phases = {'prac_multistudy','prac_distract_math','prac_cued_recall'};
 
 % % debug
 % expParam.nSessions = 1;
