@@ -7,7 +7,6 @@ function [cfg,expParam] = space_cued_recall(w,cfg,expParam,logFile,sesName,phase
 %  Intermixed test target and lure stimuli are stored in
 %  expParam.session.(sesName).(phaseName)(phaseCount).testStims_img and
 %  expParam.session.(sesName).(phaseName)(phaseCount).testStims_word.
-%  and intermixed test targets and lures are stored in
 %  Target+lure test stimuli must already be sorted in presentation order.
 %
 %
@@ -26,14 +25,6 @@ function [cfg,expParam] = space_cued_recall(w,cfg,expParam,logFile,sesName,phase
 %  screen.
 %
 
-% % keys
-% cfg.keys.crKeyNames
-% cfg.keys.crDefUn
-% cfg.keys.crMayUn
-% cfg.keys.crMayF
-% cfg.keys.crDefF
-% cfg.keys.crRecoll
-
 % % durations, in seconds
 % cfg.stim.(sesName).(phaseName).cr_study_isi = 0.8;
 % cfg.stim.(sesName).(phaseName).cr_study_preTarg = 0.2;
@@ -44,6 +35,8 @@ function [cfg,expParam] = space_cued_recall(w,cfg,expParam,logFile,sesName,phase
 % cfg.stim.(sesName).(phaseName).cr_response = 10.0;
 
 fprintf('Running %s %s (cr) (%d)...\n',sesName,phaseName,phaseCount);
+
+phaseNameForParticipant = 'test';
 
 %% set the starting date and time for this phase
 
@@ -118,7 +111,7 @@ testStims_word = expParam.session.(sesName).(phaseName)(phaseCount).testStims_wo
 if phaseCfg.isExp
   imgStimDir = cfg.files.imgStimDir;
 else
-  imgStimDir = cfg.files.stimDir_prac;
+  imgStimDir = cfg.files.imgStimDir_prac;
 end
 
 % default is to preload the images
@@ -191,16 +184,6 @@ if ~isfield(phaseCfg,'fixDuringStim')
 end
 
 %% Prepare the cued recall test task
-
-% initialize
-% test_preStimFixOn = nan(1,length(testStims_img));
-% test_imgOn = nan(1,length(testStims_img));
-% recogRespPromptOn = nan(1,length(testStims_img));
-% newRespPromptOn = nan(1,length(testStims_img));
-% recallRespPromptOn = nan(1,length(testStims_img));
-% recogRespRT = nan(1,length(testStims_img));
-% newRespRT = nan(1,length(testStims_img));
-% recallRespRT = nan(1,length(testStims_img));
 
 % put it in the log file
 startTime = fix(clock);
@@ -295,13 +278,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting test phase...';
+message = sprintf('Starting %s phase...',phaseNameForParticipant);
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  message = 'Starting data acquisition for test phase...';
+  message = sprintf('Starting data acquisition for %s phase...',phaseNameForParticipant);
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
@@ -748,11 +731,11 @@ for i = trialNum:length(testStims_img)
         end
       end
       %end
-      if ~isempty(recallResp)
-        % only need the seconds
-        % recallEndRT = endRT.secs;
-        recallEndRT = respMadeRT;
-      end
+      
+      % get the time they pressed return
+      recallEndRT = respMadeRT;
+      % only need the seconds
+      % recallEndRT = endRT.secs;
       
     elseif (keyCode(cfg.keys.recogNew) == 1 && all(keyCode(~cfg.keys.recogNew) == 0))
       recogResp = 'new';
@@ -858,6 +841,7 @@ for i = trialNum:length(testStims_img)
         thisNewResp = KbName(keyCode);
         newRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisNewResp)),thisNewResp{:}));
       elseif ~keyIsDown
+        newAcc = false;
         newRespKey = 'none';
         newResp = 'none';
       end
@@ -876,6 +860,7 @@ for i = trialNum:length(testStims_img)
     thisRecogResp = KbName(keyCode);
     recogRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisRecogResp)),thisRecogResp{:}));
   elseif ~keyIsDown
+    recogAcc = false;
     recogRespKey = 'none';
     recogResp = 'none';
   end
@@ -1357,15 +1342,22 @@ for i = trialNum:length(testStims_img)
   trialComplete(i) = true;
   % save progress after each trial
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
-  %save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','test_preStimFixOn','test_imgOn','recogRespRT','newRespRT','recallRespRT');
 end % for stimuli
 
-% % record the end time for this session
-% endTime = fix(clock);
-% endTime = sprintf('%.2d:%.2d:%.2d',endTime(4),endTime(5),endTime(6));
-% % put it in the log file
-% fprintf(logFile,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
-% fprintf(phLFile,'!!! End of %s %s (%d) (%s test) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,endTime);
+% print "continue" screen
+messageText = sprintf('You have finished the %s phase.\n\nPress "%s" to continue.',...
+  phaseNameForParticipant,cfg.keys.instructContKey);
+Screen('TextSize', w, cfg.text.instructTextSize);
+DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+Screen('Flip', w);
+
+% wait until the key is pressed
+RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+KbWait(-1,2);
+RestrictKeysForKbCheck([]);
+
+% go back to gray
+Screen('Flip', w);
 
 %% cleanup
 
@@ -1381,9 +1373,6 @@ end
 
 % reset the KbCheck
 RestrictKeysForKbCheck([]);
-
-% % Close the response key image
-% Screen('Close',respKeyImg);
 
 % release any remaining textures, including the response key image
 Screen('Close');
@@ -1421,6 +1410,5 @@ fclose(phLFile);
 % save progress after finishing phase
 phaseComplete = true; %#ok<NASGU>
 save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','endTime');
-%save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','test_preStimFixOn','test_imgOn','recogRespRT','newRespRT','recallRespRT','endTime');
 
 end % function
