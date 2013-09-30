@@ -121,10 +121,11 @@ if expParam.runPractice
     for cn = 1:length(cfg.stim.practice.categoryNames)
       imgStimStruct_prac(cn).catStims = struct();
       [imgStimStruct_prac(cn).catStims,imgStimStruct(cn).catStims] = space_divvyStims(...
-        imgStimStruct(cn).catStims,[],nPracStim,...
+        imgStimStruct(cn).catStims,[],nPracStim / length(cfg.stim.practice.categoryNames),...
         cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},[]);
-        %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},nPracStim / length(cfg.stim.practice.categoryNames));
-        %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded));
+      %imgStimStruct(cn).catStims,[],nPracStim,...
+      %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},nPracStim / length(cfg.stim.practice.categoryNames));
+      %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded));
     end
     
     wordStimStruct_prac.wordStims = struct();
@@ -149,8 +150,8 @@ end
 %   
 % %   % practice words
 % %   expParam.session.(sprintf('cn%dPractice',cn)) = [];
-% %   [expParam.session.(sprintf('cn%dPractice',cn)),wordStimStruct_prac.catStims] = space_divvyStims(...
-% %     wordStimStruct_prac.catStims,[],cfg.stim.practice.nPractice,...
+% %   [expParam.session.(sprintf('cn%dPractice',cn)),wordStimStruct_prac.wordStims] = space_divvyStims(...
+% %     wordStimStruct_prac.wordStims,[],cfg.stim.practice.nPractice,...
 % %     cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{true});
 % end
 
@@ -227,6 +228,7 @@ for s = 1:expParam.nSessions
           thisExpoName = expParam.session.(sesName).phases{p-1};
           
           expoStims = expParam.session.(sesName).(phaseName)(phaseCount).studyStims_img;
+          
           % only need one exposure of each stimulus
           expoStims = expoStims([expoStims.presNum] == 1);
           
