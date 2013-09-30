@@ -334,9 +334,6 @@ fprintf('Done.\n');
 
   function [placedAllStimuli,studyStims_img,studyStims_word,stimIndex] = distributeStims(placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxPlacementAttempts,nPairs_study_targ_onePres)
     
-    %printDebug = false;
-    
-    %for si = 1:length(stimIndex)
     for si = 1:length(studyStims_img.p1)
       
       placementCount = 0;
@@ -345,22 +342,12 @@ fprintf('Done.\n');
       % get the first presentation of this stimulus
       p1stim_img = studyStims_img.p1(si);
       p1stim_word = studyStims_word.p1(si);
-      %if printDebug
-      %  fprintf('pairNum=%d',p1stim_img.pairNum);
-      %end
       
       % if this is not a single presentation item
       if p1stim_img.lag ~= -1
         % get the second presentation of this stimulus
         p2stim_img = studyStims_img.p2([studyStims_img.p2.pairNum] == p1stim_img.pairNum);
         p2stim_word = studyStims_word.p2([studyStims_word.p2.pairNum] == p1stim_word.pairNum);
-        %if printDebug
-        %  fprintf(', %d\n',p2stim_img.pairNum);
-        %end
-      %else
-      %  if printDebug
-      %    fprintf(' (single).\n');
-      %  end
       end
       
       placedStimulus = false;
@@ -373,52 +360,29 @@ fprintf('Done.\n');
         while ~valid_p1 || ~valid_p2
           rand_p1 = randperm(length(remainingValid_p1),1);
           stimLoc_p1 = remainingValid_p1(rand_p1);
-          %if printDebug
-          %  fprintf('\tP1=%d',stimLoc_p1);
-          %end
           
           % find out if there's enough room to put in both p1 and p2
           if stimLoc_p1 <= length(stimIndex) - p1stim_img.lag - 1
-            % debug
-            %disp(stimIndex);
-            %fprintf(1,[repmat('\b',1,length(num2str(placementCount))),'%d'],placementCount);
-            
-            %if printDebug
-            %  fprintf(': true (%d).',stimIndex(stimLoc_p1));
-            %end
             valid_p1 = true;
           else
             % otherwise go back and pick a new rand_p1
-            
-            %if printDebug
-            %  fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
-            %end
             continue
           end
           
           % if this is not a single presentation, find the location of p2
           if p1stim_img.lag ~= -1
             stimLoc_p2 = stimLoc_p1 + p1stim_img.lag + 1;
-            %if printDebug
-            %  fprintf(' P2=%d',stimLoc_p2);
-            %end
             
             % if there's a NaN there, we can put it there
             if isnan(stimIndex(stimLoc_p2))
-              %if printDebug
-              %  fprintf(': true (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
-              %end
               valid_p2 = true;
             else
+              % otherwise we need a new p1
               placementCount = placementCount + 1;
-              %if printDebug
-              %  fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p2),placementCount);
-              %end
               
+              % but don't try too many times
               if placementCount >= maxPlacementAttempts
                 fprintf('\n');
-                % debug
-                %disp(stimIndex);
                 warning('Made %d placement attempts. This stimIndex probably will not work. Trying again...',maxPlacementAttempts);
                 %error('Made %d placement attempts. This stimIndex probably will not work. Delete this subject data directory and try again.',maxPlacementAttempts);
                 
@@ -433,9 +397,6 @@ fprintf('Done.\n');
           else
             % this is a single presentation item
             valid_p2 = true;
-            %if printDebug
-            %  fprintf('\n');
-            %end
           end
         end
         
