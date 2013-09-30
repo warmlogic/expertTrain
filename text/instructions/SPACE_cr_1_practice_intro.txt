@@ -1,0 +1,9 @@
+Practice
+
+You will now see "old" images that you learned earlier mixed with "new" images you have not seen before.
+
+First, you will decide whether the image is old or new. If it is an old image, press the "recogOldKey" key. Or, if it is a new image, press the "recogNewKey" key.
+
+These key assignments will be visible during the experiment as a reminder (see below), but please memorize the keys and avoid looking down at the keyboard or key assignments.
+
+Press "contKey" to continue to the next instruction screen.
