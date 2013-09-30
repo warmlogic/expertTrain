@@ -45,6 +45,8 @@ function [cfg,expParam] = space_exposure(w,cfg,expParam,logFile,sesName,phaseNam
 
 fprintf('Running %s %s (expo) (%d)...\n',sesName,phaseName,phaseCount);
 
+phaseNameForParticipant = 'judgment';
+
 %% set the starting date and time for this phase
 thisDate = date;
 startTime = fix(clock);
@@ -274,13 +276,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting judgment phase...';
+message = sprintf('Starting %s phase...',phaseNameForParticipant);
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  message = 'Starting data acquisition for judgment phase...';
+  message = sprintf('Starting data acquisition for %s phase...',phaseNameForParticipant);
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
@@ -943,6 +945,21 @@ for i = trialNum:length(expoStims_img)
   % save progress after each trial
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
+
+% print "continue" screen
+messageText = sprintf('You have finished the %s phase.\n\nPress "%s" to continue.',...
+  phaseNameForParticipant,cfg.keys.instructContKey);
+Screen('TextSize', w, cfg.text.instructTextSize);
+DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+Screen('Flip', w);
+
+% wait until the key is pressed
+RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+KbWait(-1,2);
+RestrictKeysForKbCheck([]);
+
+% go back to gray
+Screen('Flip', w);
 
 %% cleanup
 
