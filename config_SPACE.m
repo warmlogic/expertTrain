@@ -521,7 +521,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 2;
         
         % whether to have judgment keys on all the time
         cfg.stim.(sesName).(phaseName)(phaseCount).expoShowRespInBreak = true;
@@ -573,7 +573,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = false;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'word','image'},{'word','image'}};
@@ -674,7 +674,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 4;
+        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
@@ -910,7 +910,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         %cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecTarg = 6;
-        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 4;
+        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
