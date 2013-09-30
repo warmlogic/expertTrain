@@ -306,7 +306,6 @@ studyStims_word.all = eval(sprintf('struct(%s)',fn_word_str));
 
 % put p1 and p2 (and single presentations) together in study order
 placedAllStimuli = false;
-%fprintf('Shuffle count: %s',repmat(' ',1,length(num2str(maxPlacementAttempts))));
 maxParamAttempts = 100;
 paramAttemptCounter = 0;
 while ~placedAllStimuli
