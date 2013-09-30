@@ -512,9 +512,17 @@ completeTrialRT = trialRT(trialComplete);
 fprintf('length(completeTrialAcc) = %d\n',length(completeTrialAcc));
 fprintf('length(completeTrialRT) = %d\n',length(completeTrialRT));
 
+% only print RT if they got at least one right
+if ~isempty(completeTrialRT(completeTrialAcc))
+  rt_str = sprintf('For the correct trials, on average you responded in %d ms.',...
+    round(mean(completeTrialRT(completeTrialAcc))));
+else
+  rt_str = '';
+end
+
 % print accuracy and correct trial RT
-accRtText = sprintf('You have finished the %s phase.\n\nYou got %d out of %d correct.\nFor the correct trials, on average you responded in %d ms.\n\nPress "%s" to continue.',...
-  phaseNameForParticipant,sum(completeTrialAcc),length(completeTrialAcc),round(mean(completeTrialRT(completeTrialAcc))),cfg.keys.instructContKey);
+accRtText = sprintf('You have finished the %s phase.\n\nYou got %d out of %d correct.\n%s\n\nPress "%s" to continue.',...
+  phaseNameForParticipant,sum(completeTrialAcc),length(completeTrialAcc),rt_str,cfg.keys.instructContKey);
 Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,accRtText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
 Screen('Flip', w);
