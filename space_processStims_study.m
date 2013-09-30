@@ -31,7 +31,7 @@ if ~phaseCfg.isExp
       [studyStims_img.p1,imgStimStruct(cn).catStims] = space_divvyStims(...
         imgStimStruct(cn).catStims,studyStims_img.p1,...
         cfg.stim.practice.nPairs_study_targ_spaced,...
-        cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,true,[],1,[],[]});
+        cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,true,[],1,[],[]});
     end
   end
   
@@ -39,7 +39,7 @@ if ~phaseCfg.isExp
   [studyStims_word.p1,wordStimStruct.wordStims] = space_divvyStims(...
     wordStimStruct.wordStims,studyStims_word.p1,...
     cfg.stim.practice.nPairs_study_targ_spaced * length(phaseCfg.categoryNames),...
-    cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,true,[],1,[],[]});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,true,[],1,[],[]});
   
   % massed
   
@@ -49,7 +49,7 @@ if ~phaseCfg.isExp
       [studyStims_img.p1,imgStimStruct(cn).catStims] = space_divvyStims(...
         imgStimStruct(cn).catStims,studyStims_img.p1,...
         cfg.stim.practice.nPairs_study_targ_massed,...
-        cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,0,1,[],[]});
+        cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,0,1,[],[]});
     end
   end
   
@@ -57,7 +57,7 @@ if ~phaseCfg.isExp
   [studyStims_word.p1,wordStimStruct.wordStims] = space_divvyStims(...
     wordStimStruct.wordStims,studyStims_word.p1,...
     cfg.stim.practice.nPairs_study_targ_massed * length(phaseCfg.categoryNames),...
-    cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,0,1,[],[]});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,0,1,[],[]});
   
   % single presentation
   
@@ -86,7 +86,7 @@ if ~phaseCfg.isExp
         [studyStims_img.onePres,imgStimStruct(cn).catStims] = space_divvyStims(...
           imgStimStruct(cn).catStims,studyStims_img.onePres,...
           cfg.stim.practice.nPairs_study_targ_onePres,...
-          cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,-1,1,[],[]});
+          cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,-1,1,[],[]});
       end
     end
     
@@ -94,8 +94,10 @@ if ~phaseCfg.isExp
     [studyStims_word.onePres,wordStimStruct.wordStims] = space_divvyStims(...
       wordStimStruct.wordStims,studyStims_word.onePres,...
       cfg.stim.practice.nPairs_study_targ_onePres * length(phaseCfg.categoryNames),...
-      cfg.stim.practice.rmStims_init,cfg.stim.practice.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,-1,1,[],[]});
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,-1,1,[],[]});
   end
+  
+  distributeAtLags = cfg.stim.practice.lags;
 else
   % for the real experiment
   
@@ -172,15 +174,17 @@ else
       cfg.stim.nPairs_study_targ_onePres * length(phaseCfg.categoryNames),...
       cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,true,false,-1,1,[],[]});
   end
+  
+  distributeAtLags = cfg.stim.lags;
 end
 
 lagCounter = 1;
 for i = 1:length(studyStims_img.p1)
   if isempty(studyStims_img.p1(i).lag)
-    studyStims_img.p1(i).lag = cfg.stim.lags(lagCounter);
-    studyStims_word.p1(i).lag = cfg.stim.lags(lagCounter);
+    studyStims_img.p1(i).lag = distributeAtLags(lagCounter);
+    studyStims_word.p1(i).lag = distributeAtLags(lagCounter);
     
-    if lagCounter == length(cfg.stim.lags)
+    if lagCounter == length(distributeAtLags)
       lagCounter = 1;
     else
       lagCounter = lagCounter + 1;
@@ -255,7 +259,12 @@ for i = 1:length(studyStims_img.(presNum))
 end
 
 % set up the single presentation items
-if cfg.stim.nPairs_study_targ_onePres > 0
+if ~phaseCfg.isExp
+  nPairs_study_targ_onePres = cfg.stim.practice.nPairs_study_targ_onePres;
+else
+  nPairs_study_targ_onePres = cfg.stim.nPairs_study_targ_onePres;
+end
+if nPairs_study_targ_onePres > 0
   for i = 1:length(studyStims_img.onePres)
     % set the presentation number
     studyStims_img.onePres(i).presNum = 1;
@@ -297,10 +306,23 @@ studyStims_word.all = eval(sprintf('struct(%s)',fn_word_str));
 
 % put p1 and p2 (and single presentations) together in study order
 placedAllStimuli = false;
-maxAttempts = 10000;
+%fprintf('Shuffle count: %s',repmat(' ',1,length(num2str(maxPlacementAttempts))));
+maxParamAttempts = 100;
+paramAttemptCounter = 0;
 while ~placedAllStimuli
   stimIndex = nan(1,length(studyStims_img.p1) + length(studyStims_img.p2) + length(studyStims_img.onePres));
-  [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxAttempts);
+  % counter size is a function of the length of the stimIndex
+  maxPlacementAttempts = length(stimIndex) * 100;
+  
+  % count how many times we tried to distribute stimuli
+  paramAttemptCounter = paramAttemptCounter + 1;
+  [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(...
+    placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxPlacementAttempts,nPairs_study_targ_onePres);
+  
+  %disp(stimIndex);
+  if placedAllStimuli == false && paramAttemptCounter > maxParamAttempts
+    error('Tried these stim count parameters %d times. They probably will not work. Adjust parameters, delete this subject data directory, and try again.',maxParamAttempts);
+  end
 end
 
 expParam.session.(sesName).(phaseName)(phaseCount).studyStims_img = studyStims_img.all;
@@ -310,12 +332,13 @@ fprintf('Done.\n');
 
 %% function to distribute stims
 
-  function [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(cfg,placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxAttempts)
+  function [placedAllStimuli,studyStims_img,studyStims_word,stimIndex] = distributeStims(placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxPlacementAttempts,nPairs_study_targ_onePres)
     
     %printDebug = false;
     
     %for si = 1:length(stimIndex)
     for si = 1:length(studyStims_img.p1)
+      
       placementCount = 0;
       tooManyAttempts = false;
       
@@ -354,23 +377,33 @@ fprintf('Done.\n');
           %  fprintf('\tP1=%d',stimLoc_p1);
           %end
           
+          % find out if there's enough room to put in both p1 and p2
           if stimLoc_p1 <= length(stimIndex) - p1stim_img.lag - 1
+            % debug
+            %disp(stimIndex);
+            %fprintf(1,[repmat('\b',1,length(num2str(placementCount))),'%d'],placementCount);
+            
             %if printDebug
             %  fprintf(': true (%d).',stimIndex(stimLoc_p1));
             %end
             valid_p1 = true;
           else
+            % otherwise go back and pick a new rand_p1
+            
             %if printDebug
             %  fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
             %end
             continue
           end
           
+          % if this is not a single presentation, find the location of p2
           if p1stim_img.lag ~= -1
             stimLoc_p2 = stimLoc_p1 + p1stim_img.lag + 1;
             %if printDebug
             %  fprintf(' P2=%d',stimLoc_p2);
             %end
+            
+            % if there's a NaN there, we can put it there
             if isnan(stimIndex(stimLoc_p2))
               %if printDebug
               %  fprintf(': true (%d). pc=%d.\n',stimIndex(stimLoc_p1),placementCount);
@@ -381,6 +414,21 @@ fprintf('Done.\n');
               %if printDebug
               %  fprintf(': false (%d). pc=%d.\n',stimIndex(stimLoc_p2),placementCount);
               %end
+              
+              if placementCount >= maxPlacementAttempts
+                fprintf('\n');
+                % debug
+                %disp(stimIndex);
+                warning('Made %d placement attempts. This stimIndex probably will not work. Trying again...',maxPlacementAttempts);
+                %error('Made %d placement attempts. This stimIndex probably will not work. Delete this subject data directory and try again.',maxPlacementAttempts);
+                
+                tooManyAttempts = true;
+                % break the inner while loop
+                break
+              else
+                % otherwise go back and pick a new rand_p1
+                continue
+              end
             end
           else
             % this is a single presentation item
@@ -389,16 +437,9 @@ fprintf('Done.\n');
             %  fprintf('\n');
             %end
           end
-          
-          if placementCount >= maxAttempts
-            %warning('made %d attempts. trying again...',maxAttempts);
-            error('made %d attempts. delete this subject data directory and try again.',maxAttempts);
-            
-            tooManyAttempts = true;
-            break
-          end
         end
         
+        % break the outer while loop
         if tooManyAttempts
           break
         end
@@ -418,13 +459,19 @@ fprintf('Done.\n');
         placedStimulus = true;
       end
       
+      % break the for loop
       if tooManyAttempts
         break
       end
       
     end % si
     
-    if length(find(isnan(stimIndex))) == cfg.stim.nPairs_study_targ_onePres * 2
+    % get out of this function
+    if tooManyAttempts
+      return
+    end
+    
+    if length(find(isnan(stimIndex))) == nPairs_study_targ_onePres * 2
       placedAllStimuli = true;
     end
     
@@ -435,6 +482,7 @@ fprintf('Done.\n');
       studyStims_img.all(openSpots(os)) = studyStims_img.onePres(os);
       studyStims_word.all(openSpots(os)) = studyStims_word.onePres(os);
     end
+    fprintf('Successfully placed all stimuli!\n');
     
   end % function
 
