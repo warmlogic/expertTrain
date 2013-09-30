@@ -4,4 +4,4 @@ When you see a math problem, please type in the answer using the keyboard and th
 
 Please answer them as quickly and accurately as you can.
 
-Press contKey to continue.
+Press "contKey" to continue.
