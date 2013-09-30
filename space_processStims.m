@@ -59,92 +59,99 @@ wordStimStruct.wordStims = struct(...
 
 %% read the practice stimulus file, or grab stimuli from the main category for practice
 
-% if expParam.runPractice
-%   prac_phaseFamilyStimNeeded = cfg.stim.practice.nSpecies * cfg.stim.practice.nPractice;
-%   prac_independentRecogCount = 0;
-%   prac_recogFamilyStimNeeded = 0;
-%   % determine the number of independent practice recognition phases
-%   for s = 1:expParam.nSessions
-%     sesName = expParam.sesTypes{s};
-%     prac_recogCount = 0;
-%     % for each phase in this session, see if any are recognition phases
-%     for p = 1:length(expParam.session.(sesName).phases)
-%       phaseName = expParam.session.(sesName).phases{p};
-%       switch phaseName
-%         case {'prac_recog'}
-%           prac_recogCount = prac_recogCount + 1;
-%           if ~isfield(cfg.stim.(sesName).(phaseName)(prac_recogCount),'usePrevPhase') || isempty(cfg.stim.(sesName).(phaseName)(prac_recogCount).usePrevPhase)
-%             prac_independentRecogCount = prac_independentRecogCount + 1;
-%             prac_recogFamilyStimNeeded = prac_recogFamilyStimNeeded + (cfg.stim.practice.nSpecies * (cfg.stim.(sesName).(phaseName)(prac_recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(prac_recogCount).nTestLure));
-%           end
-%       end
-%     end
-%   end
-%   prac_recogFamilyStimNeeded = prac_recogFamilyStimNeeded * prac_independentRecogCount;
-%   
-%   if cfg.stim.useSeparatePracStims
-%     % read in the stimulus list
-%     fprintf('Loading stimulus list: %s...',cfg.stim.practice.stimListFile);
-%     fid = fopen(cfg.stim.practice.stimListFile);
-%     % the header line becomes the fieldnames
-%     stim_fieldnames = regexp(fgetl(fid),'\t','split');
-%     stimuli = textscan(fid,'%s%s%d%s%d%d%d%d','Delimiter','\t');
-%     fclose(fid);
-%     fprintf('Done.\n');
-%     
-%     % create a structure for each family with all the stim information
-%     
-%     % find the indices for each family and select only cfg.stim.nSpecies
-%     fprintf('Practice: Selecting %d of %d possible species for each family.\n',cfg.stim.practice.nSpecies,length(unique(stimuli{speciesNumFieldNum})));
-%     
-%     % initialize to store the stimuli
-%     stimStruct_prac = struct();
-%     
-%     % get the indices of each family and only the number of species wanted
-%     for cn = 1:length(cfg.stim.practice.categoryNames)
-%       fInd = eval([sprintf('stimuli{%d} == %d & (stimuli{%d} == %d',familyNumFieldNum,cn,speciesNumFieldNum,1),...
-%         sprintf(repmat([' | ',sprintf('stimuli{%d}',speciesNumFieldNum),' == %d'],1,(cfg.stim.practice.nSpecies - 1)),2:cfg.stim.practice.nSpecies), ')']);
-%       stimStruct_prac(cn).catStims = struct(...
-%         stim_fieldnames{1},stimuli{1}(fInd),...
-%         stim_fieldnames{2},stimuli{2}(fInd),...
-%         stim_fieldnames{3},num2cell(stimuli{3}(fInd)),...
-%         stim_fieldnames{4},stimuli{4}(fInd),...
-%         stim_fieldnames{5},num2cell(stimuli{5}(fInd)),...
-%         stim_fieldnames{6},num2cell(stimuli{6}(fInd)),...
-%         stim_fieldnames{7},num2cell(stimuli{7}(fInd)),...
-%         stim_fieldnames{8},num2cell(stimuli{8}(fInd)));
-%       
-%       if length(stimStruct_prac(cn).catStims) < (prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded)
-%         error('You have chosen %d stimuli for family %s (out of %d). This is not enough stimuli to accommodate all practice tasks.\nYou need at least %d for each of %d families (i.e., %d exemplars for each of %d species per family).',...
-%           length(stimStruct_prac(cn).catStims),cfg.stim.practice.categoryNames{cn},sum(cfg.stim.practice.nExemplars(cn,:)),(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded),length(cfg.stim.practice.categoryNames),((prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded) / cfg.stim.practice.nSpecies),cfg.stim.practice.nSpecies);
-%       end
-%     end
-%   elseif ~cfg.stim.useSeparatePracStims
-%     % find the indices for each family and select only cfg.stim.nSpecies
-%     fprintf('Practice: Selecting %d of %d possible species for each family.\n',cfg.stim.practice.nSpecies,length(unique([stimStruct(cn).catStims.speciesNum])));
-%     
-%     % initialize to store the practice stimuli
-%     stimStruct_prac = struct();
-%     
-%     for cn = 1:length(cfg.stim.categoryNames)
-%       stimStruct_prac(cn).catStims = struct();
-%       [stimStruct_prac(cn).catStims,stimStruct(cn).catStims] = et_divvyStims(...
-%         stimStruct(cn).catStims,[],((prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded) / cfg.stim.practice.nSpecies),...
-%         cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded));
-%     end
-%   end
-% end
+if expParam.runPractice
+  if cfg.stim.useSeparatePracStims
+    % read in the stimulus list
+    fprintf('Loading image stimulus list: %s...',cfg.stim.practice.imgStimListFile);
+    fid = fopen(cfg.stim.practice.imgStimListFile);
+    % the header line becomes the fieldnames
+    stim_fieldnames = regexp(fgetl(fid),'\t','split');
+    imageStimuli_prac = textscan(fid,'%s%s%d%d','Delimiter','\t');
+    fclose(fid);
+    fprintf('Done.\n');
+    
+    % create a structure for each category with all the stim information
+    
+    % initialize to store the stimuli
+    imgStimStruct_prac = struct();
+    
+    % get the indices of each family and only the number of species wanted
+    for cn = 1:length(cfg.stim.practice.categoryNames)
+      cnInd = imageStimuli_prac{ismember(stim_fieldnames,'categoryNum')} == cn;
+      
+      imgStimStruct_prac(cn).catStims = struct(...
+        stim_fieldnames{1},imageStimuli_prac{1}(cnInd),...
+        stim_fieldnames{2},imageStimuli_prac{2}(cnInd),...
+        stim_fieldnames{3},num2cell(imageStimuli_prac{3}(cnInd)),...
+        stim_fieldnames{4},num2cell(imageStimuli_prac{4}(cnInd)));
+      
+      %       if length(stimStruct_prac(cn).catStims) < (prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded)
+      %         error('You have chosen %d stimuli for family %s (out of %d). This is not enough stimuli to accommodate all practice tasks.\nYou need at least %d for each of %d families (i.e., %d exemplars for each of %d species per family).',...
+      %           length(stimStruct_prac(cn).catStims),cfg.stim.practice.categoryNames{cn},sum(cfg.stim.practice.nExemplars(cn,:)),(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded),length(cfg.stim.practice.categoryNames),((prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded) / cfg.stim.practice.nSpecies),cfg.stim.practice.nSpecies);
+      %       end
+    end
+    
+    % read in the stimulus list
+    fprintf('Loading word stimulus list: %s...',cfg.stim.practice.wordpoolListFile);
+    fid = fopen(cfg.stim.practice.wordpoolListFile);
+    % the header line becomes the fieldnames
+    stim_fieldnames = regexp(fgetl(fid),'\t','split');
+    wordStimuli_prac = textscan(fid,'%s%d','Delimiter','\t');
+    fclose(fid);
+    fprintf('Done.\n');
+    
+    % initialize to store the stimuli
+    wordStimStruct_prac = struct();
+    
+    wordStimStruct_prac.wordStims = struct(...
+      stim_fieldnames{1},wordStimuli_prac{1},...
+      stim_fieldnames{2},num2cell(wordStimuli_prac{2}));
+    
+  elseif ~cfg.stim.useSeparatePracStims
+    % find the indices for each family and select only cfg.stim.nSpecies
+%     fprintf('Practice: Selecting %d of %d possible species for each family.\n',cfg.stim.practice.nSpecies,length(unique([imgStimStruct(cn).catStims.speciesNum])));
+    
+    % initialize to store the practice stimuli
+    imgStimStruct_prac = struct();
+    
+    nPracStim = (((cfg.stim.practice.nPairs_study_targ_spaced + cfg.stim.practice.nPairs_study_targ_massed) * 2)...
+      + cfg.stim.practice.nPairs_study_targ_onePres + cfg.stim.practice.nPairs_test_lure)...
+      * length(cfg.stim.practice.categoryNames);
+    
+    for cn = 1:length(cfg.stim.practice.categoryNames)
+      imgStimStruct_prac(cn).catStims = struct();
+      [imgStimStruct_prac(cn).catStims,imgStimStruct(cn).catStims] = space_divvyStims(...
+        imgStimStruct(cn).catStims,[],nPracStim,...
+        cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},[]);
+        %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},nPracStim / length(cfg.stim.practice.categoryNames));
+        %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded));
+    end
+    
+    wordStimStruct_prac.wordStims = struct();
+    [wordStimStruct_prac.wordStims,wordStimStruct.wordStims] = space_divvyStims(...
+      wordStimStruct.wordStims,[],nPracStim,...
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},[]);
+    %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},nPracStim / length(cfg.stim.practice.categoryNames));
+    %cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{},{},(prac_phaseFamilyStimNeeded + prac_recogFamilyStimNeeded));
+  end
+end
 
 % %% Decide which will be the practice stimuli from each category
 % 
 % if expParam.runPractice
-%   % practice
+%   % practice images
 %   for cn = 1:length(cfg.stim.practice.categoryNames)
 %     expParam.session.(sprintf('cn%dPractice',cn)) = [];
-%     [expParam.session.(sprintf('cn%dPractice',cn)),stimStruct_prac(cn).catStims] = et_divvyStims(...
-%       stimStruct_prac(cn).catStims,[],cfg.stim.practice.nPractice,...
+%     [expParam.session.(sprintf('cn%dPractice',cn)),imgStimStruct_prac(cn).catStims] = space_divvyStims(...
+%       imgStimStruct_prac(cn).catStims,[],cfg.stim.practice.nPractice,...
 %       cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{true});
 %   end
+%   
+% %   % practice words
+% %   expParam.session.(sprintf('cn%dPractice',cn)) = [];
+% %   [expParam.session.(sprintf('cn%dPractice',cn)),wordStimStruct_prac.catStims] = space_divvyStims(...
+% %     wordStimStruct_prac.catStims,[],cfg.stim.practice.nPractice,...
+% %     cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{true});
 % end
 
 %% Configure each session and phase
@@ -200,7 +207,11 @@ for s = 1:expParam.nSessions
             cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           end
         else
-          [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_study(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct);
+          if phaseCfg.isExp
+            [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_study(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct);
+          else
+            [cfg,expParam,imgStimStruct_prac,wordStimStruct_prac] = space_processStims_study(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct_prac,wordStimStruct_prac);
+          end
         end
         
         % if there was an exposure phase directly before this phase,
@@ -246,8 +257,6 @@ for s = 1:expParam.nSessions
           elseif phaseCount > 1
             cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           end
-        %else
-        %  [cfg,expParam] = space_processStims_distract_math(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'cued_recall','prac_cued_recall'}
@@ -279,7 +288,11 @@ for s = 1:expParam.nSessions
             cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           end
         else
-          [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct,'multistudy');
+          if phaseCfg.isExp
+            [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct,'multistudy');
+          else
+            [cfg,expParam,imgStimStruct_prac,wordStimStruct_prac] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct_prac,wordStimStruct_prac,'prac_multistudy');
+          end
         end
         
     end % switch
