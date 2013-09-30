@@ -4,8 +4,6 @@ function [cfg,expParam] = space_distract_math(w,cfg,expParam,logFile,sesName,pha
 % Description:
 %  This function runs the math distractor task. There are no blocks, only
 %  short (blink) breaks.
-%  TODO: Maybe add a longer break in the middle and tell subjects that this
-%  is the middle of the experiment.
 %
 %
 % Inputs:
@@ -16,11 +14,9 @@ function [cfg,expParam] = space_distract_math(w,cfg,expParam,logFile,sesName,pha
 %
 %
 
-% % durations, in seconds
-
-% % keys
-
 fprintf('Running %s %s (distMath) (%d)...\n',sesName,phaseName,phaseCount);
+
+phaseNameForParticipant = 'math';
 
 %% set the starting date and time for this phase
 thisDate = date;
@@ -135,13 +131,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting math phase...';
+message = sprintf('Starting %s phase...',phaseNameForParticipant);
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  message = 'Starting data acquisition for math phase...';
+  message = sprintf('Starting data acquisition for %s phase...',phaseNameForParticipant);
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
@@ -513,8 +509,8 @@ fprintf('length(completeTrialAcc) = %d\n',length(completeTrialAcc));
 fprintf('length(completeTrialRT) = %d\n',length(completeTrialRT));
 
 % print accuracy and correct trial RT
-accRtText = sprintf('You got %d out of %d correct.\nFor the correct trials, on average you responded in %d ms.\n\nPress "%s" to continue.',...
-  sum(completeTrialAcc),length(completeTrialAcc),round(mean(completeTrialRT(completeTrialAcc))),cfg.keys.instructContKey);
+accRtText = sprintf('You have finished the %s phase.\n\nYou got %d out of %d correct.\nFor the correct trials, on average you responded in %d ms.\n\nPress "%s" to continue.',...
+  phaseNameForParticipant,sum(completeTrialAcc),length(completeTrialAcc),round(mean(completeTrialRT(completeTrialAcc))),cfg.keys.instructContKey);
 Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,accRtText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
 Screen('Flip', w);
