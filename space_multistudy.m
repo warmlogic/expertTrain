@@ -1161,7 +1161,10 @@ for i = trialNum:length(studyStims_img)
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
 
-% print "continue" screen
+%% print "continue" screen
+
+WaitSecs(2.0);
+
 messageText = sprintf('You have finished the %s phase.\n\nPress "%s" to continue.',...
   phaseNameForParticipant,cfg.keys.instructContKey);
 Screen('TextSize', w, cfg.text.instructTextSize);

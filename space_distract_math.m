@@ -502,6 +502,10 @@ for i = trialNum:phaseCfg.dist_nProbs
   end
 end
 
+%% print "continue" screen
+
+WaitSecs(2.0);
+
 completeTrialAcc = trialAcc(trialComplete);
 completeTrialRT = trialRT(trialComplete);
 
