@@ -652,6 +652,9 @@ for i = trialNum:length(testStims_img)
           end
           if isempty(char)
             return
+          else
+            % get the time the key was pressed using GetSecs
+            respMadeRT = GetSecs;
           end
           
           switch (abs(char))
@@ -690,7 +693,7 @@ for i = trialNum:length(testStims_img)
           % draw their text
           Screen('TextSize', w, cfg.text.fixSize);
           Screen('DrawText', w, sprintf('%s',dispRecallResp), recallX, recallY, cfg.text.basicTextColor);
-          [respMadeRT] = Screen('Flip', w);
+          Screen('Flip', w);
           
           WaitSecs(0.0001);
         end
