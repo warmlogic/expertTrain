@@ -674,20 +674,32 @@ for i = trialNum:length(expoStims_img)
   % determine response and compute accuracy
   if keyIsDown
     if (keyCode(cfg.keys.expo1) == 1 && all(keyCode(~cfg.keys.expo1) == 0))
-      %resp = '1';
-      resp = 'alot';
+      if cfg.keys.expoKeySet == 1
+        resp = 'v_appeal';
+      elseif cfg.keys.expoKeySet == 2
+        resp = 'v_unappeal';
+      end
       message = '';
     elseif (keyCode(cfg.keys.expo2) == 1 && all(keyCode(~cfg.keys.expo2) == 0))
-      %resp = '2';
-      resp = 'some';
+      if cfg.keys.expoKeySet == 1
+        resp = 's_appeal';
+      elseif cfg.keys.expoKeySet == 2
+        resp = 's_unappeal';
+      end
       message = '';
     elseif (keyCode(cfg.keys.expo3) == 1 && all(keyCode(~cfg.keys.expo3) == 0))
-      %resp = '3';
-      resp = 'alittle';
+      if cfg.keys.expoKeySet == 1
+        resp = 's_unappeal';
+      elseif cfg.keys.expoKeySet == 2
+        resp = 's_appeal';
+      end
       message = '';
     elseif (keyCode(cfg.keys.expo4) == 1 && all(keyCode(~cfg.keys.expo4) == 0))
-      %resp = '4';
-      resp = 'notatall';
+      if cfg.keys.expoKeySet == 1
+        resp = 'v_unappeal';
+      elseif cfg.keys.expoKeySet == 2
+        resp = 'v_appeal';
+      end
       message = '';
     elseif sum(keyCode) > 1
       warning('Multiple keys were pressed.\n');
