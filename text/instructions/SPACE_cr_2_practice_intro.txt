@@ -9,6 +9,8 @@ OR
 
 If instead you decided it is a new image, you will then say whether you are "sure" about it by pressing the "newSureKey" key, or that it was "maybe" new by pressing the "newMaybeKey" key.
 
+Just like for the first old/new response, you should use your index fingers to press newSureKey and newMaybeKey.
+
 For the sure/maybe response, the key assignments will be visible as a reminder (see below), but please memorize the keys and avoid looking down at the keyboard or key assignments.
 
 Press "contKey" to continue to the experiment.
