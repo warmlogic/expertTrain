@@ -60,6 +60,7 @@ expParam.sesTypes = {'oneDay'};
 expParam.session.oneDay.phases = {...
   'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall',...
   'expo','multistudy','distract_math','cued_recall',...
+  'expo','multistudy','distract_math','cued_recall',...
   'expo','multistudy','distract_math','cued_recall'};
 
 % % debug
@@ -123,7 +124,7 @@ if expParam.sessionNum == 1
     cfg.stim.secUntilBlinkBreak = 45.0;
   else
     % timer in secs for when to take a blink break (only when useNS=false)
-    cfg.stim.secUntilBlinkBreak = 90.0;
+    cfg.stim.secUntilBlinkBreak = 120.0;
   end
   
   %% Stimulus parameters
@@ -227,15 +228,17 @@ if expParam.sessionNum == 1
 %   % total number of additional lure pairs is: nPairs * number of categories
 %   cfg.stim.nPairs_test_lure = 20;
   
-  cfg.stim.nPairs_study_targ_spaced = 12;
-  cfg.stim.nPairs_study_targ_massed = 12;
-  cfg.stim.nPairs_study_targ_onePres = 8;
-  cfg.stim.nPairs_test_lure = 12;
+%   % 2 lists
+%   cfg.stim.nPairs_study_targ_spaced = 12;
+%   cfg.stim.nPairs_study_targ_massed = 12;
+%   cfg.stim.nPairs_study_targ_onePres = 8;
+%   cfg.stim.nPairs_test_lure = 12;
   
-%   cfg.stim.nPairs_study_targ_spaced = 10;
-%   cfg.stim.nPairs_study_targ_massed = 10;
-%   cfg.stim.nPairs_study_targ_onePres = 10;
-%   cfg.stim.nPairs_test_lure = 10;
+  % 3 lists
+  cfg.stim.nPairs_study_targ_spaced = 8;
+  cfg.stim.nPairs_study_targ_massed = 8;
+  cfg.stim.nPairs_study_targ_onePres = 5;
+  cfg.stim.nPairs_test_lure = 8;
   
   %cfg.stim.lags = [2 4 8];
   %cfg.stim.lags = [4 8];
@@ -324,6 +327,11 @@ if expParam.sessionNum == 1
     cfg.text.expo2 = 'somewhat appealing';
     cfg.text.expo3 = 'somewhat unappealing';
     cfg.text.expo4 = 'very unappealing';
+    
+    cfg.text.expo1resp = 'v_appeal';
+    cfg.text.expo2resp = 's_appeal';
+    cfg.text.expo3resp = 's_unappeal';
+    cfg.text.expo4resp = 'v_unappeal';
   else
     cfg.keys.expoKeySet = 2;
     cfg.keys.expo1 = KbName(cfg.keys.expoKeyNames{4});
@@ -335,6 +343,11 @@ if expParam.sessionNum == 1
     cfg.text.expo2 = 'somewhat unappealing';
     cfg.text.expo3 = 'somewhat appealing';
     cfg.text.expo4 = 'very appealing';
+    
+    cfg.text.expo1resp = 'v_unappeal';
+    cfg.text.expo2resp = 's_unappeal';
+    cfg.text.expo3resp = 's_appeal';
+    cfg.text.expo4resp = 'v_appeal';
   end
   
   % study response keys (counterbalanced based on subNum 1-5, 6-0)
@@ -642,7 +655,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxNum = 10;
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_plusMinus = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 5;
-        cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 10.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 15.0;
         
         % do we want to play feedback beeps for no response?
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
