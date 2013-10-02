@@ -121,7 +121,7 @@ if testInOrderedGroups > 1
   lureStimsInFinalGroup = mod(length(testStims_img),testInOrderedGroups);
   
   % shuffle the lures before we select from them
-  fprintf('Shuffling %s test (%d) task stimuli.\n',sesName,phaseCount);
+  fprintf('Shuffling %s test (%d) task stimuli, lures for ordered groups.\n',sesName,phaseCount);
   [testStims_img,randind] = et_shuffleStims(...
     testStims_img,'categoryNum',phaseCfg.crMaxConsecCategory);
   % put the word stimuli in the same shuffled order
@@ -139,7 +139,7 @@ if testInOrderedGroups > 1
     thisOrderedGroup_word = cat(1,p1_StudyStims_word(targStartInd:targEndInd),testStims_word(lureStartInd:lureEndInd));
     
     % shuffle this group of targets and lures together
-    fprintf('Shuffling %s test (%d) task stimuli.\n',sesName,phaseCount);
+    fprintf('Shuffling %s test (%d) task stimuli, ordered test groups.\n',sesName,phaseCount);
     [thisOrderedGroup_img,randind] = et_shuffleStims(...
       thisOrderedGroup_img,'categoryNum',phaseCfg.crMaxConsecCategory);
     % put the word stimuli in the same shuffled order
@@ -197,7 +197,7 @@ else
   
   % Reshuffle images for the experiment. No more than X conecutive stimuli
   % from the same category
-  fprintf('Shuffling %s test (%d) task stimuli.\n',sesName,phaseCount);
+  fprintf('Shuffling %s test (%d) task stimuli, no ordered test groups.\n',sesName,phaseCount);
   [testStims_img,randind] = et_shuffleStims(...
     testStims_img,'categoryNum',phaseCfg.crMaxConsecCategory);
   %expParam.session.(sesName).(phaseName)(phaseCount).testStims_img,'targ',phaseCfg.crMaxConsecTarg);
