@@ -18,7 +18,6 @@ if ~isExp
   
 elseif isExp
   % real experiment
-  nLists = 2;
   
   % spaced = 20;
   % massed = 16;
@@ -30,15 +29,24 @@ elseif isExp
   % onePres = 8;
   % lures = 16;
   
-  spaced = 12;
-  massed = 12;
-  onePres = 8;
-  lures = 12;
-  
   % spaced = 10;
   % massed = 10;
   % onePres = 10;
   % lures = 10;
+  
+%   nLists = 2;
+
+%   spaced = 12;
+%   massed = 12;
+%   onePres = 8;
+%   lures = 12;
+
+  nLists = 3;
+
+  spaced = 8;
+  massed = 8;
+  onePres = 6;
+  lures = 8;
   
   nDist = 30;
 end
