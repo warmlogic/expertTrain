@@ -47,7 +47,6 @@ else
   trialComplete = false(1,length(expParam.session.(sesName).(phaseName)(phaseCount).testStims_img));
   phaseComplete = false; %#ok<NASGU>
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
-  %save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','test_preStimFixOn','test_imgOn','recogRespPromptOn','recogRT');
 end
 
 % find the starting trial
@@ -186,11 +185,11 @@ end
 
 %% Prepare the cued recall test task
 
-% put it in the log file
-startTime = fix(clock);
-startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
-fprintf(logFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-fprintf(phLFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+% % put it in the log file
+% startTime = fix(clock);
+% startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
+% fprintf(logFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
+% fprintf(phLFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
 
 stimImgRect_all = nan(length(testStims_img),4);
 recallX_all = nan(length(testStims_img),1);
