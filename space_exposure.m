@@ -178,9 +178,16 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
-% should the stimuli remain on the screen during the response prompt?
-if ~isfield(phaseCfg,'stimDuringPrompt')
-  phaseCfg.stimDuringPrompt = true;
+if ~isfield(phaseCfg,'impedanceAfter_nTrials')
+  phaseCfg.impedanceAfter_nTrials = 0;
+end
+
+if ~isfield(phaseCfg,'showRespInBreak')
+  phaseCfg.showRespInBreak = true;
+end
+
+if ~isfield(phaseCfg,'showRespBtStim')
+  phaseCfg.showRespBtStim = true;
 end
 
 %% preload all stimuli for presentation
@@ -351,7 +358,7 @@ for i = trialNum:length(expoStims_img)
     end
     pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(expoStims_img));
     
-    if phaseCfg.expoShowRespInBreak
+    if phaseCfg.showRespInBreak
       % draw response prompt
       Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
     end
@@ -369,7 +376,7 @@ for i = trialNum:length(expoStims_img)
     
     RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
     
-    if phaseCfg.expoShowRespInBreak
+    if phaseCfg.showRespInBreak
       % draw response prompt
       Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
     end
@@ -412,7 +419,7 @@ for i = trialNum:length(expoStims_img)
   
   % ISI between trials
   if phaseCfg.expo_isi > 0
-    if phaseCfg.expoShowRespBtStim
+    if phaseCfg.showRespBtStim
       % draw response prompt
       Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
     end
@@ -428,7 +435,7 @@ for i = trialNum:length(expoStims_img)
 %   if length(phaseCfg.expo_preStim) == 1
 %     if phaseCfg.expo_preStim > 0
 %       if phaseCfg.fixDuringPreStim
-%         if phaseCfg.expoShowRespBtStim
+%         if phaseCfg.showRespBtStim
 %           % draw response prompt
 %           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
 %         end
@@ -437,7 +444,7 @@ for i = trialNum:length(expoStims_img)
 %         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
 %         [preStimFixOn] = Screen('Flip',w);
 %       else
-%         if phaseCfg.expoShowRespBtStim
+%         if phaseCfg.showRespBtStim
 %           % draw response prompt
 %           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
 %         end
@@ -449,7 +456,7 @@ for i = trialNum:length(expoStims_img)
 %   elseif length(phaseCfg.expo_preStim) == 2
 %     if ~all(phaseCfg.expo_preStim == 0)
 %       if phaseCfg.fixDuringPreStim
-%         if phaseCfg.expoShowRespBtStim
+%         if phaseCfg.showRespBtStim
 %           % draw response prompt
 %           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
 %         end
@@ -458,7 +465,7 @@ for i = trialNum:length(expoStims_img)
 %         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
 %         [preStimFixOn] = Screen('Flip',w);
 %       else
-%         if phaseCfg.expoShowRespBtStim
+%         if phaseCfg.showRespBtStim
 %           % draw response prompt
 %           Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
 %         end
@@ -480,7 +487,7 @@ for i = trialNum:length(expoStims_img)
   end
   if preStimTime > 0
     if phaseCfg.fixDuringPreStim
-      if phaseCfg.expoShowRespBtStim
+      if phaseCfg.showRespBtStim
         % draw response prompt
         Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
       end
@@ -489,7 +496,7 @@ for i = trialNum:length(expoStims_img)
       DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       [preStimFixOn] = Screen('Flip',w);
     else
-      if phaseCfg.expoShowRespBtStim
+      if phaseCfg.showRespBtStim
         % draw response prompt
         Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
       end
@@ -760,7 +767,7 @@ for i = trialNum:length(expoStims_img)
   end
   
   if (phaseCfg.expo_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.expo_isi == 0 && phaseCfg.fixDuringPreStim)
-    if phaseCfg.expoShowRespBtStim
+    if phaseCfg.showRespBtStim
       % draw response prompt
       Screen('DrawTexture', w, expoKeyImg, [], expoKeyImgRect);
     end

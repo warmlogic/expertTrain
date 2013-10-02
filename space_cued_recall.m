@@ -176,6 +176,14 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
+if ~isfield(phaseCfg,'impedanceAfter_nTrials')
+  phaseCfg.impedanceAfter_nTrials = 0;
+end
+
+if ~isfield(phaseCfg,'showRespInBreak')
+  phaseCfg.showRespInBreak = true;
+end
+
 %% Prepare the cued recall test task
 
 % put it in the log file
@@ -314,6 +322,24 @@ if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
 end
 
 for i = trialNum:length(testStims_img)
+  % do an impedance check after a certain number of trials
+  if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(testStims_img) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
+    % run the impedance break
+    thisGetSecs = GetSecs;
+    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
+    thisGetSecs = et_impedanceCheck(w, cfg, true);
+    fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+    fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+    
+    RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
+    
+    % reset the blink timer
+    if cfg.stim.secUntilBlinkBreak > 0
+      blinkTimerStart = GetSecs;
+    end
+  end
+  
   % Do a blink break if recording EEG and specified time has passed
   if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(testStims_img) - 3)
     thisGetSecs = GetSecs;
@@ -326,6 +352,15 @@ for i = trialNum:length(testStims_img)
       pauseMsg = '';
     end
     pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(testStims_img));
+    
+    if phaseCfg.showRespInBreak
+      % draw response prompt, one on top of the other
+      Screen('DrawTexture', w, sureMaybeKeyImg, [], sureMaybeKeyImgRect);
+      
+      %Screen('DrawTexture', w, oldNewKeyImg, [], oldNewKeyImgRect);
+      Screen('DrawTexture', w, oldNewKeyImg, [], AdjoinRect(oldNewKeyImgRect,sureMaybeKeyImgRect,RectTop));
+    end
+    
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
     Screen('Flip', w);

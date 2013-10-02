@@ -527,8 +527,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 2;
         
         % whether to have judgment keys on all the time
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoShowRespInBreak = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoShowRespBtStim = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).showRespBtStim = true;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).expo_isi = 0.0;
@@ -680,8 +680,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
         end
+        
+        % whether to have judgment keys on all the time
+        cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
         
         % whether to have judgment text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;
@@ -747,9 +750,13 @@ if expParam.sessionNum == 1
         
         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
         
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
+        end
+        
         % whether to have judgment keys on all the time
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoShowRespInBreak = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoShowRespBtStim = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).showRespBtStim = true;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).expo_isi = 0.0;
@@ -800,10 +807,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 3;
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
         
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_nPairs = 50;
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'word','image'}};
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
+        end
+        
         cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'word','image'},{'word','image'}};
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'image','word'},{'image','word'}};
         
         % stimulus order. 1 = simultaneous. 2 = sequential. 3 = overlap.
         cfg.stim.(sesName).(phaseName)(phaseCount).studyPresent = studyPresent; 
@@ -823,7 +831,6 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_postPair = 0.8;
         %cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
         
         % do we want to play feedback beeps?
@@ -859,10 +866,6 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = false;
-        
-        %if expParam.useNS
-        %  cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-        %end
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_isi = 0.0;
@@ -916,8 +919,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
         end
+        
+        % whether to have judgment keys on all the time
+        cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
         
         % whether to have judgment text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;

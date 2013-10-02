@@ -112,6 +112,10 @@ if phaseCfg.playSound
   end
 end
 
+% if ~isfield(phaseCfg,'impedanceAfter_nTrials')
+%   phaseCfg.impedanceAfter_nTrials = 0;
+% end
+
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
