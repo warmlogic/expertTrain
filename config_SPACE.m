@@ -142,7 +142,7 @@ if expParam.sessionNum == 1
   cfg.stim.cropWidth = cfg.stim.nRows * (2/3);% 320;
   
   % scale stimlus down (< 1) or up (> 1)
-  cfg.stim.stimScale = 0.75;
+  cfg.stim.stimScale = 0.6;
   
   % image directory holds the stims and resources
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
