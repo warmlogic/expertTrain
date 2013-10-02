@@ -153,3 +153,5 @@ Links
 - Project page: https://github.com/warmlogic/expertTrain
 - Psychtoolbox: http://psychtoolbox.org/PsychtoolboxDownload
 - My page: http://psych.colorado.edu/~mollison/
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/1ca46b4add50a53cc5a17326d3470510 "githalytics.com")](http://githalytics.com/warmlogic/expertTrain)
