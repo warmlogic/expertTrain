@@ -509,9 +509,6 @@ WaitSecs(2.0);
 completeTrialAcc = trialAcc(trialComplete);
 completeTrialRT = trialRT(trialComplete);
 
-fprintf('length(completeTrialAcc) = %d\n',length(completeTrialAcc));
-fprintf('length(completeTrialRT) = %d\n',length(completeTrialRT));
-
 % only print RT if they got at least one right
 if ~isempty(completeTrialRT(completeTrialAcc))
   rt_str = sprintf('For the correct trials, on average you responded in %d ms.',...
