@@ -1,6 +1,6 @@
 You will now see a series of pictures of people and living rooms.
 
-Your job is to judge how appealing each person and living room is to you. These judgments are important for the remainder of the experiment, so please be honest, but also try to respond quickly.
+Your job is to judge how appealing each person and living room is to you. These judgments are important for the remainder of the experiment, so please be honest, but also try to respond quickly. Please try to use the full range of responses.
 
 Your options are "expo1Text", "expo2Text", "expo3Text", and "expo4Text".
 You will indicate your response with the keys "expo1Key", "expo2Key", "expo3Key", and "expo4Key", respectively.
