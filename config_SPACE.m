@@ -235,11 +235,17 @@ if expParam.sessionNum == 1
 %   cfg.stim.nPairs_test_lure = 12;
   
   % 3 lists
-  cfg.stim.nPairs_study_targ_spaced = 8;
-  cfg.stim.nPairs_study_targ_massed = 8;
+%   cfg.stim.nPairs_study_targ_spaced = 8;
+%   cfg.stim.nPairs_study_targ_massed = 8;
+%   %cfg.stim.nPairs_study_targ_onePres = 5;
+%   cfg.stim.nPairs_study_targ_onePres = 8;
+%   cfg.stim.nPairs_test_lure = 8;
+  
+  cfg.stim.nPairs_study_targ_spaced = 9;
+  cfg.stim.nPairs_study_targ_massed = 9;
   %cfg.stim.nPairs_study_targ_onePres = 5;
-  cfg.stim.nPairs_study_targ_onePres = 8;
-  cfg.stim.nPairs_test_lure = 8;
+  cfg.stim.nPairs_study_targ_onePres = 9;
+  cfg.stim.nPairs_test_lure = 9;
   
   %cfg.stim.lags = [2 4 8];
   %cfg.stim.lags = [4 8];

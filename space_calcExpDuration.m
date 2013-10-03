@@ -43,15 +43,15 @@ elseif isExp
 
   nBlocks = 3;
 
+  spaced = 9;
+  massed = 9;
+  onePres = 9;
+  lures = 9;
+  
 %   spaced = 8;
 %   massed = 8;
-%   onePres = 5;
+%   onePres = 8;
 %   lures = 8;
-  
-  spaced = 8;
-  massed = 8;
-  onePres = 8;
-  lures = 8;
   
   nDist = 30;
 end
