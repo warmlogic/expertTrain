@@ -361,6 +361,14 @@ switch phaseName
       return
     end
     
+    % Subjects 1-7 had lures (targ=0) marked as spaced=-1. needs to be
+    % false instead because logical(-1)=1.
+    if str2double(subject(end-2:end)) <= 7
+      logData{crS.spaced}([logData{crS.targ}] == 0 & logData{crS.trial} ~= 0) = false;
+      % % another method
+      % logData{crS.spaced}([logData{crS.spaced}] == -1) = false;
+    end
+    
     % set all fields here so we can easily concatenate events later
     log = struct('subject',subject,'session',sesNum,'sesName',sesName,...
       'phaseName',phaseName,'phaseCount',phaseCount,...
@@ -419,10 +427,12 @@ switch phaseName
             %fprintf('\tNo recall response!!\n')
           else
             if checkSpelling
+              % if we want to check the spelling on their recall responses
               if strcmpi(log(i).recall_resp,log(i).recall_origword)
                 % auto spell check
                 log(i).recall_spellCorr = true;
               else
+                % manual spell check
                 fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
                 fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                 fprintf('\tTheir response: %s\n',log(i).recall_resp);
@@ -440,8 +450,8 @@ switch phaseName
                 end
                 log(i).recall_spellCorr = logical(decision);
               end
-              
             else
+              % if we don't want to check their spelling
               log(i).recall_spellCorr = logical(logData{crS.recall_corrSpell}(i));
             end
           end
