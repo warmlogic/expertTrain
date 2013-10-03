@@ -7,7 +7,7 @@ isExp = true;
 
 if ~isExp
   % practice
-  nLists = 1;
+  nBlocks = 1;
   
   spaced = 2;
   massed = 2;
@@ -34,18 +34,23 @@ elseif isExp
   % onePres = 10;
   % lures = 10;
   
-%   nLists = 2;
+%   nBlocks = 2;
 
 %   spaced = 12;
 %   massed = 12;
 %   onePres = 8;
 %   lures = 12;
 
-  nLists = 3;
+  nBlocks = 3;
 
+%   spaced = 8;
+%   massed = 8;
+%   onePres = 5;
+%   lures = 8;
+  
   spaced = 8;
   massed = 8;
-  onePres = 6;
+  onePres = 8;
   lures = 8;
   
   nDist = 30;
@@ -64,7 +69,7 @@ nTestStimuli = (spaced + massed + onePres + lures) * nCategories;
 expo_isi = 0;
 expo_preStim = mean([1.0 1.2]);
 expo_stim = 1.0;
-expo_resp = 2;
+expo_resp = 1.0;
 
 expo_trial = expo_isi + expo_preStim + expo_stim + expo_resp;
 expoTime = expo_trial * nStudyStimuli; 
@@ -97,8 +102,8 @@ distTime = dist_trial * nDist;
 cr_isi = 0;
 cr_preStim = mean([1.0 1.2]);
 cr_stim = 1.0;
-cr_recogResp = 1;
-cr_recallResp = 5;
+cr_recogResp = 2;
+cr_recallResp = 3;
 
 cr_trial = cr_isi + cr_preStim + cr_stim + cr_recogResp + cr_recallResp;
 testTime = cr_trial * nTestStimuli; 
@@ -114,4 +119,4 @@ fprintf('Cued recall for %d images:\t%.2f minutes.\n',nTestStimuli,(testTime / 6
 
 fprintf('\nTotal time per list: %.2f minutes\n',(totalTime / 60));
 
-fprintf('Total experiment (%d lists): %.2f minutes\n\n',nLists,(totalTime * nLists / 60));
+fprintf('Total experiment (%d blocks): %.2f minutes\n\n',nBlocks,(totalTime * nBlocks / 60));
