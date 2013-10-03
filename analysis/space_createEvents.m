@@ -420,40 +420,44 @@ switch phaseName
           % unique to RECOGTEST_RECALLRESP
           log(i).recall_resp = logData{crS.recall_resp}{i};
           log(i).recall_origword = logData{crS.recall_origword}{i};
-          if isempty(log(i).recall_resp)
-            log(i).recall_spellCorr = false;
-            % debug
-            %fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
-            %fprintf('\tNo recall response!!\n')
-          else
-            if checkSpelling
-              % if we want to check the spelling on their recall responses
-              if strcmpi(log(i).recall_resp,log(i).recall_origword)
-                % auto spell check
-                log(i).recall_spellCorr = true;
-              else
-                % manual spell check
-                fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
-                fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
-                fprintf('\tTheir response: %s\n',log(i).recall_resp);
-                
-                while 1
-                  decision = input('                Correct or incorrect? (1 or 0?). ');
-                  if ~isempty(decision) && isnumeric(decision) && (decision == 1 || decision == 0)
-                    if decision
-                      fprintf('\t\tMarked correct!\n');
-                    else
-                      fprintf('\t\tMarked incorrect!\n');
-                    end
-                    break
-                  end
-                end
-                log(i).recall_spellCorr = logical(decision);
-              end
+          if log(i).targ
+            if isempty(log(i).recall_resp)
+              log(i).recall_spellCorr = false;
+              % debug
+              %fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
+              %fprintf('\tNo recall response!!\n')
             else
-              % if we don't want to check their spelling
-              log(i).recall_spellCorr = logical(logData{crS.recall_corrSpell}(i));
+              if checkSpelling
+                % if we want to check the spelling on their recall responses
+                if strcmpi(log(i).recall_resp,log(i).recall_origword)
+                  % auto spell check
+                  log(i).recall_spellCorr = true;
+                else
+                  % manual spell check
+                  fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
+                  fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
+                  fprintf('\tTheir response: %s\n',log(i).recall_resp);
+                  
+                  while 1
+                    decision = input('                Correct or incorrect? (1 or 0?). ');
+                    if ~isempty(decision) && isnumeric(decision) && (decision == 1 || decision == 0)
+                      if decision
+                        fprintf('\t\tMarked correct!\n');
+                      else
+                        fprintf('\t\tMarked incorrect!\n');
+                      end
+                      break
+                    end
+                  end
+                  log(i).recall_spellCorr = logical(decision);
+                end
+              else
+                % if we don't want to check their spelling
+                log(i).recall_spellCorr = logical(logData{crS.recall_corrSpell}(i));
+              end
             end
+          else
+            log(i).recall_spellCorr = false;
           end
           log(i).recall_rt = single(logData{crS.recall_rt}(i));
           
@@ -513,7 +517,7 @@ switch phaseName
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
     
-    % mark the subject as spacelete
+    % mark the subject as complete
     if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
       events.isComplete = true;
     end
