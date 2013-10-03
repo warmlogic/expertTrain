@@ -315,7 +315,7 @@ while ~placedAllStimuli
   
   % count how many times we tried to distribute stimuli
   paramAttemptCounter = paramAttemptCounter + 1;
-  [placedAllStimuli,studyStims_img,studyStims_word] = distributeStims(...
+  [placedAllStimuli,studyStims_img,studyStims_word,stimIndex] = distributeStims(...
     placedAllStimuli,stimIndex,studyStims_img,studyStims_word,maxPlacementAttempts,nPairs_study_targ_onePres);
   
   %disp(stimIndex);
@@ -326,6 +326,9 @@ end
 
 expParam.session.(sesName).(phaseName)(phaseCount).studyStims_img = studyStims_img.all;
 expParam.session.(sesName).(phaseName)(phaseCount).studyStims_word = studyStims_word.all;
+
+% save this for bookkeeping
+expParam.session.(sesName).(phaseName)(phaseCount).stimIndex = stimIndex;
 
 fprintf('Done.\n');
 
