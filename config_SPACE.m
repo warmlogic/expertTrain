@@ -237,12 +237,14 @@ if expParam.sessionNum == 1
   % 3 lists
   cfg.stim.nPairs_study_targ_spaced = 8;
   cfg.stim.nPairs_study_targ_massed = 8;
-  cfg.stim.nPairs_study_targ_onePres = 5;
+  %cfg.stim.nPairs_study_targ_onePres = 5;
+  cfg.stim.nPairs_study_targ_onePres = 8;
   cfg.stim.nPairs_test_lure = 8;
   
   %cfg.stim.lags = [2 4 8];
   %cfg.stim.lags = [4 8];
-  cfg.stim.lags = 8;
+  %cfg.stim.lags = 8;
+  cfg.stim.lags = 12;
   
   % how to divide the test stimuli (e.g., so they match the study order).
   % The number denotes how many groups to split stimuli into. 0 = no order.
