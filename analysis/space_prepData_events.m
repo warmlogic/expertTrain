@@ -47,6 +47,12 @@ if nargin == 0
     'SPACE005';
     'SPACE006';
     'SPACE007';
+    'SPACE008';
+    'SPACE009';
+    'SPACE010';
+    'SPACE011';
+    'SPACE012';
+    'SPACE013';
     };
   
   prep_eeg = 0;
