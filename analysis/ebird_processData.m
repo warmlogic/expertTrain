@@ -14,6 +14,7 @@ if ~exist('subjects','var') || isempty(subjects)
     };
 end
 
+% try to determine the experiment name by removing the subject number
 if ~isempty(subjects)
   zs = strfind(subjects{1},'0');
   if ~isempty(zs)
@@ -25,6 +26,7 @@ else
   error('Cannot determine experiment name, no subjects provided.');
 end
 
+% find where the data is stored
 if ~exist('dataroot','var') || isempty(dataroot)
   serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
   serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
