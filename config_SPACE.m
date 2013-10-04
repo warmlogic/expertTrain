@@ -35,7 +35,7 @@ correctVol = 0.4;
 incorrectVol = 0.6;
 
 % whether to print trial details to the command window
-cfg.text.printTrialInfo = false;
+cfg.text.printTrialInfo = true;
 
 % how to present stimuli. 1 = simultaneous. 2 = sequential. 3 = overlap.
 studyPresent = 2;
@@ -326,37 +326,25 @@ if expParam.sessionNum == 1
   end
   if expParam.is15
     cfg.keys.expoKeySet = 1;
-    cfg.keys.expo1 = KbName(cfg.keys.expoKeyNames{1});
-    cfg.keys.expo2 = KbName(cfg.keys.expoKeyNames{2});
-    cfg.keys.expo3 = KbName(cfg.keys.expoKeyNames{3});
-    cfg.keys.expo4 = KbName(cfg.keys.expoKeyNames{4});
-    
-    cfg.text.expo1 = 'very appealing';
-    cfg.text.expo2 = 'somewhat appealing';
-    cfg.text.expo3 = 'somewhat unappealing';
-    cfg.text.expo4 = 'very unappealing';
-    
-    cfg.text.expo1resp = 'v_appeal';
-    cfg.text.expo2resp = 's_appeal';
-    cfg.text.expo3resp = 's_unappeal';
-    cfg.text.expo4resp = 'v_unappeal';
+    cfg.keys.expoVA = KbName(cfg.keys.expoKeyNames{1});
+    cfg.keys.expoSA = KbName(cfg.keys.expoKeyNames{2});
+    cfg.keys.expoSU = KbName(cfg.keys.expoKeyNames{3});
+    cfg.keys.expoVU = KbName(cfg.keys.expoKeyNames{4});
   else
     cfg.keys.expoKeySet = 2;
-    cfg.keys.expo1 = KbName(cfg.keys.expoKeyNames{4});
-    cfg.keys.expo2 = KbName(cfg.keys.expoKeyNames{3});
-    cfg.keys.expo3 = KbName(cfg.keys.expoKeyNames{2});
-    cfg.keys.expo4 = KbName(cfg.keys.expoKeyNames{1});
-    
-    cfg.text.expo1 = 'very unappealing';
-    cfg.text.expo2 = 'somewhat unappealing';
-    cfg.text.expo3 = 'somewhat appealing';
-    cfg.text.expo4 = 'very appealing';
-    
-    cfg.text.expo1resp = 'v_unappeal';
-    cfg.text.expo2resp = 's_unappeal';
-    cfg.text.expo3resp = 's_appeal';
-    cfg.text.expo4resp = 'v_appeal';
+    cfg.keys.expoVA = KbName(cfg.keys.expoKeyNames{4});
+    cfg.keys.expoSA = KbName(cfg.keys.expoKeyNames{3});
+    cfg.keys.expoSU = KbName(cfg.keys.expoKeyNames{2});
+    cfg.keys.expoVU = KbName(cfg.keys.expoKeyNames{1});
   end
+  cfg.text.expoVA = 'very appealing';
+  cfg.text.expoSA = 'somewhat appealing';
+  cfg.text.expoSU = 'somewhat unappealing';
+  cfg.text.expoVU = 'very unappealing';
+  cfg.text.expoVAresp = 'v_appeal';
+  cfg.text.expoSAresp = 's_appeal';
+  cfg.text.expoSUresp = 's_unappeal';
+  cfg.text.expoVUresp = 'v_unappeal';
   
   % study response keys (counterbalanced based on subNum 1-5, 6-0)
   if strcmp(cfg.keys.keyRow,'upper')
@@ -568,10 +556,10 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_expo_1_practice_intro.txt',expParam.expName)),...
-          {'expo1Text','expo2Text','expo3Text','expo4Text',....
-          'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
-          {cfg.text.expo1,cfg.text.expo2,cfg.text.expo3,cfg.text.expo4,...
-          upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
+          {'expoVAText','expoSAText','expoSUText','expoVUText',....
+          'expoVAKey','expoSAKey','expoSUKey','expoVUKey','contKey'},...
+          {cfg.text.expoVA,cfg.text.expoSA,cfg.text.expoSU,cfg.text.expoVU,...
+          upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
         
@@ -796,10 +784,10 @@ if expParam.sessionNum == 1
         % instructions
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_expo_1_exp_intro.txt',expParam.expName)),...
-          {'expo1Text','expo2Text','expo3Text','expo4Text',....
-          'expo1Key','expo2Key','expo3Key','expo4Key','contKey'},...
-          {cfg.text.expo1,cfg.text.expo2,cfg.text.expo3,cfg.text.expo4,...
-          upper(KbName(cfg.keys.expo1)),upper(KbName(cfg.keys.expo2)),upper(KbName(cfg.keys.expo3)),upper(KbName(cfg.keys.expo4)),cfg.keys.instructContKey});
+          {'expoVAText','expoSAText','expoSUText','expoVUText',....
+          'expoVAKey','expoSAKey','expoSUKey','expoVUKey','contKey'},...
+          {cfg.text.expoVA,cfg.text.expoSA,cfg.text.expoSU,cfg.text.expoVU,...
+          upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
         

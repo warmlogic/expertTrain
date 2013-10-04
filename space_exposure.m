@@ -319,7 +319,7 @@ WaitSecs(1.000);
 %% run the exposure task
 
 % only check these keys
-RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
+RestrictKeysForKbCheck([cfg.keys.expoVA, cfg.keys.expoSA, cfg.keys.expoSU, cfg.keys.expoVU]);
 
 % start the blink break timer
 if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
@@ -337,7 +337,7 @@ for i = trialNum:length(expoStims_img)
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     
-    RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
+    RestrictKeysForKbCheck([cfg.keys.expoVA, cfg.keys.expoSA, cfg.keys.expoSU, cfg.keys.expoVU]);
     
     % reset the blink timer
     if cfg.stim.secUntilBlinkBreak > 0
@@ -374,7 +374,7 @@ for i = trialNum:length(expoStims_img)
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
     
-    RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
+    RestrictKeysForKbCheck([cfg.keys.expoVA, cfg.keys.expoSA, cfg.keys.expoSU, cfg.keys.expoVU]);
     
     if phaseCfg.showRespInBreak
       % draw response prompt
@@ -569,10 +569,10 @@ for i = trialNum:length(expoStims_img)
         % if cfg.text.printTrialInfo
         %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
         % end
-        if (keyCode(cfg.keys.expo1) == 1 && all(keyCode(~cfg.keys.expo1) == 0)) ||...
-            (keyCode(cfg.keys.expo2) == 1 && all(keyCode(~cfg.keys.expo2) == 0)) ||...
-            (keyCode(cfg.keys.expo3) == 1 && all(keyCode(~cfg.keys.expo3) == 0)) ||...
-            (keyCode(cfg.keys.expo4) == 1 && all(keyCode(~cfg.keys.expo4) == 0))
+        if (keyCode(cfg.keys.expoVA) == 1 && all(keyCode(~cfg.keys.expoVA) == 0)) ||...
+            (keyCode(cfg.keys.expoSA) == 1 && all(keyCode(~cfg.keys.expoSA) == 0)) ||...
+            (keyCode(cfg.keys.expoSU) == 1 && all(keyCode(~cfg.keys.expoSU) == 0)) ||...
+            (keyCode(cfg.keys.expoVU) == 1 && all(keyCode(~cfg.keys.expoVU) == 0))
           break
         end
       elseif keyIsDown && sum(keyCode) > 1
@@ -647,10 +647,10 @@ for i = trialNum:length(expoStims_img)
         % if cfg.text.printTrialInfo
         %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
         % end
-        if (keyCode(cfg.keys.expo1) == 1 && all(keyCode(~cfg.keys.expo1) == 0)) ||...
-            (keyCode(cfg.keys.expo2) == 1 && all(keyCode(~cfg.keys.expo2) == 0)) ||...
-            (keyCode(cfg.keys.expo3) == 1 && all(keyCode(~cfg.keys.expo3) == 0)) ||...
-            (keyCode(cfg.keys.expo4) == 1 && all(keyCode(~cfg.keys.expo4) == 0))
+        if (keyCode(cfg.keys.expoVA) == 1 && all(keyCode(~cfg.keys.expoVA) == 0)) ||...
+            (keyCode(cfg.keys.expoSA) == 1 && all(keyCode(~cfg.keys.expoSA) == 0)) ||...
+            (keyCode(cfg.keys.expoSU) == 1 && all(keyCode(~cfg.keys.expoSU) == 0)) ||...
+            (keyCode(cfg.keys.expoVU) == 1 && all(keyCode(~cfg.keys.expoVU) == 0))
           break
         end
       elseif keyIsDown && sum(keyCode) > 1
@@ -680,23 +680,23 @@ for i = trialNum:length(expoStims_img)
   
   % determine response and compute accuracy
   if keyIsDown
-    if (keyCode(cfg.keys.expo1) == 1 && all(keyCode(~cfg.keys.expo1) == 0))
-      resp = cfg.text.expo1resp;
+    if (keyCode(cfg.keys.expoVA) == 1 && all(keyCode(~cfg.keys.expoVA) == 0))
+      resp = cfg.text.expoVAresp;
       message = '';
-    elseif (keyCode(cfg.keys.expo2) == 1 && all(keyCode(~cfg.keys.expo2) == 0))
-      resp = cfg.text.expo2resp;
+    elseif (keyCode(cfg.keys.expoSA) == 1 && all(keyCode(~cfg.keys.expoSA) == 0))
+      resp = cfg.text.expoSAresp;
       message = '';
-    elseif (keyCode(cfg.keys.expo3) == 1 && all(keyCode(~cfg.keys.expo3) == 0))
-      resp = cfg.text.expo3resp;
+    elseif (keyCode(cfg.keys.expoSU) == 1 && all(keyCode(~cfg.keys.expoSU) == 0))
+      resp = cfg.text.expoSUresp;
       message = '';
-    elseif (keyCode(cfg.keys.expo4) == 1 && all(keyCode(~cfg.keys.expo4) == 0))
-      resp = cfg.text.expo4resp;
+    elseif (keyCode(cfg.keys.expoVU) == 1 && all(keyCode(~cfg.keys.expoVU) == 0))
+      resp = cfg.text.expoVUresp;
       message = '';
     elseif sum(keyCode) > 1
       warning('Multiple keys were pressed.\n');
       resp = 'ERROR_MULTIKEY';
-    elseif sum(~ismember(find(keyCode == 1),[cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4])) > 0
-      warning('Key other than expo1/2/3/4 was pressed. This should not happen.\n');
+    elseif sum(~ismember(find(keyCode == 1),[cfg.keys.expoVA, cfg.keys.expoSA, cfg.keys.expoSU, cfg.keys.expoVU])) > 0
+      warning('Key other than expo VA/SA/SU/VU was pressed. This should not happen.\n');
       resp = 'ERROR_OTHERKEY';
     else
       warning('Some other error occurred.\n');
