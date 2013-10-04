@@ -322,7 +322,7 @@ WaitSecs(1.000);
 RestrictKeysForKbCheck([cfg.keys.expoVA, cfg.keys.expoSA, cfg.keys.expoSU, cfg.keys.expoVU]);
 
 % start the blink break timer
-if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
+if phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
@@ -340,13 +340,13 @@ for i = trialNum:length(expoStims_img)
     RestrictKeysForKbCheck([cfg.keys.expoVA, cfg.keys.expoSA, cfg.keys.expoSU, cfg.keys.expoVU]);
     
     % reset the blink timer
-    if cfg.stim.secUntilBlinkBreak > 0
+    if phaseCfg.secUntilBlinkBreak > 0
       blinkTimerStart = GetSecs;
     end
   end
   
   % Do a blink break if recording EEG and specified time has passed
-  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(expoStims_img) - 3)
+  if phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (length(expoStims_img) - 3)
     thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');

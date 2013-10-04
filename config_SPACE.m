@@ -118,15 +118,6 @@ if expParam.sessionNum == 1
     expParam.is15 = false;
   end
   
-  % blink break (set to 0 if you don't want breaks)
-  if expParam.useNS
-    % timer in secs for when to take a blink break (only when useNS=true)
-    cfg.stim.secUntilBlinkBreak = 45.0;
-  else
-    % timer in secs for when to take a blink break (only when useNS=false)
-    cfg.stim.secUntilBlinkBreak = 120.0;
-  end
-  
   %% Stimulus parameters
   
   % whether to preload images; if true, could use a lot of memory
@@ -757,6 +748,15 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
+        % blink break (set to 0 if you don't want breaks)
+        if expParam.useNS
+          % timer in secs for when to take a blink break (only when useNS=true)
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 45.0;
+        else
+          % timer in secs for when to take a blink break (only when useNS=false)
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 120.0;
+        end
+        
         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
         
         if expParam.useNS
@@ -815,6 +815,15 @@ if expParam.sessionNum == 1
         
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 3;
         cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
+        
+        % blink break (set to 0 if you don't want breaks)
+        if expParam.useNS
+          % timer in secs for when to take a blink break (only when useNS=true)
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
+        else
+          % timer in secs for when to take a blink break (only when useNS=false)
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
+        end
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
@@ -926,6 +935,15 @@ if expParam.sessionNum == 1
         
         %cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecTarg = 6;
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
+        
+        % blink break (set to 0 if you don't want breaks)
+        if expParam.useNS
+          % timer in secs for when to take a blink break (only when useNS=true)
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 45.0;
+        else
+          % timer in secs for when to take a blink break (only when useNS=false)
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 120.0;
+        end
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;

@@ -345,7 +345,7 @@ if phaseCfg.studyJudgment
 end
 
 % start the blink break timer
-if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
+if phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0
   blinkTimerStart = GetSecs;
 end
 
@@ -376,14 +376,14 @@ for i = trialNum:length(studyStims_img)
       end
       
       % reset the blink timer
-      if cfg.stim.secUntilBlinkBreak > 0
+      if phaseCfg.secUntilBlinkBreak > 0
         blinkTimerStart = GetSecs;
       end
     end
   end
   
   % Do a blink break if specified time has passed
-  if (phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(studyStims_img) - 3)) || blinkBreakOnNextTrial
+  if (phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (length(studyStims_img) - 3)) || blinkBreakOnNextTrial
     % if lag=0 and this is pres1, then pres2 is next so don't break yet
     if studyStims_img(i).lag == 0 && studyStims_img(i).presNum == 1
       blinkBreakOnNextTrial = true;
