@@ -284,7 +284,7 @@ for sub = 1:length(subjects)
                 case {'cued_recall'}
                   lagConds = unique([events.(sesName).(fn).data.lag]);
                   
-                  if sum(lagConds(lagConds > 0)) > 1
+                  if sum(lagConds > 0) > 1
                     error('%s does not yet support multiple lag conditions!',mfilename);
                   end
                   
