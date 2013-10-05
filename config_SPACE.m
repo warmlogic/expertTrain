@@ -182,6 +182,8 @@ if expParam.sessionNum == 1
   cfg.stim.useSeparatePracStims = false;
   
   if expParam.runPractice
+    cfg.stim.practice.nPairs_study_buff_start = 0;
+    cfg.stim.practice.nPairs_study_buff_end = 0;
     cfg.stim.practice.nPairs_study_targ_spaced = 2;
     cfg.stim.practice.nPairs_study_targ_massed = 2;
     cfg.stim.practice.nPairs_study_targ_onePres = 2;
@@ -232,6 +234,8 @@ if expParam.sessionNum == 1
 %   cfg.stim.nPairs_study_targ_onePres = 8;
 %   cfg.stim.nPairs_test_lure = 8;
   
+  cfg.stim.nPairs_study_buff_start = 1;
+  cfg.stim.nPairs_study_buff_end = 1;
   cfg.stim.nPairs_study_targ_spaced = 9;
   cfg.stim.nPairs_study_targ_massed = 9;
   %cfg.stim.nPairs_study_targ_onePres = 5;

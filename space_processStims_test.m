@@ -96,9 +96,13 @@ else
     cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,[],[],[]});
 end
 
-% get the study stimuli
-p1_StudyStims_img = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img([expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img.presNum] == 1);
-p1_StudyStims_word = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word([expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word.presNum] == 1);
+% get the study target stimuli
+p1_StudyStims_img = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img(...
+  [expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img.presNum] == 1 &...
+  [expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_img.targ] == 1);
+p1_StudyStims_word = expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word(...
+  [expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word.presNum] == 1 &...
+  [expParam.session.(sesName).(studyPhaseName)(phaseCount).studyStims_word.targ] == 1);
 
 % if desired, do not keep the single presentation stimuli
 if ~testOnePres

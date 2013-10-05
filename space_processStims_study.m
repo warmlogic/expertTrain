@@ -20,6 +20,11 @@ studyStims_word.p1 = [];
 studyStims_img.onePres = [];
 studyStims_word.onePres = [];
 
+studyStims_img.buff_start = [];
+studyStims_word.buff_start = [];
+studyStims_img.buff_end = [];
+studyStims_word.buff_end = [];
+
 if ~phaseCfg.isExp
   % for the practice
   
@@ -95,6 +100,46 @@ if ~phaseCfg.isExp
       wordStimStruct.wordStims,studyStims_word.onePres,...
       cfg.stim.practice.nPairs_study_targ_onePres * length(phaseCfg.categoryNames),...
       cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{true,true,false,-1,1,[],[]});
+  end
+  
+  % study buffers - start
+  
+  if cfg.stim.practice.nPairs_study_buff_start > 0
+    % put all the image stimuli together, across categories
+    for cn = 1:length(cfg.stim.practice.categoryNames)
+      if ismember(cfg.stim.practice.categoryNames{cn},phaseCfg.categoryNames)
+        [studyStims_img.buff_start,imgStimStruct(cn).catStims] = space_divvyStims(...
+          imgStimStruct(cn).catStims,studyStims_img.buff_start,...
+          cfg.stim.practice.nPairs_study_buff_start,...
+          cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+      end
+    end
+    
+    % do the word stimuli
+    [studyStims_word.buff_start,wordStimStruct.wordStims] = space_divvyStims(...
+      wordStimStruct.wordStims,studyStims_word.buff_start,...
+      cfg.stim.practice.nPairs_study_buff_start * length(phaseCfg.categoryNames),...
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+  end
+  
+  % study buffers - end
+  
+  if cfg.stim.practice.nPairs_study_buff_end > 0
+    % put all the image stimuli together, across categories
+    for cn = 1:length(cfg.stim.practice.categoryNames)
+      if ismember(cfg.stim.practice.categoryNames{cn},phaseCfg.categoryNames)
+        [studyStims_img.buff_end,imgStimStruct(cn).catStims] = space_divvyStims(...
+          imgStimStruct(cn).catStims,studyStims_img.buff_end,...
+          cfg.stim.practice.nPairs_study_buff_end,...
+          cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+      end
+    end
+    
+    % do the word stimuli
+    [studyStims_word.buff_end,wordStimStruct.wordStims] = space_divvyStims(...
+      wordStimStruct.wordStims,studyStims_word.buff_end,...
+      cfg.stim.practice.nPairs_study_buff_end * length(phaseCfg.categoryNames),...
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
   end
   
   distributeAtLags = cfg.stim.practice.lags;
@@ -175,6 +220,46 @@ else
       cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,true,false,-1,1,[],[]});
   end
   
+  % study buffers - start
+  
+  if cfg.stim.nPairs_study_buff_start > 0
+    % put all the image stimuli together, across categories
+    for cn = 1:length(cfg.stim.categoryNames)
+      if ismember(cfg.stim.categoryNames{cn},phaseCfg.categoryNames)
+        [studyStims_img.buff_start,imgStimStruct(cn).catStims] = space_divvyStims(...
+          imgStimStruct(cn).catStims,studyStims_img.buff_start,...
+          cfg.stim.nPairs_study_buff_start,...
+          cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+      end
+    end
+    
+    % do the word stimuli
+    [studyStims_word.buff_start,wordStimStruct.wordStims] = space_divvyStims(...
+      wordStimStruct.wordStims,studyStims_word.buff_start,...
+      cfg.stim.nPairs_study_buff_start * length(phaseCfg.categoryNames),...
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+  end
+  
+  % study buffers - end
+  
+  if cfg.stim.nPairs_study_buff_end > 0
+    % put all the image stimuli together, across categories
+    for cn = 1:length(cfg.stim.categoryNames)
+      if ismember(cfg.stim.categoryNames{cn},phaseCfg.categoryNames)
+        [studyStims_img.buff_end,imgStimStruct(cn).catStims] = space_divvyStims(...
+          imgStimStruct(cn).catStims,studyStims_img.buff_end,...
+          cfg.stim.nPairs_study_buff_end,...
+          cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+      end
+    end
+    
+    % do the word stimuli
+    [studyStims_word.buff_end,wordStimStruct.wordStims] = space_divvyStims(...
+      wordStimStruct.wordStims,studyStims_word.buff_end,...
+      cfg.stim.nPairs_study_buff_end * length(phaseCfg.categoryNames),...
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice','targ','spaced','lag','presNum','pairNum','pairOrd'},{false,false,false,-1,1,[],[]});
+  end
+  
   distributeAtLags = cfg.stim.lags;
 end
 
@@ -207,6 +292,8 @@ fprintf('Shuffling %s study (%d) task stimuli.\n',sesName,phaseCount);
 % put the words in the same order
 studyStims_word.p1 = studyStims_word.p1(randind);
 
+pairNumCounter = 0;
+
 % give them metadata: presentation number, pair numbers, and pair order
 pn = 1;
 presNum = sprintf('p%d',pn);
@@ -217,8 +304,9 @@ for i = 1:length(studyStims_img.(presNum))
   % studyStims_word.(presNum)(i).presNum = pn;
   
   % set a pair number to keep image and word stimuli linked
-  studyStims_img.(presNum)(i).pairNum = i;
-  studyStims_word.(presNum)(i).pairNum = i;
+  pairNumCounter = pairNumCounter + 1;
+  studyStims_img.(presNum)(i).pairNum = pairNumCounter;
+  studyStims_word.(presNum)(i).pairNum = pairNumCounter;
   
   % set the pair order, which comes first and which comes second
   if strcmp(phaseCfg.study_order{pn}{1},'image') && strcmp(phaseCfg.study_order{pn}{2},'word')
@@ -244,8 +332,9 @@ for i = 1:length(studyStims_img.(presNum))
   
   % this is already set
   % % set a pair number to keep image and word stimuli linked
-  % studyStims_img.(presNum)(i).pairNum = i;
-  % studyStims_word.(presNum)(i).pairNum = i;
+  % pairNumCounter = pairNumCounter + 1;
+  % studyStims_img.(presNum)(i).pairNum = pairNumCounter;
+  % studyStims_word.(presNum)(i).pairNum = pairNumCounter;
   
   % set the pair order, which comes first and which comes second
   if strcmp(phaseCfg.study_order{pn}{1},'image') && strcmp(phaseCfg.study_order{pn}{2},'word')
@@ -271,8 +360,9 @@ if nPairs_study_targ_onePres > 0
     studyStims_word.onePres(i).presNum = 1;
     
     % set a pair number to keep image and word stimuli linked
-    studyStims_img.onePres(i).pairNum = i + length(studyStims_img.p1);
-    studyStims_word.onePres(i).pairNum = i + length(studyStims_img.p1);
+    pairNumCounter = pairNumCounter + 1;
+    studyStims_img.onePres(i).pairNum = pairNumCounter;
+    studyStims_word.onePres(i).pairNum = pairNumCounter;
     
     % set the pair order, which comes first and which comes second
     pn = 1;
@@ -282,6 +372,59 @@ if nPairs_study_targ_onePres > 0
     elseif strcmp(phaseCfg.study_order{pn}{1},'word') && strcmp(phaseCfg.study_order{pn}{2},'image')
       studyStims_img.onePres(i).pairOrd = 2;
       studyStims_word.onePres(i).pairOrd = 1;
+    end
+  end
+end
+
+% set up the study buffers - start
+if ~phaseCfg.isExp
+  nPairs_study_buff_start = cfg.stim.practice.nPairs_study_buff_start;
+  nPairs_study_buff_end = cfg.stim.practice.nPairs_study_buff_end;
+else
+  nPairs_study_buff_start = cfg.stim.nPairs_study_buff_start;
+  nPairs_study_buff_end = cfg.stim.nPairs_study_buff_end;
+end
+if nPairs_study_buff_start > 0
+  for i = 1:length(studyStims_img.buff_start)
+    % set the presentation number
+    studyStims_img.buff_start(i).presNum = 1;
+    studyStims_word.buff_start(i).presNum = 1;
+    
+    % set a pair number to keep image and word stimuli linked
+    pairNumCounter = pairNumCounter + 1;
+    studyStims_img.buff_start(i).pairNum = pairNumCounter;
+    studyStims_word.buff_start(i).pairNum = pairNumCounter;
+    
+    % set the pair order, which comes first and which comes second
+    pn = 1;
+    if strcmp(phaseCfg.study_order{pn}{1},'image') && strcmp(phaseCfg.study_order{pn}{2},'word')
+      studyStims_img.buff_start(i).pairOrd = 1;
+      studyStims_word.buff_start(i).pairOrd = 2;
+    elseif strcmp(phaseCfg.study_order{pn}{1},'word') && strcmp(phaseCfg.study_order{pn}{2},'image')
+      studyStims_img.buff_start(i).pairOrd = 2;
+      studyStims_word.buff_start(i).pairOrd = 1;
+    end
+  end
+end
+if nPairs_study_buff_end > 0
+  for i = 1:length(studyStims_img.buff_end)
+    % set the presentation number
+    studyStims_img.buff_end(i).presNum = 1;
+    studyStims_word.buff_end(i).presNum = 1;
+    
+    % set a pair number to keep image and word stimuli linked
+    pairNumCounter = pairNumCounter + 1;
+    studyStims_img.buff_end(i).pairNum = pairNumCounter;
+    studyStims_word.buff_end(i).pairNum = pairNumCounter;
+    
+    % set the pair order, which comes first and which comes second
+    pn = 1;
+    if strcmp(phaseCfg.study_order{pn}{1},'image') && strcmp(phaseCfg.study_order{pn}{2},'word')
+      studyStims_img.buff_end(i).pairOrd = 1;
+      studyStims_word.buff_end(i).pairOrd = 2;
+    elseif strcmp(phaseCfg.study_order{pn}{1},'word') && strcmp(phaseCfg.study_order{pn}{2},'image')
+      studyStims_img.buff_end(i).pairOrd = 2;
+      studyStims_word.buff_end(i).pairOrd = 1;
     end
   end
 end
@@ -324,6 +467,27 @@ while ~placedAllStimuli
   end
 end
 
+% add in the study buffers
+if nPairs_study_buff_start > 0
+  [studyStims_img.buff_start,randind] = et_shuffleStims(studyStims_img.buff_start);
+  studyStims_word.buff_start = studyStims_word.buff_start(randind);
+  
+  for i = 1:length(studyStims_img.buff_start)
+    studyStims_img.all = cat(2,studyStims_img.buff_start(i),studyStims_img.all);
+    studyStims_word.all = cat(2,studyStims_word.buff_start(i),studyStims_word.all);
+  end
+end
+if nPairs_study_buff_end > 0
+  [studyStims_img.buff_end,randind] = et_shuffleStims(studyStims_img.buff_end);
+  studyStims_word.buff_end = studyStims_word.buff_end(randind);
+  
+  for i = 1:length(studyStims_img.buff_end)
+    studyStims_img.all = cat(2,studyStims_img.all,studyStims_img.buff_end(i));
+    studyStims_word.all = cat(2,studyStims_word.all,studyStims_word.buff_end(i));
+  end
+end
+
+% save stimuli in the expParam struct
 expParam.session.(sesName).(phaseName)(phaseCount).studyStims_img = studyStims_img.all;
 expParam.session.(sesName).(phaseName)(phaseCount).studyStims_word = studyStims_word.all;
 
