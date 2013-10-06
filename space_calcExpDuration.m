@@ -12,6 +12,7 @@ if ~isExp
   spaced = 2;
   massed = 2;
   onePres = 2;
+  buffers = 0; % start + end
   lures = 2;
   
   nDist = 5;
@@ -19,45 +20,35 @@ if ~isExp
 elseif isExp
   % real experiment
   
-  % spaced = 20;
-  % massed = 16;
-  % onePres = 10;
-  % lures = 16;
-  
-  % spaced = 16;
-  % massed = 8;
-  % onePres = 8;
-  % lures = 16;
-  
-  % spaced = 10;
-  % massed = 10;
-  % onePres = 10;
-  % lures = 10;
-  
 %   nBlocks = 2;
-
-%   spaced = 12;
-%   massed = 12;
-%   onePres = 8;
-%   lures = 12;
+% 
+%   spaced = 16;
+%   massed = 16;
+%   onePres = 16;
+%   buffers = 2; % start + end
+%   lures = 16;
 
   nBlocks = 3;
 
   spaced = 9;
   massed = 9;
   onePres = 9;
+  buffers = 2; % start + end
   lures = 9;
   
-%   spaced = 8;
-%   massed = 8;
-%   onePres = 8;
-%   lures = 8;
+%   nBlocks = 4;
+% 
+%   spaced = 7;
+%   massed = 7;
+%   onePres = 7;
+%   buffers = 2; % start + end
+%   lures = 7;
   
   nDist = 30;
 end
 
-nExpoStimuli = (spaced + massed + onePres) * nCategories;
-nStudyStimuli = (((spaced + massed)*2) + onePres) * nCategories;
+nExpoStimuli = (spaced + massed + onePres + buffers) * nCategories;
+nStudyStimuli = (((spaced + massed)*2) + onePres + buffers) * nCategories;
 
 nTestStimuli = (spaced + massed + onePres + lures) * nCategories;
 
@@ -69,7 +60,7 @@ nTestStimuli = (spaced + massed + onePres + lures) * nCategories;
 expo_isi = 0;
 expo_preStim = mean([1.0 1.2]);
 expo_stim = 1.0;
-expo_resp = 1.0;
+expo_resp = 0.4;
 
 expo_trial = expo_isi + expo_preStim + expo_stim + expo_resp;
 expoTime = expo_trial * nStudyStimuli; 
@@ -102,8 +93,8 @@ distTime = dist_trial * nDist;
 cr_isi = 0;
 cr_preStim = mean([1.0 1.2]);
 cr_stim = 1.0;
-cr_recogResp = 2;
-cr_recallResp = 3;
+cr_recogResp = 1.0;
+cr_recallResp = 2;
 
 cr_trial = cr_isi + cr_preStim + cr_stim + cr_recogResp + cr_recallResp;
 testTime = cr_trial * nTestStimuli; 
