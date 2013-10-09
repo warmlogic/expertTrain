@@ -70,6 +70,10 @@ if nargin == 0
     'SPACE028';
     'SPACE029';
     'SPACE030';
+    'SPACE031';
+    'SPACE032';
+    'SPACE033';
+    'SPACE034';
     };
   
   prep_eeg = 0;
@@ -100,13 +104,16 @@ for sub = 1:length(subjects)
   
   expParamFile = fullfile(dataroot,subjects{sub},'experimentParams.mat');
   if exist(expParamFile,'file')
+    fprintf('Loading experiment parameter file for %s (%s).\n',subjects{sub},expParamFile);
     load(expParamFile)
   else
-    error('experiment parameter file does not exist: %s',expParamFile);
+    error('Experiment parameter file does not exist: %s',expParamFile);
   end
   
   eventsOutfile_sub = fullfile(eventsOutdir_sub,'events.mat');
-  %if ~exist(eventsOutfile_sub,'file')
+  if ~exist(eventsOutfile_sub,'file')
+    fprintf('Creating events for %s (%s).\n',subjects{sub},eventsOutfile_sub);
+    
     % initialize the events struct
     events = struct;
     
@@ -140,13 +147,66 @@ for sub = 1:length(subjects)
         end
         
       end
+      
+      % collapse phases
+      fprintf('\n');
+      
+      fprintf('Collapsing phases together...');
+      % remove the phase numbers
+      fn = fieldnames(events.(sesName));
+      fn_trunc = fn;
+      for p = 1:length(fn_trunc)
+        startPN = strfind(fn_trunc{p},'_');
+        if length(fn_trunc{p}(startPN(end):end)) == 2
+          fn_trunc{p} = fn_trunc{p}(1:startPN(end) - 1);
+        end
+      end
+      % get the unique phase types
+      u_phases = unique(fn_trunc);
+      for up = 1:length(u_phases)
+        for p = 1:length(fn)
+          % if it's the same phase type, concatenate the events. Can use
+          % phaseCount field to divide them later.
+          if strncmp(u_phases{up},fn{p},length(u_phases{up}))
+            thisPhase = events.(sesName).(fn{p}).data;
+            if str2double(fn{p}(end)) == 1
+              events.(sesName).(u_phases{up}).data = thisPhase;
+            else
+              events.(sesName).(u_phases{up}).data = cat(1,events.(sesName).(u_phases{up}).data,thisPhase);
+            end
+          end
+          
+        end
+        % set this phase as complete
+        events.(sesName).(u_phases{up}).isComplete = true;
+      end
+      fprintf('Done.\n');
+      
     end
-%   else
-%     %fprintf('%s already exists! Skipping this subject!\n',eventsOutfile_sub);
-%     %continue
-%     fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
-%     continue
-  %end % if exist
+  else
+    %     % hack to set each phase as complete
+    %     load(eventsOutfile_sub);
+    %
+    %     for sesNum = 1:length(expParam.sesTypes)
+    %       % set the subject events file
+    %       sesName = expParam.sesTypes{sesNum};
+    %
+    %       % phase names without phase numbers
+    %       uniquePhaseNames = unique(expParam.session.(sesName).phases);
+    %       % all phase names, including some with phase numbers
+    %       fn = fieldnames(events.(sesName));
+    %       % set them as complete
+    %       fprintf('Marking %s %s as complete (%s).\n',subjects{sub},sesName,eventsOutfile_sub);
+    %       for p = 1:length(fn)
+    %         if ismember(fn{p},uniquePhaseNames)
+    %           events.(sesName).(fn{p}).isComplete = true;
+    %         end
+    %       end
+    %     end
+    
+    fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
+    continue
+  end % if exist
   
   fprintf('Saving %s...',eventsOutfile_sub);
   % save each subject's events
