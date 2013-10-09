@@ -1,7 +1,14 @@
-function [results] = space_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults)
-% function [results] = space_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults)
+function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults)
+% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
+
+% subject after which to set up results struct fields
+templateSubject = 31;
+
+if ~exist('results','var') || isempty(results)
+  results = [];
+end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
@@ -35,6 +42,10 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE028';
     'SPACE029';
     'SPACE030';
+    'SPACE031';
+    'SPACE032';
+    'SPACE033';
+    'SPACE034';
     };
 end
 
@@ -65,6 +76,18 @@ if ~exist('dataroot','var') || isempty(dataroot)
     error('No data directory found.');
   end
   %saveDir = dataroot;
+end
+
+if ~exist('collapsePhases','var') || isempty(collapsePhases)
+  collapsePhases = false;
+end
+
+if ~exist('collapseCategories','var') || isempty(collapseCategories)
+  collapseCategories = true;
+end
+
+if ~exist('separateCategories','var') || isempty(separateCategories)
+  separateCategories = true;
 end
 
 if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
@@ -115,330 +138,292 @@ end
 % fprintf('onePres recall acc (%d/%d) = %.3f\n',sum([onePres.recall_spellCorr]),length(onePres),mean([onePres.recall_spellCorr]));
 % %fprintf('newStims recall acc %.3f\n',mean([newStims.recall_spellCorr]));
 
-
-%% some constants
-
-%nBlocks = 3;
-
-% lagConds = [8, 0, -1];
-
-results = struct;
-
-dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
-mainFields = {'recog','recall'};
-
-% categories = [1, 2];
-% categoryStr = {'faces', 'houses'};
-
-%% initialize to store the data
-
-% use subject 5's files for initialization
-if length(subjects) > 5
-  sub = 5;
-else
-  sub = length(subjects);
-end
-subDir = fullfile(dataroot,subjects{sub});
-expParamFile = fullfile(subDir,'experimentParams.mat');
-if exist(expParamFile,'file')
-  load(expParamFile,'expParam','cfg')
-else
-  error('initialization experiment parameter file does not exist: %s',expParamFile);
-end
-eventsFile = fullfile(subDir,'events','events.mat');
-if exist(eventsFile,'file')
-  load(eventsFile,'events');
-else
-  error('initialization events file does not exist: %s',eventsFile);
-end
-
-for sesNum = 1:length(expParam.sesTypes)
-  % set the subject events file
-  sesName = expParam.sesTypes{sesNum};
+if isempty(results)
   
-  uniquePhaseNames = unique(expParam.session.(sesName).phases);
-  uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+  %% some constants
   
-  for pha = 1:length(expParam.session.(sesName).phases)
-    phaseName = expParam.session.(sesName).phases{pha};
-    
-    % find out where this phase occurs in the list of unique phases
-    uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
-    % increase the phase count for that phase
-    uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
-    % set the phase count
-    phaseCount = uniquePhaseCounts(uniquePhaseInd);
-    
-    if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-      
-      % set the phase name with phase count
-      fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
-      
-      if isfield(events.(sesName),fn)
-        switch phaseName
-          case {'cued_recall'}
-            lagConds = unique([events.(sesName).(fn).data.lag]);
-            
-            for lc = 1:length(lagConds)
-              % choose the training condition
-              if length(lagConds(lc)) == 1
-                if lagConds(lc) > 0
-                  %lagStr = sprintf('lag%d',lagConds(lc));
-                  lagStr = 'spaced';
-                elseif lagConds(lc) == 0
-                  lagStr = 'massed';
-                elseif lagConds(lc) == -1
-                  lagStr = 'once';
-                end
-              elseif length(lagConds(lc)) > 1
-                lagStr = 'multi?';
-              end
-              
-              for mf = 1:length(mainFields)
-                for df = 1:length(dataFields)
-                  results.(sesName).(fn).(lagStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-                end
-              end
-              
-              % image categories
-              catStrs = unique({events.(sesName).(fn).data.catStr});
-              if length(catStrs) > 1
-                for im = 1:length(catStrs)
-                  for mf = 1:length(mainFields)
-                    for df = 1:length(dataFields)
-                      results.(sesName).(fn).(lagStr).(catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-                    end
-                  end
-                end
-              end
-              
-            end % for t
-            %         case {'name', 'nametrain', 'prac_name'}
-            %
-            %           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-            %             nBlocks = 1;
-            %           else
-            %             nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-            %           end
-            %
-            %           for mf = 1:length(mainFields)
-            %             for df = 1:length(dataFields)
-            %               results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-            %             end
-            %           end
-            %           if nBlocks > 1
-            %             for b = 1:nBlocks
-            %               for mf = 1:length(mainFields)
-            %                 for df = 1:length(dataFields)
-            %                   results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-            %                 end
-            %               end
-            %             end
-            %           end
-        end % switch
-      end
-    end
+  %nBlocks = 3;
+  
+  % lagConds = [8, 0, -1];
+  
+  results = struct;
+  
+  dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
+  mainFields = {'recog','recall'};
+  
+  % categories = [1, 2];
+  % categoryStr = {'faces', 'houses'};
+  
+  %% initialize to store the data
+  
+  % use subject 5's files for initialization
+  if length(subjects) > 5
+    sub = templateSubject;
+  else
+    sub = length(subjects);
   end
-end
-
-%% process the data
-
-fprintf('Processing data for experiment %s...\n',expName);
-
-for sub = 1:length(subjects)
   subDir = fullfile(dataroot,subjects{sub});
-  fprintf('Processing %s in %s...\n',subjects{sub},subDir);
-  
-  fprintf('Loading events for %s...',subjects{sub});
+  expParamFile = fullfile(subDir,'experimentParams.mat');
+  if exist(expParamFile,'file')
+    load(expParamFile,'expParam','cfg')
+  else
+    error('initialization experiment parameter file does not exist: %s',expParamFile);
+  end
   eventsFile = fullfile(subDir,'events','events.mat');
   if exist(eventsFile,'file')
     load(eventsFile,'events');
-    fprintf('Done.\n');
   else
-    error('events file does not exist: %s',eventsFile);
+    error('initialization events file does not exist: %s',eventsFile);
   end
   
-  % do we only want to get data from subjects who have completed the exp?
-  if ~onlyCompleteSub || (onlyCompleteSub && events.isComplete)
+  for sesNum = 1:length(expParam.sesTypes)
+    % set the subject events file
+    sesName = expParam.sesTypes{sesNum};
     
-    fprintf('Loading experiment parameters for %s...',subjects{sub});
-    expParamFile = fullfile(subDir,'experimentParams.mat');
-    if exist(expParamFile,'file')
-      load(expParamFile)
-      fprintf('Done.\n');
+    uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+    uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases,'stable')));
+    
+    if collapsePhases
+      processThesePhases = uniquePhaseNames;
     else
-      error('experiment parameter file does not exist: %s',expParamFile);
+      processThesePhases = expParam.session.(sesName).phases;
     end
     
-    for sesNum = 1:length(expParam.sesTypes)
-      % set the subject events file
-      sesName = expParam.sesTypes{sesNum};
+    for pha = 1:length(processThesePhases)
+      phaseName = expParam.session.(sesName).phases{pha};
       
-      uniquePhaseNames = unique(expParam.session.(sesName).phases);
-      uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+      % find out where this phase occurs in the list of unique phases
+      uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
+      % increase the phase count for that phase
+      uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
+      % set the phase count
+      phaseCount = uniquePhaseCounts(uniquePhaseInd);
       
-      for pha = 1:length(expParam.session.(sesName).phases)
-        phaseName = expParam.session.(sesName).phases{pha};
+      % accidently set isExp=true for prac_distract_math
+      if ~isempty(strfind(phaseName,'prac_')) && cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+      end
+      
+      if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
         
-        % find out where this phase occurs in the list of unique phases
-        uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
-        % increase the phase count for that phase
-        uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
-        % set the phase count
-        phaseCount = uniquePhaseCounts(uniquePhaseInd);
-        
-        % accidently set isExp=true for prac_distract_math
-        if ~isempty(strfind(phaseName,'prac_')) && cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
-        end
-        
-        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          
+        if collapsePhases
+          fn = phaseName;
+        else
           % set the phase name with phase count
           fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
-          
-          if isfield(events.(sesName),fn)
-            
-            % collect data if this phase is complete
-            if events.(sesName).(fn).isComplete
+        end
+        
+        if isfield(events.(sesName),fn)
+          switch phaseName
+            case {'cued_recall'}
+              lagConds = unique([events.(sesName).(fn).data.lag]);
               
-              switch phaseName
-                case {'cued_recall'}
-                  lagConds = unique([events.(sesName).(fn).data.lag]);
-                  
-                  if sum(lagConds > 0) > 1
-                    error('%s does not yet support multiple lag conditions!',mfilename);
+              for lc = 1:length(lagConds)
+                % choose the training condition
+                if length(lagConds(lc)) == 1
+                  if lagConds(lc) > 0
+                    %lagStr = sprintf('lag%d',lagConds(lc));
+                    lagStr = 'spaced';
+                  elseif lagConds(lc) == 0
+                    lagStr = 'massed';
+                  elseif lagConds(lc) == -1
+                    lagStr = 'once';
                   end
-                  
-                  for lc = 1:length(lagConds)
-                    fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
+                elseif length(lagConds(lc)) > 1
+                  lagStr = 'multi?';
+                end
+                
+                if collapseCategories
+                  for mf = 1:length(mainFields)
+                    for df = 1:length(dataFields)
+                      results.(sesName).(fn).(lagStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                    end
+                  end
+                end
+                
+                % image categories
+                catStrs = unique({events.(sesName).(fn).data.catStr},'stable');
+                if length(catStrs) > 1 && separateCategories
+                  for im = 1:length(catStrs)
+                    for mf = 1:length(mainFields)
+                      for df = 1:length(dataFields)
+                        results.(sesName).(fn).(lagStr).(catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                      end
+                    end
+                  end
+                end
+                
+              end % for t
+              %         case {'name', 'nametrain', 'prac_name'}
+              %
+              %           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+              %             nBlocks = 1;
+              %           else
+              %             nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+              %           end
+              %
+              %           for mf = 1:length(mainFields)
+              %             for df = 1:length(dataFields)
+              %               results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+              %             end
+              %           end
+              %           if nBlocks > 1
+              %             for b = 1:nBlocks
+              %               for mf = 1:length(mainFields)
+              %                 for df = 1:length(dataFields)
+              %                   results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+              %                 end
+              %               end
+              %             end
+              %           end
+          end % switch
+        end
+      end
+    end
+  end
+  
+  %% process the data
+  
+  fprintf('Processing data for experiment %s...\n',expName);
+  
+  for sub = 1:length(subjects)
+    subDir = fullfile(dataroot,subjects{sub});
+    fprintf('Processing %s in %s...\n',subjects{sub},subDir);
+    
+    fprintf('Loading events for %s...',subjects{sub});
+    eventsFile = fullfile(subDir,'events','events.mat');
+    if exist(eventsFile,'file')
+      load(eventsFile,'events');
+      fprintf('Done.\n');
+    else
+      error('events file does not exist: %s',eventsFile);
+    end
+    
+    % do we only want to get data from subjects who have completed the exp?
+    if ~onlyCompleteSub || (onlyCompleteSub && events.isComplete)
+      
+      fprintf('Loading experiment parameters for %s...',subjects{sub});
+      expParamFile = fullfile(subDir,'experimentParams.mat');
+      if exist(expParamFile,'file')
+        load(expParamFile)
+        fprintf('Done.\n');
+      else
+        error('experiment parameter file does not exist: %s',expParamFile);
+      end
+      
+      for sesNum = 1:length(expParam.sesTypes)
+        % set the subject events file
+        sesName = expParam.sesTypes{sesNum};
+        
+        uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+        uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases,'stable')));
+        
+        if collapsePhases
+          processThesePhases = uniquePhaseNames;
+        else
+          processThesePhases = expParam.session.(sesName).phases;
+        end
+        
+        for pha = 1:length(processThesePhases)
+          phaseName = processThesePhases{pha};
+          
+          % find out where this phase occurs in the list of unique phases
+          uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
+          % increase the phase count for that phase
+          uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
+          % set the phase count
+          phaseCount = uniquePhaseCounts(uniquePhaseInd);
+          
+          % accidently set isExp=true for prac_distract_math
+          if ~isempty(strfind(phaseName,'prac_')) && cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+            cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+          end
+          
+          if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+            
+            if collapsePhases
+              fn = phaseName;
+            else
+              % set the phase name with phase count
+              fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+            end
+            
+            if isfield(events.(sesName),fn)
+              
+              % collect data if this phase is complete
+              if events.(sesName).(fn).isComplete
+                
+                switch phaseName
+                  case {'cued_recall'}
+                    lagConds = unique([events.(sesName).(fn).data.lag]);
                     
-                    % choose the training condition
-                    if length(lagConds(lc)) == 1
-                      if lagConds(lc) > 0
-                        if printResults
-                          fprintf('*** Spaced (lag %d) ***\n',lagConds(lc));
-                        end
-                        %lagStr = sprintf('lag%d',lagConds(lc));
-                        lagStr = 'spaced';
-                      elseif lagConds(lc) == 0
-                        if printResults
-                          fprintf('*** Massed ***\n');
-                        end
-                        lagStr = 'massed';
-                      elseif lagConds(lc) == -1
-                        if printResults
-                          fprintf('*** Once ***\n');
-                        end
-                        lagStr = 'once';
-                      end
-                    elseif length(lagConds(lc)) > 1
-                      if printResults
-                        fprintf('Multi?\n');
-                      end
-                      lagStr = 'all';
+                    if sum(lagConds > 0) > 1
+                      error('%s does not yet support multiple lag conditions!',mfilename);
                     end
                     
-                    % filter the events that we want
-                    %recog_spaced_resp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RECOGRESP') & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
-                    
-                    % exclude missed responses ('none')
-                    %recog_spaced_resp = recog_spaced_resp(~ismember({recog_spaced_resp.recog_resp},'none'));
-                    % % set missing responses to incorrect
-                    % noRespInd = find(ismember({matchResp.resp},'none'));
-                    % if ~isempty(noRespInd)
-                    %   for nr = 1:length(noRespInd)
-                    %     matchResp(noRespInd(nr)).acc = 0;
-                    %   end
-                    % end
-                    
-                    for mf = 1:length(mainFields)
-                      thisField = mainFields{mf};
+                    for lc = 1:length(lagConds)
+                      fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
+                      
+                      % choose the training condition
+                      if length(lagConds(lc)) == 1
+                        if lagConds(lc) > 0
+                          if printResults
+                            fprintf('*** Spaced (lag %d) ***\n',lagConds(lc));
+                          end
+                          %lagStr = sprintf('lag%d',lagConds(lc));
+                          lagStr = 'spaced';
+                        elseif lagConds(lc) == 0
+                          if printResults
+                            fprintf('*** Massed ***\n');
+                          end
+                          lagStr = 'massed';
+                        elseif lagConds(lc) == -1
+                          if printResults
+                            fprintf('*** Once ***\n');
+                          end
+                          lagStr = 'once';
+                        end
+                      elseif length(lagConds(lc)) > 1
+                        if printResults
+                          fprintf('Multi?\n');
+                        end
+                        lagStr = 'all';
+                      end
                       
                       % filter the events that we want
-                      theseEvents = events.(sesName).(fn).data(strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
+                      %recog_spaced_resp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RECOGRESP') & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
                       
-                      if strcmp(thisField,'recog')
-                        % exclude missed responses ('none')
-                        theseEvents = theseEvents(~ismember({theseEvents.recog_resp},'none'));
-                      end
+                      % exclude missed responses ('none')
+                      %recog_spaced_resp = recog_spaced_resp(~ismember({recog_spaced_resp.recog_resp},'none'));
+                      % % set missing responses to incorrect
+                      % noRespInd = find(ismember({matchResp.resp},'none'));
+                      % if ~isempty(noRespInd)
+                      %   for nr = 1:length(noRespInd)
+                      %     matchResp(noRespInd(nr)).acc = 0;
+                      %   end
+                      % end
                       
-                      if strcmp(thisField,'recog')
-                        accField = sprintf('%s_acc',thisField);
-                      elseif strcmp(thisField,'recall')
-                        accField = sprintf('%s_spellCorr',thisField);
-                      end
-                      nCorField = sprintf('%s_nCor',thisField);
-                      nIncField = sprintf('%s_nInc',thisField);
-                      rtField = sprintf('%s_rt',thisField);
-                      
-                      results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),thisField,accField,nCorField,nIncField,rtField);
-                      theseResults = results.(sesName).(fn).(lagStr).(thisField);
-                      if printResults
-                        fprintf('\t%s\n',thisField);
-                        fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
-                        fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
-                      end
-                    end
-                    
-                    % basic and subordinate
-                    %matchBasic = recog_spaced_resp([recog_spaced_resp.isSubord] == 0);
-                    %matchSubord = recog_spaced_resp([recog_spaced_resp.isSubord] == 1);
-                    
-                    %                   thisField = 'basic';
-                    %                   results.(sesName).(fn).(lagStr) = accAndRT(matchBasic,sub,results.(sesName).(fn).(lagStr),thisField);
-                    %                   matchBasicResults = results.(sesName).(fn).(lagStr).(thisField);
-                    %                   thisField = 'subord';
-                    %                   results.(sesName).(fn).(lagStr) = accAndRT(matchSubord,sub,results.(sesName).(fn).(lagStr),thisField);
-                    %                   matchSubordResults = results.(sesName).(fn).(lagStr).(thisField);
-                    %                   if printResults
-                    %                     fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchBasicResults.acc(sub),matchBasicResults.nCor(sub),(matchBasicResults.nCor(sub) + matchBasicResults.nInc(sub)),matchBasicResults.dp(sub));
-                    %                     fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchSubordResults.acc(sub),matchSubordResults.nCor(sub),(matchSubordResults.nCor(sub) + matchSubordResults.nInc(sub)),matchSubordResults.dp(sub));
-                    %                     fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchBasicResults.rt(sub),matchBasicResults.rt_cor(sub),matchBasicResults.rt_inc(sub));
-                    %                     fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchSubordResults.rt(sub),matchSubordResults.rt_cor(sub),matchSubordResults.rt_inc(sub));
-                    %                   end
-                    
-                    %                   % check out the RT distribution
-                    %                   distrib = 0:100:2000;
-                    %
-                    %                   figure;hist([matchResp.rt],distrib);
-                    %                   axis([min(distrib) max(distrib) 0 150]);
-                    %                   title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
-                    %                   ylabel('Number of trials');
-                    %                   xlabel('RT (ms) measured from ''?'' prompt');
-                    %
-                    %                   figure;hist([matchBasic.rt],distrib);
-                    %                   axis([min(distrib) max(distrib) 0 150]);
-                    %                   title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
-                    %                   ylabel('Number of trials');
-                    %                   xlabel('RT (ms) measured from ''?'' prompt');
-                    %
-                    %                   figure;hist([matchSubord.rt],distrib);
-                    %                   axis([min(distrib) max(distrib) 0 150]);
-                    %                   title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
-                    %                   ylabel('Number of trials');
-                    %                   xlabel('RT (ms) measured from ''?'' prompt');
-                    %
-                    %                   keyboard
-                    %                   close all
-                    %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
-                    
-                    % accuracy for the different image categories
-                    catStrs = unique({events.(sesName).(fn).data.catStr});
-                    % if there's only 1 image category, the results were
-                    % printed above
-                    if length(catStrs) > 1
-                      fprintf('\n');
-                      for im = 1:length(catStrs)
+                      if collapseCategories
+                        % overall, collapsing across categories
                         for mf = 1:length(mainFields)
                           thisField = mainFields{mf};
                           
                           % filter the events that we want
-                          theseEvents = events.(sesName).(fn).data(strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) & ismember([events.(sesName).(fn).data.lag],lagConds(lc)) & strcmpi({events.(sesName).(fn).data.catStr},catStrs{im}));
+                          %theseEvents = events.(sesName).(fn).data(...
+                          %  strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                          %  ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
+                          theseEvents = events.(sesName).(fn).data(...
+                            strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                            ismember([events.(sesName).(fn).data.lag],lagConds(lc)) &...
+                            [events.(sesName).(fn).data.targ]);
                           
                           if strcmp(thisField,'recog')
                             % exclude missed responses ('none')
                             theseEvents = theseEvents(~ismember({theseEvents.recog_resp},'none'));
+                          end
+                          
+                          if isempty(theseEvents)
+                            keyboard
                           end
                           
                           if strcmp(thisField,'recog')
@@ -450,165 +435,105 @@ for sub = 1:length(subjects)
                           nIncField = sprintf('%s_nInc',thisField);
                           rtField = sprintf('%s_rt',thisField);
                           
-                          results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField,accField,nCorField,nIncField,rtField);
-                          theseResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+                          results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),thisField,accField,nCorField,nIncField,rtField);
+                          theseResults = results.(sesName).(fn).(lagStr).(thisField);
                           if printResults
-                            fprintf('\t%s %s\n',catStrs{im},thisField);
+                            fprintf('\t%s\n',thisField);
                             fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
                             fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
                           end
                         end
-                        
-%                         % overall for this category
-%                         matchCond = matchResp(ismember({matchResp.catStr},catStrs{im}));
-%                         
-%                         thisField = 'overall';
-%                         results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(matchCond,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField);
-%                         matchCondResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
-%                         if printResults
-%                           fprintf('\t%s:',catStrs{im});
-%                           fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchCondResults.acc(sub),matchCondResults.nCor(sub),(matchCondResults.nCor(sub) + matchCondResults.nInc(sub)),matchCondResults.dp(sub));
-%                           fprintf('\t');
-%                           fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondResults.rt(sub),matchCondResults.rt_cor(sub),matchCondResults.rt_inc(sub));
-%                         end
-%                         
-%                         % basic and subordinate for this manipulation
-%                         matchCondBasic = matchResp([matchCond.isSubord] == 0);
-%                         matchCondSubord = matchResp([matchCond.isSubord] == 1);
-%                         
-%                         thisField = 'basic';
-%                         results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(matchCondBasic,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField);
-%                         matchCondBasicResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
-%                         thisField = 'subord';
-%                         results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(matchCondSubord,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField);
-%                         matchCondSubordResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
-%                         if printResults
-%                           fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondBasicResults.acc(sub),matchCondBasicResults.nCor(sub),(matchCondBasicResults.nCor(sub) + matchCondBasicResults.nInc(sub)),matchCondBasicResults.dp(sub));
-%                           fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondSubordResults.acc(sub),matchCondSubordResults.nCor(sub),(matchCondSubordResults.nCor(sub) + matchCondSubordResults.nInc(sub)),matchCondSubordResults.dp(sub));
-%                           fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondBasicResults.rt(sub),matchCondBasicResults.rt_cor(sub),matchCondBasicResults.rt_inc(sub));
-%                           fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondSubordResults.rt(sub),matchCondSubordResults.rt_cor(sub),matchCondSubordResults.rt_inc(sub));
-%                         end
                       end
-                    end
+                      
+                      % accuracy for the different image categories
+                      catStrs = unique({events.(sesName).(fn).data.catStr},'stable');
+                      % if there's only 1 image category, the results were
+                      % printed above
+                      if length(catStrs) > 1 && separateCategories
+                        fprintf('\n');
+                        for im = 1:length(catStrs)
+                          for mf = 1:length(mainFields)
+                            thisField = mainFields{mf};
+                            
+                            % filter the events that we want
+                            %theseEvents = events.(sesName).(fn).data(...
+                            %  strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                            %  ismember([events.(sesName).(fn).data.lag],lagConds(lc)) &...
+                            %  strcmpi({events.(sesName).(fn).data.catStr},catStrs{im}));
+                            theseEvents = events.(sesName).(fn).data(...
+                              strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                              ismember([events.(sesName).(fn).data.lag],lagConds(lc)) &...
+                              strcmpi({events.(sesName).(fn).data.catStr},catStrs{im}) &...
+                              [events.(sesName).(fn).data.targ]);
+                            
+                            if strcmp(thisField,'recog')
+                              % exclude missed responses ('none')
+                              theseEvents = theseEvents(~ismember({theseEvents.recog_resp},'none'));
+                            end
+                            
+                            if isempty(theseEvents)
+                              keyboard
+                            end
+                            
+                            if strcmp(thisField,'recog')
+                              accField = sprintf('%s_acc',thisField);
+                            elseif strcmp(thisField,'recall')
+                              accField = sprintf('%s_spellCorr',thisField);
+                            end
+                            nCorField = sprintf('%s_nCor',thisField);
+                            nIncField = sprintf('%s_nInc',thisField);
+                            rtField = sprintf('%s_rt',thisField);
+                            
+                            results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField,accField,nCorField,nIncField,rtField);
+                            theseResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+                            if printResults
+                              fprintf('\t%s %s\n',catStrs{im},thisField);
+                              fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
+                              fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
+                            end
+                          end % mf
+                          
+                        end % im
+                      end
+                      
+                    end % lc
                     
-                  end
-                  
-                  %               case {'name', 'nametrain', 'prac_name'}
-                  %                 fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
-                  %
-                  %                 if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-                  %                   nBlocks = 1;
-                  %                 else
-                  %                   nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-                  %                 end
-                  %
-                  %                 % filter the events that we want
-                  %                 nameResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'NAME_RESP'));
-                  %
-                  %                 % exclude missed responses (-1)
-                  %                 nameResp = nameResp([nameResp.resp] ~= -1);
-                  %                 % set missing response to incorrect
-                  %                 % noRespInd = find([nameResp.resp] == -1);
-                  %                 % if ~isempty(noRespInd)
-                  %                 %   for nr = 1:length(noRespInd)
-                  %                 %     nameResp(noRespInd(nr)).acc = 0;
-                  %                 %   end
-                  %                 % end
-                  %
-                  %                 % overall
-                  %                 thisField = 'overall';
-                  %                 results.(sesName).(fn) = accAndRT(nameResp,sub,results.(sesName).(fn),thisField);
-                  %                 nameResults = results.(sesName).(fn).(thisField);
-                  %                 if printResults
-                  %                   fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameResults.acc(sub),nameResults.nCor(sub),(nameResults.nCor(sub) + nameResults.nInc(sub)),nameResults.dp(sub));
-                  %                   fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameResults.rt(sub),nameResults.rt_cor(sub),nameResults.rt_inc(sub));
-                  %                 end
-                  %
-                  %                 % basic and subordinate
-                  %                 nameBasic = nameResp([nameResp.isSubord] == 0);
-                  %                 nameSubord = nameResp([nameResp.isSubord] == 1);
-                  %
-                  %                 thisField = 'basic';
-                  %                 results.(sesName).(fn) = accAndRT(nameBasic,sub,results.(sesName).(fn),thisField);
-                  %                 nameBasicResults = results.(sesName).(fn).(thisField);
-                  %                 thisField = 'subord';
-                  %                 results.(sesName).(fn) = accAndRT(nameSubord,sub,results.(sesName).(fn),thisField);
-                  %                 nameSubordResults = results.(sesName).(fn).(thisField);
-                  %                 if printResults
-                  %                   fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBasicResults.acc(sub),nameBasicResults.nCor(sub),(nameBasicResults.nCor(sub) + nameBasicResults.nInc(sub)),nameBasicResults.dp(sub));
-                  %                   fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameSubordResults.acc(sub),nameSubordResults.nCor(sub),(nameSubordResults.nCor(sub) + nameSubordResults.nInc(sub)),nameSubordResults.dp(sub));
-                  %                   fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBasicResults.rt(sub),nameBasicResults.rt_cor(sub),nameBasicResults.rt_inc(sub));
-                  %                   fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameSubordResults.rt(sub),nameSubordResults.rt_cor(sub),nameSubordResults.rt_inc(sub));
-                  %                 end
-                  %
-                  %                 % if there's only 1 block, the results were printed above
-                  %                 if nBlocks > 1
-                  %                   fprintf('\n');
-                  %                   for b = 1:nBlocks
-                  %                     blockStr = sprintf('b%d',b);
-                  %
-                  %                     % overall
-                  %                     nameBlock = nameResp([nameResp.block] == b);
-                  %
-                  %                     thisField = 'overall';
-                  %                     results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,sub,results.(sesName).(fn).(blockStr),thisField);
-                  %                     nameBlockResults = results.(sesName).(fn).(blockStr).(thisField);
-                  %                     if printResults
-                  %                       fprintf('\tB%d:',b);
-                  %                       fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameBlockResults.acc(sub),nameBlockResults.nCor(sub),(nameBlockResults.nCor(sub) + nameBlockResults.nInc(sub)),nameBlockResults.dp(sub));
-                  %                       fprintf('\t');
-                  %                       fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockResults.rt(sub),nameBlockResults.rt_cor(sub),nameBlockResults.rt_inc(sub));
-                  %                     end
-                  %
-                  %                     % basic and subordinate for this block
-                  %                     nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
-                  %                     nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
-                  %
-                  %                     thisField = 'basic';
-                  %                     results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
-                  %                     nameBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
-                  %                     thisField = 'subord';
-                  %                     results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
-                  %                     nameBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
-                  %                     if printResults
-                  %                       fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockBasicResults.acc(sub),nameBlockBasicResults.nCor(sub),(nameBlockBasicResults.nCor(sub) + nameBlockBasicResults.nInc(sub)),nameBlockBasicResults.dp(sub));
-                  %                       fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockSubordResults.acc(sub),nameBlockSubordResults.nCor(sub),(nameBlockSubordResults.nCor(sub) + nameBlockSubordResults.nInc(sub)),nameBlockSubordResults.dp(sub));
-                  %                       fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockBasicResults.rt(sub),nameBlockBasicResults.rt_cor(sub),nameBlockBasicResults.rt_inc(sub));
-                  %                       fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockSubordResults.rt(sub),nameBlockSubordResults.rt_cor(sub),nameBlockSubordResults.rt_inc(sub));
-                  %                     end
-                  %
-                  %                   end
-                  %                 end
-                  
-              end % switch phaseName
-              
+                end % switch phaseName
+                
+              else
+                fprintf('processData: %s, %s: phase %s is incomplete.\n',expParam.subject,sesName,fn);
+              end % phaseName complete
             else
-              fprintf('%s, %s: phase %s is incomplete.\n',expParam.subject,sesName,fn);
-            end % phaseName complete
-          else
-            fprintf('%s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
-          end % field doesn't exist
-        end % isExp
+              fprintf('processData: %s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
+            end % field doesn't exist
+          end % isExp
+          
+        end % for pha
+        fprintf('\n');
         
-      end % for pha
-      fprintf('\n');
-    end % for ses
-  else
-    fprintf('\t%s, %s: session is incomplete. Not including in results.\n',expParam.subject,sesName);
-  end % onlyComplete check
-end % for sub
-fprintf('Done processing data for experiment %s.\n\n',expName);
+      end % for ses
+    else
+      fprintf('\tprocessData: %s, %s: session is incomplete. Not including in results.\n',expParam.subject,sesName);
+    end % onlyComplete check
+  end % for sub
+  fprintf('Done processing data for experiment %s.\n\n',expName);
+  
+  if saveResults
+    matFileName = fullfile(dataroot,sprintf('%s_behav_results.mat',expName));
+    save(matFileName,'results');
+  end
+end
 
 if saveResults
-  fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,results,fileName);
+  textFileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
+  printResultsToFile(dataroot,subjects,results,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,fileName)
+function printResultsToFile(dataroot,subjects,results,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
 
 fprintf('Saving results to file: %s.\n',fileName);
 
@@ -622,7 +547,7 @@ dataToPrint = {...
 
 % use subject 5's files for initialization
 if length(subjects) > 5
-  sub = 5;
+  sub = templateSubject;
 else
   sub = length(subjects);
 end
@@ -644,12 +569,18 @@ for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
   sesName = expParam.sesTypes{sesNum};
   
-  uniquePhaseNames = unique(expParam.session.(sesName).phases);
-  uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+  uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+  uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases,'stable')));
   
   fprintf(fid,'session\t%s\n',sesName);
   
-  for pha = 1:length(expParam.session.(sesName).phases)
+  if collapsePhases
+    processThesePhases = uniquePhaseNames;
+  else
+    processThesePhases = expParam.session.(sesName).phases;
+  end
+  
+  for pha = 1:length(processThesePhases)
     phaseName = expParam.session.(sesName).phases{pha};
     
     % find out where this phase occurs in the list of unique phases
@@ -659,10 +590,19 @@ for sesNum = 1:length(expParam.sesTypes)
     % set the phase count
     phaseCount = uniquePhaseCounts(uniquePhaseInd);
     
+    % accidently set isExp=true for prac_distract_math
+    if ~isempty(strfind(phaseName,'prac_')) && cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+      cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+    end
+    
     if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
       
-      % set the phase name with phase count
-      fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+      if collapsePhases
+        fn = phaseName;
+      else
+        % set the phase name with phase count
+        fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+      end
       
       if isfield(events.(sesName),fn)
         
@@ -688,10 +628,28 @@ for sesNum = 1:length(expParam.sesTypes)
                 lagStr = 'all';
               end
               
-              %matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
+              if collapseCategories
+                % overall
+                headerCell = {{lagStr},mainToPrint};
+                [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
+                fprintf(fid,sprintf('\t%s\n',headerStr));
+                [headerStr] = setHeaderStr({generic_dataToPrint},1);
+                headerStr = sprintf('\t%s',headerStr);
+                headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                fprintf(fid,sprintf('%s\n',headerStr));
+                
+                for sub = 1:length(subjects)
+                  dataStr = subjects{sub};
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint{mf});
+                  end
+                  fprintf(fid,sprintf('%s\n',dataStr));
+                end
+              end
               
-              catStrs = unique({events.(sesName).(fn).data.catStr});
-              if length(catStrs) > 1
+              % separate categories
+              catStrs = unique({events.(sesName).(fn).data.catStr},'stable');
+              if length(catStrs) > 1 && separateCategories
                 headerCell = {{lagStr},catStrs,mainToPrint};
                 [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
                 fprintf(fid,sprintf('\t%s\n',headerStr));
@@ -709,33 +667,14 @@ for sesNum = 1:length(expParam.sesTypes)
                   end
                   fprintf(fid,sprintf('%s\n',dataStr));
                 end
-                
-              else
-                
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                %keyboard
-                
-                headerCell = {{lagStr},mainToPrint};
-                [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
-                fprintf(fid,sprintf('\t%s\n',headerStr));
-                [headerStr] = setHeaderStr({generic_dataToPrint},1);
-                headerStr = sprintf('\t%s',headerStr);
-                headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-                fprintf(fid,sprintf('%s\n',headerStr));
-                
-                for sub = 1:length(subjects)
-                  dataStr = subjects{sub};
-                  for mf = 1:length(mainToPrint)
-                    [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint{mf});
-                    %[dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint);
-                  end
-                  fprintf(fid,sprintf('%s\n',dataStr));
-                end
               end
-            end
-            if lc ~= length(lagConds)
-              fprintf(fid,'\n');
-            end
+              
+              if lc ~= length(lagConds)
+                fprintf(fid,'\n');
+              end
+              
+            end % lc
+            
             %             end
             
             %           case {'name', 'nametrain', 'prac_name'}
@@ -791,11 +730,11 @@ for sesNum = 1:length(expParam.sesTypes)
         end % switch phaseName
         fprintf(fid,'\n');
       else
-        fprintf('%s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
+        fprintf('printResultsToFile: %s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
       end
     end
-  end
-end
+  end % phases
+end % sessions
 
 % close out the results file
 fprintf('Saving %s...',fileName);
