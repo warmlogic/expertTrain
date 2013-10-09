@@ -61,6 +61,7 @@ expParam.session.oneDay.phases = {...
   'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall',...
   'expo','multistudy','distract_math','cued_recall',...
   'expo','multistudy','distract_math','cued_recall',...
+  'expo','multistudy','distract_math','cued_recall',...
   'expo','multistudy','distract_math','cued_recall'};
 
 % % debug
@@ -236,11 +237,18 @@ if expParam.sessionNum == 1
   
   cfg.stim.nPairs_study_buff_start = 1;
   cfg.stim.nPairs_study_buff_end = 1;
-  cfg.stim.nPairs_study_targ_spaced = 9;
-  cfg.stim.nPairs_study_targ_massed = 9;
-  %cfg.stim.nPairs_study_targ_onePres = 5;
-  cfg.stim.nPairs_study_targ_onePres = 9;
-  cfg.stim.nPairs_test_lure = 9;
+  
+%   % 3 lists
+%   cfg.stim.nPairs_study_targ_spaced = 9;
+%   cfg.stim.nPairs_study_targ_massed = 9;
+%   cfg.stim.nPairs_study_targ_onePres = 9;
+%   cfg.stim.nPairs_test_lure = 9;
+  
+  % 4 lists
+  cfg.stim.nPairs_study_targ_spaced = 7;
+  cfg.stim.nPairs_study_targ_massed = 7;
+  cfg.stim.nPairs_study_targ_onePres = 7;
+  cfg.stim.nPairs_test_lure = 7;
   
   %cfg.stim.lags = [2 4 8];
   %cfg.stim.lags = [4 8];
@@ -898,8 +906,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_minNum = 1;
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxNum = 10;
         cfg.stim.(sesName).(phaseName)(phaseCount).dist_plusMinus = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 30;
-        cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 60.0;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 30;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 60.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 60;
+        cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 120.0;
         %cfg.stim.(sesName).(phaseName)(phaseCount).dist_nProbs = 5;
         %cfg.stim.(sesName).(phaseName)(phaseCount).dist_maxTimeLimit = 10.0;
         % % cfg.stim.(sesName).(phaseName)(phaseCount).dist_response = 10.0;

@@ -25,26 +25,26 @@ elseif isExp
 %   spaced = 16;
 %   massed = 16;
 %   onePres = 16;
-%   buffers = 2; % start + end
+%   buffers = 2; % start + end together
 %   lures = 16;
 
-  nBlocks = 3;
-
-  spaced = 9;
-  massed = 9;
-  onePres = 9;
-  buffers = 2; % start + end
-  lures = 9;
-  
-%   nBlocks = 4;
+%   nBlocks = 3;
 % 
-%   spaced = 7;
-%   massed = 7;
-%   onePres = 7;
-%   buffers = 2; % start + end
-%   lures = 7;
+%   spaced = 9;
+%   massed = 9;
+%   onePres = 9;
+%   buffers = 2; % start + end together
+%   lures = 9;
   
-  nDist = 30;
+  nBlocks = 4;
+
+  spaced = 7;
+  massed = 7;
+  onePres = 7;
+  buffers = 2; % start + end together
+  lures = 7;
+  
+  nDist = 50;
 end
 
 nExpoStimuli = (spaced + massed + onePres + buffers) * nCategories;
