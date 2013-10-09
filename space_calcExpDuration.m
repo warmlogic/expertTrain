@@ -104,6 +104,10 @@ testTime = cr_trial * nTestStimuli;
 totalTime = expoTime + studyTime + distTime + testTime;
 
 fprintf('Exposure to %d images:\t%.2f minutes.\n',nExpoStimuli,(expoTime / 60));
+fprintf('\t# spaced per category: %d\n',spaced);
+fprintf('\t# massed per category: %d\n',massed);
+fprintf('\t# onePres per category: %d\n',onePres);
+fprintf('\t# buffers (start+end) per category: %d\n',buffers);
 fprintf('Study %d word+image pairs:\t%.2f minutes.\n',nStudyStimuli,(studyTime / 60));
 fprintf('Distractor: %d math problems:\t%.2f minutes.\n',nDist,(distTime / 60));
 fprintf('Cued recall for %d images:\t%.2f minutes.\n',nTestStimuli,(testTime / 60));
