@@ -22,6 +22,19 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE015';
     'SPACE016';
     'SPACE017';
+    'SPACE018';
+    'SPACE019';
+    'SPACE020';
+    'SPACE021';
+    'SPACE022';
+    'SPACE023';
+    'SPACE024';
+    'SPACE025';
+    'SPACE026';
+    'SPACE027';
+    'SPACE028';
+    'SPACE029';
+    'SPACE030';
     };
 end
 
@@ -114,10 +127,17 @@ results = struct;
 dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
 mainFields = {'recog','recall'};
 
+% categories = [1, 2];
+% categoryStr = {'faces', 'houses'};
+
 %% initialize to store the data
 
-% use subject 1's files for initialization
-sub = 5;
+% use subject 5's files for initialization
+if length(subjects) > 5
+  sub = 5;
+else
+  sub = length(subjects);
+end
 subDir = fullfile(dataroot,subjects{sub});
 expParamFile = fullfile(subDir,'experimentParams.mat');
 if exist(expParamFile,'file')
@@ -180,16 +200,18 @@ for sesNum = 1:length(expParam.sesTypes)
                 end
               end
               
-              %             imgConds = unique({events.(sesName).(fn).data.imgCond});
-              %             if length(imgConds) > 1
-              %               for im = 1:length(imgConds)
-              %                 for mf = 1:length(mainFields)
-              %                   for df = 1:length(dataFields)
-              %                     results.(sesName).(fn).(lagStr).(imgConds{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-              %                   end
-              %                 end
-              %               end
-              %             end
+              % image categories
+              catStrs = unique({events.(sesName).(fn).data.catStr});
+              if length(catStrs) > 1
+                for im = 1:length(catStrs)
+                  for mf = 1:length(mainFields)
+                    for df = 1:length(dataFields)
+                      results.(sesName).(fn).(lagStr).(catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                    end
+                  end
+                end
+              end
+              
             end % for t
             %         case {'name', 'nametrain', 'prac_name'}
             %
@@ -353,9 +375,9 @@ for sub = 1:length(subjects)
                       results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),thisField,accField,nCorField,nIncField,rtField);
                       theseResults = results.(sesName).(fn).(lagStr).(thisField);
                       if printResults
-                        fprintf('\t%s',thisField);
-                        fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
-                        fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
+                        fprintf('\t%s\n',thisField);
+                        fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
+                        fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
                       end
                     end
                     
@@ -401,44 +423,73 @@ for sub = 1:length(subjects)
                     %                   close all
                     %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
                     
-                    %                   % accuracy for the different image manipulation conditions
-                    %                   imgConds = unique({matchResp.imgCond});
-                    %                   % if there's only 1 image manipulation condition, the
-                    %                   % results were printed above
-                    %                   if length(imgConds) > 1
-                    %                     fprintf('\n');
-                    %                     for im = 1:length(imgConds)
-                    %                       % overall for this manipulation
-                    %                       matchCond = matchResp(ismember({matchResp.imgCond},imgConds{im}));
-                    %
-                    %                       thisField = 'overall';
-                    %                       results.(sesName).(fn).(lagStr).(imgConds{im}) = accAndRT(matchCond,sub,results.(sesName).(fn).(lagStr).(imgConds{im}),thisField);
-                    %                       matchCondResults = results.(sesName).(fn).(lagStr).(imgConds{im}).(thisField);
-                    %                       if printResults
-                    %                         fprintf('\t%s:',imgConds{im});
-                    %                         fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchCondResults.acc(sub),matchCondResults.nCor(sub),(matchCondResults.nCor(sub) + matchCondResults.nInc(sub)),matchCondResults.dp(sub));
-                    %                         fprintf('\t');
-                    %                         fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondResults.rt(sub),matchCondResults.rt_cor(sub),matchCondResults.rt_inc(sub));
-                    %                       end
-                    %
-                    %                       % basic and subordinate for this manipulation
-                    %                       matchCondBasic = matchResp([matchCond.isSubord] == 0);
-                    %                       matchCondSubord = matchResp([matchCond.isSubord] == 1);
-                    %
-                    %                       thisField = 'basic';
-                    %                       results.(sesName).(fn).(lagStr).(imgConds{im}) = accAndRT(matchCondBasic,sub,results.(sesName).(fn).(lagStr).(imgConds{im}),thisField);
-                    %                       matchCondBasicResults = results.(sesName).(fn).(lagStr).(imgConds{im}).(thisField);
-                    %                       thisField = 'subord';
-                    %                       results.(sesName).(fn).(lagStr).(imgConds{im}) = accAndRT(matchCondSubord,sub,results.(sesName).(fn).(lagStr).(imgConds{im}),thisField);
-                    %                       matchCondSubordResults = results.(sesName).(fn).(lagStr).(imgConds{im}).(thisField);
-                    %                       if printResults
-                    %                         fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondBasicResults.acc(sub),matchCondBasicResults.nCor(sub),(matchCondBasicResults.nCor(sub) + matchCondBasicResults.nInc(sub)),matchCondBasicResults.dp(sub));
-                    %                         fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondSubordResults.acc(sub),matchCondSubordResults.nCor(sub),(matchCondSubordResults.nCor(sub) + matchCondSubordResults.nInc(sub)),matchCondSubordResults.dp(sub));
-                    %                         fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondBasicResults.rt(sub),matchCondBasicResults.rt_cor(sub),matchCondBasicResults.rt_inc(sub));
-                    %                         fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondSubordResults.rt(sub),matchCondSubordResults.rt_cor(sub),matchCondSubordResults.rt_inc(sub));
-                    %                       end
-                    %                     end
-                    %                   end
+                    % accuracy for the different image categories
+                    catStrs = unique({events.(sesName).(fn).data.catStr});
+                    % if there's only 1 image category, the results were
+                    % printed above
+                    if length(catStrs) > 1
+                      fprintf('\n');
+                      for im = 1:length(catStrs)
+                        for mf = 1:length(mainFields)
+                          thisField = mainFields{mf};
+                          
+                          % filter the events that we want
+                          theseEvents = events.(sesName).(fn).data(strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) & ismember([events.(sesName).(fn).data.lag],lagConds(lc)) & strcmpi({events.(sesName).(fn).data.catStr},catStrs{im}));
+                          
+                          if strcmp(thisField,'recog')
+                            % exclude missed responses ('none')
+                            theseEvents = theseEvents(~ismember({theseEvents.recog_resp},'none'));
+                          end
+                          
+                          if strcmp(thisField,'recog')
+                            accField = sprintf('%s_acc',thisField);
+                          elseif strcmp(thisField,'recall')
+                            accField = sprintf('%s_spellCorr',thisField);
+                          end
+                          nCorField = sprintf('%s_nCor',thisField);
+                          nIncField = sprintf('%s_nInc',thisField);
+                          rtField = sprintf('%s_rt',thisField);
+                          
+                          results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField,accField,nCorField,nIncField,rtField);
+                          theseResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+                          if printResults
+                            fprintf('\t%s %s\n',catStrs{im},thisField);
+                            fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
+                            fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
+                          end
+                        end
+                        
+%                         % overall for this category
+%                         matchCond = matchResp(ismember({matchResp.catStr},catStrs{im}));
+%                         
+%                         thisField = 'overall';
+%                         results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(matchCond,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField);
+%                         matchCondResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+%                         if printResults
+%                           fprintf('\t%s:',catStrs{im});
+%                           fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchCondResults.acc(sub),matchCondResults.nCor(sub),(matchCondResults.nCor(sub) + matchCondResults.nInc(sub)),matchCondResults.dp(sub));
+%                           fprintf('\t');
+%                           fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondResults.rt(sub),matchCondResults.rt_cor(sub),matchCondResults.rt_inc(sub));
+%                         end
+%                         
+%                         % basic and subordinate for this manipulation
+%                         matchCondBasic = matchResp([matchCond.isSubord] == 0);
+%                         matchCondSubord = matchResp([matchCond.isSubord] == 1);
+%                         
+%                         thisField = 'basic';
+%                         results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(matchCondBasic,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField);
+%                         matchCondBasicResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+%                         thisField = 'subord';
+%                         results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(matchCondSubord,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField);
+%                         matchCondSubordResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+%                         if printResults
+%                           fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondBasicResults.acc(sub),matchCondBasicResults.nCor(sub),(matchCondBasicResults.nCor(sub) + matchCondBasicResults.nInc(sub)),matchCondBasicResults.dp(sub));
+%                           fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondSubordResults.acc(sub),matchCondSubordResults.nCor(sub),(matchCondSubordResults.nCor(sub) + matchCondSubordResults.nInc(sub)),matchCondSubordResults.dp(sub));
+%                           fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondBasicResults.rt(sub),matchCondBasicResults.rt_cor(sub),matchCondBasicResults.rt_inc(sub));
+%                           fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondSubordResults.rt(sub),matchCondSubordResults.rt_cor(sub),matchCondSubordResults.rt_inc(sub));
+%                         end
+                      end
+                    end
                     
                   end
                   
@@ -569,8 +620,12 @@ dataToPrint = {...
   {'nTrials','recog_nCor','recog_acc','dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
   {'nTrials','recall_nCor','recall_spellCorr','dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
 
-% use subject 1's files for initialization
-sub = 5;
+% use subject 5's files for initialization
+if length(subjects) > 5
+  sub = 5;
+else
+  sub = length(subjects);
+end
 subDir = fullfile(dataroot,subjects{sub});
 expParamFile = fullfile(subDir,'experimentParams.mat');
 if exist(expParamFile,'file')
@@ -633,47 +688,49 @@ for sesNum = 1:length(expParam.sesTypes)
                 lagStr = 'all';
               end
               
-              %               matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
-              %
-              %               imgConds = unique({matchResp.imgCond});
-              %               if length(imgConds) > 1
-              %                 headerCell = {{lagStr},imgConds,mainToPrint};
-              %                 [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
-              %                 fprintf(fid,sprintf('\t%s\n',headerStr));
-              %                 [headerStr] = setHeaderStr({dataToPrint},1);
-              %                 headerStr = sprintf('\t%s',headerStr);
-              %                 headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-              %                 fprintf(fid,sprintf('%s\n',headerStr));
-              %
-              %                 for sub = 1:length(subjects)
-              %                   dataStr = subjects{sub};
-              %                   for im = 1:length(imgConds)
-              %                     for mf = 1:length(mainToPrint)
-              %                       [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,imgConds{im},mainToPrint{mf}},results,sub,dataToPrint);
-              %                     end
-              %                   end
-              %                   fprintf(fid,sprintf('%s\n',dataStr));
-              %                 end
-              %
-              %               else
+              %matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
               
-              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              %keyboard
-              
-              headerCell = {{lagStr},mainToPrint};
-              [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
-              fprintf(fid,sprintf('\t%s\n',headerStr));
-              [headerStr] = setHeaderStr({generic_dataToPrint},1);
-              headerStr = sprintf('\t%s',headerStr);
-              headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-              fprintf(fid,sprintf('%s\n',headerStr));
-              
-              for sub = 1:length(subjects)
-                dataStr = subjects{sub};
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint{mf});
+              catStrs = unique({events.(sesName).(fn).data.catStr});
+              if length(catStrs) > 1
+                headerCell = {{lagStr},catStrs,mainToPrint};
+                [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
+                fprintf(fid,sprintf('\t%s\n',headerStr));
+                [headerStr] = setHeaderStr({generic_dataToPrint},1);
+                headerStr = sprintf('\t%s',headerStr);
+                headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                fprintf(fid,sprintf('%s\n',headerStr));
+                
+                for sub = 1:length(subjects)
+                  dataStr = subjects{sub};
+                  for im = 1:length(catStrs)
+                    for mf = 1:length(mainToPrint)
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,catStrs{im},mainToPrint{mf}},results,sub,dataToPrint{mf});
+                    end
+                  end
+                  fprintf(fid,sprintf('%s\n',dataStr));
                 end
-                fprintf(fid,sprintf('%s\n',dataStr));
+                
+              else
+                
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %keyboard
+                
+                headerCell = {{lagStr},mainToPrint};
+                [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
+                fprintf(fid,sprintf('\t%s\n',headerStr));
+                [headerStr] = setHeaderStr({generic_dataToPrint},1);
+                headerStr = sprintf('\t%s',headerStr);
+                headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                fprintf(fid,sprintf('%s\n',headerStr));
+                
+                for sub = 1:length(subjects)
+                  dataStr = subjects{sub};
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint{mf});
+                    %[dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint);
+                  end
+                  fprintf(fid,sprintf('%s\n',dataStr));
+                end
               end
             end
             if lc ~= length(lagConds)
