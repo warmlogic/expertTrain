@@ -202,6 +202,11 @@ recallX_all = nan(length(testStims_img),1);
 recallY_all = nan(length(testStims_img),1);
 errorTextY_all = nan(length(testStims_img),1);
 
+% initialize to hold all recallResponses
+recallResp_all = {};
+recallCounter = 0;
+recallsInARowCounter = 0;
+
 [~, screenCenterY] = RectCenter(cfg.screen.wRect);
 
 % load up the stimuli for this block
@@ -359,7 +364,7 @@ for i = trialNum:length(testStims_img)
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     
-    RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
+    RestrictKeysForKbCheck([cfg.keys.recogOld, cfg.keys.recogNew, cfg.keys.newSure, cfg.keys.newMaybe]);
     
     % show preparation text
     DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -811,6 +816,71 @@ for i = trialNum:length(testStims_img)
       recallEndRT = respMadeRT;
       % only need the seconds
       % recallEndRT = endRT.secs;
+      
+      % see if they're behaving badly (making the same resp over and over)
+      if ~isempty(recallResp)
+        recallCounter = recallCounter + 1;
+        recallResp_all = cat(1,recallResp_all,recallResp);
+        if recallCounter > 1
+          if strcmpi(recallResp,recallResp_all(recallCounter-1))
+            % they made the same response as last time
+            recallsInARowCounter = recallsInARowCounter + 1;
+          else
+            recallsInARowCounter = 0;
+          end
+          
+          if length(recallResp_all) > 2 && recallsInARowCounter >= 3
+            % if they've made the same response more than 3 times in a row
+            
+            if phaseCfg.playSound
+              % loud angry beep
+              Beeper(440, 0.9, 3);
+            end
+            
+            tooManyInARowText1 = sprintf('Are you having trouble understanding what you should be doing?\n\nYou have made the response "%s" many times in a row. It seems that you are not doing the task correctly.',recallResp);
+            tooManyInARowText2 = sprintf('\n\nPlease stop doing the task and talk to the experimenter now.\n\nPlease press "%s" when you know how to do the task properly.',cfg.keys.instructContKey);
+            
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w,sprintf('%s%s',tooManyInARowText1,tooManyInARowText2),'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+            Screen('Flip', w);
+            
+            % wait until the key is pressed
+            RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+            KbWait(-1,2);
+            RestrictKeysForKbCheck([cfg.keys.recogOld, cfg.keys.recogNew, cfg.keys.newSure, cfg.keys.newMaybe]);
+            
+            % show preparation text
+            DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+            Screen('Flip', w);
+            WaitSecs(2.0);
+
+          elseif length(recallResp_all) > 4 && sum(strcmpi(recallResp_all,recallResp)) / length(recallResp_all) >= (1/3)
+            % if they've made the same response for >= 33% of the responses
+            
+            if phaseCfg.playSound
+              % loud angry beep
+              Beeper(440, 0.9, 3);
+            end
+            
+            tooManySameText1 = sprintf('Are you having trouble understanding what you should be doing?\n\nYou have made the response "%s" many times.\nIf you are simply trying to show that you do not remember a word, please press DELETE until you see "%s" again.',recallResp,cfg.text.recallPrompt);
+            tooManySameText2 = sprintf('\n\nIf instead you do not understand what you should be doing, please stop doing the task and talk to the experimenter now.\n\nPlease press "%s" when you know how to do the task properly.',cfg.keys.instructContKey);
+            
+            Screen('TextSize', w, cfg.text.instructTextSize);
+            DrawFormattedText(w,sprintf('%s%s',tooManySameText1,tooManySameText2),'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+            Screen('Flip', w);
+            
+            % wait until the key is pressed
+            RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+            KbWait(-1,2);
+            RestrictKeysForKbCheck([cfg.keys.recogOld, cfg.keys.recogNew, cfg.keys.newSure, cfg.keys.newMaybe]);
+            
+            % show preparation text
+            DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+            Screen('Flip', w);
+            WaitSecs(2.0);
+          end
+        end
+      end
       
     elseif (keyCode(cfg.keys.recogNew) == 1 && all(keyCode(~cfg.keys.recogNew) == 0))
       recogResp = 'new';
