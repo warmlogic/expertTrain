@@ -49,7 +49,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE035';
     'SPACE036';
     'SPACE037';
-    'SPACE038';
+    'SPACE038'; % responded "J" to almost all cued recall prompts
     'SPACE039';
     'SPACE040';
     'SPACE041';
