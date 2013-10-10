@@ -565,6 +565,9 @@ if expParam.sessionNum == 1
           upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.image = cfg.files.exposureRankRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo.imageScale = cfg.files.respKeyImgScale;
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -623,7 +626,9 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.study.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_study_1_practice_intro.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
-          %{'sameKey','diffKey','contKey'},{KbName(cfg.keys.judgeSame),KbName(cfg.keys.judgeDiff),cfg.keys.instructContKey});
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -667,6 +672,9 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.dist.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_dist_1_practice_intro.txt',expParam.expName)),...
           {'contKey'},{cfg.keys.instructContKey});
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -690,6 +698,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategoryOrdered = 4;
         
         if expParam.useNS
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
@@ -737,6 +746,9 @@ if expParam.sessionNum == 1
           cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).image = cfg.files.recogTestSureMaybeRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.cr(2).imageScale = cfg.files.respKeyImgScale;
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -763,10 +775,10 @@ if expParam.sessionNum == 1
         % blink break (set to 0 if you don't want breaks)
         if expParam.useNS
           % timer in secs for when to take a blink break (only when useNS=true)
-          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 45.0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
         else
           % timer in secs for when to take a blink break (only when useNS=false)
-          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 120.0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
         end
         
         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
@@ -949,6 +961,7 @@ if expParam.sessionNum == 1
         
         %cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecTarg = 6;
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategoryOrdered = 4;
         
         % blink break (set to 0 if you don't want breaks)
         if expParam.useNS

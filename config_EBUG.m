@@ -501,6 +501,9 @@ if expParam.sessionNum == 1
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_match_1_practice_intro.txt',expParam.expName)),...
           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -657,6 +660,9 @@ if expParam.sessionNum == 1
           {'contKey'},{cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.recogTest.image = cfg.files.recogTestRespKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.recogTest.imageScale = cfg.files.recogTestRespKeyImgScale;
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -786,6 +792,9 @@ if expParam.sessionNum == 1
           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name.image = cfg.files.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name.imageScale = cfg.files.speciesNumKeyImgScale;
+        % whether to ask the participant if they have any questions; only
+        % continues with experimenter's secret key
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
