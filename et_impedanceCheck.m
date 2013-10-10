@@ -1,4 +1,4 @@
-function [secs] = et_impedanceCheck(w, cfg, talkToNS)
+function [secs] = et_impedanceCheck(w, cfg, talkToNS, phaseName)
 % function [secs] = et_impedanceCheck(w, cfg, talkToNS)
 %
 % Run an impedance check.
@@ -12,6 +12,12 @@ function [secs] = et_impedanceCheck(w, cfg, talkToNS)
 
 if ~exist('talkToNS','var') || isempty(talkToNS)
   talkToNS = false;
+end
+
+if ~exist('phaseName','var') || isempty(phaseName)
+  phaseName = 'experiment';
+else
+  phaseName = sprintf('%s phase',phaseName);
 end
 
 Screen('TextSize', w, cfg.text.basicTextSize);
@@ -42,5 +48,12 @@ message = 'Starting data acquisition...';
 DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
 Screen('Flip', w);
 WaitSecs(5.000);
+
+continueMsg = sprintf('Ready to continue.\nPress any key to go to the %s.',phaseName);
+% just draw straight into the main window since we don't need speed here
+DrawFormattedText(w, continueMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+Screen('Flip', w);
+% listen for any keypress on any keyboard
+KbWait(-1,2);
 
 end
