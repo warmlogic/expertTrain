@@ -145,7 +145,7 @@ if testInOrderedGroups > 1
     % shuffle this group of targets and lures together
     fprintf('Shuffling %s test (%d) task stimuli, ordered test groups.\n',sesName,phaseCount);
     [thisOrderedGroup_img,randind] = et_shuffleStims(...
-      thisOrderedGroup_img,'categoryNum',phaseCfg.crMaxConsecCategory);
+      thisOrderedGroup_img,'categoryNum',phaseCfg.crMaxConsecCategoryOrdered);
     % put the word stimuli in the same shuffled order
     thisOrderedGroup_word = thisOrderedGroup_word(randind);
     
@@ -204,7 +204,7 @@ else
   fprintf('Shuffling %s test (%d) task stimuli, no ordered test groups.\n',sesName,phaseCount);
   [testStims_img,randind] = et_shuffleStims(...
     testStims_img,'categoryNum',phaseCfg.crMaxConsecCategory);
-  %expParam.session.(sesName).(phaseName)(phaseCount).testStims_img,'targ',phaseCfg.crMaxConsecTarg);
+  %testStims_img,'targ',phaseCfg.crMaxConsecTarg);
   
   % put the word stimuli in the same shuffled order
   testStims_word = testStims_word(randind);
