@@ -275,7 +275,7 @@ if expParam.useNS && phaseCfg.impedanceBeforePhase
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
   fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-  thisGetSecs = et_impedanceCheck(w, cfg, false);
+  thisGetSecs = et_impedanceCheck(w, cfg, false, phaseName);
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
   fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
 end
@@ -355,11 +355,23 @@ for i = trialNum:length(testStims_img)
     thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-    thisGetSecs = et_impedanceCheck(w, cfg, true);
+    thisGetSecs = et_impedanceCheck(w, cfg, true, phaseName);
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
     
     RestrictKeysForKbCheck([cfg.keys.expo1, cfg.keys.expo2, cfg.keys.expo3, cfg.keys.expo4]);
+    
+    % show preparation text
+    DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+    Screen('Flip', w);
+    WaitSecs(2.0);
+    
+    if (phaseCfg.cr_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.cr_isi == 0 && phaseCfg.fixDuringPreStim)
+      Screen('TextSize', w, cfg.text.fixSize);
+      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    end
+    Screen('Flip',w);
+    WaitSecs(1.0);
     
     % reset the blink timer
     if phaseCfg.secUntilBlinkBreak > 0
@@ -411,6 +423,7 @@ for i = trialNum:length(testStims_img)
     end
     Screen('Flip',w);
     WaitSecs(1.0);
+    
     % reset the timer
     blinkTimerStart = GetSecs;
   end

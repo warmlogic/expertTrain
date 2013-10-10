@@ -173,7 +173,7 @@ if expParam.useNS && phaseCfg.impedanceBeforePhase
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
   fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-  thisGetSecs = et_impedanceCheck(w, cfg, false);
+  thisGetSecs = et_impedanceCheck(w, cfg, false, phaseName);
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
   fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
 end
@@ -317,9 +317,21 @@ if runView
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-      thisGetSecs = et_impedanceCheck(w, cfg, true);
+      thisGetSecs = et_impedanceCheck(w, cfg, true, phaseName);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
+      
+      if (phaseCfg.comp_view_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_view_isi == 0 && phaseCfg.fixDuringPreStim)
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      Screen('Flip',w);
+      WaitSecs(1.0);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -358,6 +370,7 @@ if runView
       end
       Screen('Flip',w);
       WaitSecs(1.0);
+      
       % reset the timer
       blinkTimerStart = GetSecs;
     end
@@ -690,12 +703,28 @@ if runBt
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-      thisGetSecs = et_impedanceCheck(w, cfg, true);
+      thisGetSecs = et_impedanceCheck(w, cfg, true, phaseName);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.c01, cfg.keys.c02, cfg.keys.c03, cfg.keys.c04, cfg.keys.c05]);
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
+      
+      if (phaseCfg.comp_bt_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_bt_isi == 0 && phaseCfg.fixDuringPreStim)
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      if cfg.text.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, cfg.text.respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
+      Screen('Flip',w);
+      WaitSecs(1.0);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -743,6 +772,7 @@ if runBt
       end
       Screen('Flip',w);
       WaitSecs(1.0);
+      
       % reset the timer
       blinkTimerStart = GetSecs;
     end
@@ -1391,12 +1421,28 @@ if runWi
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
-      thisGetSecs = et_impedanceCheck(w, cfg, true);
+      thisGetSecs = et_impedanceCheck(w, cfg, true, phaseName);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.c01, cfg.keys.c02, cfg.keys.c03, cfg.keys.c04, cfg.keys.c05]);
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
+      
+      if (phaseCfg.comp_wi_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_wi_isi == 0 && phaseCfg.fixDuringPreStim)
+        Screen('TextSize', w, cfg.text.fixSize);
+        DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      if cfg.text.respReminder
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w, cfg.text.respReminderText, 'center', respReminderY, cfg.text.instructColor, cfg.text.instructCharWidth);
+      end
+      Screen('Flip',w);
+      WaitSecs(1.0);
       
       % reset the blink timer
       if cfg.stim.secUntilBlinkBreak > 0
@@ -1444,6 +1490,7 @@ if runWi
       end
       Screen('Flip',w);
       WaitSecs(1.0);
+      
       % reset the timer
       blinkTimerStart = GetSecs;
     end
