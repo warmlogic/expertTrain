@@ -41,6 +41,8 @@ function [cfg,expParam] = et_compare(w,cfg,expParam,logFile,sesName,phaseName,ph
 
 fprintf('Running %s %s (compare) (%d)...\n',sesName,phaseName,phaseCount);
 
+phaseNameForParticipant = 'comparison';
+
 %% set the starting date and time for this phase
 thisDate = date;
 startTime = fix(clock);
@@ -154,6 +156,12 @@ if ~isfield(cfg.text,'respReminder')
 end
 respReminderY = cfg.screen.wRect(RectBottom) - (cfg.screen.wRect(RectBottom) * 0.05);
 
+% whether to ask the participant if they have any questions; only continues
+% with experimenter's secret key
+if ~isfield(phaseCfg.instruct,'questions')
+  phaseCfg.instruct.questions = true;
+end
+
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
@@ -173,13 +181,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting comparison phase...';
+message = sprintf('Starting %s phase...',phaseNameForParticipant);
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  message = 'Starting data acquisition for comparison phase...';
+  message = sprintf('Starting data acquisition for %s phase...',phaseNameForParticipant);
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
@@ -228,7 +236,7 @@ if runView
   if cfg.stim.preloadImages
     message = sprintf('Preparing part 1 images, please wait...');
     Screen('TextSize', w, cfg.text.basicTextSize);
-    % put the instructions on the screen
+    % put the "preparing" message on the screen
     DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
   end
   % Update the display to show the message:
@@ -269,7 +277,29 @@ if runView
     et_showTextInstruct(w,phaseCfg.instruct.compView(i),cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   end
+  % Wait a second before starting trial
+  WaitSecs(1.000);
   
+  %% questions? only during practice. continues with experimenter's key.
+  
+  if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+    questionsMsg.text = sprintf('If you have any questions about the %s phase (part 1), please ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+    et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+    % Wait a second before continuing
+    WaitSecs(1.000);
+  end
+  
+  %% let them start when they're ready
+  
+  if phaseCfg.isExp
+    expStr = '';
+  else
+    expStr = ' practice';
+  end
+  readyMsg.text = sprintf('Ready to begin%s %s phase (part 1).\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   % Wait a second before starting trial
   WaitSecs(1.000);
   
@@ -297,7 +327,7 @@ if runView
       end
     end
     
-    % Do a blink break if recording EEG and specified time has passed
+    % Do a blink break if specified time has passed
     if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(viewStims) - 3)
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -316,6 +346,11 @@ if runView
       thisGetSecs = KbWait(-1,2);
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
       
       if (phaseCfg.comp_view_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_view_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
@@ -612,10 +647,32 @@ if runBt
     et_showTextInstruct(w,phaseCfg.instruct.compBt(i),cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   end
-  
   % Wait a second before starting trial
   WaitSecs(1.000);
   
+  %% questions? only during practice. continues with experimenter's key.
+  
+  if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+    questionsMsg.text = sprintf('If you have any questions about the %s phase (part 2), please ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+    et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+    % Wait a second before continuing
+    WaitSecs(1.000);
+  end
+  
+  %% let them start when they're ready
+  
+  if phaseCfg.isExp
+    expStr = '';
+  else
+    expStr = ' practice';
+  end
+  readyMsg.text = sprintf('Ready to begin%s %s phase (part 2).\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  % Wait a second before starting trial
+  WaitSecs(1.000);
+
   %% run the comparison - between task
   
   % only check these keys
@@ -646,7 +703,7 @@ if runBt
       end
     end
     
-    % Do a blink break if recording EEG and specified time has passed
+    % Do a blink break if specified time has passed
     if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(btStim2) - 3)
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -670,6 +727,11 @@ if runBt
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.c01, cfg.keys.c02, cfg.keys.c03, cfg.keys.c04, cfg.keys.c05]);
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
       
       if (phaseCfg.comp_bt_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_bt_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
@@ -1286,7 +1348,29 @@ if runWi
     et_showTextInstruct(w,phaseCfg.instruct.compWi(i),cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   end
+  % Wait a second before starting trial
+  WaitSecs(1.000);
   
+  %% questions? only during practice. continues with experimenter's key.
+  
+  if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+    questionsMsg.text = sprintf('If you have any questions about the %s phase (part 3), please ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+    et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+    % Wait a second before continuing
+    WaitSecs(1.000);
+  end
+  
+  %% let them start when they're ready
+  
+  if phaseCfg.isExp
+    expStr = '';
+  else
+    expStr = ' practice';
+  end
+  readyMsg.text = sprintf('Ready to begin%s %s phase (part 3).\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   % Wait a second before starting trial
   WaitSecs(1.000);
   
@@ -1320,7 +1404,7 @@ if runWi
       end
     end
     
-    % Do a blink break if recording EEG and specified time has passed
+    % Do a blink break if specified time has passed
     if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(wiStim2) - 3)
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -1344,6 +1428,11 @@ if runWi
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.c01, cfg.keys.c02, cfg.keys.c03, cfg.keys.c04, cfg.keys.c05]);
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
       
       if (phaseCfg.comp_wi_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.comp_wi_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);
@@ -1851,6 +1940,24 @@ if runWi
   phaseComplete = true; %#ok<NASGU>
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete','endTime');
 end
+
+%% print "continue" screen
+
+WaitSecs(2.0);
+
+messageText = sprintf('You have finished the %s phase.\n\nPress "%s" to continue.',...
+  phaseNameForParticipant,cfg.keys.instructContKey);
+Screen('TextSize', w, cfg.text.instructTextSize);
+DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+Screen('Flip', w);
+
+% wait until the key is pressed
+RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+KbWait(-1,2);
+RestrictKeysForKbCheck([]);
+
+% go back to gray
+Screen('Flip', w);
 
 %% cleanup
 

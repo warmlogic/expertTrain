@@ -189,6 +189,12 @@ if ~isfield(phaseCfg,'impedanceAfter_nTrials')
   phaseCfg.impedanceAfter_nTrials = 0;
 end
 
+% whether to ask the participant if they have any questions; only continues
+% with experimenter's secret key
+if ~isfield(phaseCfg.instruct,'questions')
+  phaseCfg.instruct.questions = true;
+end
+
 %% preload all stimuli for presentation
 
 studyImgTex = nan(1,length(studyStims_img));
@@ -333,7 +339,29 @@ for i = 1:length(phaseCfg.instruct.study)
   et_showTextInstruct(w,phaseCfg.instruct.study(i),cfg.keys.instructContKey,...
     cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 end
+% Wait a second before starting trial
+WaitSecs(1.000);
 
+%% questions? only during practice. continues with experimenter's key.
+
+if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+  questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+  et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  % Wait a second before continuing
+  WaitSecs(1.000);
+end
+
+%% let them start when they're ready
+
+if phaseCfg.isExp
+  expStr = '';
+else
+  expStr = ' practice';
+end
+readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+  cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 % Wait a second before starting trial
 WaitSecs(1.000);
 
@@ -417,6 +445,11 @@ for i = trialNum:length(studyStims_img)
         % only check these keys
         RestrictKeysForKbCheck([cfg.keys.judgeSame, cfg.keys.judgeDiff]);
       end
+      
+      % show preparation text
+      DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('Flip', w);
+      WaitSecs(2.0);
       
       if (phaseCfg.study_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.study_isi == 0 && phaseCfg.fixDuringPreStim)
         Screen('TextSize', w, cfg.text.fixSize);

@@ -116,6 +116,12 @@ end
 %   phaseCfg.impedanceAfter_nTrials = 0;
 % end
 
+% whether to ask the participant if they have any questions; only continues
+% with experimenter's secret key
+if ~isfield(phaseCfg.instruct,'questions')
+  phaseCfg.instruct.questions = true;
+end
+
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
@@ -164,7 +170,29 @@ for i = 1:length(phaseCfg.instruct.dist)
   et_showTextInstruct(w,phaseCfg.instruct.dist(i),cfg.keys.instructContKey,...
     cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 end
+% Wait a second before starting trial
+WaitSecs(1.000);
 
+%% questions? only during practice. continues with experimenter's key.
+
+if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+  questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+  et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  % Wait a second before continuing
+  WaitSecs(1.000);
+end
+
+%% let them start when they're ready
+
+if phaseCfg.isExp
+  expStr = '';
+else
+  expStr = ' practice';
+end
+readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+  cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 % Wait a second before starting trial
 WaitSecs(1.000);
 
@@ -200,7 +228,7 @@ for i = trialNum:phaseCfg.dist_nProbs
   %     end
   %   end
   %
-  %   % Do a blink break if recording EEG and specified time has passed
+  %   % Do a blink break if specified time has passed
   %   if phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (phaseCfg.dist_nProbs - 3)
   %     thisGetSecs = GetSecs;
   %     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -224,6 +252,11 @@ for i = trialNum:phaseCfg.dist_nProbs
   %     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
   %     % % only check these keys
   %     % RestrictKeysForKbCheck([cfg.keys.judgeSame, cfg.keys.judgeDiff]);
+  %
+  %     % show preparation text
+  %     DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+  %     Screen('Flip', w);
+  %     WaitSecs(2.0);
   %
   %     if (phaseCfg.dist_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.dist_isi == 0 && phaseCfg.fixDuringPreStim)
   %       Screen('TextSize', w, cfg.text.fixSize);

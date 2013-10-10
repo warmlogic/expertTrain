@@ -33,6 +33,8 @@ function [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,ph
 
 fprintf('Running %s %s (view) (%d)...\n',sesName,phaseName,phaseCount);
 
+phaseNameForParticipant = 'viewing';
+
 %% set up blocks
 
 % Small hack. Because training day 1 uses blocks, those stims are stored in
@@ -186,12 +188,18 @@ if ~isfield(phaseCfg,'fixDuringStim')
   phaseCfg.fixDuringStim = true;
 end
 
+% whether to ask the participant if they have any questions; only continues
+% with experimenter's secret key
+if ~isfield(phaseCfg.instruct,'questions')
+  phaseCfg.instruct.questions = true;
+end
+
 %% preload all stimuli for presentation
 
 if cfg.stim.preloadImages
   message = sprintf('Preparing images, please wait...');
   Screen('TextSize', w, cfg.text.basicTextSize);
-  % put the instructions on the screen
+  % put the "preparing" message on the screen
   DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
 end
 % Update the display to show the message:
@@ -267,13 +275,13 @@ end
 %% start NS recording, if desired
 
 % put a message on the screen as experiment phase begins
-message = 'Starting viewing phase...';
+message = sprintf('Starting %s phase...',phaseNameForParticipant);
 if expParam.useNS
   % start recording
   [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
   [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
-  message = 'Starting data acquisition for viewing phase...';
+  message = sprintf('Starting data acquisition for %s phase...',phaseNameForParticipant);
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_START');
@@ -311,6 +319,34 @@ if showInstruct
   end
   % Wait a second before starting trial
   WaitSecs(1.000);
+  
+  %% questions? only during practice. continues with experimenter's key.
+  
+  if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+    questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+    et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+    % Wait a second before continuing
+    WaitSecs(1.000);
+  end
+  
+  %% let them start when they're ready
+  
+  if phaseCfg.isExp
+    expStr = '';
+  else
+    expStr = ' practice';
+  end
+  if runInBlocks
+    readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
+  else
+    readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+  end
+  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  
+  % Wait a second before starting trial
+  WaitSecs(1.000);
 end
 
 %% run the viewing task
@@ -346,6 +382,29 @@ for i = trialNum:length(viewStims)
       % Wait a second before starting trial
       WaitSecs(1.000);
       
+      %% questions? only during practice. continues with experimenter's key.
+      
+      if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+        questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
+        et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+          cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+        % Wait a second before continuing
+        WaitSecs(1.000);
+      end
+      
+      %% let them start when they're ready
+      
+      if phaseCfg.isExp
+        expStr = '';
+      else
+        expStr = ' practice';
+      end
+      readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
+      et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+        cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+      % Wait a second before starting trial
+      WaitSecs(1.000);
+      
       % only check these keys
       RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
         cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
@@ -376,7 +435,7 @@ for i = trialNum:length(viewStims)
     end
   end
   
-  % Do a blink break if recording EEG and specified time has passed
+  % Do a blink break if specified time has passed
   if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(viewStims) - 3)
     thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -400,6 +459,11 @@ for i = trialNum:length(viewStims)
     % only check these keys
     RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
       cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
+    
+    % show preparation text
+    DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+    Screen('Flip', w);
+    WaitSecs(2.0);
     
     if (phaseCfg.view_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.view_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
@@ -824,6 +888,24 @@ for i = trialNum:length(viewStims)
   % save progress after each trial
   save(phaseProgressFile,'thisDate','startTime','trialComplete','phaseComplete');
 end
+
+%% print "continue" screen
+
+WaitSecs(2.0);
+
+messageText = sprintf('You have finished the %s phase.\n\nPress "%s" to continue.',...
+  phaseNameForParticipant,cfg.keys.instructContKey);
+Screen('TextSize', w, cfg.text.instructTextSize);
+DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+Screen('Flip', w);
+
+% wait until the key is pressed
+RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+KbWait(-1,2);
+RestrictKeysForKbCheck([]);
+
+% go back to gray
+Screen('Flip', w);
 
 %% cleanup
 
