@@ -4,7 +4,7 @@ function [results] = space_processData(results,dataroot,subjects,collapsePhases,
 % Processes data into basic measures like accuracy, response time, and d-prime
 
 % subject after which to set up results struct fields
-templateSubject = 31;
+templateSubject = 'SPACE031';
 
 if ~exist('results','var') || isempty(results)
   results = [];
@@ -12,36 +12,6 @@ end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
-    'SPACE001';
-    'SPACE002';
-    'SPACE003';
-    'SPACE004';
-    'SPACE005';
-    'SPACE006';
-    'SPACE007';
-    'SPACE008';
-    'SPACE009';
-    'SPACE010';
-    'SPACE011';
-    'SPACE012';
-    'SPACE013';
-    'SPACE014';
-    'SPACE015';
-    'SPACE016';
-    'SPACE017';
-    'SPACE018';
-    'SPACE019';
-    'SPACE020';
-    'SPACE021';
-    'SPACE022';
-    'SPACE023';
-    'SPACE024';
-    'SPACE025';
-    'SPACE026';
-    'SPACE027';
-    'SPACE028';
-    'SPACE029';
-    'SPACE030';
     'SPACE031';
     'SPACE032';
     'SPACE033';
@@ -49,7 +19,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE035';
     'SPACE036';
     'SPACE037';
-    'SPACE038'; % responded "J" to almost all cued recall prompts
+    %'SPACE038'; % responded "J" to almost all cued recall prompts
     'SPACE039';
     'SPACE040';
     'SPACE041';
@@ -58,6 +28,55 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE044';
     };
 end
+
+% if ~exist('subjects','var') || isempty(subjects)
+%   subjects = {
+%     'SPACE001';
+%     'SPACE002';
+%     'SPACE003';
+%     'SPACE004';
+%     'SPACE005';
+%     'SPACE006';
+%     'SPACE007';
+%     'SPACE008';
+%     'SPACE009';
+%     'SPACE010';
+%     'SPACE011';
+%     'SPACE012';
+%     'SPACE013';
+%     'SPACE014';
+%     'SPACE015';
+%     'SPACE016';
+%     'SPACE017';
+%     'SPACE018';
+%     'SPACE019';
+%     'SPACE020';
+%     'SPACE021';
+%     'SPACE022';
+%     'SPACE023';
+%     'SPACE024';
+%     'SPACE025';
+%     'SPACE026';
+%     'SPACE027';
+%     'SPACE028';
+%     'SPACE029';
+%     'SPACE030';
+%     'SPACE031';
+%     'SPACE032';
+%     'SPACE033';
+%     'SPACE034';
+%     'SPACE035';
+%     'SPACE036';
+%     'SPACE037';
+%     'SPACE038'; % responded "J" to almost all cued recall prompts
+%     'SPACE039';
+%     'SPACE040';
+%     'SPACE041';
+%     'SPACE042';
+%     'SPACE043';
+%     'SPACE044';
+%     };
+% end
 
 % try to determine the experiment name by removing the subject number
 if ~isempty(subjects)
@@ -166,13 +185,15 @@ if isempty(results)
   
   %% initialize to store the data
   
-  % use subject 5's files for initialization
+  % use a subject's files for initialization
   if length(subjects) > 5
-    sub = templateSubject;
+    tempSub = templateSubject;
   else
-    sub = length(subjects);
+    tempSub = subjects{end};
   end
-  subDir = fullfile(dataroot,subjects{sub});
+  tempSub = ismember(subjects,tempSub);
+  
+  subDir = fullfile(dataroot,subjects{tempSub});
   expParamFile = fullfile(subDir,'experimentParams.mat');
   if exist(expParamFile,'file')
     load(expParamFile,'expParam','cfg')
@@ -555,13 +576,15 @@ dataToPrint = {...
   {'nTrials','recog_nCor','recog_acc','dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
   {'nTrials','recall_nCor','recall_spellCorr','dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
 
-% use subject 5's files for initialization
+% use a subject's files for initialization
 if length(subjects) > 5
-  sub = templateSubject;
+  tempSub = templateSubject;
 else
-  sub = length(subjects);
+  tempSub = subjects{end};
 end
-subDir = fullfile(dataroot,subjects{sub});
+tempSub = ismember(subjects,tempSub);
+
+subDir = fullfile(dataroot,subjects{tempSub});
 expParamFile = fullfile(subDir,'experimentParams.mat');
 if exist(expParamFile,'file')
   load(expParamFile)
