@@ -788,11 +788,7 @@ try
         end
 
       case {'expo','prac_expo'}
-        
-        % debug
-        %continue
-        
-        % Spacing study task
+        % Spacing exposure task
         if strcmp(phaseName,'expo')
           expoCount = expoCount + 1;
           phaseCount = expoCount;
@@ -825,10 +821,6 @@ try
         end
         
       case {'multistudy','prac_multistudy'}
-        
-        % debug
-        %continue
-        
         % Spacing study task
         if strcmp(phaseName,'multistudy')
           msCount = msCount + 1;
