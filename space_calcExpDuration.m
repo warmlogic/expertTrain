@@ -36,7 +36,8 @@ elseif isExp
 %   buffers = 2; % start + end together
 %   lures = 9;
   
-  nBlocks = 4;
+  nBlocks = 4; % behavioral
+  %nBlocks = 6; % EEG?
 
   spaced = 7;
   massed = 7;
