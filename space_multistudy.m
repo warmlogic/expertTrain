@@ -1126,6 +1126,7 @@ for i = trialNum:length(studyStims_img)
     % 'pcou', phase count
     % 'expt', whether this is the experiment (1) or practice (0)
     % 'trln', trial number
+    % 'type', the type of stimulus (iamge or word)
     % 'stmn', stimulus name
     % 'snum', stimulus number
     % 'targ', whether this is a target (1) or a lure (0)
