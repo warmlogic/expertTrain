@@ -35,7 +35,7 @@ correctVol = 0.4;
 incorrectVol = 0.6;
 
 % whether to print trial details to the command window
-cfg.text.printTrialInfo = true;
+cfg.text.printTrialInfo = false;
 
 % how to present stimuli. 1 = simultaneous. 2 = sequential. 3 = overlap.
 studyPresent = 2;
@@ -193,7 +193,8 @@ if expParam.sessionNum == 1
     cfg.stim.practice.lags = 4;
     
     % how to divide the test stimuli (e.g., so they match the study order).
-    % The number denotes how many groups to split stimuli into. 0 = no order.
+    % The number denotes how many groups to split stimuli into. 0 = no
+    % order. 1 is not a valid option.
     cfg.stim.practice.testInOrderedGroups = 2;
     
     % whether to test the single-presentation stimuli
@@ -257,6 +258,7 @@ if expParam.sessionNum == 1
   
   % how to divide the test stimuli (e.g., so they match the study order).
   % The number denotes how many groups to split stimuli into. 0 = no order.
+  % 1 is not a valid option.
   cfg.stim.testInOrderedGroups = 5;
   
   % whether to test the single-presentation stimuli
