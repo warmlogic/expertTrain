@@ -3,15 +3,33 @@ function [results] = space_processData(results,dataroot,subjects,collapsePhases,
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 
-% subject after which to set up results struct fields
-templateSubject = 'SPACE031';
-
 if ~exist('results','var') || isempty(results)
   results = [];
 end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
+    'SPACE010';
+    'SPACE011';
+    'SPACE012';
+    'SPACE013';
+    'SPACE014';
+    'SPACE015';
+    'SPACE016';
+    'SPACE017';
+    'SPACE018';
+    'SPACE019';
+    'SPACE020';
+    'SPACE021';
+    'SPACE022';
+    'SPACE023';
+    'SPACE024';
+    'SPACE025';
+    'SPACE026';
+    'SPACE027';
+    'SPACE028';
+    'SPACE029';
+    'SPACE030';
     'SPACE031';
     'SPACE032';
     'SPACE033';
@@ -28,6 +46,36 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE044';
     };
 end
+% subject after which to set up results struct fields
+templateSubject = 'SPACE033';
+
+% if ~exist('subjects','var') || isempty(subjects)
+%   subjects = {
+%     'SPACE010';
+%     'SPACE011';
+%     'SPACE012';
+%     'SPACE013';
+%     'SPACE014';
+%     'SPACE015';
+%     'SPACE016';
+%     'SPACE017';
+%     'SPACE018';
+%     'SPACE019';
+%     'SPACE020';
+%     'SPACE021';
+%     'SPACE022';
+%     'SPACE023';
+%     'SPACE024';
+%     'SPACE025';
+%     'SPACE026';
+%     'SPACE027';
+%     'SPACE028';
+%     'SPACE029';
+%     'SPACE030';
+%     };
+% end
+% % subject after which to set up results struct fields
+% templateSubject = 'SPACE010';
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -77,6 +125,8 @@ end
 %     'SPACE044';
 %     };
 % end
+% % subject after which to set up results struct fields
+% templateSubject = 'SPACE033';
 
 % try to determine the experiment name by removing the subject number
 if ~isempty(subjects)
