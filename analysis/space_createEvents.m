@@ -319,8 +319,8 @@ switch phaseName
       crS.isExp = 6;
       crS.type = 7;
       crS.trial = 8;
-      crS.stimStr = 9;
-      crS.stimNum = 10;
+      crS.i_stimStr = 9;
+      crS.i_stimNum = 10;
       crS.targ = 11;
       crS.spaced = 12;
       crS.lag = 13;
@@ -343,8 +343,15 @@ switch phaseName
       % unique to {'RECOGTEST_RECALLRESP'}
       crS.recall_resp = 17;
       crS.recall_origword = 18;
-      crS.recall_corrSpell = 19;
-      crS.recall_rt = 20;
+      % hack due to minor log file change
+      if str2double(subject(end-2:end)) <= 44
+        crS.recall_corrSpell = 19;
+        crS.recall_rt = 20;
+      else
+        crS.w_stimNum = 19;
+        crS.recall_corrSpell = 20;
+        crS.recall_rt = 21;
+      end
       
       % read the real file
       fid = fopen(logFile);
@@ -374,7 +381,7 @@ switch phaseName
       'phaseName',phaseName,'phaseCount',phaseCount,...
       'isExp',num2cell(logical(logData{crS.isExp})), 'time',num2cell(logData{crS.time}),...
       'type',logData{crS.type}, 'trial',num2cell(single(logData{crS.trial})),...
-      'stimStr',logData{crS.stimStr}, 'stimNum',num2cell(single(logData{crS.stimNum})), 'targ',num2cell(logical(logData{crS.targ})),...
+      'stimStr',logData{crS.i_stimStr}, 'stimNum',num2cell(single(logData{crS.i_stimNum})), 'targ',num2cell(logical(logData{crS.targ})),...
       'spaced',num2cell(logical(logData{crS.spaced})), 'lag',num2cell(single(logData{crS.lag})),...
       'pairNum',num2cell(single(logData{crS.pairNum})), 'catStr',logData{crS.i_catStr}, 'catNum',num2cell(single(logData{crS.i_catNum})),...
       'recog_resp',[], 'recog_acc',[], 'recog_rt',[],...
