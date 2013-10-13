@@ -5,8 +5,16 @@ nCategories = 2;
 
 isExp = true;
 
+testOnePres = false;
+
+useNS = true;
+
 if ~isExp
   % practice
+  eegSetupTime = 0;
+  nImpedance = 0;
+  impedanceTime = 0;
+  
   nBlocks = 1;
   
   spaced = 2;
@@ -20,7 +28,17 @@ if ~isExp
 elseif isExp
   % real experiment
   
-%   nBlocks = 2;
+  if useNS
+    eegSetupTime = 30 * 60;
+    impedanceTime = 5 * 60;
+    nImpedance = 3;
+  else
+    eegSetupTime = 0;
+    nImpedance = 0;
+    impedanceTime = 0;
+  end
+  
+  %   nBlocks = 2;
 % 
 %   spaced = 16;
 %   massed = 16;
@@ -36,13 +54,13 @@ elseif isExp
 %   buffers = 2; % start + end together
 %   lures = 9;
   
-  nBlocks = 4; % behavioral
-  %nBlocks = 6; % EEG?
+%   nBlocks = 4; % behavioral
+  nBlocks = 7; % EEG?
 
   spaced = 7;
   massed = 7;
   onePres = 7;
-  buffers = 2; % start + end together
+  buffers = 4; % start + end together
   lures = 7;
   
   nDist = 50;
@@ -51,10 +69,12 @@ end
 nExpoStimuli = (spaced + massed + onePres + buffers) * nCategories;
 nStudyStimuli = (((spaced + massed)*2) + onePres + buffers) * nCategories;
 
-nTestStimuli = (spaced + massed + onePres + lures) * nCategories;
-
-% % don't test single presentation items
-% nTestStimuli = (spaced + massed + lures) * nCategories;
+if testOnePres
+  nTestStimuli = (spaced + massed + onePres + lures) * nCategories;
+else
+  % don't test single presentation items
+  nTestStimuli = (spaced + massed + lures) * nCategories;
+end
 
 % exposure
 
@@ -104,15 +124,31 @@ testTime = cr_trial * nTestStimuli;
 
 totalTime = expoTime + studyTime + distTime + testTime;
 
+totalExpTime = (totalTime * nBlocks) + eegSetupTime + (nImpedance * impedanceTime);
+
 fprintf('Exposure to %d images:\t%.2f minutes.\n',nExpoStimuli,(expoTime / 60));
-fprintf('\t# spaced per category: %d\n',spaced);
-fprintf('\t# massed per category: %d\n',massed);
-fprintf('\t# onePres per category: %d\n',onePres);
-fprintf('\t# buffers (start+end) per category: %d\n',buffers);
-fprintf('Study %d word+image pairs:\t%.2f minutes.\n',nStudyStimuli,(studyTime / 60));
+fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
+fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBlocks, nBlocks);
+fprintf('\t# onePres per category: %d (%d in %d blocks)\n',onePres, onePres * nBlocks, nBlocks);
+fprintf('\t# buffers (start+end) per category: %d (%d in %d blocks)\n',buffers, buffers * nBlocks, nBlocks);
+
+fprintf('Study %d word+image pair presentations:\t%.2f minutes.\n',nStudyStimuli,(studyTime / 60));
+fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
+fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBlocks, nBlocks);
+fprintf('\t# onePres per category: %d (%d in %d blocks)\n',onePres, onePres * nBlocks, nBlocks);
+fprintf('\t# buffers (start+end) per category: %d (%d in %d blocks)\n',buffers, buffers * nBlocks, nBlocks);
+
 fprintf('Distractor: %d math problems:\t%.2f minutes.\n',nDist,(distTime / 60));
+
 fprintf('Cued recall for %d images:\t%.2f minutes.\n',nTestStimuli,(testTime / 60));
+fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
+fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBlocks, nBlocks);
+if testOnePres
+  fprintf('\t# onePres per category: %d (%d in %d blocks)\n',onePres, onePres * nBlocks, nBlocks);
+end
+fprintf('\t# lures per category: %d (%d in %d blocks)\n',lures, lures * nBlocks, nBlocks);
+
 
 fprintf('\nTotal time per list: %.2f minutes\n',(totalTime / 60));
 
-fprintf('Total experiment (%d blocks): %.2f minutes\n\n',nBlocks,(totalTime * nBlocks / 60));
+fprintf('Total experiment (%d blocks): %.2f minutes\n\n',nBlocks,(totalExpTime / 60));
