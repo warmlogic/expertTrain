@@ -62,7 +62,15 @@ expParam.session.oneDay.phases = {...
   'expo','multistudy','distract_math','cued_recall',...
   'expo','multistudy','distract_math','cued_recall',...
   'expo','multistudy','distract_math','cued_recall',...
+  'expo','multistudy','distract_math','cued_recall',...
+  'expo','multistudy','distract_math','cued_recall',...
+  'expo','multistudy','distract_math','cued_recall',...
   'expo','multistudy','distract_math','cued_recall'};
+
+if expParam.useNS
+  %preExpoImpedance = [1 3 5];
+  preExpoImpedance = [2 4 6];
+end
 
 % % debug
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','expo','multistudy','cued_recall'};
@@ -155,6 +163,7 @@ if expParam.sessionNum == 1
   cfg.files.wordpoolDir = fullfile(cfg.files.textDir,'pools','PEERS_wordpool');
   cfg.files.wordpool = fullfile(cfg.files.wordpoolDir,'wasnorm_wordpool.txt');
   cfg.files.wordpoolExclude = fullfile(cfg.files.wordpoolDir,'excluded_words.txt');
+  cfg.stim.maxWordLength = 8;
   
   % set the instructions directory
   cfg.files.instructDir = fullfile(cfg.files.textDir,'instructions');
@@ -198,7 +207,7 @@ if expParam.sessionNum == 1
     cfg.stim.practice.testInOrderedGroups = 2;
     
     % whether to test the single-presentation stimuli
-    cfg.stim.practice.testOnePres = true;
+    cfg.stim.practice.testOnePres = false;
     
     cfg.files.imgStimDir_prac = cfg.files.imgStimDir;
     cfg.stim.practice.categoryNames = cfg.stim.categoryNames;
@@ -236,8 +245,8 @@ if expParam.sessionNum == 1
 %   cfg.stim.nPairs_study_targ_onePres = 8;
 %   cfg.stim.nPairs_test_lure = 8;
   
-  cfg.stim.nPairs_study_buff_start = 1;
-  cfg.stim.nPairs_study_buff_end = 1;
+  cfg.stim.nPairs_study_buff_start = 2;
+  cfg.stim.nPairs_study_buff_end = 2;
   
 %   % 3 lists
 %   cfg.stim.nPairs_study_targ_spaced = 9;
@@ -262,7 +271,7 @@ if expParam.sessionNum == 1
   cfg.stim.testInOrderedGroups = 5;
   
   % whether to test the single-presentation stimuli
-  cfg.stim.testOnePres = true;
+  cfg.stim.testOnePres = false;
   
   % total number of additional lure pairs is: nPairs * number of categories
   
@@ -702,10 +711,6 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategory = 3;
         cfg.stim.(sesName).(phaseName)(phaseCount).crMaxConsecCategoryOrdered = 4;
         
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
-        end
-        
         % whether to have judgment keys on all the time
         cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
         
@@ -766,7 +771,12 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        % only do impedance breaks sometimes
+        if expParam.useNS && ismember(phaseCount, preExpoImpedance)
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
+        else
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        end
         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
         
