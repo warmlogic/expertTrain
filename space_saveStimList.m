@@ -80,6 +80,10 @@ if exist(wpStimDir,'dir')
     words = includeWords{1};
   end
   
+  % exclude words that are longer than we want
+  tooLongWords = logical(cell2mat(cellfun(@(x) length(x) > cfg.stim.maxWordLength, words, 'UniformOutput', false)));
+  words = words(~tooLongWords);
+  
   % write out the list
   fid = fopen(stimInfoStruct.wordpoolListFile,'w');
   fprintf(fid,'word\tstimNum\n');
