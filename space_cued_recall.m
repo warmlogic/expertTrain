@@ -694,7 +694,12 @@ for i = trialNum:length(testStims_img)
     if (keyCode(cfg.keys.recogOld) == 1 && all(keyCode(~cfg.keys.recogOld) == 0))
       recogResp = 'old';
       
+      % not going to make a "new" response
       newRespPromptOn = nan;
+      newRespRT = nan;
+      newAcc = false;
+      newRespKey = 'none';
+      newResp = 'none';
       
       % if they answer 'old', get typed word response
       useKbCheck = false;
@@ -887,7 +892,11 @@ for i = trialNum:length(testStims_img)
     elseif (keyCode(cfg.keys.recogNew) == 1 && all(keyCode(~cfg.keys.recogNew) == 0))
       recogResp = 'new';
       
+      % not going to make a recall response
       recallRespPromptOn = nan;
+      recallRespRT = nan;
+      recallResp = '';
+      corrSpell = false;
       
       % elseif they answer 'new', ask 'sure' vs 'maybe'
       
@@ -1010,16 +1019,35 @@ for i = trialNum:length(testStims_img)
     thisRecogRespKey = KbName(keyCode);
     recogRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisRecogRespKey)),thisRecogRespKey{:}));
     recogResp = 'ERROR_MULTIKEY';
+    %recogRespRT = nan;
     
     newRespPromptOn = nan;
+    newRespRT = nan;
+    newAcc = false;
+    newRespKey = 'none';
+    newResp = 'none';
+    
     recallRespPromptOn = nan;
+    recallRespRT = nan;
+    recallResp = '';
+    corrSpell = false;
   elseif ~keyIsDown_recog
+    % no recognition response was made
     recogAcc = false;
     recogRespKey = 'none';
     recogResp = 'none';
+    recogRespRT = nan;
     
     newRespPromptOn = nan;
+    newRespRT = nan;
+    newAcc = false;
+    newRespKey = 'none';
+    newResp = 'none';
+    
     recallRespPromptOn = nan;
+    recallRespRT = nan;
+    recallResp = '';
+    corrSpell = false;
   end
   
   if (phaseCfg.cr_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.cr_isi == 0 && phaseCfg.fixDuringPreStim)
@@ -1035,40 +1063,56 @@ for i = trialNum:length(testStims_img)
   Screen('Close', testImgTex(i));
   
   % compute old/new recognition response time
-  if phaseCfg.respDuringStim
-    measureRTfromHere = test_imgOnset;
-  else
-    measureRTfromHere = recogRespPromptStartRT;
-  end
-  recogRespRT = int32(round(1000 * (recogEndRT - measureRTfromHere)));
-  
-  % compute response times and accuracy
-  if strcmp(recogResp,'old')
-    % compute recall response time
-    recallRespRT = int32(round(1000 * (recallEndRT - recallRespPromptStartRT)));
-    
-    % compute accuracy
-    if testStims_img(i).targ
-      % hit
-      recogAcc = true;
-    elseif ~testStims_img(i).targ
-      % miss
-      recogAcc = false;
+  if ~strcmp(recogResp,'none')
+    if phaseCfg.respDuringStim
+      measureRTfromHere = test_imgOnset;
+    else
+      measureRTfromHere = recogRespPromptStartRT;
     end
-    newAcc = false;
-  elseif strcmp(recogResp,'new')
-    % compute sure/maybe response time
-    newRespRT = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
+    recogRespRT = int32(round(1000 * (recogEndRT - measureRTfromHere)));
     
-    % compute accuracy
-    if testStims_img(i).targ
-      % false alarm
-      recogAcc = false;
+    % compute response times and accuracy
+    if strcmp(recogResp,'old')
+      % compute accuracy
+      if testStims_img(i).targ
+        % hit
+        recogAcc = true;
+      elseif ~testStims_img(i).targ
+        % miss
+        recogAcc = false;
+      end
+      
+      if ~strcmp(recallResp,'none')
+        % compute recall response time
+        recallRespRT = int32(round(1000 * (recallEndRT - recallRespPromptStartRT)));
+      else
+        recallRespRT = nan;
+      end
+      
+      newRespRT = nan;
       newAcc = false;
-    elseif ~testStims_img(i).targ
-      % correct rejection
-      recogAcc = true;
-      newAcc = true;
+      
+    elseif strcmp(recogResp,'new')
+      % compute accuracy
+      if testStims_img(i).targ
+        % false alarm
+        recogAcc = false;
+        newAcc = false;
+      elseif ~testStims_img(i).targ
+        % correct rejection
+        recogAcc = true;
+        newAcc = true;
+      end
+      
+      if ~strcmp(newResp,'none')
+        % compute sure/maybe response time
+        newRespRT = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
+      else
+        newRespRT = nan;
+      end
+      
+      recallRespRT = nan;
+      corrSpell = false;
     end
   end
   
@@ -1086,12 +1130,16 @@ for i = trialNum:length(testStims_img)
   i_catNum = int32(testStims_img(i).categoryNum);
   i_stimNum = int32(testStims_img(i).stimNum);
   i_pairNum = int32(testStims_img(i).pairNum);
-  % word stimulus properties
-  %w_stimNum = int32(studyStims_word(i).stimNum);
   % both stimuli
   targStatus = testStims_img(i).targ;
   spacStatus = testStims_img(i).spaced;
   studyLag = int32(testStims_img(i).lag);
+  if targStatus
+    % word stimulus properties
+    w_stimNum = int32(testStims_word(i).stimNum);
+  else
+    w_stimNum = int32(-1);
+  end
   
   %% session log file
   
@@ -1242,6 +1290,7 @@ for i = trialNum:length(testStims_img)
       i_catNum,...
       recallResp,...
       thisPairedWord,...
+      w_stimNum,...
       corrSpell,...
       recallRespRT);
   end
@@ -1395,6 +1444,7 @@ for i = trialNum:length(testStims_img)
       i_catNum,...
       recallResp,...
       thisPairedWord,...
+      w_stimNum,...
       corrSpell,...
       recallRespRT);
   end
@@ -1415,18 +1465,33 @@ for i = trialNum:length(testStims_img)
     % 'inum', image stimulus number
     % 'icts', image category string
     % 'ictn', image category number
-    % 'targ', target status (1=target, 0=lure)
-    % 'spac', whether this was spaced (1=yes, 0=no)
-    % 'slag', lag during study period
+    % 'targ', whether this is a target (1) or a lure (0)
+    % 'spac', whether it was spaced (1) or not (0; massed or single pres)
+    % 'slag', the spacing lag (>0=spaced, 0=massed, -1=single pres)
     % 'pnum', the pair number, for keeping image and word stimuli together
     % 'wstm', original paired word
     % 'wnum', paired word number
-    % 'rsps', response string
-    % 'rspk', the name of the key pressed
-    % 'rspt', the response time
-    % 'corr', accuracy code (1=correct, 0=incorrect)
-    % 'keyp', key pressed?(1=yes, 0=no)
-
+    
+    % recognition = rg
+    % 'rgrs', response string
+    % 'rgke', the name of the key pressed
+    % 'rgrt', the response time
+    % 'rgac', accuracy code (1=correct, 0=incorrect)
+    % 'rgkp', key pressed?(1=yes, 0=no)
+    
+    % recall = rc
+    % 'rcrs', response string
+    % 'rcrt', the response time
+    % 'rcac', accuracy of spelling (1=correct, 0=incorrect)
+    % 'rckp', key pressed?(1=yes, 0=no)
+    
+    % new = nw
+    % 'nwrs', response string
+    % 'nwke', the name of the key pressed
+    % 'nwrt', the response time
+    % 'nwac', accuracy code (1=correct, 0=incorrect)
+    % 'nwkp', key pressed?(1=yes, 0=no)
+    
     if ~isnan(test_preStimFixOn)
       % prestimulus fixation
       [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', test_preStimFixOn, .001,...
@@ -1434,8 +1499,10 @@ for i = trialNum:length(testStims_img)
         'expt',phaseCfg.isExp, 'type', 'recognition', 'trln', int32(i),...
         'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-        'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-        'rsps', recogResp, 'rspk', recogRespKey, 'rspt', recogRespRT, 'corr', recogAcc, 'keyp', keyIsDown_recog); %#ok<NASGU,ASGLU>
+        'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+        'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+        'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+        'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
     end
     
     % img presentation
@@ -1444,8 +1511,10 @@ for i = trialNum:length(testStims_img)
       'expt',phaseCfg.isExp, 'type', 'recognition', 'trln', int32(i),...
       'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
       'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-      'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-      'rsps', recogResp, 'rspk', recogRespKey, 'rspt', recogRespRT, 'corr', recogAcc, 'keyp', keyIsDown_recog); %#ok<NASGU,ASGLU>
+      'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+      'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+      'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+      'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
     
     if ~isnan(recogRespPromptOn)
       % recognition response prompt
@@ -1454,8 +1523,10 @@ for i = trialNum:length(testStims_img)
         'expt',phaseCfg.isExp, 'type', 'recognition', 'trln', int32(i),...
         'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-        'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-        'rsps', recogResp, 'rspk', recogRespKey, 'rspt', recogRespRT, 'corr', recogAcc, 'keyp', keyIsDown_recog); %#ok<NASGU,ASGLU>
+        'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+        'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+        'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+        'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
     end
     
     % did they make a recognition response?
@@ -1466,8 +1537,10 @@ for i = trialNum:length(testStims_img)
         'expt',phaseCfg.isExp, 'type', 'recognition', 'trln', int32(i),...
         'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-        'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-        'rsps', recogResp, 'rspk', recogRespKey, 'rspt', recogRespRT, 'corr', recogAcc, 'keyp', keyIsDown_recog); %#ok<NASGU,ASGLU>
+        'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+        'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+        'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+        'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
     end
     
     if ~isnan(newRespPromptOn)
@@ -1477,8 +1550,10 @@ for i = trialNum:length(testStims_img)
         'expt',phaseCfg.isExp, 'type', 'new', 'trln', int32(i),...
         'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-        'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-        'rsps', newResp, 'rspk', newRespKey, 'rspt', newRespRT, 'corr', newAcc, 'keyp', keyIsDown_new); %#ok<NASGU,ASGLU>
+        'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+        'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+        'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+        'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
       
       % did they make a new response?
       if keyIsDown_new
@@ -1488,8 +1563,10 @@ for i = trialNum:length(testStims_img)
           'expt',phaseCfg.isExp, 'type', 'new', 'trln', int32(i),...
           'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
           'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-          'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-          'rsps', newResp, 'rspk', newRespKey, 'rspt', newRespRT, 'corr', newAcc, 'keyp', keyIsDown_new); %#ok<NASGU,ASGLU>
+          'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+          'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+          'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+          'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
       end
     end
     
@@ -1500,8 +1577,10 @@ for i = trialNum:length(testStims_img)
         'expt',phaseCfg.isExp, 'type', 'recall', 'trln', int32(i),...
         'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
         'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-        'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-        'rsps', recallResp, 'rspt', recallRespRT, 'corr', corrSpell, 'keyp', ~isempty(recallResp)); %#ok<NASGU,ASGLU>
+        'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+        'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+        'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+        'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
       
       % did they make a recall response?
       if ~isempty(recallResp)
@@ -1511,8 +1590,10 @@ for i = trialNum:length(testStims_img)
           'expt',phaseCfg.isExp, 'type', 'recall', 'trln', int32(i),...
           'istm', testStims_img(i).fileName, 'inum', i_stimNum, 'icts', testStims_img(i).categoryStr, 'ictn', i_catNum,...
           'targ', targStatus, 'spac', spacStatus, 'slag', studyLag,...
-          'pnum', int32(testStims_img(i).pairNum),'wstm', thisPairedWord, 'wnum', w_stimNum,...
-          'rsps', recallResp, 'rspt', recallRespRT, 'corr', corrSpell, 'keyp', ~isempty(recallResp)); %#ok<NASGU,ASGLU>
+          'pnum', i_pairNum,'wstm', thisPairedWord, 'wnum', w_stimNum,...
+          'rgrs', recogResp, 'rgrt', recogRespRT, 'rgac', recogAcc, 'rgkp', keyIsDown_recog,...
+          'rcrs', recallResp, 'rcrt', recallRespRT, 'rcac', corrSpell, 'rckp', ~isempty(recallResp),...
+          'nwrs', newResp, 'nwke', newRespKey, 'nwrt', newRespRT, 'nwac', newAcc, 'nwkp', keyIsDown_new); %#ok<NASGU,ASGLU>
       end
     end
     
