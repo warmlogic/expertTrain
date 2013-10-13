@@ -1,7 +1,8 @@
 After you make the old/new response, you will make a second response.
 
 If you decided it was an old image, you will see "recallPromptText" and you should type the word that was previously paired with the image. Think about the word-image connection you formed earlier.
-Please try to spell accurately; you can use the DELETE key to fix a typo, however you will not be penalized for spelling mistakes. It is OK to guess, but if you really cannot remember the word, simply press ENTER.
+Please try to spell accurately; you can use the DELETE key to fix a typo, however you will not be penalized for spelling mistakes.
+It is OK to guess, but if you really cannot remember the word, DELETE any letters you typed and press ENTER.
 
 OR
 
