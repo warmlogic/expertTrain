@@ -787,7 +787,7 @@ if expParam.sessionNum == 1
         % blink break (set to 0 if you don't want breaks)
         if expParam.useNS
           % timer in secs for when to take a blink break (only when useNS=true)
-          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 45.0;
         else
           % timer in secs for when to take a blink break (only when useNS=false)
           cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
