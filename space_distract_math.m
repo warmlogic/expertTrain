@@ -18,6 +18,12 @@ fprintf('Running %s %s (distMath) (%d)...\n',sesName,phaseName,phaseCount);
 
 phaseNameForParticipant = 'math';
 
+% whether to use GetChar (false) or GetKbChar (true)
+%
+% Linux, OS X, and Windows can use GetChar; I think Windows Vista and
+% Windows 7 need to use GetKbChar, but I have not tested this
+useKbCheck = false;
+
 %% set the starting date and time for this phase
 thisDate = date;
 startTime = fix(clock);
@@ -346,8 +352,6 @@ for i = trialNum:phaseCfg.dist_nProbs
   if cfg.text.printTrialInfo
     fprintf('Trial %d of %d: %s %d.\n',i,phaseCfg.dist_nProbs,tv_str,sum(theseVars));
   end
-  
-  useKbCheck = false;
   
   % get their answer and type it to the screen
   resp = '';
