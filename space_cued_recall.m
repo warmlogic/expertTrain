@@ -484,6 +484,7 @@ for i = trialNum:length(testStims_img)
   newResp = 'NO_RESPONSE';
   newResp_rt = int32(-1);
   % old - recall response
+  madeRecallResp = false;
   recallEndRT = nan;
   recallRespPromptOn = nan;
   corrSpell = false;
@@ -735,7 +736,7 @@ for i = trialNum:length(testStims_img)
       end
       
       % initialize
-      madeRecallResp = false;
+      typedRecallStr = false;
       
       if phaseCfg.cr_corrSpell && phaseCfg.cr_nAttempts > 0
         attemptCounter = 0;
@@ -754,7 +755,7 @@ for i = trialNum:length(testStims_img)
       
       [recallRespPromptOn, recallRespPromptStartRT] = Screen('Flip', w);
       
-      while ~madeRecallResp
+      while ~typedRecallStr
         while true
           %while (GetSecs - probOnset) <= phaseCfg.dist_response
           
@@ -820,24 +821,24 @@ for i = trialNum:length(testStims_img)
             
             if strcmpi(recallStr,thisPairedWord)
               corrSpell = true;
-              madeRecallResp = true;
+              typedRecallStr = true;
               %break
             else
               corrSpell = false;
               if attemptCounter >= phaseCfg.cr_nAttempts
-                madeRecallResp = true;
+                typedRecallStr = true;
                 %break
               end
             end
           else
             corrSpell = true;
-            madeRecallResp = true;
+            typedRecallStr = true;
             %break
           end
         else
           % this was a lure image and they're making a response
           corrSpell = false;
-          madeRecallResp = true;
+          typedRecallStr = true;
         end
       end
       
@@ -847,7 +848,6 @@ for i = trialNum:length(testStims_img)
       % recallEndRT = endRT.secs;
       
       % see if they're behaving badly (making the same resp over and over)
-      madeRecallResp = false; % reuse this variable name
       if ~isempty(recallStr)
         recallResp = recallStr;
         madeRecallResp = true;
