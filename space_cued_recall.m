@@ -197,12 +197,6 @@ end
 
 %% Prepare the cued recall test task
 
-% % put it in the log file
-% startTime = fix(clock);
-% startTime = sprintf('%.2d:%.2d:%.2d',startTime(4),startTime(5),startTime(6));
-% fprintf(logFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-% fprintf(phLFile,'!!! Start of %s %s (%d) (%s) %s %s\n',sesName,phaseName,phaseCount,mfilename,thisDate,startTime);
-
 stimImgRect_all = nan(length(testStims_img),4);
 recallX_all = nan(length(testStims_img),1);
 recallY_all = nan(length(testStims_img),1);
@@ -847,12 +841,15 @@ for i = trialNum:length(testStims_img)
       % only need the seconds, only for when using GetChar
       % recallEndRT = endRT.secs;
       
-      % see if they're behaving badly (making the same resp over and over)
+      % collect their response and make sure they're behaving appropriately
       if ~isempty(recallStr)
         recallResp = recallStr;
-        madeRecallResp = true;
-        recallCounter = recallCounter + 1;
         recallResp_all = cat(1,recallResp_all,recallResp);
+        madeRecallResp = true;
+        
+        % see if they're behaving badly (making the same response over and
+        % over)
+        recallCounter = recallCounter + 1;
         if recallCounter > 1
           if strcmpi(recallResp,recallResp_all(recallCounter-1))
             % they made the same response as last time
@@ -865,10 +862,11 @@ for i = trialNum:length(testStims_img)
             % if they've made the same response more than 3 times in a row
             
             if phaseCfg.playSound
-              % loud angry beep
+              % play a loud angry beep
               Beeper(440, 0.9, 3);
             end
             
+            % tell them that they're not responding correctly
             tooManyInARowText1 = sprintf('Are you having trouble understanding what you should be doing?\n\nYou have made the response "%s" many times in a row. It seems that you are not doing the task correctly.',recallResp);
             tooManyInARowText2 = sprintf('\n\nPlease stop doing the task and talk to the experimenter now.\n\nPlease press "%s" when you know how to do the task properly.',cfg.keys.instructContKey);
             
@@ -890,10 +888,11 @@ for i = trialNum:length(testStims_img)
             % if they've made the same response for >= 33% of the responses
             
             if phaseCfg.playSound
-              % loud angry beep
+              % play a loud angry beep
               Beeper(440, 0.9, 3);
             end
             
+            % tell them that they're not responding correctly
             tooManySameText1 = sprintf('Are you having trouble understanding what you should be doing?\n\nYou have made the response "%s" many times.\nIf you are simply trying to show that you do not remember a word, please press DELETE until you see "%s" again.',recallResp,cfg.text.recallPrompt);
             tooManySameText2 = sprintf('\n\nIf instead you do not understand what you should be doing, please stop doing the task and talk to the experimenter now.\n\nPlease press "%s" when you know how to do the task properly.',cfg.keys.instructContKey);
             
@@ -1015,10 +1014,6 @@ for i = trialNum:length(testStims_img)
         thisNewRespKey = KbName(keyCode);
         newRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisNewRespKey)),thisNewRespKey{:}));
         newResp = 'ERROR_MULTIKEY';
-        %elseif ~keyIsDown_new
-        %  newAcc = false;
-        %  newRespKey = 'none';
-        %  newResp = 'NO_RESPONSE';
       end
       
     elseif keyCode(cfg.keys.recogOld) == 0 && keyCode(cfg.keys.recogNew) == 0
@@ -1037,36 +1032,6 @@ for i = trialNum:length(testStims_img)
     thisRecogRespKey = KbName(keyCode);
     recogRespKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisRecogRespKey)),thisRecogRespKey{:}));
     recogResp = 'ERROR_MULTIKEY';
-    
-    %     newRespPromptOn = nan;
-    %     newResp_rt = int32(-1);
-    %     newAcc = false;
-    %     newRespKey = 'NO_RESPONSE_KEY';
-    %     newResp = 'NO_RESPONSE';
-    %     keyIsDown_new = false;
-    %
-    %     recallRespPromptOn = nan;
-    %     recallResp_rt = int32(-1);
-    %     recallResp = 'NO_RESPONSE';
-    %     corrSpell = false;
-    %   elseif ~keyIsDown_recog
-    %     % no recognition response was made
-    %     recogAcc = false;
-    %     recogRespKey = 'NO_RESPONSE_KEY';
-    %     recogResp = 'NO_RESPONSE';
-    %     recogResp_rt = int32(-1);
-    %
-    %     newRespPromptOn = nan;
-    %     newResp_rt = int32(-1);
-    %     newAcc = false;
-    %     newRespKey = 'NO_RESPONSE_KEY';
-    %     newResp = 'NO_RESPONSE';
-    %     keyIsDown_new = false;
-    %
-    %     recallRespPromptOn = nan;
-    %     recallResp_rt = int32(-1);
-    %     recallResp = 'NO_RESPONSE';
-    %     corrSpell = false;
   end
   
   if (phaseCfg.cr_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.cr_isi == 0 && phaseCfg.fixDuringPreStim)
@@ -1103,16 +1068,7 @@ for i = trialNum:length(testStims_img)
       
       % % there will always be a recallEndRT, so does not need to be
       % % conditional
-      %
-      % if madeRecallResp
-      % % compute recall response time
       recallResp_rt = int32(round(1000 * (recallEndRT - recallRespPromptStartRT)));
-      % else
-      %   recallResp_rt = int32(-1);
-      % end
-      
-      %newResp_rt = int32(-1);
-      %newAcc = false;
       
     elseif strcmp(recogResp,'new')
       % compute accuracy
@@ -1129,12 +1085,7 @@ for i = trialNum:length(testStims_img)
       if keyIsDown_new
         % compute sure/maybe response time
         newResp_rt = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
-      %else
-      %  newResp_rt = int32(-1);
       end
-      
-      %recallResp_rt = int32(-1);
-      %corrSpell = false;
     else
       fprintf('recogResp was ''%s'' instead of ''old'' or ''new''. Something is wrong!\n',recogResp);
     end
@@ -1160,13 +1111,6 @@ for i = trialNum:length(testStims_img)
   targStatus = testStims_img(i).targ;
   spacStatus = testStims_img(i).spaced;
   studyLag = int32(testStims_img(i).lag);
-  % % gets set above, don't need this here
-  % if targStatus
-  %   % word stimulus properties
-  %   w_stimNum = int32(testStims_word(i).stimNum);
-  % else
-  %   w_stimNum = int32(-1);
-  % end
   
   %% session log file
   
