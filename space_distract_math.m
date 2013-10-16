@@ -371,6 +371,9 @@ for i = trialNum:phaseCfg.dist_nProbs
       end
       if isempty(char)
         return
+      else
+        % get the time the key was pressed using GetSecs
+        respMadeRT = GetSecs;
       end
       
       switch (abs(char))
@@ -391,21 +394,21 @@ for i = trialNum:phaseCfg.dist_nProbs
       % draw their text
       Screen('TextSize', w, cfg.text.basicTextSize);
       Screen('DrawText', w, sprintf('%s %s',tv_str,resp), screenCenterX, screenCenterY, cfg.text.basicTextColor);
-      [respMadeRT] = Screen('Flip', w);
+      %[respMadeRT] = Screen('Flip', w);
+      Screen('Flip', w);
       
       WaitSecs(0.0001);
     end
   end
-  if ~isempty(resp)
-    % only need the seconds
-    %endRT = endRT.secs;
-    endRT = respMadeRT;
-  end
+  % get the time they pressed return
+  endRT = respMadeRT;
+  % only need the seconds, only for when using GetChar
+  %endRT = endRT.secs;
   
   %if ~keyIsDown
   if isempty(resp)
     % need a new endRT
-    endRT = GetSecs;
+    %endRT = GetSecs;
     trialRT(i) = int32(round(1000 * (endRT - probOnset)));
     
     if phaseCfg.playSound
@@ -421,6 +424,8 @@ for i = trialNum:phaseCfg.dist_nProbs
     
     % wait to let them view the feedback
     WaitSecs(cfg.text.respondFasterFeedbackTime);
+    
+    theirAnswer = -999;
   else
     % collect their answer
     theirAnswer = str2double(resp);
@@ -449,7 +454,7 @@ for i = trialNum:phaseCfg.dist_nProbs
     end
     
     if cfg.text.printTrialInfo
-      fprintf('Trial %d of %d: %s %d. Their answer: %s. Accuracy: %d. RT: %d.\n',i,phaseCfg.dist_nProbs,tv_str,sum(theseVars),resp,trialAcc(i),trialRT(i));
+      fprintf('Trial %d of %d: %s %d. Their answer: %d. Accuracy: %d. RT: %d.\n',i,phaseCfg.dist_nProbs,tv_str,sum(theseVars),theirAnswer,trialAcc(i),trialRT(i));
     end
   end
   
