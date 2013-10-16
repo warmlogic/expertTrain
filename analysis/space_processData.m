@@ -15,7 +15,6 @@ if ~exist('subjects','var') || isempty(subjects)
     };
 end
 templateSubject = 'SPACE001';
-testOnePres = false;
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -58,7 +57,6 @@ testOnePres = false;
 % end
 % % subject after which to set up results struct fields
 % templateSubject = 'SPACE033';
-% testOnePres = true;
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -87,7 +85,6 @@ testOnePres = false;
 % end
 % % subject after which to set up results struct fields
 % templateSubject = 'SPACE010';
-% testOnePres = true;
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -139,7 +136,6 @@ testOnePres = false;
 % end
 % % subject after which to set up results struct fields
 % templateSubject = 'SPACE033';
-% testOnePres = true;
 
 % try to determine the experiment name by removing the subject number
 if ~isempty(subjects)
@@ -323,9 +319,6 @@ if isempty(results)
                   elseif lagConds(lc) == 0
                     lagStr = 'massed';
                   elseif lagConds(lc) == -1
-                    if ~testOnePres
-                      continue
-                    end
                     lagStr = 'once';
                   end
                 elseif length(lagConds(lc)) > 1
@@ -478,9 +471,6 @@ if isempty(results)
                           end
                           lagStr = 'massed';
                         elseif lagConds(lc) == -1
-                          if ~testOnePres
-                            continue
-                          end
                           lagStr = 'once';
                           if printResults
                             fprintf('*** Once ***\n');
@@ -635,14 +625,14 @@ end
 
 if saveResults
   textFileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,results,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,testOnePres);
+  printResultsToFile(dataroot,subjects,results,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject,testOnePres)
+function printResultsToFile(dataroot,subjects,results,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
 
 fprintf('Saving results to file: %s.\n',fileName);
 
@@ -734,9 +724,6 @@ for sesNum = 1:length(expParam.sesTypes)
                 elseif lagConds(lc) == 0
                   lagStr = 'massed';
                 elseif lagConds(lc) == -1
-                  if ~testOnePres
-                    continue
-                  end
                   lagStr = 'once';
                 end
               elseif length(lagConds(lc)) > 1
