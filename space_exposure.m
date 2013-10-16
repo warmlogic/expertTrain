@@ -768,7 +768,7 @@ for i = trialNum:length(expoStims_img)
     %       feedbackTime = 0.01;
     %     end
   else
-    resp = 'none';
+    resp = 'NO_RESPONSE';
     %     % did not push a key
     %     acc = false;
     
@@ -805,7 +805,7 @@ for i = trialNum:length(expoStims_img)
       respKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisResp)),thisResp{:}));
     end
   else
-    respKey = 'none';
+    respKey = 'NO_RESPONSE_KEY';
   end
   
   if (phaseCfg.expo_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.expo_isi == 0 && phaseCfg.fixDuringPreStim)
