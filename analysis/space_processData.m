@@ -15,6 +15,7 @@ if ~exist('subjects','var') || isempty(subjects)
     };
 end
 templateSubject = 'SPACE001';
+testOnePres = false;
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -57,6 +58,7 @@ templateSubject = 'SPACE001';
 % end
 % % subject after which to set up results struct fields
 % templateSubject = 'SPACE033';
+% testOnePres = true;
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -85,6 +87,7 @@ templateSubject = 'SPACE001';
 % end
 % % subject after which to set up results struct fields
 % templateSubject = 'SPACE010';
+% testOnePres = true;
 
 % if ~exist('subjects','var') || isempty(subjects)
 %   subjects = {
@@ -136,6 +139,7 @@ templateSubject = 'SPACE001';
 % end
 % % subject after which to set up results struct fields
 % templateSubject = 'SPACE033';
+% testOnePres = true;
 
 % try to determine the experiment name by removing the subject number
 if ~isempty(subjects)
@@ -203,10 +207,10 @@ end
 %   end
 % end
 %
-% massed = r1data(~strcmp({r1data.recog_resp},'none') & [r1data.targ] == true & [r1data.spaced] == false & [r1data.lag] == 0);
-% spaced = r1data(~strcmp({r1data.recog_resp},'none') & [r1data.targ] == true & [r1data.spaced] == true & [r1data.lag] > 0);
-% onePres = r1data(~strcmp({r1data.recog_resp},'none') & [r1data.targ] == true & [r1data.spaced] == false & [r1data.lag] == -1);
-% newStims = r1data(~strcmp({r1data.recog_resp},'none') & [r1data.targ] == false);
+% massed = r1data(~ismember({r1data.recog_resp},{'NO_RESPONSE', 'none'}) & [r1data.targ] == true & [r1data.spaced] == false & [r1data.lag] == 0);
+% spaced = r1data(~ismember({r1data.recog_resp},{'NO_RESPONSE', 'none'}) & [r1data.targ] == true & [r1data.spaced] == true & [r1data.lag] > 0);
+% onePres = r1data(~ismember({r1data.recog_resp},{'NO_RESPONSE', 'none'}) & [r1data.targ] == true & [r1data.spaced] == false & [r1data.lag] == -1);
+% newStims = r1data(~ismember({r1data.recog_resp},{'NO_RESPONSE', 'none'}) & [r1data.targ] == false);
 %
 % fprintf('\n\n');
 % fprintf('Spaced recog acc (%d/%d) = %.3f\n',sum([spaced.recog_acc]),length(spaced),mean([spaced.recog_acc]));
@@ -304,9 +308,11 @@ if isempty(results)
         end
         
         if isfield(events.(sesName),fn)
+          
           switch phaseName
             case {'cued_recall'}
-              lagConds = unique([events.(sesName).(fn).data.lag]);
+              targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
+              lagConds = unique([targEvents.lag]);
               
               for lc = 1:length(lagConds)
                 % choose the training condition
@@ -317,6 +323,9 @@ if isempty(results)
                   elseif lagConds(lc) == 0
                     lagStr = 'massed';
                   elseif lagConds(lc) == -1
+                    if ~testOnePres
+                      continue
+                    end
                     lagStr = 'once';
                   end
                 elseif length(lagConds(lc)) > 1
@@ -332,7 +341,7 @@ if isempty(results)
                 end
                 
                 % image categories
-                catStrs = unique({events.(sesName).(fn).data.catStr},'stable');
+                catStrs = unique({targEvents.catStr},'stable');
                 if length(catStrs) > 1 && separateCategories
                   for im = 1:length(catStrs)
                     for mf = 1:length(mainFields)
@@ -445,7 +454,8 @@ if isempty(results)
                 
                 switch phaseName
                   case {'cued_recall'}
-                    lagConds = unique([events.(sesName).(fn).data.lag]);
+                    targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
+                    lagConds = unique([targEvents.lag]);
                     
                     if sum(lagConds > 0) > 1
                       error('%s does not yet support multiple lag conditions!',mfilename);
@@ -468,10 +478,13 @@ if isempty(results)
                           end
                           lagStr = 'massed';
                         elseif lagConds(lc) == -1
+                          if ~testOnePres
+                            continue
+                          end
+                          lagStr = 'once';
                           if printResults
                             fprintf('*** Once ***\n');
                           end
-                          lagStr = 'once';
                         end
                       elseif length(lagConds(lc)) > 1
                         if printResults
@@ -481,12 +494,12 @@ if isempty(results)
                       end
                       
                       % filter the events that we want
-                      %recog_spaced_resp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RECOGRESP') & ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
+                      %recog_spaced_resp = targEvents(ismember({targEvents.type},'RECOGTEST_RECOGRESP') & ismember([targEvents.lag],lagConds(lc)));
                       
-                      % exclude missed responses ('none')
-                      %recog_spaced_resp = recog_spaced_resp(~ismember({recog_spaced_resp.recog_resp},'none'));
+                      % exclude missed responses ({'NO_RESPONSE', 'none'})
+                      %recog_spaced_resp = recog_spaced_resp(~ismember({recog_spaced_resp.recog_resp},{'NO_RESPONSE', 'none'}));
                       % % set missing responses to incorrect
-                      % noRespInd = find(ismember({matchResp.resp},'none'));
+                      % noRespInd = find(ismember({matchResp.resp},{'NO_RESPONSE', 'none'}));
                       % if ~isempty(noRespInd)
                       %   for nr = 1:length(noRespInd)
                       %     matchResp(noRespInd(nr)).acc = 0;
@@ -499,22 +512,25 @@ if isempty(results)
                           thisField = mainFields{mf};
                           
                           % filter the events that we want
-                          %theseEvents = events.(sesName).(fn).data(...
-                          %  strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
-                          %  ismember([events.(sesName).(fn).data.lag],lagConds(lc)));
-                          theseEvents = events.(sesName).(fn).data(...
-                            strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
-                            ismember([events.(sesName).(fn).data.lag],lagConds(lc)) &...
-                            [events.(sesName).(fn).data.targ]);
+                          theseEvents = targEvents(...
+                           strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                           ismember([targEvents.lag],lagConds(lc)));
+                          %theseEvents = targEvents(...
+                          %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                          %  ismember([targEvents.lag],lagConds(lc)) &...
+                          %  [targEvents.targ]);
                           
                           if strcmp(thisField,'recog')
-                            % exclude missed responses ('none')
-                            theseEvents = theseEvents(~ismember({theseEvents.recog_resp},'none'));
+                            % exclude missed responses ({'NO_RESPONSE', 'none'})
+                            theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
                           end
                           
-                          if isempty(theseEvents)
-                            keyboard
-                          end
+                          % if single presentation items are not tested,
+                          % there will be no targets with lag=-1, only
+                          % lures have this lag field value.
+                          %if isempty(theseEvents)
+                          %  keyboard
+                          %end
                           
                           if strcmp(thisField,'recog')
                             accField = sprintf('%s_acc',thisField);
@@ -536,7 +552,7 @@ if isempty(results)
                       end
                       
                       % accuracy for the different image categories
-                      catStrs = unique({events.(sesName).(fn).data.catStr},'stable');
+                      catStrs = unique({targEvents.catStr},'stable');
                       % if there's only 1 image category, the results were
                       % printed above
                       if length(catStrs) > 1 && separateCategories
@@ -546,24 +562,27 @@ if isempty(results)
                             thisField = mainFields{mf};
                             
                             % filter the events that we want
-                            %theseEvents = events.(sesName).(fn).data(...
-                            %  strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
-                            %  ismember([events.(sesName).(fn).data.lag],lagConds(lc)) &...
-                            %  strcmpi({events.(sesName).(fn).data.catStr},catStrs{im}));
-                            theseEvents = events.(sesName).(fn).data(...
-                              strcmpi({events.(sesName).(fn).data.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
-                              ismember([events.(sesName).(fn).data.lag],lagConds(lc)) &...
-                              strcmpi({events.(sesName).(fn).data.catStr},catStrs{im}) &...
-                              [events.(sesName).(fn).data.targ]);
+                            theseEvents = targEvents(...
+                              strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                              ismember([targEvents.lag],lagConds(lc)) &...
+                              strcmpi({targEvents.catStr},catStrs{im}));
+                            %theseEvents = targEvents(...
+                            %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                            %  ismember([targEvents.lag],lagConds(lc)) &...
+                            %  strcmpi({targEvents.catStr},catStrs{im}) &...
+                            %  [targEvents.targ]);
                             
                             if strcmp(thisField,'recog')
-                              % exclude missed responses ('none')
-                              theseEvents = theseEvents(~ismember({theseEvents.recog_resp},'none'));
+                              % exclude missed responses ({'NO_RESPONSE', 'none'})
+                              theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
                             end
                             
-                            if isempty(theseEvents)
-                              keyboard
-                            end
+                            % if single presentation items are not tested,
+                            % there will be no targets with lag=-1, only
+                            % lures have this lag field value.
+                            %if isempty(theseEvents)
+                            %  keyboard
+                            %end
                             
                             if strcmp(thisField,'recog')
                               accField = sprintf('%s_acc',thisField);
@@ -616,14 +635,14 @@ end
 
 if saveResults
   textFileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,results,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
+  printResultsToFile(dataroot,subjects,results,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,testOnePres);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
+function printResultsToFile(dataroot,subjects,results,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject,testOnePres)
 
 fprintf('Saving results to file: %s.\n',fileName);
 
@@ -702,7 +721,8 @@ for sesNum = 1:length(expParam.sesTypes)
         
         switch phaseName
           case {'cued_recall'}
-            lagConds = unique([events.(sesName).(fn).data.lag]);
+            targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
+            lagConds = unique([targEvents.lag]);
             
             for lc = 1:length(lagConds)
               
@@ -714,6 +734,9 @@ for sesNum = 1:length(expParam.sesTypes)
                 elseif lagConds(lc) == 0
                   lagStr = 'massed';
                 elseif lagConds(lc) == -1
+                  if ~testOnePres
+                    continue
+                  end
                   lagStr = 'once';
                 end
               elseif length(lagConds(lc)) > 1
@@ -740,7 +763,7 @@ for sesNum = 1:length(expParam.sesTypes)
               end
               
               % separate categories
-              catStrs = unique({events.(sesName).(fn).data.catStr},'stable');
+              catStrs = unique({targEvents.catStr},'stable');
               if length(catStrs) > 1 && separateCategories
                 headerCell = {{lagStr},catStrs,mainToPrint};
                 [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
