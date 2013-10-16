@@ -996,7 +996,7 @@ catch ME
   expParam.session.(sesName).errorDate = errorDate;
   expParam.session.(sesName).errorTime = sprintf('%.2d:%.2d:%.2d',errorTime(4),errorTime(5),errorTime(6));
   
-  fprintf(logFile,'Crash\t%s\t%s\n',errorDate,expParam.session.(sesName).errorTime);
+  fprintf(logFile,'!!! ERROR: Crash %s %s\n',errorDate,expParam.session.(sesName).errorTime);
   
   % save the experiment info in its current state
   save(cfg.files.expParamFile,'cfg','expParam');
