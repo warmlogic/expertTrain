@@ -57,7 +57,7 @@ switch phaseName
       expoS.r_rt = 11;
       
       % read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       
@@ -173,7 +173,7 @@ switch phaseName
       msS.i_catNum = 18;
       
       % read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       
@@ -242,7 +242,7 @@ switch phaseName
       mathS.r_rt = 11;
       
       % read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       
@@ -354,7 +354,7 @@ switch phaseName
       end
       
       % read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       

@@ -44,7 +44,7 @@ switch phaseName
       
       %% figure out the format string
       checkCounter = 1;
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       while checkCounter < oldNewFormatMaxCheck
         tline = fgetl(fid);
         tline = regexp(tline,'\t','split');
@@ -129,7 +129,7 @@ switch phaseName
       end
       
       %% read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       
@@ -244,7 +244,7 @@ switch phaseName
       if exist(logFile,'file')
         %% figure out the format string
         checkCounter = 1;
-        fid = fopen(logFile);
+        fid = fopen(logFile,'r');
         while checkCounter < oldNewFormatMaxCheck
           tline = fgetl(fid);
           tline = regexp(tline,'\t','split');
@@ -321,7 +321,7 @@ switch phaseName
         end
         
         %% read the real file
-        fid = fopen(logFile);
+        fid = fopen(logFile,'r');
         logData = textscan(fid,formatStr, 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle',commentStyle);
         fclose(fid);
         

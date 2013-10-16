@@ -69,7 +69,7 @@ switch phaseName
       compS.r_rt = 11;
       
       %% read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       

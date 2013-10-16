@@ -60,7 +60,7 @@ switch phaseName
       matchS.r_rt = 15;
       
       %% read the real file
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
       fclose(fid);
       
@@ -192,7 +192,7 @@ switch phaseName
         nameS.r_rt = 19;
         
         %% read the real file
-        fid = fopen(logFile);
+        fid = fopen(logFile,'r');
         logData = textscan(fid,formatStr, 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle',commentStyle);
         fclose(fid);
         
@@ -310,7 +310,7 @@ switch phaseName
         recogS.r_rt = 19;
         
         %% read the real file
-        fid = fopen(logFile);
+        fid = fopen(logFile,'r');
         logData = textscan(fid,formatStr, 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle',commentStyle);
         fclose(fid);
         

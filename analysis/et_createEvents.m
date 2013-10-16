@@ -15,7 +15,7 @@ switch phaseName
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_match_%d.txt',sesName,phaseName,phaseCount));
 
     if exist(logFile,'file')
-      fid = fopen(logFile);
+      fid = fopen(logFile,'r');
       logData = textscan(fid,'%.6f%s%s%s%d%s%d%s%s%s%s%s%d%d%d','Delimiter','\t','emptyvalue',NaN, 'CommentStyle','!!!');
       fclose(fid);
     else
@@ -92,7 +92,7 @@ switch phaseName
       logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_name_%d_b%d.txt',sesName,phaseName,phaseCount,b));
       
       if exist(logFile,'file')
-        fid = fopen(logFile);
+        fid = fopen(logFile,'r');
         logData = textscan(fid,'%.6f%s%s%s%d%s%d%d%s%s%d%d%d%d%s%s%d%d', 'Delimiter','\t', 'emptyvalue',NaN, 'CommentStyle','!!!');
         fclose(fid);
       else
