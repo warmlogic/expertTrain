@@ -450,6 +450,8 @@ if isempty(results)
                     targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
                     lagConds = unique([targEvents.lag]);
                     
+                    % lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
+                    
                     if sum(lagConds > 0) > 1
                       error('%s does not yet support multiple lag conditions!',mfilename);
                     end
@@ -527,11 +529,14 @@ if isempty(results)
                           elseif strcmp(thisField,'recall')
                             accField = sprintf('%s_spellCorr',thisField);
                           end
+                          hrField = sprintf('%s_hr',thisField);
+                          farField = sprintf('%s_far',thisField);
                           nCorField = sprintf('%s_nCor',thisField);
                           nIncField = sprintf('%s_nInc',thisField);
                           rtField = sprintf('%s_rt',thisField);
                           
-                          results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),thisField,accField,nCorField,nIncField,rtField);
+                          results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),thisField,...
+                            accField,hrField,farField,nCorField,nIncField,rtField);
                           theseResults = results.(sesName).(fn).(lagStr).(thisField);
                           if printResults
                             fprintf('\t%s\n',thisField);
@@ -579,11 +584,14 @@ if isempty(results)
                             elseif strcmp(thisField,'recall')
                               accField = sprintf('%s_spellCorr',thisField);
                             end
+                            hrField = sprintf('%s_hr',thisField);
+                            farField = sprintf('%s_far',thisField);
                             nCorField = sprintf('%s_nCor',thisField);
                             nIncField = sprintf('%s_nInc',thisField);
                             rtField = sprintf('%s_rt',thisField);
                             
-                            results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField,accField,nCorField,nIncField,rtField);
+                            results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField,...
+                              accField,hrField,farField,nCorField,nIncField,rtField);
                             theseResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
                             if printResults
                               fprintf('\t%s %s\n',catStrs{im},thisField);
@@ -639,10 +647,14 @@ fprintf('Saving results to file: %s.\n',fileName);
 fid = fopen(fileName,'wt');
 
 mainToPrint = {'recog','recall'};
-generic_dataToPrint = {'nTrials','nCor','acc','dp','rt','rt_cor','rt_inc'};
+generic_dataToPrint = {'nCor','nInc','hr','far','dp','rt_cor','rt_inc'};
 dataToPrint = {...
-  {'nTrials','recog_nCor','recog_acc','dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
-  {'nTrials','recall_nCor','recall_spellCorr','dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
+  {'recog_nCor','recog_nInc','recog_hr','recog_far','dp','recog_rt_cor','recog_rt_inc'},...
+  {'recall_nCor','recall_nInc','recall_hr','recall_far','dp','recall_rt_cor','recall_rt_inc'}};
+% generic_dataToPrint = {'nTrials','nCor','acc','hr','far','dp','rt','rt_cor','rt_inc'};
+% dataToPrint = {...
+%   {'nTrials','recog_nCor','recog_acc','recog_hr','recog_far','dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
+%   {'nTrials','recall_nCor','recall_spellCorr','recall_hr','recall_far','dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
 
 % use a subject's files for initialization
 if length(subjects) > 5
@@ -713,6 +725,8 @@ for sesNum = 1:length(expParam.sesTypes)
           case {'cued_recall'}
             targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
             lagConds = unique([targEvents.lag]);
+            
+            % lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
             
             for lc = 1:length(lagConds)
               
@@ -895,10 +909,16 @@ end
 
 %% Calculate accuracy and reaction time
 
-function inputStruct = accAndRT(inputData,sub,inputStruct,destField,accField,nCorField,nIncField,rtField)
+function inputStruct = accAndRT(inputData,sub,inputStruct,destField,accField,hrField,farField,nCorField,nIncField,rtField)
 
 if ~exist('accField','var') || isempty(accField)
   accField = 'acc';
+end
+if ~exist('hrField','var') || isempty(hrField)
+  hrField = 'hr';
+end
+if ~exist('farField','var') || isempty(farField)
+  farField = 'far';
 end
 if ~exist('nCorField','var') || isempty(nCorField)
   nCorField = 'nCor';
@@ -960,6 +980,9 @@ elseif far == 0
     far = (sum([inputData.(accField)] == 0) + 0.5) / (nTrials + 1);
   end
 end
+
+inputStruct.(destField).(hrField)(sub) = hr;
+inputStruct.(destField).(farField)(sub) = far;
 
 zhr = norminv(hr,0,1);
 zfar = norminv(far,0,1);
