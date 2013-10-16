@@ -304,7 +304,7 @@ switch phaseName
     
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_cr_%d.txt',sesName,phaseName,phaseCount));
     
-    formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%s%d%s%s%d%d';
+    formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%s%d%s%s%d%d%d';
     if exist(logFile,'file')
       
       % set up column numbers denoting kinds of data in the log file
