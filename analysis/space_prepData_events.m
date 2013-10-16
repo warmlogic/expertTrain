@@ -24,9 +24,12 @@ function space_prepData_events(subjects,prep_eeg)
 
 expName = 'SPACE';
 
-serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
-serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
-localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
+behDataFolder = 'Behavioral';
+% behDataFolder = 'Behavioral_pilot';
+
+serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,behDataFolder,'Sessions');
+serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,behDataFolder,'Sessions');
+localDir = fullfile(getenv('HOME'),'data',expName,behDataFolder,'Sessions');
 if exist(serverDir,'dir')
   dataroot = serverDir;
 elseif exist(serverLocalDir,'dir')
@@ -42,49 +45,55 @@ if nargin == 0
   subjects = {
     'SPACE001';
     'SPACE002';
-    'SPACE003';
-    'SPACE004';
-    'SPACE005';
-    'SPACE006';
-    'SPACE007';
-    'SPACE008';
-    'SPACE009';
-    'SPACE010';
-    'SPACE011';
-    'SPACE012';
-    'SPACE013';
-    'SPACE014';
-    'SPACE015';
-    'SPACE016';
-    'SPACE017';
-    'SPACE018';
-    'SPACE019';
-    'SPACE020';
-    'SPACE021';
-    'SPACE022';
-    'SPACE023';
-    'SPACE024';
-    'SPACE025';
-    'SPACE026';
-    'SPACE027';
-    'SPACE028';
-    'SPACE029';
-    'SPACE030';
-    'SPACE031';
-    'SPACE032';
-    'SPACE033';
-    'SPACE034';
-    'SPACE035';
-    'SPACE036';
-    'SPACE037';
-    'SPACE038'; % responded "J" to almost all cued recall prompts
-    'SPACE039';
-    'SPACE040';
-    'SPACE041';
-    'SPACE042';
-    'SPACE043';
-    'SPACE044';
     };
+  
+%   % behavioral pilot
+%   subjects = {
+%     'SPACE001';
+%     'SPACE002';
+%     'SPACE003';
+%     'SPACE004';
+%     'SPACE005';
+%     'SPACE006';
+%     'SPACE007';
+%     'SPACE008';
+%     'SPACE009';
+%     'SPACE010';
+%     'SPACE011';
+%     'SPACE012';
+%     'SPACE013';
+%     'SPACE014';
+%     'SPACE015';
+%     'SPACE016';
+%     'SPACE017';
+%     'SPACE018';
+%     'SPACE019';
+%     'SPACE020';
+%     'SPACE021';
+%     'SPACE022';
+%     'SPACE023';
+%     'SPACE024';
+%     'SPACE025';
+%     'SPACE026';
+%     'SPACE027';
+%     'SPACE028';
+%     'SPACE029';
+%     'SPACE030';
+%     'SPACE031';
+%     'SPACE032';
+%     'SPACE033';
+%     'SPACE034';
+%     'SPACE035';
+%     'SPACE036';
+%     'SPACE037';
+%     'SPACE038'; % responded "J" to almost all cued recall prompts
+%     'SPACE039';
+%     'SPACE040';
+%     'SPACE041';
+%     'SPACE042';
+%     'SPACE043';
+%     'SPACE044';
+%     };
   
   prep_eeg = 0;
 end

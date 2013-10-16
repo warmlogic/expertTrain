@@ -19,6 +19,8 @@ if ~isfield(events,'isComplete')
   events.isComplete = false;
 end
 
+isPilotData = false;
+
 switch phaseName
   case {'expo'}
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_expo_%d.txt',sesName,phaseName,phaseCount));
@@ -304,7 +306,16 @@ switch phaseName
     
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_cr_%d.txt',sesName,phaseName,phaseCount));
     
-    formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%s%d%s%s%d%d%d';
+    if ~isPilotData
+      formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%s%d%s%s%d%d%d';
+    else
+      if str2double(subject(end-2:end)) <= 44
+        formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%s%d%s%s%d%d';
+      else
+        formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%s%d%s%s%d%d%d';
+      end
+    end
+    
     if exist(logFile,'file')
       
       % set up column numbers denoting kinds of data in the log file
@@ -344,13 +355,19 @@ switch phaseName
       crS.recall_resp = 17;
       crS.recall_origword = 18;
       % hack due to minor log file change
-      if str2double(subject(end-2:end)) <= 44
-        crS.recall_corrSpell = 19;
-        crS.recall_rt = 20;
-      else
+      if ~isPilotData
         crS.w_stimNum = 19;
         crS.recall_corrSpell = 20;
         crS.recall_rt = 21;
+      else
+        if str2double(subject(end-2:end)) <= 44
+          crS.recall_corrSpell = 19;
+          crS.recall_rt = 20;
+        else
+          crS.w_stimNum = 19;
+          crS.recall_corrSpell = 20;
+          crS.recall_rt = 21;
+        end
       end
       
       % read the real file
@@ -428,10 +445,10 @@ switch phaseName
           log(i).recall_resp = logData{crS.recall_resp}{i};
           log(i).recall_origword = logData{crS.recall_origword}{i};
           if log(i).targ
-            if isempty(log(i).recall_resp)
+            if isempty(log(i).recall_resp) || strcmpi(log(i).recall_resp,'NO_RESPONSE')
               log(i).recall_spellCorr = false;
               % debug
-              %fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
+              %fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
               %fprintf('\tNo recall response!!\n')
             else
               if checkSpelling
@@ -441,7 +458,7 @@ switch phaseName
                   log(i).recall_spellCorr = true;
                 else
                   % manual spell check
-                  fprintf('\nRecall for %s (%d) trial %d of %d:\n',phaseName,phaseCount,log(i).trial,max([log.trial]));
+                  fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
                   fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                   
