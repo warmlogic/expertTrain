@@ -4,8 +4,8 @@ function space_fix_cr_log
 % written to the next line
 
 dataroot = '~/data/SPACE/Behavioral/Sessions';
-%subjects = {'SPACE001','SPACE002'};
-subjects = {'SPACE001'};
+% subjects = {'SPACE001'};
+subjects = {'SPACE002'};
 sesNum = 1;
 sesDir = sprintf('session_%d',sesNum);
 sesName = 'oneDay';
