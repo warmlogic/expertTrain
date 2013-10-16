@@ -474,7 +474,7 @@ for i = trialNum:length(testStims_img)
   recogAcc = false;
   recogRespKey = 'NO_RESPONSE_KEY';
   recogResp = 'NO_RESPONSE';
-  recogResp_rt = -1;
+  recogResp_rt = int32(-1);
   % new - sure/maybe response
   keyIsDown_new = false;
   newEndRT = nan;
@@ -482,13 +482,13 @@ for i = trialNum:length(testStims_img)
   newAcc = false;
   newRespKey = 'NO_RESPONSE_KEY';
   newResp = 'NO_RESPONSE';
-  newResp_rt = -1;
+  newResp_rt = int32(-1);
   % old - recall response
   recallEndRT = nan;
   recallRespPromptOn = nan;
   corrSpell = false;
-  recallResp = '';
-  recallResp_rt = -1;
+  recallResp = 'NO_RESPONSE';
+  recallResp_rt = int32(-1);
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
@@ -715,7 +715,7 @@ for i = trialNum:length(testStims_img)
     end
   else
     % otherwise leave it empty
-    thisPairedWord = '';
+    thisPairedWord = 'LURE_STIM';
     w_stimNum = int32(-1);
   end
   
@@ -728,7 +728,7 @@ for i = trialNum:length(testStims_img)
       
       % if they answer 'old', get their answer and type it to the screen
       dispRecallResp = cfg.text.recallPrompt;
-      recallResp = '';
+      recallStr = '';
       if ~useKbCheck
         % Flush the keyboard buffer:
         FlushEvents;
@@ -754,7 +754,6 @@ for i = trialNum:length(testStims_img)
       
       [recallRespPromptOn, recallRespPromptStartRT] = Screen('Flip', w);
       
-      %while isempty(recogResp)
       while ~madeRecallResp
         while true
           %while (GetSecs - probOnset) <= phaseCfg.dist_response
@@ -779,20 +778,20 @@ for i = trialNum:length(testStims_img)
             case {8}
               % 8 = backspace
               
-              if ~isempty(recallResp)
-                recallResp = recallResp(1:length(recallResp)-1);
+              if ~isempty(recallStr)
+                recallStr = recallStr(1:length(recallStr)-1);
               end
-              if ~isempty(recallResp)
-                dispRecallResp = recallResp;
+              if ~isempty(recallStr)
+                dispRecallResp = recallStr;
               else
                 dispRecallResp = cfg.text.recallPrompt;
               end
             otherwise
               if ismember(char, cfg.keys.recallKeyNames)
-                recallResp = [recallResp, char]; %#ok<AGROW>
+                recallStr = [recallStr, char]; %#ok<AGROW>
               end
-              if ~isempty(recallResp)
-                dispRecallResp = recallResp;
+              if ~isempty(recallStr)
+                dispRecallResp = recallStr;
               else
                 dispRecallResp = cfg.text.recallPrompt;
               end
@@ -819,7 +818,7 @@ for i = trialNum:length(testStims_img)
           if phaseCfg.cr_corrSpell
             attemptCounter = attemptCounter + 1;
             
-            if strcmpi(recallResp,thisPairedWord)
+            if strcmpi(recallStr,thisPairedWord)
               corrSpell = true;
               madeRecallResp = true;
               %break
@@ -841,7 +840,6 @@ for i = trialNum:length(testStims_img)
           madeRecallResp = true;
         end
       end
-      %end
       
       % get the time they pressed return
       recallEndRT = respMadeRT;
@@ -850,7 +848,8 @@ for i = trialNum:length(testStims_img)
       
       % see if they're behaving badly (making the same resp over and over)
       madeRecallResp = false; % reuse this variable name
-      if ~isempty(recallResp)
+      if ~isempty(recallStr)
+        recallResp = recallStr;
         madeRecallResp = true;
         recallCounter = recallCounter + 1;
         recallResp_all = cat(1,recallResp_all,recallResp);
@@ -913,19 +912,10 @@ for i = trialNum:length(testStims_img)
             WaitSecs(2.0);
           end
         end
-      else
-        recallResp = 'NO_RESPONSE';
       end
       
     elseif (keyCode(cfg.keys.recogNew) == 1 && all(keyCode(~cfg.keys.recogNew) == 0))
       recogResp = 'new';
-      
-      %       % not going to make a recall response
-      %       recallRespPromptOn = nan;
-      %       recallResp_rt = nan;
-      %       recallResp = '';
-      %       corrSpell = false;
-      
       % elseif they answer 'new', ask 'sure' vs 'maybe'
       
       % draw the stimulus
@@ -1049,14 +1039,14 @@ for i = trialNum:length(testStims_img)
     recogResp = 'ERROR_MULTIKEY';
     
     %     newRespPromptOn = nan;
-    %     newResp_rt = -1;
+    %     newResp_rt = int32(-1);
     %     newAcc = false;
     %     newRespKey = 'NO_RESPONSE_KEY';
     %     newResp = 'NO_RESPONSE';
     %     keyIsDown_new = false;
     %
     %     recallRespPromptOn = nan;
-    %     recallResp_rt = -1;
+    %     recallResp_rt = int32(-1);
     %     recallResp = 'NO_RESPONSE';
     %     corrSpell = false;
     %   elseif ~keyIsDown_recog
@@ -1064,17 +1054,17 @@ for i = trialNum:length(testStims_img)
     %     recogAcc = false;
     %     recogRespKey = 'NO_RESPONSE_KEY';
     %     recogResp = 'NO_RESPONSE';
-    %     recogResp_rt = -1;
+    %     recogResp_rt = int32(-1);
     %
     %     newRespPromptOn = nan;
-    %     newResp_rt = -1;
+    %     newResp_rt = int32(-1);
     %     newAcc = false;
     %     newRespKey = 'NO_RESPONSE_KEY';
     %     newResp = 'NO_RESPONSE';
     %     keyIsDown_new = false;
     %
     %     recallRespPromptOn = nan;
-    %     recallResp_rt = -1;
+    %     recallResp_rt = int32(-1);
     %     recallResp = 'NO_RESPONSE';
     %     corrSpell = false;
   end
@@ -1118,10 +1108,10 @@ for i = trialNum:length(testStims_img)
       % % compute recall response time
       recallResp_rt = int32(round(1000 * (recallEndRT - recallRespPromptStartRT)));
       % else
-      %   recallResp_rt = -1;
+      %   recallResp_rt = int32(-1);
       % end
       
-      %newResp_rt = -1;
+      %newResp_rt = int32(-1);
       %newAcc = false;
       
     elseif strcmp(recogResp,'new')
@@ -1140,10 +1130,10 @@ for i = trialNum:length(testStims_img)
         % compute sure/maybe response time
         newResp_rt = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
       %else
-      %  newResp_rt = -1;
+      %  newResp_rt = int32(-1);
       end
       
-      %recallResp_rt = -1;
+      %recallResp_rt = int32(-1);
       %corrSpell = false;
     else
       fprintf('recogResp was ''%s'' instead of ''old'' or ''new''. Something is wrong!\n',recogResp);
