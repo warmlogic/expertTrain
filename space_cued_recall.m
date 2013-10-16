@@ -825,7 +825,11 @@ for i = trialNum:length(testStims_img)
               end
             end
           else
-            corrSpell = true;
+            % if we're not checking spelling then set correct=true if they
+            % made some kind of response
+            if ~isempty(recallStr)
+              corrSpell = true;
+            end
             typedRecallStr = true;
             %break
           end
@@ -1047,14 +1051,15 @@ for i = trialNum:length(testStims_img)
   Screen('Close', testImgTex(i));
   
   % compute old/new recognition response time
+  if phaseCfg.respDuringStim
+    measureRTfromHere = test_imgOnset;
+  else
+    measureRTfromHere = recogRespPromptStartRT;
+  end
+  recogResp_rt = int32(round(1000 * (recogEndRT - measureRTfromHere)));
+  
+  % compute accuracies and response times
   if keyIsDown_recog
-    if phaseCfg.respDuringStim
-      measureRTfromHere = test_imgOnset;
-    else
-      measureRTfromHere = recogRespPromptStartRT;
-    end
-    recogResp_rt = int32(round(1000 * (recogEndRT - measureRTfromHere)));
-    
     % compute response times and accuracy
     if strcmp(recogResp,'old')
       % compute accuracy
@@ -1082,10 +1087,10 @@ for i = trialNum:length(testStims_img)
         newAcc = true;
       end
       
-      if keyIsDown_new
-        % compute sure/maybe response time
-        newResp_rt = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
-      end
+      %if keyIsDown_new
+      % compute sure/maybe response time
+      newResp_rt = int32(round(1000 * (newEndRT - newRespPromptStartRT)));
+      %end
     else
       fprintf('recogResp was ''%s'' instead of ''old'' or ''new''. Something is wrong!\n',recogResp);
     end
