@@ -325,7 +325,7 @@ if showInstruct
   
   %% questions? only during practice. continues with experimenter's key.
   
-  if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+  if ~phaseCfg.isExp && phaseCfg.instruct.questions
     questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
     et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
@@ -391,7 +391,7 @@ for i = trialNum:length(nameStims)
       
       %% questions? only during practice. continues with experimenter's key.
       
-      if ~phaseCfg.isExp && cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions
+      if ~phaseCfg.isExp && phaseCfg.instruct.questions
         questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
         et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
           cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
