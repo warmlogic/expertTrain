@@ -913,7 +913,7 @@ for i = trialNum:length(studyStims_img)
         resp = 'ERROR_OTHER';
       end
     else
-      resp = 'none';
+      resp = 'NO_RESPONSE';
       % did not push a key
       
       % need a new endRT
@@ -949,12 +949,12 @@ for i = trialNum:length(studyStims_img)
         respKey = sprintf('multikey%s',sprintf(repmat(' %s',1,numel(thisResp)),thisResp{:}));
       end
     else
-      respKey = 'none';
+      respKey = 'NO_RESPONSE_KEY';
     end
   else
     % no response required
-    resp = 'notReq';
-    respKey = 'notReq';
+    resp = 'NOT_REQUIRED';
+    respKey = 'NOT_REQUIRED';
     keyIsDown = false;
   end
   

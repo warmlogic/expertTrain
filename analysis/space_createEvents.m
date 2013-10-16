@@ -99,7 +99,6 @@ switch phaseName
           
         case {'EXPO_RESP'}
           % unique to EXPO_RESP
-          %if ~strcmp(logData{expoS.r_resp}{i},'none')
           if strcmp(logData{expoS.r_resp}{i},'v_appeal')
             log(i).resp = 4;
           elseif strcmp(logData{expoS.r_resp}{i},'s_appeal')
@@ -108,7 +107,8 @@ switch phaseName
             log(i).resp = 2;
           elseif strcmp(logData{expoS.r_resp}{i},'v_unappeal')
             log(i).resp = 1;
-          elseif strcmp(logData{expoS.r_resp}{i},'none')
+          else
+          %elseif strcmp(logData{expoS.r_resp}{i},'NO_RESPONSE')
             log(i).resp = -1;
           end
           log(i).rt = single(str2double(logData{expoS.r_rt}(i)));
