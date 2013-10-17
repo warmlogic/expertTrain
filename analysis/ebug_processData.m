@@ -346,7 +346,7 @@ for sub = 1:length(subjects)
 %                     end
 %                   end
 %                   
-%                 end
+                 end
                 
               case {'name', 'nametrain', 'prac_name'}
                 fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
@@ -552,28 +552,28 @@ for sesNum = 1:length(expParam.sesTypes)
 %               
 %             else
 %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%               keyboard
-%               
-%               headerCell = {{trainStr},mainToPrint};
-%               [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
-%               fprintf(fid,sprintf('\t%s\n',headerStr));
-%               [headerStr] = setHeaderStr({dataToPrint},1);
-%               headerStr = sprintf('\t%s',headerStr);
-%               headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-%               fprintf(fid,sprintf('%s\n',headerStr));
-%               
-%               for sub = 1:length(subjects)
-%                 dataStr = subjects{sub};
-%                 for mf = 1:length(mainToPrint)
-%                   [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
-%                 end
-%                 fprintf(fid,sprintf('%s\n',dataStr));
-%               end
-%             end
-%             if t ~= length(trainedConds)
-%               fprintf(fid,'\n');
-%             end
-          end
+              keyboard
+              
+              headerCell = {{trainStr},mainToPrint};
+              [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+              fprintf(fid,sprintf('\t%s\n',headerStr));
+              [headerStr] = setHeaderStr({dataToPrint},1);
+              headerStr = sprintf('\t%s',headerStr);
+              headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+              fprintf(fid,sprintf('%s\n',headerStr));
+              
+              for sub = 1:length(subjects)
+                dataStr = subjects{sub};
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
+         end
+            if t ~= length(trainedConds)
+              fprintf(fid,'\n');
+            end
+%           end
           
         case {'name', 'nametrain', 'prac_name'}
           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)

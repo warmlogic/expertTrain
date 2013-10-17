@@ -22,12 +22,11 @@ else
 end
 
 subjects = {
-  'EBIRD049';
-  'EBIRD002';
-  'EBIRD003';
-  'EBIRD004';
-  'EBIRD005';
-  'EBIRD006';
+  'EBUG001';
+%   'EBUG002';
+%   'EBUG003';
+%   'EBUG004';
+%   'EBUG005';
   };
 
 saveFigs = true;
@@ -48,7 +47,7 @@ onlyCompleteSub = true;
 printResults = true;
 saveResults = false;
 
-[results] = ebird_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+[results] = ebug_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
 
 %% Plot basic and subordinate RTs across training days, all phases on one figure
 
