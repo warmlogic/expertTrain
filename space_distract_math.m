@@ -411,6 +411,7 @@ for i = trialNum:phaseCfg.dist_nProbs
       end
     end
   else
+    WaitSecs(0.5);
     respMadeRT = GetSecs;
   end
   % get the time they pressed return
