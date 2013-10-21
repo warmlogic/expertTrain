@@ -1,31 +1,44 @@
-function expertTrain(expName,subNum,useNS)
-% function expertTrain(expName,subNum,useNS)
+function expertTrain(expName,subNum,useNS,photoCellTest)
+% function expertTrain(expName,subNum,useNS,photoCellTest)
 %
-% expertise training experiment
+% expertise training experiment (and more!)
 %
-% 6 potential phases:
-%  - Subordinate matching task
-%  - Old/new recognition
-%  - Name training
-%  - Passive viewing (with confirmatory button press.)
-%  - Active naming
-%  - Comparison (similarity of two stimuli)
+% Many potential phases:
+%  - Subordinate matching task (et_matching)
+%  - Old/new recognition (et_recognition)
+%  - Name training (et_naming with block setup)
+%  - Passive viewing (with confirmatory button press.) (et_viewing)
+%  - Active naming (et_naming)
+%  - Comparison (similarity of two stimuli) (et_compare)
+%  - Exposure with ratings (space_exposure)
+%  - Pair associate studying (space_multistudy)
+%  - Math distractor (space_distract_math)
+%  - Cued recall with typing (space_cued_recall)
 %
 % Input:
-%  expName: the name of the experiment (as a string). You must set up a
-%           config_EXPNAME.m file describing the experiment configuration.
-%  subNum:  the subject number (integer). This will get transformed into
-%           the full subject name EXPNAMEXXX; e.g., subNum=1 = EXPNAME001.
-%  useNS:   whether to use Net Station (logical, 1 for yes or 0 for no).
+%  expName:       the name of the experiment (as a string). You must set up
+%                 a config_EXPNAME.m file describing the experiment
+%                 configuration.
+%  subNum:        the subject number (integer). This will get transformed
+%                 into the full subject name EXPNAMEXXX; e.g., subNum=1 =
+%                 EXPNAME001.
+%  useNS:         whether to use Net Station (logical; 1 for yes, 0 for no)
+%  photoCellTest: whether to conduct a photo cell test (logical; 1 for yes,
+%                 0 for no). Default = 0.
 %
-% NB: You can also launch the experiment by just running the command
-%     expertTrain; and an popup window will prompt for the above info.
+% NB: You can also launch the experiment by just running the command:
+%     expertTrain;
+%     A popup window will prompt for the above info. It is not possible to
+%     run the photoCellTest using this method.
 %
 % See the file README.md for more information.
 %
 % see also: et_saveStimList, config_EBUG, config_EBIRD, config_COMP,
 %           et_processStims, et_matching, et_viewing, et_naming,
 %           et_recognition, et_compare
+
+% see also: space_processStims, space_saveStimList, space_exposure,
+%           space_multistudy, space_distract_math, space_cued_recall
 %
 
 %% any preliminary stuff
@@ -56,54 +69,66 @@ end
 
 %% process experiment name and subject number
 
-if nargin < 3
-  if nargin == 1
-    % cannot proceed with one argument
-    error('You provided one argument, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
-  elseif nargin == 2
-    % cannot proceed with one argument
-    error('You provided two arguments, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
-  elseif nargin == 0
-    % if no variables are provided, use an input dialogue
-    repeat = 1;
-    while repeat
-      prompt = {'Experiment name (alphanumerics only, no quotes)', 'Subject number (number(s) only)', 'Use Net Station? (1 = yes, 0 = no)'};
-      defaultAnswer = {'', '', ''};
-      options.Resize = 'on';
-      answer = inputdlg(prompt,'Subject Information', 1, defaultAnswer, options);
-      [expName, subNum, useNS] = deal(answer{:});
-      if isempty(expName) || ~ischar(expName)
-        h = errordlg('Experiment name must consist of characters. Try again.', 'Input Error');
-        repeat = 1;
-        uiwait(h);
-        continue
-      end
-      if isempty(str2double(subNum)) || ~isnumeric(str2double(subNum)) || mod(str2double(subNum),1) ~= 0 || str2double(subNum) <= 0
-        h = errordlg('Subject number must be an integer (e.g., 9) and greater than zero. Try again.', 'Input Error');
-        repeat = 1;
-        uiwait(h);
-        continue
-      end
-      if isempty(str2double(useNS)) || ~isnumeric(str2double(useNS)) || (str2double(useNS) ~= 0 && str2double(useNS) ~= 1)
-        h = errordlg('useNS must be either 1 or 0. Try again.', 'Input Error');
-        repeat = 1;
-        uiwait(h);
-        continue
-      end
-      if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
-        h = errordlg(sprintf('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName), 'Input Error');
-        repeat = 1;
-        uiwait(h);
-        continue
-      else
-        subNum = str2double(subNum);
-        useNS = logical(str2double(useNS));
-        repeat = 0;
-      end
+% make sure there are somewhere betwen 0 and 4 arguments
+minArg = 0;
+maxArg = 4;
+narginchk(minArg,maxArg);
+
+if nargin == 0
+  % if no variables are provided, use an input dialogue
+  repeat = 1;
+  while repeat
+    prompt = {'Experiment name (alphanumerics only, no quotes)', 'Subject number (number(s) only)', 'Use Net Station? (1 = yes, 0 = no)'};
+    defaultAnswer = {'', '', ''};
+    options.Resize = 'on';
+    answer = inputdlg(prompt,'Subject Information', 1, defaultAnswer, options);
+    [expName, subNum, useNS] = deal(answer{:});
+    if isempty(expName) || ~ischar(expName)
+      h = errordlg('Experiment name must consist of characters. Try again.', 'Input Error');
+      repeat = 1;
+      uiwait(h);
+      continue
+    end
+    if isempty(str2double(subNum)) || ~isnumeric(str2double(subNum)) || mod(str2double(subNum),1) ~= 0 || str2double(subNum) <= 0
+      h = errordlg('Subject number must be an integer (e.g., 9) and greater than zero. Try again.', 'Input Error');
+      repeat = 1;
+      uiwait(h);
+      continue
+    end
+    if isempty(str2double(useNS)) || ~isnumeric(str2double(useNS)) || (str2double(useNS) ~= 0 && str2double(useNS) ~= 1)
+      h = errordlg('useNS must be either 1 or 0. Try again.', 'Input Error');
+      repeat = 1;
+      uiwait(h);
+      continue
+    end
+    if ~exist(fullfile(pwd,sprintf('config_%s.m',expName)),'file')
+      h = errordlg(sprintf('Configuration file for experiment with name ''%s'' does not exist (config_%s.m). Check the experiment name and try again.',expName,expName), 'Input Error');
+      repeat = 1;
+      uiwait(h);
+      continue
+    else
+      subNum = str2double(subNum);
+      useNS = logical(str2double(useNS));
+      repeat = 0;
     end
   end
-elseif nargin == 3
+  
+  % default
+  photoCellTest = false;
+  
+elseif nargin == 1
+  % cannot proceed with one argument
+  error('You provided 1 argument, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
+elseif nargin == 2
+  % cannot proceed with one argument
+  error('You provided 2 arguments, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
+elseif nargin >= 3
   % the correct number of arguments
+  
+  if nargin == 3
+    % default
+    photoCellTest = false;
+  end
   
   % check the experiment name make sure the configuration file exists
   if ~isempty(expName) && ischar(expName)
@@ -127,19 +152,34 @@ elseif nargin == 3
   
   % check on using Net Station
   if isempty(useNS)
-    error('Must provide whether to use Net Station (variable: ''useNS'', 1 or 0).');
+    error('Must provide whether to use Net Station (variable: ''useNS'', 1 (yes) or 0 (no)).');
   end
-  if ~isnumeric(useNS) || (useNS ~= 0 && useNS ~= 1)
-    fprintf('For whether to use Net Station (variable: ''useNS''), you entered: ');
-    disp(useNS);
-    error('useNS must be either 1 or 0.');
-  else
-    useNS = logical(useNS);
+  if ~islogical(useNS)
+    if ~isnumeric(useNS) || (useNS ~= 0 && useNS ~= 1)
+      fprintf('For whether to use Net Station (variable: ''useNS''), you entered: ');
+      disp(useNS);
+      error('useNS must be either 1 or 0.');
+    else
+      useNS = logical(useNS);
+    end
   end
   
-elseif nargin > 3
-  % cannot proceed with more than three arguments
-  error('More than three arguments provided. This function only accetps three arguments: experiment name (as a string), subject number (as an integer), and whether to use Net Station (1=yes, 0=no).');
+  % check on using Net Station
+  if isempty(photoCellTest)
+    error('Must provide whether to run the photo cell test (variable: ''photoCellTest'', 1 (yes) or 0 (no)).');
+  end
+  if ~islogical(photoCellTest)
+    if ~isnumeric(photoCellTest) || (photoCellTest ~= 0 && photoCellTest ~= 1)
+      fprintf('For whether to run the photo cell test (variable: ''photoCellTest''), you entered: ');
+      disp(photoCellTest);
+      error('photoCellTest must be either 1 or 0.');
+    else
+      photoCellTest = logical(photoCellTest);
+    end
+    if photoCellTest && ~useNS
+      error('If doing a photo cell test, must use Net Station (set variable: ''useNS'' = 1)');
+    end
+  end
 end
 
 %% Experiment database struct preparation
@@ -212,12 +252,18 @@ if exist(cfg.files.expParamFile,'file')
   % override whether to use Net Station, in case it is different for this
   % session
   expParam.useNS = useNS;
+  
+  % whether to do a photo cell test
+  expParam.photoCellTest = photoCellTest;
 else
   % if it doesn't exist that means we're starting a new subject
   expParam.sessionNum = 1;
   
   % whether to use Net Station
   expParam.useNS = useNS;
+  
+  % whether to do a photo cell test
+  expParam.photoCellTest = photoCellTest;
   
   % make sure we want to start this session
   startUnanswered = 1;
@@ -326,9 +372,15 @@ try
   %end
   
   % Set up the gray color value to be used as experiment backdrop
-  if ~isfield(cfg.screen,'gray')
-    fprintf('You did not set a value for cfg.screen.gray! Setting experiment backdrop to the GrayIndex of this screen.\n');
-    cfg.screen.gray = GrayIndex(screenNumber);
+  if ~expParam.photoCellTest
+    if ~isfield(cfg.screen,'gray')
+      fprintf('You did not set a value for cfg.screen.gray! Setting experiment backdrop to the GrayIndex of this screen.\n');
+      cfg.screen.gray = GrayIndex(screenNumber);
+    end
+  else
+    fprintf('Doing a photocell test. Setting experiment backdrop to the BlackIndex of this screen.\n');
+    warning('Black text (e.g., instructions) may not be visible!\n');
+    cfg.screen.gray = BlackIndex(screenNumber);
   end
   
   % Open a double buffered fullscreen window on the stimulation screen
@@ -357,6 +409,14 @@ try
   % Set priority for script execution to realtime priority:
   priorityLevel = MaxPriority(w);
   Priority(priorityLevel);
+  
+  % set up the photo cell test rectangle
+  if expParam.photoCellTest
+    cfg.stim.photoCellRect = SetRect(0, 0, 250, 250);
+    cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'center','right');
+    cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
+    %cfg.stim.photoCellRectColor = rgb('White');
+  end
   
   %% Verify that Net Station will run
   

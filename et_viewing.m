@@ -262,7 +262,7 @@ if ~isfield(phaseCfg,'impedanceBeforePhase')
   phaseCfg.impedanceBeforePhase = false;
 end
 
-if expParam.useNS && phaseCfg.impedanceBeforePhase
+if ~expParam.photoCellTest && expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -311,18 +311,20 @@ else
 end
 
 if showInstruct
-  for inst = 1:length(phaseCfg.instruct.view)
+  if ~expParam.photoCellTest
+    for inst = 1:length(phaseCfg.instruct.view)
+      WaitSecs(1.000);
+      et_showTextInstruct(w,phaseCfg.instruct.view(inst),cfg.keys.instructContKey,...
+        cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+        {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
+    end
+    % Wait a second before starting trial
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct.view(inst),cfg.keys.instructContKey,...
-      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
-      {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
   end
-  % Wait a second before starting trial
-  WaitSecs(1.000);
   
   %% questions? only during practice. continues with experimenter's key.
   
-  if ~phaseCfg.isExp && phaseCfg.instruct.questions
+  if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
     questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
     et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
@@ -332,21 +334,23 @@ if showInstruct
   
   %% let them start when they're ready
   
-  if phaseCfg.isExp
-    expStr = '';
-  else
-    expStr = ' practice';
+  if ~expParam.photoCellTest
+    if phaseCfg.isExp
+      expStr = '';
+    else
+      expStr = ' practice';
+    end
+    if runInBlocks
+      readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
+    else
+      readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+    end
+    et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+    
+    % Wait a second before starting trial
+    WaitSecs(1.000);
   end
-  if runInBlocks
-    readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
-  else
-    readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
-  end
-  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
-    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
-  
-  % Wait a second before starting trial
-  WaitSecs(1.000);
 end
 
 %% run the viewing task
@@ -363,7 +367,7 @@ end
 for i = trialNum:length(viewStims)
   % do an impedance check after a certain number of blocks or trials
   if runInBlocks
-    if expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && i == 1
+    if ~expParam.photoCellTest && expParam.useNS && phaseCfg.isExp && b > 1 && b < length(phaseCfg.blockSpeciesOrder) && mod((b - 1),phaseCfg.impedanceAfter_nBlocks) == 0 && i == 1
       % run the impedance break before trial 1 of this block starts
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -372,19 +376,21 @@ for i = trialNum:length(viewStims)
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       
-      % show the instructions after the impedance check
-      for inst = 1:length(phaseCfg.instruct.view)
+      if ~expParam.photoCellTest
+        % show the instructions after the impedance check
+        for inst = 1:length(phaseCfg.instruct.view)
+          WaitSecs(1.000);
+          et_showTextInstruct(w,phaseCfg.instruct.view(inst),cfg.keys.instructContKey,...
+            cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
+            {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
+        end
+        % Wait a second before starting trial
         WaitSecs(1.000);
-        et_showTextInstruct(w,phaseCfg.instruct.view(inst),cfg.keys.instructContKey,...
-          cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
-          {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
       end
-      % Wait a second before starting trial
-      WaitSecs(1.000);
       
       %% questions? only during practice. continues with experimenter's key.
       
-      if ~phaseCfg.isExp && phaseCfg.instruct.questions
+      if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
         questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
         et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
           cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
@@ -394,28 +400,30 @@ for i = trialNum:length(viewStims)
       
       %% let them start when they're ready
       
-      if phaseCfg.isExp
-        expStr = '';
-      else
-        expStr = ' practice';
-      end
-      readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
-      et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
-        cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
-      % Wait a second before starting trial
-      WaitSecs(1.000);
-      
-      % only check these keys
-      RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
-        cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
-      
-      % reset the blink timer
-      if cfg.stim.secUntilBlinkBreak > 0
-        blinkTimerStart = GetSecs;
+      if ~expParam.photoCellTest
+        if phaseCfg.isExp
+          expStr = '';
+        else
+          expStr = ' practice';
+        end
+        readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
+        et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+          cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+        % Wait a second before starting trial
+        WaitSecs(1.000);
+        
+        % only check these keys
+        RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
+          cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
+        
+        % reset the blink timer
+        if cfg.stim.secUntilBlinkBreak > 0
+          blinkTimerStart = GetSecs;
+        end
       end
     end
   else
-    if expParam.useNS && phaseCfg.isExp && i > 1 && i < length(viewStims) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
+    if ~expParam.photoCellTest && expParam.useNS && phaseCfg.isExp && i > 1 && i < length(viewStims) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
       % run the impedance break
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -448,7 +456,7 @@ for i = trialNum:length(viewStims)
   end
   
   % Do a blink break if specified time has passed
-  if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(viewStims) - 3)
+  if ~expParam.photoCellTest && phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= cfg.stim.secUntilBlinkBreak && i > 3 && i < (length(viewStims) - 3)
     thisGetSecs = GetSecs;
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -562,6 +570,10 @@ for i = trialNum:length(viewStims)
     DrawFormattedText(w,num2str(specNum),'center',sNumY,initial_sNumColor, cfg.text.instructCharWidth);
   else
     DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,initial_sNumColor, cfg.text.instructCharWidth);
+  end
+  
+  if expParam.photoCellTest
+    Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
   end
   
   % Show stimulus on screen at next possible display refresh cycle,
@@ -912,9 +924,11 @@ Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
 Screen('Flip', w);
 
-% wait until the key is pressed
-RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
-KbWait(-1,2);
+if ~expParam.photoCellTest
+  % wait until the key is pressed
+  RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+  KbWait(-1,2);
+end
 RestrictKeysForKbCheck([]);
 
 % go back to gray

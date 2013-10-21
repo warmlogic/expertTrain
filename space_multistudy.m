@@ -297,7 +297,7 @@ if ~isfield(phaseCfg,'impedanceBeforePhase')
   phaseCfg.impedanceBeforePhase = false;
 end
 
-if expParam.useNS && phaseCfg.impedanceBeforePhase
+if ~expParam.photoCellTest && expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -334,17 +334,19 @@ Screen('Flip', w);
 
 %% show the instructions
 
-for i = 1:length(phaseCfg.instruct.study)
+if ~expParam.photoCellTest
+  for i = 1:length(phaseCfg.instruct.study)
+    WaitSecs(1.000);
+    et_showTextInstruct(w,phaseCfg.instruct.study(i),cfg.keys.instructContKey,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  end
+  % Wait a second before starting trial
   WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct.study(i),cfg.keys.instructContKey,...
-    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 end
-% Wait a second before starting trial
-WaitSecs(1.000);
 
 %% questions? only during practice. continues with experimenter's key.
 
-if ~phaseCfg.isExp && phaseCfg.instruct.questions
+if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
   questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
   et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
     cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
@@ -354,16 +356,18 @@ end
 
 %% let them start when they're ready
 
-if phaseCfg.isExp
-  expStr = '';
-else
-  expStr = ' practice';
+if ~expParam.photoCellTest
+  if phaseCfg.isExp
+    expStr = '';
+  else
+    expStr = ' practice';
+  end
+  readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  % Wait a second before starting trial
+  WaitSecs(1.000);
 end
-readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
-et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
-  cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
-% Wait a second before starting trial
-WaitSecs(1.000);
 
 %% run the multistudy task
 
@@ -383,7 +387,7 @@ blinkBreakOnNextTrial = false;
 
 for i = trialNum:length(studyStims_img)
   % do an impedance check after a certain number of trials
-  if (expParam.useNS && phaseCfg.isExp && i > 1 && i < length(studyStims_img) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0) || impedanceBreakOnNextTrial
+  if ~expParam.photoCellTest && ((expParam.useNS && phaseCfg.isExp && i > 1 && i < length(studyStims_img) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0) || impedanceBreakOnNextTrial)
     if studyStims_img(i).lag == 0 && studyStims_img(i).presNum == 1
       impedanceBreakOnNextTrial = true;
     else
@@ -423,7 +427,7 @@ for i = trialNum:length(studyStims_img)
   end
   
   % Do a blink break if specified time has passed
-  if (phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (length(studyStims_img) - 3)) || blinkBreakOnNextTrial
+  if ~expParam.photoCellTest && ((phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (length(studyStims_img) - 3)) || blinkBreakOnNextTrial)
     % if lag=0 and this is pres1, then pres2 is next so don't break yet
     if studyStims_img(i).lag == 0 && studyStims_img(i).presNum == 1
       blinkBreakOnNextTrial = true;
@@ -576,6 +580,10 @@ for i = trialNum:length(studyStims_img)
     Screen('DrawText', w, thisWord, wordStimX, wordStimY, cfg.text.basicTextColor);
     %DrawFormattedText(w,thisWord,'center',wordStimY,cfg.text.basicTextColor, cfg.text.instructCharWidth);
     
+    if expParam.photoCellTest
+      Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+    end
+    
     % put the stimuli on the screen
     [wordOn, stim2Onset] = Screen('Flip', w);
     imgOn = wordOn;
@@ -606,8 +614,12 @@ for i = trialNum:length(studyStims_img)
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       end
       
+      if expParam.photoCellTest
+        Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+      end
+      
       % Show stimulus on screen at next possible display refresh cycle,
-      % and record stimulus onset time in 'stimOnset':
+      % and record stimulus onset time in 'imgOn':
       [imgOn, stimImgOnset] = Screen('Flip', w);
       
       if cfg.text.printTrialInfo
@@ -621,7 +633,7 @@ for i = trialNum:length(studyStims_img)
         WaitSecs(0.0001);
       end
       
-      % if they overlap, put on the image stimulus
+      % if they overlap, put on the image stimulus and word rectangle
       if phaseCfg.studyPresent == 3
         % draw the image stimulus
         Screen('DrawTexture', w, studyImgTex(i), [], stimImgRect);
@@ -639,6 +651,11 @@ for i = trialNum:length(studyStims_img)
       Screen('TextSize', w, cfg.text.basicTextSize);
       Screen('DrawText', w, thisWord, wordStimX, wordStimY, cfg.text.basicTextColor);
       %DrawFormattedText(w,thisWord,'center',wordStimY,cfg.text.basicTextColor, cfg.text.instructCharWidth);
+      
+      if expParam.photoCellTest
+        Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+      end
+      
       [wordOn, stimWordOnset] = Screen('Flip', w);
       
       if cfg.text.printTrialInfo
@@ -666,6 +683,10 @@ for i = trialNum:length(studyStims_img)
         % and fixation on top of it
         Screen('TextSize', w, cfg.text.fixSize);
         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      end
+      
+      if expParam.photoCellTest
+        Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
       end
       
       [wordOn, stimWordOnset] = Screen('Flip', w);
@@ -699,6 +720,10 @@ for i = trialNum:length(studyStims_img)
         % % draw the word stimulus
         % Screen('TextSize', w, cfg.text.basicTextSize);
         % DrawFormattedText(w,thisWord,'center',wordStimY,cfg.text.basicTextColor, cfg.text.instructCharWidth);
+      end
+      
+      if expParam.photoCellTest
+        Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
       end
       
       % Show stimulus on screen at next possible display refresh cycle,
@@ -743,6 +768,11 @@ for i = trialNum:length(studyStims_img)
           % and the "too fast" text
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          
+          if expParam.photoCellTest
+            Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+          end
+          
           Screen('Flip', w);
           
           keyIsDown = 0;
@@ -788,6 +818,11 @@ for i = trialNum:length(studyStims_img)
           % don't push multiple keys
           Screen('TextSize', w, cfg.text.instructTextSize);
           DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+          
+          if expParam.photoCellTest
+            Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+          end
+          
           % put them on the screen
           Screen('Flip', w);
           
@@ -844,6 +879,10 @@ for i = trialNum:length(studyStims_img)
           % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
           DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+        end
+        
+        if expParam.photoCellTest
+          Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
         end
       end
       [respPromptOn, startRT] = Screen('Flip',w);
@@ -1244,9 +1283,11 @@ Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,messageText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
 Screen('Flip', w);
 
-% wait until the key is pressed
-RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
-KbWait(-1,2);
+if ~expParam.photoCellTest
+  % wait until the key is pressed
+  RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+  KbWait(-1,2);
+end
 RestrictKeysForKbCheck([]);
 
 % go back to gray

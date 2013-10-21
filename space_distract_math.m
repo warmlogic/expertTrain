@@ -134,7 +134,7 @@ if ~isfield(phaseCfg,'impedanceBeforePhase')
   phaseCfg.impedanceBeforePhase = false;
 end
 
-if expParam.useNS && phaseCfg.impedanceBeforePhase
+if ~expParam.photoCellTest && expParam.useNS && phaseCfg.impedanceBeforePhase
   % run the impedance break
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -171,17 +171,19 @@ Screen('Flip', w);
 
 %% show the instructions
 
-for i = 1:length(phaseCfg.instruct.dist)
+if ~expParam.photoCellTest
+  for i = 1:length(phaseCfg.instruct.dist)
+    WaitSecs(1.000);
+    et_showTextInstruct(w,phaseCfg.instruct.dist(i),cfg.keys.instructContKey,...
+      cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  end
+  % Wait a second before starting trial
   WaitSecs(1.000);
-  et_showTextInstruct(w,phaseCfg.instruct.dist(i),cfg.keys.instructContKey,...
-    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
 end
-% Wait a second before starting trial
-WaitSecs(1.000);
 
 %% questions? only during practice. continues with experimenter's key.
 
-if ~phaseCfg.isExp && phaseCfg.instruct.questions
+if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
   questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
   et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
     cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
@@ -191,16 +193,18 @@ end
 
 %% let them start when they're ready
 
-if phaseCfg.isExp
-  expStr = '';
-else
-  expStr = ' practice';
+if ~expParam.photoCellTest
+  if phaseCfg.isExp
+    expStr = '';
+  else
+    expStr = ' practice';
+  end
+  readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
+  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
+  % Wait a second before starting trial
+  WaitSecs(1.000);
 end
-readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
-et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
-  cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
-% Wait a second before starting trial
-WaitSecs(1.000);
 
 %% run the distractor task
 
@@ -216,7 +220,7 @@ mathStartTime = GetSecs;
 
 for i = trialNum:phaseCfg.dist_nProbs
   %   % do an impedance check after a certain number of trials
-  %   if expParam.useNS && phaseCfg.isExp && i > 1 && i < phaseCfg.dist_nProbs && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
+  %   if ~expParam.photoCellTest && expParam.useNS && phaseCfg.isExp && i > 1 && i < phaseCfg.dist_nProbs && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
   %     % run the impedance break
   %     thisGetSecs = GetSecs;
   %     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
@@ -247,7 +251,7 @@ for i = trialNum:phaseCfg.dist_nProbs
   %   end
   %
   %   % Do a blink break if specified time has passed
-  %   if phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (phaseCfg.dist_nProbs - 3)
+  %   if ~expParam.photoCellTest && phaseCfg.isExp && phaseCfg.secUntilBlinkBreak > 0 && (GetSecs - blinkTimerStart) >= phaseCfg.secUntilBlinkBreak && i > 3 && i < (phaseCfg.dist_nProbs - 3)
   %     thisGetSecs = GetSecs;
   %     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
   %     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_START');
@@ -347,6 +351,11 @@ for i = trialNum:phaseCfg.dist_nProbs
   screenCenterX = screenCenterX * 0.85;
   Screen('TextSize', w, cfg.text.basicTextSize);
   Screen('DrawText', w, tv_str, screenCenterX, screenCenterY, cfg.text.basicTextColor);
+  
+  if expParam.photoCellTest
+    Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+  end
+  
   [probOn, probOnset] = Screen('Flip', w);
   
   if cfg.text.printTrialInfo
@@ -359,46 +368,50 @@ for i = trialNum:phaseCfg.dist_nProbs
     % Flush the keyboard buffer:
     FlushEvents;
   end
-  while isempty(resp)
-    while true
-      %while (GetSecs - probOnset) <= phaseCfg.dist_response
-      
-      % reimplementing GetEchoString to get RT
-      if useKbCheck
-        [char, GetCharEndRT] = GetKbChar; %#ok<UNRCH>
-      else
-        [char, GetCharEndRT] = GetChar;
+  if ~expParam.photoCellTest
+    while isempty(resp)
+      while true
+        %while (GetSecs - probOnset) <= phaseCfg.dist_response
+        
+        % reimplementing GetEchoString to get RT
+        if useKbCheck
+          [char, GetCharEndRT] = GetKbChar; %#ok<UNRCH>
+        else
+          [char, GetCharEndRT] = GetChar;
+        end
+        if isempty(char)
+          return
+        else
+          % get the time the key was pressed using GetSecs
+          respMadeRT = GetSecs;
+        end
+        
+        switch (abs(char))
+          case {13, 3, 10}
+            % ctrl-C, enter, or return
+            break
+          case 8
+            % backspace
+            if ~isempty(resp)
+              resp = resp(1:length(resp)-1);
+            end
+          otherwise
+            if ismember(char, cfg.keys.distMathKeyNames)
+              resp = [resp, char]; %#ok<AGROW>
+            end
+        end
+        
+        % draw their text
+        Screen('TextSize', w, cfg.text.basicTextSize);
+        Screen('DrawText', w, sprintf('%s %s',tv_str,resp), screenCenterX, screenCenterY, cfg.text.basicTextColor);
+        %[respMadeRT] = Screen('Flip', w);
+        Screen('Flip', w);
+        
+        WaitSecs(0.0001);
       end
-      if isempty(char)
-        return
-      else
-        % get the time the key was pressed using GetSecs
-        respMadeRT = GetSecs;
-      end
-      
-      switch (abs(char))
-        case {13, 3, 10}
-          % ctrl-C, enter, or return
-          break
-        case 8
-          % backspace
-          if ~isempty(resp)
-            resp = resp(1:length(resp)-1);
-          end
-        otherwise
-          if ismember(char, cfg.keys.distMathKeyNames)
-            resp = [resp, char]; %#ok<AGROW>
-          end
-      end
-      
-      % draw their text
-      Screen('TextSize', w, cfg.text.basicTextSize);
-      Screen('DrawText', w, sprintf('%s %s',tv_str,resp), screenCenterX, screenCenterY, cfg.text.basicTextColor);
-      %[respMadeRT] = Screen('Flip', w);
-      Screen('Flip', w);
-      
-      WaitSecs(0.0001);
     end
+  else
+    respMadeRT = GetSecs;
   end
   % get the time they pressed return
   endRT = respMadeRT;
@@ -581,9 +594,11 @@ Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,accRtText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
 Screen('Flip', w);
 
-% wait until the key is pressed
-RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
-KbWait(-1,2);
+if ~expParam.photoCellTest
+  % wait until the key is pressed
+  RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
+  KbWait(-1,2);
+end
 RestrictKeysForKbCheck([]);
 
 % go back to gray
