@@ -6,11 +6,11 @@ function [results] = ebug_processData(dataroot,subjects,onlyCompleteSub,printRes
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'EBUG001';
-%     'EBUG002';
-%     'EBUG003';
-%     'EBUG004';
-%     'EBUG005';
-     };
+    %     'EBUG002';
+    %     'EBUG003';
+    %     'EBUG004';
+    %     'EBUG005';
+    };
 end
 
 % try to determine the experiment name by removing the subject number
@@ -63,6 +63,8 @@ results = struct;
 
 dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
 mainFields = {'overall','basic','subord'};
+
+recogField = {'recogtest'};
 
 %% initialize to store the data
 
@@ -124,16 +126,6 @@ for sesNum = 1:length(expParam.sesTypes)
               end
             end
             
-%             imgConds = unique({events.(sesName).(fn).data.imgCond});
-%             if length(imgConds) > 1
-%               for im = 1:length(imgConds)
-%                 for mf = 1:length(mainFields)
-%                   for df = 1:length(dataFields)
-%                     results.(sesName).(fn).(trainStr).(imgConds{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-%                   end
-%                 end
-%               end
-%             end
           end % for t
         case {'name', 'nametrain', 'prac_name'}
           
@@ -157,6 +149,30 @@ for sesNum = 1:length(expParam.sesTypes)
               end
             end
           end
+          
+        case {'recog', 'prac_recog'}
+          
+          if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
+            nBlocks = 1;
+          else
+            nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
+          end
+          
+          for mf = 1:length(recogField)
+            for df = 1:length(dataFields)
+              results.(sesName).(fn).(recogField{mf}).(dataFields{df}) = nan(length(subjects),1);
+            end
+          end
+          if nBlocks > 1
+            for b = 1:nBlocks
+              for mf = 1:length(recogField)
+                for df = 1:length(dataFields)
+                  results.(sesName).(fn).(sprintf('b%d',b)).(recogField{mf}).(dataFields{df}) = nan(length(subjects),1);
+                end
+              end
+            end
+          end
+          
       end % switch
     end
   end
@@ -280,73 +296,33 @@ for sub = 1:length(subjects)
                     fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchSubordResults.rt(sub),matchSubordResults.rt_cor(sub),matchSubordResults.rt_inc(sub));
                   end
                   
-%                   % check out the RT distribution
-%                   distrib = 0:100:2000;
-%                   
-%                   figure;hist([matchResp.rt],distrib);
-%                   axis([min(distrib) max(distrib) 0 150]);
-%                   title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
-%                   ylabel('Number of trials');
-%                   xlabel('RT (ms) measured from ''?'' prompt');
-%                   
-%                   figure;hist([matchBasic.rt],distrib);
-%                   axis([min(distrib) max(distrib) 0 150]);
-%                   title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
-%                   ylabel('Number of trials');
-%                   xlabel('RT (ms) measured from ''?'' prompt');
-%                   
-%                   figure;hist([matchSubord.rt],distrib);
-%                   axis([min(distrib) max(distrib) 0 150]);
-%                   title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
-%                   ylabel('Number of trials');
-%                   xlabel('RT (ms) measured from ''?'' prompt');
-%                   
-%                   keyboard
-%                   close all
-%                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
-%                   
-%            %% BLOCK BELOW GREENED OUT FOR EBUG (No different image
-%            conditions)
-%                   % accuracy for the different image manipulation conditions
-%                   imgConds = unique({matchResp.imgCond});
-%                   % if there's only 1 image manipulation condition, the
-%                   % results were printed above
-%                   if length(imgConds) > 1
-%                     fprintf('\n');
-%                     for im = 1:length(imgConds)
-%                       % overall for this manipulation
-%                       matchCond = matchResp(ismember({matchResp.imgCond},imgConds{im}));
-%                       
-%                       thisField = 'overall';
-%                       results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCond,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),thisField);
-%                       matchCondResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(thisField);
-%                       if printResults
-%                         fprintf('\t%s:',imgConds{im});
-%                         fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchCondResults.acc(sub),matchCondResults.nCor(sub),(matchCondResults.nCor(sub) + matchCondResults.nInc(sub)),matchCondResults.dp(sub));
-%                         fprintf('\t');
-%                         fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondResults.rt(sub),matchCondResults.rt_cor(sub),matchCondResults.rt_inc(sub));
-%                       end
-%                       
-%                       % basic and subordinate for this manipulation
-%                       matchCondBasic = matchResp([matchCond.isSubord] == 0);
-%                       matchCondSubord = matchResp([matchCond.isSubord] == 1);
-%                       
-%                       thisField = 'basic';
-%                       results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCondBasic,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),thisField);
-%                       matchCondBasicResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(thisField);
-%                       thisField = 'subord';
-%                       results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCondSubord,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),thisField);
-%                       matchCondSubordResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(thisField);
-%                       if printResults
-%                         fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondBasicResults.acc(sub),matchCondBasicResults.nCor(sub),(matchCondBasicResults.nCor(sub) + matchCondBasicResults.nInc(sub)),matchCondBasicResults.dp(sub));
-%                         fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchCondSubordResults.acc(sub),matchCondSubordResults.nCor(sub),(matchCondSubordResults.nCor(sub) + matchCondSubordResults.nInc(sub)),matchCondSubordResults.dp(sub));
-%                         fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondBasicResults.rt(sub),matchCondBasicResults.rt_cor(sub),matchCondBasicResults.rt_inc(sub));
-%                         fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchCondSubordResults.rt(sub),matchCondSubordResults.rt_cor(sub),matchCondSubordResults.rt_inc(sub));
-%                       end
-%                     end
-%                   end
-%                   
-                 end
+                  %                   % check out the RT distribution
+                  %                   distrib = 0:100:2000;
+                  %
+                  %                   figure;hist([matchResp.rt],distrib);
+                  %                   axis([min(distrib) max(distrib) 0 150]);
+                  %                   title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
+                  %                   ylabel('Number of trials');
+                  %                   xlabel('RT (ms) measured from ''?'' prompt');
+                  %
+                  %                   figure;hist([matchBasic.rt],distrib);
+                  %                   axis([min(distrib) max(distrib) 0 150]);
+                  %                   title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
+                  %                   ylabel('Number of trials');
+                  %                   xlabel('RT (ms) measured from ''?'' prompt');
+                  %
+                  %                   figure;hist([matchSubord.rt],distrib);
+                  %                   axis([min(distrib) max(distrib) 0 150]);
+                  %                   title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
+                  %                   ylabel('Number of trials');
+                  %                   xlabel('RT (ms) measured from ''?'' prompt');
+                  %
+                  %                   keyboard
+                  %                   close all
+                  %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
+                  
+                  
+                end
                 
               case {'name', 'nametrain', 'prac_name'}
                 fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
@@ -435,6 +411,64 @@ for sub = 1:length(subjects)
                   end
                 end
                 
+              case {'recog', 'prac_recog'}
+                % set up recognition processing
+                
+                % decide whether we need blocks
+                
+                fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
+                
+                if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
+                  nBlocks = 1;
+                else
+                  nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
+                end
+                
+                
+                % filter RECOGTEST_RESP events
+                % filter the events that we want
+                recogResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RESP'));
+                
+                % exclude missed responses (-1)
+                recogResp = recogResp(~ismember({recogResp.resp},'none'));
+                % set missing response to incorrect
+                % noRespInd = find(ismember({recogResp.resp},'none'));
+                % if ~isempty(noRespInd)
+                %   for nr = 1:length(noRespInd)
+                %     recogResp(noRespInd(nr)).acc = 0;
+                %   end
+                % end
+                
+                % overall
+                thisField = recogField{1};
+                results.(sesName).(fn) = accAndRT(recogResp,sub,results.(sesName).(fn),thisField);
+                recogResults = results.(sesName).(fn).(thisField);
+                if printResults
+                  fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',recogResults.acc(sub),recogResults.nCor(sub),(recogResults.nCor(sub) + recogResults.nInc(sub)),recogResults.dp(sub));
+                  fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogResults.rt(sub),recogResults.rt_cor(sub),recogResults.rt_inc(sub));
+                end
+                
+                
+                % if there's only 1 block, the results were printed above
+                if nBlocks > 1
+                  fprintf('\n');
+                  for b = 1:nBlocks
+                    blockStr = sprintf('b%d',b);
+                    
+                    % overall
+                    recogBlock = recogResp([recogResp.block] == b);
+                    
+                    thisField = recogField{1};
+                    results.(sesName).(fn).(blockStr) = accAndRT(recogBlock,sub,results.(sesName).(fn).(blockStr),thisField);
+                    recogBlockResults = results.(sesName).(fn).(blockStr).(thisField);
+                    if printResults
+                      fprintf('\tB%d:',b);
+                      fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',recogBlockResults.acc(sub),recogBlockResults.nCor(sub),(recogBlockResults.nCor(sub) + recogBlockResults.nInc(sub)),recogBlockResults.dp(sub));
+                      fprintf('\t');
+                      fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockResults.rt(sub),recogBlockResults.rt_cor(sub),recogBlockResults.rt_inc(sub));
+                    end
+                  end
+                end
             end % switch phaseName
             
           else
@@ -469,6 +503,8 @@ fid = fopen(fileName,'wt');
 
 mainToPrint = {'basic','subord'};
 dataToPrint = {'nTrials','nCor','acc','dp','rt','rt_cor','rt_inc'};
+
+recogToPrint = {'recogtest'};
 
 % use subject 1's files for initialization
 sub = 1;
@@ -527,53 +563,26 @@ for sesNum = 1:length(expParam.sesTypes)
               trainStr = 'all';
             end
             
-            matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
-         
-%             %GREENED OUT FOR EBUG (No image conditions)
-%             imgConds = unique({matchResp.imgCond});
-%             if length(imgConds) > 1
-%               headerCell = {{trainStr},imgConds,mainToPrint};
-%               [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
-%               fprintf(fid,sprintf('\t%s\n',headerStr));
-%               [headerStr] = setHeaderStr({dataToPrint},1);
-%               headerStr = sprintf('\t%s',headerStr);
-%               headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-%               fprintf(fid,sprintf('%s\n',headerStr));
-%               
-%               for sub = 1:length(subjects)
-%                 dataStr = subjects{sub};
-%                 for im = 1:length(imgConds)
-%                   for mf = 1:length(mainToPrint)
-%                     [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,imgConds{im},mainToPrint{mf}},results,sub,dataToPrint);
-%                   end
-%                 end
-%                 fprintf(fid,sprintf('%s\n',dataStr));
-%               end
-%               
-%             else
-%               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              keyboard
-              
-              headerCell = {{trainStr},mainToPrint};
-              [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
-              fprintf(fid,sprintf('\t%s\n',headerStr));
-              [headerStr] = setHeaderStr({dataToPrint},1);
-              headerStr = sprintf('\t%s',headerStr);
-              headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-              fprintf(fid,sprintf('%s\n',headerStr));
-              
-              for sub = 1:length(subjects)
-                dataStr = subjects{sub};
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
-                end
-                fprintf(fid,sprintf('%s\n',dataStr));
+            headerCell = {{trainStr},mainToPrint};
+            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            fprintf(fid,sprintf('\t%s\n',headerStr));
+            [headerStr] = setHeaderStr({dataToPrint},1);
+            headerStr = sprintf('\t%s',headerStr);
+            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+            fprintf(fid,sprintf('%s\n',headerStr));
+            
+            for sub = 1:length(subjects)
+              dataStr = subjects{sub};
+              for mf = 1:length(mainToPrint)
+                [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
               end
-         end
-            if t ~= length(trainedConds)
-              fprintf(fid,'\n');
+              fprintf(fid,sprintf('%s\n',dataStr));
             end
-%           end
+          end
+          if t ~= length(trainedConds)
+            fprintf(fid,'\n');
+          end
+          %           end
           
         case {'name', 'nametrain', 'prac_name'}
           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
@@ -620,6 +629,57 @@ for sesNum = 1:length(expParam.sesTypes)
               dataStr = subjects{sub};
               for mf = 1:length(mainToPrint)
                 [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+              end
+              fprintf(fid,sprintf('%s\n',dataStr));
+            end
+            
+          end
+          
+        case {'recog', 'prac_recog'}
+          if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
+            nBlocks = 1;
+          else
+            nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
+          end
+          
+          if nBlocks > 1
+            blockStr = cell(1,nBlocks);
+            for b = 1:nBlocks
+              blockStr{b} = sprintf('b%d',b);
+            end
+            headerCell = {blockStr,recogToPrint};
+            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            fprintf(fid,sprintf('\t%s\n',headerStr));
+            [headerStr] = setHeaderStr({dataToPrint},1);
+            headerStr = sprintf('\t%s',headerStr);
+            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+            fprintf(fid,sprintf('%s\n',headerStr));
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            for sub = 1:length(subjects)
+              dataStr = subjects{sub};
+              for b = 1:nBlocks
+                for mf = 1:length(recogToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),recogToPrint{mf}},results,sub,dataToPrint);
+                end
+              end
+              fprintf(fid,sprintf('%s\n',dataStr));
+            end
+          else
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            headerCell = {recogToPrint};
+            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            fprintf(fid,sprintf('\t%s\n',headerStr));
+            [headerStr] = setHeaderStr({dataToPrint},1);
+            headerStr = sprintf('\t%s',headerStr);
+            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+            fprintf(fid,sprintf('%s\n',headerStr));
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            for sub = 1:length(subjects)
+              dataStr = subjects{sub};
+              for mf = 1:length(recogToPrint)
+                [dataStr] = setDataStr(dataStr,{sesName,fn,recogToPrint{mf}},results,sub,dataToPrint);
               end
               fprintf(fid,sprintf('%s\n',dataStr));
             end
