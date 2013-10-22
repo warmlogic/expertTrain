@@ -55,7 +55,7 @@ elseif isExp
 %   lures = 9;
   
 %   nBlocks = 4; % behavioral
-  nBlocks = 7; % EEG?
+  nBlocks = 6; % EEG?
 
   spaced = 7;
   massed = 7;
@@ -81,7 +81,7 @@ end
 expo_isi = 0;
 expo_preStim = mean([1.0 1.2]);
 expo_stim = 1.0;
-expo_resp = 0.4;
+expo_resp = 0.75;
 
 expo_trial = expo_isi + expo_preStim + expo_stim + expo_resp;
 expoTime = expo_trial * nStudyStimuli; 
@@ -104,7 +104,7 @@ studyTime = study_trial * nStudyStimuli;
 % math distractor
 
 dist_preStim = mean([0.25 0.5]);
-dist_prob = 2;
+dist_prob = 2.5;
 
 dist_trial = dist_preStim + dist_prob;
 distTime = dist_trial * nDist; 
@@ -115,7 +115,7 @@ cr_isi = 0;
 cr_preStim = mean([1.0 1.2]);
 cr_stim = 1.0;
 cr_recogResp = 1.0;
-cr_recallResp = 2;
+cr_recallResp = 5;
 
 cr_trial = cr_isi + cr_preStim + cr_stim + cr_recogResp + cr_recallResp;
 testTime = cr_trial * nTestStimuli; 
