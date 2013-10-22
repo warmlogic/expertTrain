@@ -9,8 +9,8 @@ expertTrain is a visual category expertise training environment written in Matla
 About
 ----
 
-- The environment supports running experiments with multiple sessions, where each session is divided into phases. Configuration files for the experiments called `EBIRD` and `EBUG` are included.
-- There are four potential phases for each session:
+- The environment supports running experiments with multiple sessions, where each session is divided into phases. Configuration files for the experiments called `EBIRD`, `EBUG`, `SPACE`, and `COMP` are included.
+- There are four potential main phases for each session of `EBIRD` and `EBUG`:
    1. Old/New recognition (`recog`): study a list of targets, tested on recognizing targets and lures.
    1. Subordinate matching (`match`): decide whether two stimuli are from the same species.
    1. Naming (`name`): must press corresponding species key, and the species number is not displayed on screen.
@@ -18,8 +18,13 @@ About
 - There are two additional augmented introductory training phases (typically to be used on Training Day 1):
    1. Nametrain (`nametrain`): Just like the `name` phase, but species are introduced a one or two at a time (as defined in `config_EXPNAME.m`) and subjects have to name the species even if no exposure has occurred. The idea is that this will force subjects to learn the species labels quickly.
    1. Viewname (`viewname`): intermixed viewing and naming blocks (described above) for introducing the subject to different species. **This phase is not being used.**
-- Additionally, there is another phase that could be used for stimulus similarity normalization (`compare`). A configuration file for a separate experiment called `COMP` is included, though the comparison task could easily be implemented in a training experiment with the correct configuration setup.
-- `expertTrain` has been developed and tested under Matlab 2012b and Psychtoolbox 3.0.10 (Flavor: beta) on Mac OS X 10.8.3. It has been used extensively on Windows XP with Matlab 2013a, and to a lesser extent on Debian 7.
+- Another phase is included that could be used for stimulus similarity normalization (`compare`). A configuration file for a separate experiment called `COMP` is included, though the comparison task could easily be implemented in a training experiment with the correct configuration setup.
+- Another experiment with its own set of phases is called `SPACE`. This is a spacing effect experiment. There are four phases:
+   1. Exposure (`expo`): expose subject to stimuli and have them provide ratings. These stimuli will be shown in the `multistudy` phase.
+   1. Paired associate study (`multistudy`): view paired associate stimuli (words and images).
+   1. Math distractor (`distract_math`): solve math problems as a distractor task.
+   1. Cued recall (`cued_recall`): cued recall for stimuli in the `multistudy` phase, with a typed response for word stimuli.
+- `expertTrain` has been developed and tested under Matlab 2013a and Psychtoolbox 3.0.11 (Flavor: beta) on Mac OS X 10.8.3, as well as 10.6.8 using Matlab 2012b. It has been used extensively on Windows XP with Matlab 2013a, and to a lesser extent on Debian 7.
 - **You must use a USB keyboard with this experiment.**
 
 Installation
@@ -43,7 +48,7 @@ Installation
    - There is a creature set located on curran-lab:
       - <pre><code>/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip</code></pre>
       - NB: If you use this stimulus set and the provided config files (see "Preparing the experiment", below), you must rename the family 1 directory to "a" and the family 2 directory to "s".
-   - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt/Final Bird Stimuli` (email me or `tclab@colorado` if you need help)
+   - There is a bird set located on curran-lab: `/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Birds/Birds_matt/Final Bird Stimuli` (email me or `tclab@colorado.edu` if you need help)
 
 Preparing the experiment
 ----
@@ -76,6 +81,7 @@ Preparing the experiment
    - There are multiple versions of the recognition and naming/viewing response key images (in `expertTrain/images/resources/`).
    - Net Station support (sending tags to NS) is fully implemented (http://docs.psychtoolbox.org/NetStation) but the NetStation function has been improved. Use `et_NetStation.m` instead of PTB's implementation.
    - If your computer doesn't have much memory, you can choose to not preload all stimulus images by setting cfg.stim.preloadImages to `false` in the config file.
+   - You can do a photocell test to determine accuracy of timing of Psychtoolbox presenting stimuli and talking to Net Station. This is done with an argument in the initial `expertTrain` command. See `help expertTrain` for details. Email `tclab@colorado.edu` if you need help with this.
 
 Running the experiment
 ----
@@ -105,7 +111,7 @@ Important notes
 ====
 
 - I think this has been resolved (meaning it is no longer an issue), but you're better safe than sorry. If you're running on Windows XP, it seems that you should not allow participants to push other keys along with the response key.
-   - For example, do not let participants rest their hand(s) on the Control key, as the double key press will crash the experiment. You may want to physically remove the Control key and other modifier keys (e.g., Alt and Windows keys) from the participant keyboard.
+   - For example, do not let participants rest their hand(s) on the Control key, as the double key press may crash the experiment. This is probably too extreme, but you may want to physically remove the Control key and other modifier keys (e.g., Alt and Windows keys) from the participant keyboard.
 
 Convenient functions
 ====
@@ -132,15 +138,16 @@ Windows backup-data rsync function
       SET PATH=%CWRSYNCHOME%\BIN
       rsync -a --perms --update --max-delete=0 --verbose '/cygdrive/c/Documents and Settings/curranlab/My Documents/My Experiments/expertTrain/data/' /cygdrive/z/Data/EBIRD/Behavioral/Sessions/
       cd c:\WINDOWS\system32
-      attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\*.*
+      attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\ *.*
       </code></pre>
+   1. Note that the last line should not have a space between "Sessions\" and "*.*"
    1. Save it in `c:\Program Files\cwRsync`
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
 
 Known Issues
 ====
 
-- Resuming a partially run recognition phase (`et_recognition.m`) will cause a squashed version of the stimulus image to be presented where the response key image should be.
+- Resuming a partially run recognition phase (`et_recognition.m`) may cause a squashed version of the stimulus image to be presented where the response key image should be. I have no idea why this happens.
 
 TODO
 ====
