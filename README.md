@@ -136,11 +136,12 @@ Windows backup-data rsync function
       SET CYGWIN=nontsec
       SET CWOLDPATH=%PATH%
       SET PATH=%CWRSYNCHOME%\BIN
-      rsync -a --perms --update --max-delete=0 --verbose '/cygdrive/c/Documents and Settings/curranlab/My Documents/My Experiments/expertTrain/data/' /cygdrive/z/Data/EBIRD/Behavioral/Sessions/
+      rsync -avzP --include="EBIRD**" --exclude="*" --perms --update --max-delete=0 --verbose '/cygdrive/c/Documents and Settings/curranlab/My Documents/My Experiments/expertTrain/data/' /cygdrive/z/Data/EBIRD/Behavioral/Sessions/
       cd c:\WINDOWS\system32
       attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\\\*.\*
       </code></pre>
    1. In case you are reading the raw README.md file, note that the last line should only have one backslash between "Sessions" and the asterisk-dot-asterisk sequence.
+   1. Replace "EBIRD" with your experiment name.
    1. Save it in `c:\Program Files\cwRsync`
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
 
