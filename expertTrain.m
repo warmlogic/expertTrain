@@ -342,7 +342,7 @@ try
   
   %% Begin PTB display setup
   
-  % set some font display options
+  % set some font display options; must be set before opening w with Screen
   if ispc
     Screen('Preference','DefaultFontName','Courier New');
     Screen('Preference','DefaultFontStyle',1);
@@ -374,13 +374,16 @@ try
   % Set up the gray color value to be used as experiment backdrop
   if ~expParam.photoCellTest
     if ~isfield(cfg.screen,'gray')
-      fprintf('You did not set a value for cfg.screen.gray! Setting experiment backdrop to the GrayIndex of this screen.\n');
       cfg.screen.gray = GrayIndex(screenNumber);
+      warning('You did not set a value for the background color (cfg.screen.gray in your config_%s.m)! It is recommended to set this value. Setting experiment backdrop to the GrayIndex of this screen (%d).',expParam.expName,cfg.screen.gray);
+      manualGray = false;
+    else
+      manualGray = true;
     end
   else
-    fprintf('Doing a photocell test. Setting experiment backdrop to the BlackIndex of this screen.\n');
-    warning('Black text (e.g., instructions) may not be visible!\n');
     cfg.screen.gray = BlackIndex(screenNumber);
+    fprintf('Doing a photocell test. Setting experiment backdrop to the BlackIndex of this screen (%d).\n',cfg.screen.gray);
+    warning('Black text (e.g., instructions) may not be visible!');
   end
   
   % Open a double buffered fullscreen window on the stimulation screen
@@ -396,6 +399,29 @@ try
   % midWidth=round(RectWidth(wRect)/2);    % get center coordinates
   % midLength=round(RectHeight(wRect)/2);
   Screen('FillRect', w, cfg.screen.gray);
+  
+  if ~expParam.photoCellTest
+    if ~manualGray
+      Screen('TextSize', w);
+      DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.gray in config_%s.m)! It is recommended to set this value.\nAutomatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue.',expParam.expName,cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+      
+      % put message on screen
+      Screen('Flip', w);
+      
+      RestrictKeysForKbCheck([]);
+      KbWait(-1,2);
+    end
+  else
+    Screen('TextSize', w);
+    DrawFormattedText(w,sprintf('Doing a photocell test.\nSetting experiment backdrop to the BlackIndex of this screen (%d).\n\nBlack text (e.g., instructions) may not be visible but should proceed automatically!\n\nPress any key to continue.',cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+    
+    % put message on screen
+    Screen('Flip', w);
+    
+    RestrictKeysForKbCheck([]);
+    KbWait(-1,2);
+  end
+  
   % put on a grey screen
   Screen('Flip',w);
   
