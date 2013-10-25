@@ -11,6 +11,14 @@ if ~exist('subjects','var') || isempty(subjects)
     'EBIRD004';
     'EBIRD005';
     'EBIRD006';
+    'EBIRD007';
+    'EBIRD008';
+    'EBIRD009';
+    'EBIRD010';
+    'EBIRD011';
+    'EBIRD012';
+    'EBIRD013';
+    'EBIRD014';
     };
 end
 
@@ -167,6 +175,8 @@ end
 
 fprintf('Processing data for experiment %s...\n',expName);
 
+completeStatus = true(1,length(subjects));
+
 for sub = 1:length(subjects)
   subDir = fullfile(dataroot,subjects{sub});
   fprintf('Processing %s in %s...\n',subjects{sub},subDir);
@@ -178,6 +188,11 @@ for sub = 1:length(subjects)
     fprintf('Done.\n');
   else
     error('events file does not exist: %s',eventsFile);
+  end
+  
+  % if we only want complete subjects and this one is not done, set to F
+  if onlyCompleteSub && ~events.isComplete
+    completeStatus(sub) = false;
   end
   
   % do we only want to get data from subjects who have completed the exp?
@@ -453,14 +468,14 @@ fprintf('Done processing data for experiment %s.\n\n',expName);
 
 if saveResults
   fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,trainedConds,results,fileName);
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,fileName);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,trainedConds,results,fileName)
+function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,fileName)
 
 fprintf('Saving results to file: %s.\n',fileName);
 
@@ -539,13 +554,15 @@ for sesNum = 1:length(expParam.sesTypes)
               fprintf(fid,sprintf('%s\n',headerStr));
               
               for sub = 1:length(subjects)
-                dataStr = subjects{sub};
-                for im = 1:length(imgConds)
-                  for mf = 1:length(mainToPrint)
-                    [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,imgConds{im},mainToPrint{mf}},results,sub,dataToPrint);
+                if completeStatus(sub)
+                  dataStr = subjects{sub};
+                  for im = 1:length(imgConds)
+                    for mf = 1:length(mainToPrint)
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,imgConds{im},mainToPrint{mf}},results,sub,dataToPrint);
+                    end
                   end
+                  fprintf(fid,sprintf('%s\n',dataStr));
                 end
-                fprintf(fid,sprintf('%s\n',dataStr));
               end
               
             else
@@ -561,11 +578,13 @@ for sesNum = 1:length(expParam.sesTypes)
               fprintf(fid,sprintf('%s\n',headerStr));
               
               for sub = 1:length(subjects)
-                dataStr = subjects{sub};
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
+                if completeStatus(sub)
+                  dataStr = subjects{sub};
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
+                  end
+                  fprintf(fid,sprintf('%s\n',dataStr));
                 end
-                fprintf(fid,sprintf('%s\n',dataStr));
               end
             end
             if t ~= length(trainedConds)
@@ -595,13 +614,15 @@ for sesNum = 1:length(expParam.sesTypes)
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for b = 1:nBlocks
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for b = 1:nBlocks
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
+                  end
                 end
+                fprintf(fid,sprintf('%s\n',dataStr));
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
             end
           else
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -615,11 +636,13 @@ for sesNum = 1:length(expParam.sesTypes)
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for mf = 1:length(mainToPrint)
-                [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
             end
             
           end
@@ -672,7 +695,7 @@ end
 
 function [dataStr] = setDataStr(dataStr,structFields,results,sub,dataToPrint) %#ok<INUSL>
 
-theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,size(structFields)),structFields{:})));
+theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,length(structFields)),structFields{:})));
 
 for i = 1:length(dataToPrint)
   if ~isnan(theseResults.(dataToPrint{i})(sub))

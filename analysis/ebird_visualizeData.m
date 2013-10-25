@@ -28,6 +28,14 @@ subjects = {
   'EBIRD004';
   'EBIRD005';
   'EBIRD006';
+  'EBIRD007';
+  'EBIRD008';
+  'EBIRD009';
+  'EBIRD010';
+  'EBIRD011';
+  'EBIRD012';
+  'EBIRD013';
+  'EBIRD014';
   };
 
 saveFigs = true;
@@ -46,7 +54,7 @@ end
 
 onlyCompleteSub = true;
 printResults = true;
-saveResults = false;
+saveResults = true;
 
 [results] = ebird_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
 

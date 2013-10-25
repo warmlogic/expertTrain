@@ -46,6 +46,14 @@ if nargin == 0
     'EBIRD004';
     'EBIRD005';
     'EBIRD006';
+    'EBIRD007';
+    'EBIRD008';
+    'EBIRD009';
+    'EBIRD010';
+    'EBIRD011';
+    'EBIRD012';
+    'EBIRD013';
+    'EBIRD014';
     };
   
   prep_eeg = 0;
