@@ -343,18 +343,28 @@ try
   %% Begin PTB display setup
   
   % set some font display options; must be set before opening w with Screen
+  defaultFont = 'Courier New';
   if ispc
-    Screen('Preference','DefaultFontName','Courier New');
+    Screen('Preference','DefaultFontName',defaultFont);
     Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
   elseif ismac
-    Screen('Preference','DefaultFontName','Courier New');
+    Screen('Preference','DefaultFontName',defaultFont);
     Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
   elseif isunix
-    Screen('Preference','DefaultFontName','Courier New');
+    Screen('Preference','DefaultFontName',defaultFont);
     Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
+  end
+  fontCount = 0;
+  % something's weird with fonts in Matlab 2013b?
+  while ~strcmp(Screen('Preference','DefaultFontName'),defaultFont)
+    if fontCount == 100
+      error('Something is wrong with setting the font to %s!',defaultFont);
+    end
+    Screen('Preference','DefaultFontName',defaultFont);
+    fontCount = fontCount + 1;
   end
   
   % Get screenNumber of stimulation display. We choose the display with
