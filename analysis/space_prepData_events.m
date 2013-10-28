@@ -45,6 +45,11 @@ if nargin == 0
   subjects = {
     'SPACE001';
     'SPACE002';
+    'SPACE003';
+    'SPACE004';
+    'SPACE005';
+    'SPACE006';
+    'SPACE007';
     };
   
 %   % behavioral pilot
