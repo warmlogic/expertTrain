@@ -12,6 +12,11 @@ if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'SPACE001';
     'SPACE002';
+    'SPACE003';
+    'SPACE004';
+    'SPACE005';
+    'SPACE006';
+    'SPACE007';
     };
 end
 templateSubject = 'SPACE001';
@@ -895,7 +900,7 @@ end
 
 function [dataStr] = setDataStr(dataStr,structFields,results,sub,dataToPrint) %#ok<INUSL>
 
-theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,size(structFields)),structFields{:})));
+theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,length(structFields)),structFields{:})));
 
 for i = 1:length(dataToPrint)
   if ~isnan(theseResults.(dataToPrint{i})(sub))
