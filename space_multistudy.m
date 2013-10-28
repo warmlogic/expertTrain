@@ -674,6 +674,12 @@ for i = trialNum:length(studyStims_img)
         WaitSecs(0.0001);
       end
       
+      if expParam.photoCellTest
+        % need a short delay with the photocell square off
+        Screen('Flip', w);
+        WaitSecs(0.1);
+      end
+      
       % if they overlap, put on the image stimulus and word rectangle
       if phaseCfg.studyPresent == 3
         % draw the image stimulus
@@ -743,6 +749,12 @@ for i = trialNum:length(studyStims_img)
         % Wait <1 ms before checking the keyboard again to prevent
         % overload of the machine at elevated Priority():
         WaitSecs(0.0001);
+      end
+      
+      if expParam.photoCellTest
+        % need a short delay with the photocell square off
+        Screen('Flip', w);
+        WaitSecs(0.1);
       end
       
       % draw the image stimulus
