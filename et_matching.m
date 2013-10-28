@@ -220,12 +220,10 @@ fixRectX = fixRect(1);
 fixRectY = fixRect(2);
 
 % create a rectangle for placing response symbol using Screen('DrawText')
-if phaseCfg.studyJudgment
-  if phaseCfg.studyTextPrompt
-    responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
-  else
-    responsePromptText = cfg.text.respSymbol;
-  end
+if phaseCfg.matchTextPrompt
+  responsePromptText = sprintf('%s  %s  %s',leftKey,cfg.text.respSymbol,rightKey);
+else
+  responsePromptText = cfg.text.respSymbol;
 end
 Screen('TextSize', w, cfg.text.fixSize);
 respRect = Screen('TextBounds', w, responsePromptText);
