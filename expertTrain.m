@@ -357,15 +357,6 @@ try
     Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
   end
-  fontCount = 0;
-  % something's weird with fonts in Matlab 2013b?
-  while ~strcmp(Screen('Preference','DefaultFontName'),defaultFont)
-    if fontCount == 100
-      error('Something is wrong with setting the font to %s!',defaultFont);
-    end
-    Screen('Preference','DefaultFontName',defaultFont);
-    fontCount = fontCount + 1;
-  end
   
   % Get screenNumber of stimulation display. We choose the display with
   % the maximum index, which is usually the right one, e.g., the external
@@ -403,6 +394,16 @@ try
   % See "help PsychRects" for help on such rectangles and useful helper
   % functions:
   [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray);
+  
+  % hack, because something's weird with fonts in Mac Matlab 2013b?
+  if ismac && ~isempty(strfind(version,'2013b'))
+    Screen('CloseAll');
+    Screen('Preference','DefaultFontName',defaultFont);
+    Screen('Preference','DefaultFontStyle',1);
+    Screen('Preference','DefaultFontSize',18);
+    [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray);
+  end
+  
   % store the screen dimensions
   cfg.screen.wRect = wRect;
   
