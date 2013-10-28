@@ -128,6 +128,17 @@ if ~isfield(phaseCfg.instruct,'questions')
   phaseCfg.instruct.questions = true;
 end
 
+%% set up text rectangles
+
+% create a rectangle for placing fixation symbol using Screen('DrawText')
+Screen('TextSize', w, cfg.text.fixSize);
+fixRect = Screen('TextBounds', w, cfg.text.fixSymbol);
+% center it in the middle of the screen
+fixRect = CenterRect(fixRect, cfg.screen.wRect);
+% get the X and Y coordinates
+fixRectX = fixRect(1);
+fixRectY = fixRect(2);
+
 %% do an impedance check before the phase begins, if desired
 
 if ~isfield(phaseCfg,'impedanceBeforePhase')
@@ -300,7 +311,8 @@ for i = trialNum:phaseCfg.dist_nProbs
   if phaseCfg.dist_isi > 0
     if phaseCfg.fixDuringISI
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
       Screen('Flip',w);
     end
     WaitSecs(phaseCfg.dist_isi);

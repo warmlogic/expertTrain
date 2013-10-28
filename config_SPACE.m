@@ -43,10 +43,10 @@ studyPresent = 2;
 % judgment task defaults
 studyJudgment = false;
 studyTextPrompt = false;
-% recognition task defaults
-recogTextPrompt = true;
-% prompt if they response 'new'
-newTextPrompt = true;
+% % recognition task defaults
+% recogTextPrompt = true;
+% % prompt if they response 'new'
+% newTextPrompt = true;
 
 %% Experiment session information
 
@@ -493,18 +493,18 @@ if expParam.sessionNum == 1
   fixDuringPreStim = true;
   fixDuringStim = true;
   
-  if studyTextPrompt
+  if studyJudgment
     cfg.text.judgeSame = ' Related ';
     cfg.text.judgeDiff = 'Unrelated';
   end
-  if recogTextPrompt
-    cfg.text.recogOld = 'Old';
-    cfg.text.recogNew = 'New';
-  end
-  if newTextPrompt
-    cfg.text.newSure = ' Sure';
-    cfg.text.newMaybe = 'Maybe';
-  end
+  %   if recogTextPrompt
+  %     cfg.text.recogOld = 'Old';
+  %     cfg.text.recogNew = 'New';
+  %   end
+  %   if newTextPrompt
+  %     cfg.text.newSure = ' Sure';
+  %     cfg.text.newMaybe = 'Maybe';
+  %   end
   cfg.text.recallPrompt = '???????';
   
   % "respond faster" text
@@ -594,8 +594,15 @@ if expParam.sessionNum == 1
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+        
+        % whether to have judgment text with the response prompt
+        cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
+        if cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment
+          cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
+        end
         
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
@@ -613,10 +620,6 @@ if expParam.sessionNum == 1
         % 2: stim1 on for study_stim1, then stim2 on for study_stim2;
         %
         % 3: stim1 on for study_stim1, then both on for study_stim2.
-        
-        % whether to have judgment text with the response prompt
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).study_isi = 0.0;
@@ -713,9 +716,9 @@ if expParam.sessionNum == 1
         % whether to have judgment keys on all the time
         cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
         
-        % whether to have judgment text with the response prompt
-        cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;
-        cfg.stim.(sesName).(phaseName)(phaseCount).newTextPrompt = newTextPrompt;
+        % % whether to have judgment text with the response prompt
+        % cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).newTextPrompt = newTextPrompt;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_isi = 0.0;
@@ -841,8 +844,15 @@ if expParam.sessionNum == 1
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+        
+        % whether to have judgment text with the response prompt
+        cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
+        if cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment
+          cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
+        end
         
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
@@ -874,17 +884,12 @@ if expParam.sessionNum == 1
         %
         % 3: stim1 on for study_stim1, then both on for study_stim2.
         
-        % whether to have judgment text with the response prompt
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
-        
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).study_isi = 0.0;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
-        %cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
@@ -990,9 +995,9 @@ if expParam.sessionNum == 1
         % whether to have judgment keys on all the time
         cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
         
-        % whether to have judgment text with the response prompt
-        cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;
-        cfg.stim.(sesName).(phaseName)(phaseCount).newTextPrompt = newTextPrompt;
+        % % whether to have judgment text with the response prompt
+        % cfg.stim.(sesName).(phaseName)(phaseCount).recogTextPrompt = recogTextPrompt;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).newTextPrompt = newTextPrompt;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).cr_isi = 0.0;

@@ -196,6 +196,26 @@ if ~isfield(phaseCfg.instruct,'questions')
   phaseCfg.instruct.questions = true;
 end
 
+%% set up text rectangles
+
+% create a rectangle for placing fixation symbol using Screen('DrawText')
+Screen('TextSize', w, cfg.text.fixSize);
+fixRect = Screen('TextBounds', w, cfg.text.fixSymbol);
+% center it in the middle of the screen
+fixRect = CenterRect(fixRect, cfg.screen.wRect);
+% get the X and Y coordinates
+fixRectX = fixRect(1);
+fixRectY = fixRect(2);
+
+% create a rectangle for placing response symbol using Screen('DrawText')
+Screen('TextSize', w, cfg.text.fixSize);
+respRect = Screen('TextBounds', w, cfg.text.respSymbol);
+% center it in the middle of the screen
+respRect = CenterRect(respRect, cfg.screen.wRect);
+% get the X and Y coordinates
+respRectX = respRect(1);
+respRectY = respRect(2);
+
 %% preload all stimuli for presentation
 
 expoImgTex = nan(1,length(expoStims_img));
@@ -214,14 +234,6 @@ errorTextY_all = nan(length(expoStims_img),1);
 %responsePromptY_all = nan(length(expoStims_img),1);
 
 [~, screenCenterY] = RectCenter(cfg.screen.wRect);
-
-% create a rectangle for placing fixation symbol using Screen('DrawText')
-fixRect = Screen('TextBounds', w, cfg.text.fixSymbol);
-% center it in the middle of the screen
-fixRect = CenterRect(fixRect, cfg.screen.wRect);
-% get the X and Y coordinates
-fixRectX = fixRect(1);
-fixRectY = fixRect(2);
 
 for i = 1:length(expoStims_img)
   % make sure image stimulus exists
@@ -386,7 +398,8 @@ for i = trialNum:length(expoStims_img)
     end
     if (phaseCfg.expo_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.expo_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
+      %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
     end
     Screen('Flip',w);
     WaitSecs(1.0);
@@ -443,7 +456,8 @@ for i = trialNum:length(expoStims_img)
     end
     if (phaseCfg.expo_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.expo_isi == 0 && phaseCfg.fixDuringPreStim)
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
     end
     Screen('Flip',w);
     WaitSecs(1.0);
@@ -487,7 +501,8 @@ for i = trialNum:length(expoStims_img)
     end
     if phaseCfg.fixDuringISI
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
       Screen('Flip',w);
     end
     WaitSecs(phaseCfg.expo_isi);
@@ -503,7 +518,8 @@ for i = trialNum:length(expoStims_img)
 %         end
 %         % draw fixation
 %         Screen('TextSize', w, cfg.text.fixSize);
-%         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
 %         [preStimFixOn] = Screen('Flip',w);
 %       else
 %         if phaseCfg.showRespBtStim
@@ -524,7 +540,8 @@ for i = trialNum:length(expoStims_img)
 %         end
 %         % draw fixation
 %         Screen('TextSize', w, cfg.text.fixSize);
-%         DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+%         Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
 %         [preStimFixOn] = Screen('Flip',w);
 %       else
 %         if phaseCfg.showRespBtStim
@@ -555,7 +572,8 @@ for i = trialNum:length(expoStims_img)
       end
       % draw fixation
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
       [preStimFixOn] = Screen('Flip',w);
     else
       if phaseCfg.showRespBtStim
@@ -578,7 +596,8 @@ for i = trialNum:length(expoStims_img)
   if phaseCfg.fixDuringStim
     % and fixation on top of it
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
   end
   if expParam.photoCellTest
     Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
@@ -607,7 +626,8 @@ for i = trialNum:length(expoStims_img)
         if phaseCfg.fixDuringStim
           % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
-          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
         end
         
         % and the "too fast" text
@@ -653,7 +673,8 @@ for i = trialNum:length(expoStims_img)
         if phaseCfg.fixDuringStim
           % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
-          DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
         end
         % don't push multiple keys
         Screen('TextSize', w, cfg.text.instructTextSize);
@@ -700,7 +721,8 @@ for i = trialNum:length(expoStims_img)
     if phaseCfg.fixDuringStim
       % and fixation on top of it
       Screen('TextSize', w, cfg.text.fixSize);
-      DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      %DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+      Screen('DrawText', w, cfg.text.respSymbol, respRectX, respRectY, cfg.text.fixationColor);
     end
     if expParam.photoCellTest
       Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
@@ -740,7 +762,8 @@ for i = trialNum:length(expoStims_img)
         if phaseCfg.fixDuringStim
           % and fixation on top of it
           Screen('TextSize', w, cfg.text.fixSize);
-          DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          %DrawFormattedText(w,cfg.text.respSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+          Screen('DrawText', w, cfg.text.respSymbol, respRectX, respRectY, cfg.text.fixationColor);
         end
         % don't push multiple keys
         Screen('TextSize', w, cfg.text.instructTextSize);
@@ -841,7 +864,8 @@ for i = trialNum:length(expoStims_img)
     end
     % draw fixation after response
     Screen('TextSize', w, cfg.text.fixSize);
-    DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
+    Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
   end
   
   % clear screen
