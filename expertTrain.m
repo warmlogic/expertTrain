@@ -500,7 +500,7 @@ try
   
   %% EEG baseline recording
   
-  if expParam.useNS && expParam.baselineRecordSecs > 0
+  if expParam.useNS && ~expParam.photoCellTest && expParam.baselineRecordSecs > 0
     Screen('TextSize', w, cfg.text.basicTextSize);
     %display instructions
     baselineMsg = sprintf('The experimenter will now record baseline activity.\nPlease remain still...');
