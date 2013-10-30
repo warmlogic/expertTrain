@@ -298,9 +298,9 @@ end
 message = sprintf('Starting %s phase...',phaseNameForParticipant);
 if expParam.useNS
   % start recording
-  [NSStopStatus, NSStopError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+  [NSStopStatus, NSStopError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
   % synchronize
-  [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
+  [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   message = sprintf('Starting data acquisition for %s phase...',phaseNameForParticipant);
   
   thisGetSecs = GetSecs;
@@ -536,7 +536,7 @@ for i = trialNum:length(viewStims)
   
   % resynchronize netstation before the start of drawing
   if expParam.useNS
-    [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize'); %#ok<NASGU,ASGLU>
+    [NSSyncStatus, NSSyncError] = NetStation('Synchronize'); %#ok<NASGU,ASGLU>
   end
   
   % ISI between trials
@@ -910,7 +910,7 @@ for i = trialNum:length(viewStims)
     
     if ~isnan(preStimFixOn)
       % pretrial fixation
-      [NSEventStatus, NSEventError] = et_NetStation('Event', 'FIXT', preStimFixOn, .001,...
+      [NSEventStatus, NSEventError] = NetStation('Event', 'FIXT', preStimFixOn, .001,...
         'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
         'expt',phaseCfg.isExp,...
         'bloc', int32(b),...
@@ -919,7 +919,7 @@ for i = trialNum:length(viewStims)
     end
     
     % img presentation
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'STIM', imgOn, .001,...
+    [NSEventStatus, NSEventError] = NetStation('Event', 'STIM', imgOn, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
       'expt',phaseCfg.isExp,...
       'bloc', int32(b),...
@@ -929,7 +929,7 @@ for i = trialNum:length(viewStims)
     % did they make a response?
     if keyIsDown
       % button push
-      [NSEventStatus, NSEventError] = et_NetStation('Event', 'RESP', endRT, .001,...
+      [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
       'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
       'expt',phaseCfg.isExp,...
       'bloc', int32(b),...
@@ -969,7 +969,7 @@ Screen('Flip', w);
 % stop recording
 if expParam.useNS
   WaitSecs(5.0);
-  [NSSyncStatus, NSSyncError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+  [NSSyncStatus, NSSyncError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
   
   thisGetSecs = GetSecs;
   fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'NS_REC_STOP');

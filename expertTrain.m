@@ -473,26 +473,26 @@ try
     
     fprintf('\nTrying to connect to Net Station @ %s, port %d...\n', expParam.NSHost, expParam.NSPort);
     % connect
-    [NSConnectStatus, NSConnectError] = et_NetStation('Connect', expParam.NSHost, expParam.NSPort);
+    [NSConnectStatus, NSConnectError] = NetStation('Connect', expParam.NSHost, expParam.NSPort);
     
     if NSConnectStatus
       error('!!! ERROR: Problem with Net Station connection because of error: %s !!!',NSConnectError);
     else
       fprintf('\nConnected to Net Station @ %s, port %d.\n', expParam.NSHost, expParam.NSPort);
       % synchronize
-      [NSSyncStatus, NSSyncError] = et_NetStation('Synchronize');
+      [NSSyncStatus, NSSyncError] = NetStation('Synchronize');
       if NSSyncStatus
         error('!!! ERROR: Problem with Net Station syncronization. because of error: %s !!!',NSSyncError);
       end
       
       % start recording
-      [NSStartStatus, NSStartError] = et_NetStation('StartRecording');
+      [NSStartStatus, NSStartError] = NetStation('StartRecording');
       if NSStartStatus
         error('!!! ERROR: Problem with Net Station starting the recording because of error: %s !!!',NSStartError);
       end
       
       % stop recording
-      [NSStopStatus, NSStopError] = et_NetStation('StopRecording');
+      [NSStopStatus, NSStopError] = NetStation('StopRecording');
       if NSStopStatus
         error('!!! ERROR: Problem with Net Station stopping the recording because of error: %s !!!',NSStopError);
       end
@@ -517,7 +517,7 @@ try
     
     % start recording
     Screen('TextSize', w, cfg.text.basicTextSize);
-    [NSStartStatus, NSStartError] = et_NetStation('StartRecording');
+    [NSStartStatus, NSStartError] = NetStation('StartRecording');
     if NSStartStatus
       error('!!! ERROR: Problem with Net Station starting the recording because of error: %s !!!',NSStartError);
     end
@@ -526,7 +526,7 @@ try
     WaitSecs(5.0);
     
     % tag the start of the rest period
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'REST', GetSecs, .001); %#ok<NASGU,ASGLU>
+    [NSEventStatus, NSEventError] = NetStation('Event', 'REST', GetSecs, .001); %#ok<NASGU,ASGLU>
     
     % draw a countdown -- no need for super accurate timing here
     Screen('TextSize', w, cfg.text.basicTextSize);
@@ -539,10 +539,10 @@ try
     fprintf('\n');
     
     % tag the end of the rest period
-    [NSEventStatus, NSEventError] = et_NetStation('Event', 'REND', GetSecs, .001); %#ok<NASGU,ASGLU>
+    [NSEventStatus, NSEventError] = NetStation('Event', 'REND', GetSecs, .001); %#ok<NASGU,ASGLU>
     
     % stop recording
-    [NSStopStatus, NSStopError] = et_NetStation('StopRecording');
+    [NSStopStatus, NSStopError] = NetStation('StopRecording');
     if NSStopStatus
       error('!!! ERROR: Problem with Net Station stopping the recording because of error: %s !!!',NSStopError);
     end
@@ -553,7 +553,7 @@ try
 %   if expParam.useNS
 %     Screen('TextSize', w, cfg.text.basicTextSize);
 %     % start recording
-%     [NSStartStatus, NSStartError] = et_NetStation('StartRecording'); %#ok<NASGU,ASGLU>
+%     [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
 %     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
 %     Screen('Flip', w);
 %     WaitSecs(5.0);
@@ -1041,9 +1041,9 @@ try
   % end of EEG recording, hang up with netstation
   if expParam.useNS
     % stop recording
-    %[NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+    %[NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
     fprintf('\nDisconnecting from Net Station @ %s\n', expParam.NSHost);
-    [NSDisconnectStatus, NSDisconnectError] = et_NetStation('Disconnect'); %#ok<NASGU,ASGLU>
+    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1118,9 +1118,9 @@ catch ME
   % end of EEG recording, hang up with netstation
   if expParam.useNS
     % stop recording
-    %[NSStopStatus, NSStopError] = et_NetStation('StopRecording'); %#ok<NASGU,ASGLU>
+    %[NSStopStatus, NSStopError] = NetStation('StopRecording'); %#ok<NASGU,ASGLU>
     fprintf('\nDisconnecting from Net Station @ %s\n', expParam.NSHost);
-    [NSDisconnectStatus, NSDisconnectError] = et_NetStation('Disconnect'); %#ok<NASGU,ASGLU>
+    [NSDisconnectStatus, NSDisconnectError] = NetStation('Disconnect'); %#ok<NASGU,ASGLU>
   end
   
   % Do same cleanup as at the end of a regular session...

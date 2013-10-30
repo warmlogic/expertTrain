@@ -79,7 +79,7 @@ Preparing the experiment
       - Also use the field `reshuffleStims`, which must be `true` or `false`.
    - Resize image stimuli using the field `cfg.stim.stimScale` in in `config_EBUG.m`. Set equal to the proportion of image; e.g., 1.0 = full-size image. Instruction images can be scaled as well.
    - There are multiple versions of the recognition and naming/viewing response key images (in `expertTrain/images/resources/`).
-   - Net Station support (sending tags to NS) is fully implemented (http://docs.psychtoolbox.org/NetStation) but the NetStation function has been improved. Use `et_NetStation.m` instead of PTB's implementation.
+   - Net Station support (sending tags to NS) is fully implemented (http://docs.psychtoolbox.org/NetStation). I send an improved NetStation.m function to the PTB team in mid-summer 2013, so it is ok to use that function. (This means `et_NetStation.m` is no longer necessary.)
    - If your computer doesn't have much memory, you can choose to not preload all stimulus images by setting cfg.stim.preloadImages to `false` in the config file.
    - You can do a photocell test to determine accuracy of timing of Psychtoolbox presenting stimuli and talking to Net Station. This is done with an argument in the initial `expertTrain` command. See `help expertTrain` for details. Email `tclab@colorado.edu` if you need help with this.
 
