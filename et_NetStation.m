@@ -71,6 +71,7 @@ function [status, error] = et_NetStation(varargin)
 %   Adapted to PC by Zhao Fan, 2008
 %
 
+warning('%s is no longer necessary. Use the version of NetStation.m that comes with Psychtoolbox (note the different in name).',mfilename);
 
 persistent NSIDENTIFIER;
 persistent NSSTATUS; %#ok<USENS>
