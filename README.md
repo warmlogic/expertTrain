@@ -140,7 +140,7 @@ Windows backup-data rsync function
       cd c:\WINDOWS\system32
       attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\\\*.\*
       </code></pre>
-   1. In case you are reading the raw README.md file, note that the last line should only have one backslash between "Sessions" and the asterisk-dot-asterisk sequence.
+   1. In case you are reading the raw README.md file, note that the last line (starts with "attrib") should end with: "Sessions" followed by a backslash and then asterisk-dot-asterisk (no spaces)
    1. Replace "EBIRD" with your experiment name.
    1. Save it in `c:\Program Files\cwRsync`
    1. Create a shortcut, move to somewhere convenient (e.g., the desktop), double-click to run.
