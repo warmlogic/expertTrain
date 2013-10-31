@@ -138,7 +138,7 @@ Windows backup-data rsync function
       SET PATH=%CWRSYNCHOME%\BIN
       rsync -avzP --include="EBIRD**" --exclude="*" --perms --update --max-delete=0 --verbose '/cygdrive/c/Documents and Settings/curranlab/My Documents/My Experiments/expertTrain/data/' /cygdrive/z/Data/EBIRD/Behavioral/Sessions/
       cd c:\WINDOWS\system32
-      attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\\ \*.\*
+      attrib -h /s z:\Data\EBIRD\Behavioral\Sessions\\ *.*
       </code></pre>
    1. In case you are reading the raw README.md file, note that the last line (starts with "attrib") should end with: "Sessions" followed by a backslash and then asterisk-dot-asterisk (no spaces between these items)
    1. Replace "EBIRD" with your experiment name.
