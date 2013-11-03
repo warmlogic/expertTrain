@@ -413,8 +413,10 @@ try
   
 %   % set up the photo cell test rectangle
 %   if expParam.photoCellTest
-%     photoCellRectSize = 100;
-%     cfg.stim.photoCellRect = SetRect(0, 0, photoCellRectSize, photoCellRectSize);
+%     if ~isfield(cfg.stim,'photoCellRectSize')
+%       cfg.stim.photoCellRectSize = 50;
+%     end
+%     cfg.stim.photoCellRect = SetRect(0, 0, cfg.stim.photoCellRectSize, cfg.stim.photoCellRectSize);
 %     cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'center','right');
 %     cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
 %     %cfg.stim.photoCellRectColor = rgb('White');
@@ -422,8 +424,10 @@ try
   
   % set up the photo cell test rectangle
   if cfg.stim.photoCell
-    photoCellRectSize = 100;
-    cfg.stim.photoCellRect = SetRect(0, 0, photoCellRectSize, photoCellRectSize);
+    if ~isfield(cfg.stim,'photoCellRectSize')
+      cfg.stim.photoCellRectSize = 50;
+    end
+    cfg.stim.photoCellRect = SetRect(0, 0, cfg.stim.photoCellRectSize, cfg.stim.photoCellRectSize);
     cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'bottom','right');
     cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
     %cfg.stim.photoCellRectColor = rgb('White');

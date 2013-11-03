@@ -197,6 +197,12 @@ if ~isfield(phaseCfg.instruct,'questions')
   phaseCfg.instruct.questions = true;
 end
 
+% whether to present a white square during the stimulus and a black square
+% at all other times
+if ~isfield(cfg.stim,'photoCell')
+  cfg.stim.photoCell = false;
+end
+
 %% set up text rectangles
 
 % create a rectangle for placing fixation symbol using Screen('DrawText')
