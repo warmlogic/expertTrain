@@ -104,6 +104,10 @@ if expParam.sessionNum == 1
   
   %% Stimulus parameters
   
+  % whether to present a white square during the stimulus
+  cfg.stim.photoCell = false;
+  cfg.stim.photoCellRectSize = 50;
+  
   % whether to preload images; if true, could use a lot of memory
   cfg.stim.preloadImages = false;
   
