@@ -382,6 +382,9 @@ try
       manualGray = true;
     end
   else
+    % override setting in config_EXPNAME to show white photocell rectangle
+    cfg.stim.photoCell = true;
+    
     cfg.screen.gray = BlackIndex(screenNumber);
     fprintf('Doing a photocell test. Setting experiment backdrop to the BlackIndex of this screen (%d).\n',cfg.screen.gray);
     warning('Black text (e.g., instructions) may not be visible!');
@@ -395,7 +398,8 @@ try
   % functions:
   [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray);
   
-  % hack, because something's weird with fonts in Mac Matlab 2013b?
+  % hack, because something's weird with fonts in Mac Matlab 2013b? seems
+  % that the window needs to be closed and them opened again.
   if ismac && ~isempty(strfind(version,'2013b'))
     Screen('CloseAll');
     Screen('Preference','DefaultFontName',defaultFont);
@@ -407,9 +411,34 @@ try
   % store the screen dimensions
   cfg.screen.wRect = wRect;
   
+%   % set up the photo cell test rectangle
+%   if expParam.photoCellTest
+%     photoCellRectSize = 100;
+%     cfg.stim.photoCellRect = SetRect(0, 0, photoCellRectSize, photoCellRectSize);
+%     cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'center','right');
+%     cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
+%     %cfg.stim.photoCellRectColor = rgb('White');
+%   end
+  
+  % set up the photo cell test rectangle
+  if cfg.stim.photoCell
+    photoCellRectSize = 100;
+    cfg.stim.photoCellRect = SetRect(0, 0, photoCellRectSize, photoCellRectSize);
+    cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'bottom','right');
+    cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
+    %cfg.stim.photoCellRectColor = rgb('White');
+    
+    % color for when stimuli are not on screen
+    %cfg.stim.photoCellAntiRect = SetRect(0, 0, photoCellRectSize, photoCellRectSize);
+    %cfg.stim.photoCellAntiRect = AlignRect(cfg.stim.photoCellRect,wRect,'bottom','right');
+    cfg.stim.photoCellAntiRectColor = uint8((rgb('Black') * 255) + 0.5);
+    %cfg.stim.photoCellAntiRectColor = rgb('Black');
+  end
+  
   % midWidth=round(RectWidth(wRect)/2);    % get center coordinates
   % midLength=round(RectHeight(wRect)/2);
-  Screen('FillRect', w, cfg.screen.gray);
+  
+  % Screen('FillRect', w, cfg.screen.gray);
   
   if ~expParam.photoCellTest
     if ~manualGray
@@ -433,7 +462,7 @@ try
     KbWait(-1,2);
   end
   
-  % put on a grey screen
+  % put on the blank background color screen
   Screen('Flip',w);
   
   % Do dummy calls to GetSecs, WaitSecs, KbCheck to make sure
@@ -446,14 +475,6 @@ try
   % Set priority for script execution to realtime priority:
   priorityLevel = MaxPriority(w);
   Priority(priorityLevel);
-  
-  % set up the photo cell test rectangle
-  if expParam.photoCellTest
-    cfg.stim.photoCellRect = SetRect(0, 0, 250, 250);
-    cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'center','right');
-    cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
-    %cfg.stim.photoCellRectColor = rgb('White');
-  end
   
   %% Verify that Net Station will run
   
