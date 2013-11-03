@@ -226,6 +226,9 @@ if cfg.stim.preloadImages
   DrawFormattedText(w, message, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
 end
 % Update the display to show the message:
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 % initialize
@@ -314,10 +317,16 @@ Screen('TextSize', w, cfg.text.basicTextSize);
 % draw message to screen
 DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
 % put it on
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 % Wait before starting trial
 WaitSecs(5.000);
 % Clear screen to background color (our 'gray' as set at the beginning):
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 %% show the instructions
@@ -337,7 +346,7 @@ if showInstruct
   if ~expParam.photoCellTest
     for inst = 1:length(phaseCfg.instruct.name)
       WaitSecs(1.000);
-      et_showTextInstruct(w,phaseCfg.instruct.name(inst),cfg.keys.instructContKey,...
+      et_showTextInstruct(w,cfg,phaseCfg.instruct.name(inst),cfg.keys.instructContKey,...
         cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
         {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
     end
@@ -349,7 +358,7 @@ if showInstruct
   
   if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
     questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
-    et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+    et_showTextInstruct(w,cfg,questionsMsg,cfg.keys.expContinue,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
     % Wait a second before continuing
     WaitSecs(1.000);
@@ -368,7 +377,7 @@ if showInstruct
     else
       readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
     end
-    et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    et_showTextInstruct(w,cfg,readyMsg,cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
     
     % Wait a second before starting trial
@@ -407,7 +416,7 @@ for i = trialNum:length(nameStims)
         % show the instructions after the impedance check
         for inst = 1:length(phaseCfg.instruct.name)
           WaitSecs(1.000);
-          et_showTextInstruct(w,phaseCfg.instruct.name(inst),cfg.keys.instructContKey,...
+          et_showTextInstruct(w,cfg,phaseCfg.instruct.name(inst),cfg.keys.instructContKey,...
             cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
             {'blockNum','nSpecies','theseSpecies'},{num2str(b),num2str(nSpecies),theseSpeciesStr});
         end
@@ -419,7 +428,7 @@ for i = trialNum:length(nameStims)
       
       if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
         questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
-        et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+        et_showTextInstruct(w,cfg,questionsMsg,cfg.keys.expContinue,...
           cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
         % Wait a second before continuing
         WaitSecs(1.000);
@@ -434,7 +443,7 @@ for i = trialNum:length(nameStims)
           expStr = ' practice';
         end
         readyMsg.text = sprintf('Ready to begin%s %s phase (block %d).\nPress "%s" to start.',expStr,phaseNameForParticipant,b,cfg.keys.instructContKey);
-        et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+        et_showTextInstruct(w,cfg,readyMsg,cfg.keys.instructContKey,...
           cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
         % Wait a second before starting trial
         WaitSecs(1.000);
@@ -465,6 +474,9 @@ for i = trialNum:length(nameStims)
       
       % show preparation text
       DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+      end
       Screen('Flip', w);
       WaitSecs(2.0);
       
@@ -472,6 +484,9 @@ for i = trialNum:length(nameStims)
         Screen('TextSize', w, cfg.text.fixSize);
         %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
+      end
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
       end
       Screen('Flip',w);
       WaitSecs(1.0);
@@ -497,6 +512,9 @@ for i = trialNum:length(nameStims)
     pauseMsg = sprintf('%sReady for trial %d of %d.\nPress any key to continue.', pauseMsg, i, length(nameStims));
     % just draw straight into the main window since we don't need speed here
     DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     Screen('Flip', w);
     
     % listen for any keypress on any keyboard
@@ -510,6 +528,9 @@ for i = trialNum:length(nameStims)
     
     % show preparation text
     DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     Screen('Flip', w);
     WaitSecs(2.0);
     
@@ -517,6 +538,9 @@ for i = trialNum:length(nameStims)
       Screen('TextSize', w, cfg.text.fixSize);
       %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
+    end
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
     end
     Screen('Flip',w);
     WaitSecs(1.0);
@@ -552,6 +576,9 @@ for i = trialNum:length(nameStims)
       Screen('TextSize', w, cfg.text.fixSize);
       %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+      end
       Screen('Flip',w);
     end
     WaitSecs(phaseCfg.name_isi);
@@ -565,9 +592,15 @@ for i = trialNum:length(nameStims)
         Screen('TextSize', w, cfg.text.fixSize);
         %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
         [preStimFixOn] = Screen('Flip',w);
       else
         preStimFixOn = NaN;
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
         Screen('Flip',w);
       end
       WaitSecs(phaseCfg.name_preStim);
@@ -579,9 +612,15 @@ for i = trialNum:length(nameStims)
         Screen('TextSize', w, cfg.text.fixSize);
         %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
         Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
         [preStimFixOn] = Screen('Flip',w);
       else
         preStimFixOn = NaN;
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
         Screen('Flip',w);
       end
       % fixation on screen before stim for a random amount of time
@@ -598,7 +637,7 @@ for i = trialNum:length(nameStims)
     Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
   end
   
-  if expParam.photoCellTest
+  if cfg.stim.photoCell
     Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
   end
   
@@ -628,6 +667,10 @@ for i = trialNum:length(nameStims)
         % and the "too fast" text
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+        end
+        
         Screen('Flip', w);
         
         keyIsDown = 0;
@@ -663,6 +706,9 @@ for i = trialNum:length(nameStims)
         % don't push multiple keys
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
+        end
         % put them on the screen
         Screen('Flip', w);
         
@@ -710,6 +756,9 @@ for i = trialNum:length(nameStims)
     else
       DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
     end
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     Screen('Flip', w);
     
     if phaseCfg.playSound
@@ -722,6 +771,9 @@ for i = trialNum:length(nameStims)
     Screen('TextSize', w, cfg.text.basicTextSize);
     %DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor, cfg.text.instructCharWidth);
     Screen('DrawText', w, cfg.text.respSymbol, respRectX, respRectY, initial_sNumColor);
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     [respPromptOn, startRT] = Screen('Flip',w);
     
     % poll for a resp
@@ -765,6 +817,9 @@ for i = trialNum:length(nameStims)
         else
           DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
         end
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
         Screen('Flip', w);
         
         if phaseCfg.playSound
@@ -780,6 +835,9 @@ for i = trialNum:length(nameStims)
         % don't push multiple keys
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
         % put them on the screen
         Screen('Flip',w);
         
@@ -812,7 +870,9 @@ for i = trialNum:length(nameStims)
       % "need to respond faster"
       Screen('TextSize', w, cfg.text.instructTextSize);
       DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor, cfg.text.instructCharWidth);
-      
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+      end
       Screen('Flip', w);
       
       if phaseCfg.playSound
@@ -837,6 +897,9 @@ for i = trialNum:length(nameStims)
   end
   
   % Clear screen to background color after response
+  if cfg.stim.photoCell
+    Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+  end
   Screen('Flip', w);
   
   % Close this stimulus before next trial
@@ -1066,6 +1129,9 @@ end
 accRtText = sprintf('You have finished the %s phase.\n\nYou got %d out of %d correct.\nFor the correct trials, on average you responded in %d ms.\n\nPress "%s" to continue.',phaseNameForParticipant,sum(trialAcc),length(trialAcc),round(mean(trialRT(trialAcc))),cfg.keys.instructContKey);
 Screen('TextSize', w, cfg.text.instructTextSize);
 DrawFormattedText(w,accRtText,'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 if ~expParam.photoCellTest
@@ -1075,7 +1141,10 @@ if ~expParam.photoCellTest
 end
 RestrictKeysForKbCheck([]);
 
-% go back to gray
+% go back to background color
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 %% cleanup

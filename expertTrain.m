@@ -445,6 +445,9 @@ try
       Screen('TextSize', w);
       DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.gray in config_%s.m)! It is recommended to set this value.\nAutomatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue.',expParam.expName,cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
       
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+      end
       % put message on screen
       Screen('Flip', w);
       
@@ -455,6 +458,9 @@ try
     Screen('TextSize', w);
     DrawFormattedText(w,sprintf('Doing a photocell test.\nSetting experiment backdrop to the BlackIndex of this screen (%d).\n\nBlack text (e.g., instructions) may not be visible but should proceed automatically!\n\nPress any key to continue.',cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
     
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     % put message on screen
     Screen('Flip', w);
     
@@ -462,6 +468,9 @@ try
     KbWait(-1,2);
   end
   
+  if cfg.stim.photoCell
+    Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+  end
   % put on the blank background color screen
   Screen('Flip',w);
   
@@ -483,6 +492,9 @@ try
     % put wait for experimenter instructions on screen
     message = 'Experimenter:\nStart the Net Station application, apply the EEG cap, and check impedance measures...';
     DrawFormattedText(w, message, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     Screen('Flip', w);
     
     % % wait until g key is held for ~1 seconds
@@ -527,6 +539,9 @@ try
     %display instructions
     baselineMsg = sprintf('The experimenter will now record baseline activity.\nPlease remain still...');
     DrawFormattedText(w, baselineMsg, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     Screen('Flip', w);
     
     % % wait until g key is held for ~1 seconds
@@ -543,6 +558,9 @@ try
       error('!!! ERROR: Problem with Net Station starting the recording because of error: %s !!!',NSStartError);
     end
     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+    if cfg.stim.photoCell
+      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    end
     Screen('Flip', w);
     WaitSecs(5.0);
     
@@ -553,6 +571,9 @@ try
     Screen('TextSize', w, cfg.text.basicTextSize);
     for sec = expParam.baselineRecordSecs:-1:1
       DrawFormattedText(w, num2str(sec), 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+      end
       Screen('Flip', w);
       fprintf('%s ', num2str(sec));
       WaitSecs(1.0);
@@ -576,6 +597,9 @@ try
 %     % start recording
 %     [NSStartStatus, NSStartError] = NetStation('StartRecording'); %#ok<NASGU,ASGLU>
 %     DrawFormattedText(w,'Starting EEG recording...', 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+%     if cfg.stim.photoCell
+%       Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+%     end
 %     Screen('Flip', w);
 %     WaitSecs(5.0);
 %   end
@@ -1076,6 +1100,9 @@ try
   % put the instructions on the screen
   DrawFormattedText(w, message, 'center', 'center', cfg.text.experimenterColor, cfg.text.instructCharWidth);
   % Update the display to show the message:
+  if cfg.stim.photoCell
+    Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+  end
   Screen('Flip', w);
   
   % % wait until g key is held for ~1 seconds
@@ -1084,6 +1111,9 @@ try
   RestrictKeysForKbCheck(KbName(cfg.keys.expContinue));
   KbWait(-1,2);
   RestrictKeysForKbCheck([]);
+  if cfg.stim.photoCell
+    Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+  end
   Screen('Flip', w);
   WaitSecs(1.000);
   
