@@ -1,5 +1,5 @@
-function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructCharWidth,origText,replacementText)
-% function et_showTextInstruct(w,instructions,continueKey,instructTextColor,instructTextSize,instructCharWidth,origText,replacementText)
+function et_showTextInstruct(w,cfg,instructions,continueKey,instructTextColor,instructTextSize,instructCharWidth,origText,replacementText)
+% function et_showTextInstruct(w,cfg,instructions,continueKey,instructTextColor,instructTextSize,instructCharWidth,origText,replacementText)
 
 if ~exist('continueKey','var') || isempty(continueKey)
   continueKey = 'any';
@@ -62,6 +62,9 @@ Screen('TextSize', w, instructTextSize);
 % put the instructions on the screen
 DrawFormattedText(w, instructions.text, 'center', 'center', instructTextColor, instructCharWidth);
 % Update the display to show the instruction text:
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 % wait until the key is pressed
@@ -73,6 +76,9 @@ KbWait(-1,2);
 RestrictKeysForKbCheck([]);
 
 % Clear screen to background color (our 'gray' as set at the beginning):
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 if isfield(instructions,'image') && ~isempty(instructions.image)

@@ -367,7 +367,7 @@ Screen('Flip', w);
 if ~expParam.photoCellTest
   for i = 1:length(phaseCfg.instruct.match)
     WaitSecs(1.000);
-    et_showTextInstruct(w,phaseCfg.instruct.match(i),cfg.keys.instructContKey,...
+    et_showTextInstruct(w,cfg,phaseCfg.instruct.match(i),cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   end
   % Wait a second before continuing
@@ -378,7 +378,7 @@ end
 
 if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
   questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
-  et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+  et_showTextInstruct(w,cfg,questionsMsg,cfg.keys.expContinue,...
     cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   % Wait a second before continuing
   WaitSecs(1.000);
@@ -393,7 +393,7 @@ if ~expParam.photoCellTest
     expStr = ' practice';
   end
   readyMsg.text = sprintf('Ready to begin%s %s phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
-  et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+  et_showTextInstruct(w,cfg,readyMsg,cfg.keys.instructContKey,...
     cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
   % Wait a second before starting trial
   WaitSecs(1.000);

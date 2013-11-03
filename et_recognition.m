@@ -328,13 +328,13 @@ for b = 1:phaseCfg.nBlocks
     if ~expParam.photoCellTest
       for i = 1:length(phaseCfg.instruct.recogIntro)
         WaitSecs(1.000);
-        et_showTextInstruct(w,phaseCfg.instruct.recogIntro(i),cfg.keys.instructContKey,...
+        et_showTextInstruct(w,cfg,phaseCfg.instruct.recogIntro(i),cfg.keys.instructContKey,...
           cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
           {'blockNum'},{num2str(b)});
       end
       for i = 1:length(phaseCfg.instruct.recogStudy)
         WaitSecs(1.000);
-        et_showTextInstruct(w,phaseCfg.instruct.recogStudy(i),cfg.keys.instructContKey,...
+        et_showTextInstruct(w,cfg,phaseCfg.instruct.recogStudy(i),cfg.keys.instructContKey,...
           cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth,...
           {'blockNum'},{num2str(b)});
       end
@@ -346,7 +346,7 @@ for b = 1:phaseCfg.nBlocks
     
     if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
       questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
-      et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+      et_showTextInstruct(w,cfg,questionsMsg,cfg.keys.expContinue,...
         cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
       % Wait a second before continuing
       WaitSecs(1.000);
@@ -361,7 +361,7 @@ for b = 1:phaseCfg.nBlocks
         expStr = ' practice';
       end
       readyMsg.text = sprintf('Ready to begin%s %s study phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
-      et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+      et_showTextInstruct(w,cfg,readyMsg,cfg.keys.instructContKey,...
         cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
       % Wait a second before starting trial
       WaitSecs(1.000);
@@ -698,7 +698,7 @@ for b = 1:phaseCfg.nBlocks
   if ~expParam.photoCellTest
     for i = 1:length(phaseCfg.instruct.recogTest)
       WaitSecs(1.000);
-      et_showTextInstruct(w,phaseCfg.instruct.recogTest(i),cfg.keys.instructContKey,...
+      et_showTextInstruct(w,cfg,phaseCfg.instruct.recogTest(i),cfg.keys.instructContKey,...
         cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
     end
     % Wait a second before starting trial
@@ -709,7 +709,7 @@ for b = 1:phaseCfg.nBlocks
   
   if ~expParam.photoCellTest && ~phaseCfg.isExp && phaseCfg.instruct.questions
     questionsMsg.text = sprintf('If you have any questions about the %s phase,\nplease ask the experimenter now.\n\nPlease tell the experimenter when you are ready to begin the task.',phaseNameForParticipant);
-    et_showTextInstruct(w,questionsMsg,cfg.keys.expContinue,...
+    et_showTextInstruct(w,cfg,questionsMsg,cfg.keys.expContinue,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
     % Wait a second before continuing
     WaitSecs(1.000);
@@ -724,7 +724,7 @@ for b = 1:phaseCfg.nBlocks
       expStr = ' practice';
     end
     readyMsg.text = sprintf('Ready to begin%s %s test phase.\nPress "%s" to start.',expStr,phaseNameForParticipant,cfg.keys.instructContKey);
-    et_showTextInstruct(w,readyMsg,cfg.keys.instructContKey,...
+    et_showTextInstruct(w,cfg,readyMsg,cfg.keys.instructContKey,...
       cfg.text.instructColor,cfg.text.instructTextSize,cfg.text.instructCharWidth);
     % Wait a second before starting trial
     WaitSecs(1.000);

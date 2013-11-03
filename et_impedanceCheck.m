@@ -24,6 +24,9 @@ Screen('TextSize', w, cfg.text.basicTextSize);
 pauseMsg = sprintf('The experimenter will now check the EEG cap.');
 % just draw straight into the main window since we don't need speed here
 DrawFormattedText(w, pauseMsg, 'center', 'center', cfg.text.experimenterColor);
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 
 if talkToNS
@@ -46,12 +49,18 @@ end
 
 message = 'Starting data acquisition...';
 DrawFormattedText(w, message, 'center', 'center', cfg.text.basicTextColor, cfg.text.instructCharWidth);
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 WaitSecs(5.000);
 
 continueMsg = sprintf('Ready to continue.\nPress any key to go to the %s.',phaseName);
 % just draw straight into the main window since we don't need speed here
 DrawFormattedText(w, continueMsg, 'center', 'center', cfg.text.instructColor, cfg.text.instructCharWidth);
+if cfg.stim.photoCell
+  Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+end
 Screen('Flip', w);
 % listen for any keypress on any keyboard
 KbWait(-1,2);
