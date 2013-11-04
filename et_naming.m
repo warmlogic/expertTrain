@@ -560,7 +560,7 @@ for i = trialNum:length(nameStims)
     stimImg = imread(fullfile(stimDir,nameStims(i).familyStr,nameStims(i).fileName));
     nameStimTex(i) = Screen('MakeTexture',w,stimImg);
   end
-
+  
   % Is this a subordinate (1) or basic (0) family/species? If subordinate,
   % get the species number.
   if any(nameStims(i).familyNum == famNumSubord)
@@ -643,6 +643,7 @@ for i = trialNum:length(nameStims)
     Screen('DrawText', w, cfg.text.fixSymbol, fixRectX, fixRectY, cfg.text.fixationColor);
   end
   
+  % photocell rect with stim
   if cfg.stim.photoCell
     Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
   end
@@ -673,6 +674,7 @@ for i = trialNum:length(nameStims)
         % and the "too fast" text
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.tooFastText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        % photocell rect with stimulus
         if cfg.stim.photoCell
           Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
         end
@@ -712,6 +714,7 @@ for i = trialNum:length(nameStims)
         % don't push multiple keys
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
+        % photocell rect with stimulus
         if cfg.stim.photoCell
           Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
         end
@@ -1117,11 +1120,11 @@ for i = trialNum:length(nameStims)
     if keyIsDown
       % button push
       [NSEventStatus, NSEventError] = NetStation('Event', 'RESP', endRT, .001,...
-      'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
-      'expt',phaseCfg.isExp,...
-      'bloc', int32(b),...
-      'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
-      'rsps', resp, 'rspk', respKey, 'rspt', trialRT(i), 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
+        'subn', expParam.subject, 'sess', sesName, 'phas', phaseName, 'pcou', int32(phaseCount),...
+        'expt',phaseCfg.isExp,...
+        'bloc', int32(b),...
+        'trln', int32(i), 'stmn', stimName, 'famn', fNum, 'spcn', specNum, 'sord', isSubord,...
+        'rsps', resp, 'rspk', respKey, 'rspt', trialRT(i), 'corr', trialAcc(i), 'keyp', keyIsDown); %#ok<NASGU,ASGLU>
     end
   end % useNS
   
