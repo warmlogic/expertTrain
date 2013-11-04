@@ -23,7 +23,7 @@ function expertTrain(expName,subNum,useNS,photoCellTest)
 %                 into the full subject name EXPNAMEXXX; e.g., subNum=1 =
 %                 EXPNAME001.
 %  useNS:         whether to use Net Station (logical; 1 for yes, 0 for no)
-%  photoCellTest: whether to conduct a photo cell test (logical; 1 for yes,
+%  photoCellTest: whether to conduct a photocell test (logical; 1 for yes,
 %                 0 for no). Default = 0.
 %
 % NB: You can also launch the experiment by just running the command:
@@ -166,18 +166,18 @@ elseif nargin >= 3
   
   % check on using Net Station
   if isempty(photoCellTest)
-    error('Must provide whether to run the photo cell test (variable: ''photoCellTest'', 1 (yes) or 0 (no)).');
+    error('Must provide whether to run the photocell test (variable: ''photoCellTest'', 1 (yes) or 0 (no)).');
   end
   if ~islogical(photoCellTest)
     if ~isnumeric(photoCellTest) || (photoCellTest ~= 0 && photoCellTest ~= 1)
-      fprintf('For whether to run the photo cell test (variable: ''photoCellTest''), you entered: ');
+      fprintf('For whether to run the photocell test (variable: ''photoCellTest''), you entered: ');
       disp(photoCellTest);
       error('photoCellTest must be either 1 or 0.');
     else
       photoCellTest = logical(photoCellTest);
     end
     if photoCellTest && ~useNS
-      error('If doing a photo cell test, must use Net Station (set variable: ''useNS'' = 1)');
+      %error('If doing a photocell test, must use Net Station (set variable: ''useNS'' = 1)');
     end
   end
 end
@@ -253,7 +253,7 @@ if exist(cfg.files.expParamFile,'file')
   % session
   expParam.useNS = useNS;
   
-  % whether to do a photo cell test
+  % whether to do a photocell test
   expParam.photoCellTest = photoCellTest;
 else
   % if it doesn't exist that means we're starting a new subject
@@ -262,7 +262,7 @@ else
   % whether to use Net Station
   expParam.useNS = useNS;
   
-  % whether to do a photo cell test
+  % whether to do a photocell test
   expParam.photoCellTest = photoCellTest;
   
   % make sure we want to start this session
@@ -372,22 +372,21 @@ try
   ListenChar(2);
   %end
   
-  % Set up the gray color value to be used as experiment backdrop
-  if ~expParam.photoCellTest
-    if ~isfield(cfg.screen,'gray')
-      cfg.screen.gray = GrayIndex(screenNumber);
-      warning('You did not set a value for the background color (cfg.screen.gray in your config_%s.m)! It is recommended to set this value. Setting experiment backdrop to the GrayIndex of this screen (%d).',expParam.expName,cfg.screen.gray);
-      manualGray = false;
-    else
-      manualGray = true;
-    end
+  % Set up the gray color value to be used as experiment background color
+  if ~isfield(cfg.screen,'gray')
+    cfg.screen.gray = GrayIndex(screenNumber);
+    warning('You did not set a value for the background color (cfg.screen.gray in your config_%s.m)! It is recommended to set this value. Setting experiment backdrop to the GrayIndex of this screen (%d).',expParam.expName,cfg.screen.gray);
+    manualGray = false;
   else
+    manualGray = true;
+  end
+  if expParam.photoCellTest
     % override setting in config_EXPNAME to show white photocell rectangle
     cfg.stim.photoCell = true;
     
-    cfg.screen.gray = BlackIndex(screenNumber);
-    fprintf('Doing a photocell test. Setting experiment backdrop to the BlackIndex of this screen (%d).\n',cfg.screen.gray);
-    warning('Black text (e.g., instructions) may not be visible!');
+    %cfg.screen.gray = BlackIndex(screenNumber);
+    %fprintf('Doing a photocell test. Setting experiment background color to the BlackIndex of this screen (%d).\n',cfg.screen.gray);
+    %warning('Black text (e.g., instructions) may not be visible!');
   end
   
   % Open a double buffered fullscreen window on the stimulation screen
@@ -396,7 +395,7 @@ try
   % the window. 'wRect' is a rectangle defining the size of the window.
   % See "help PsychRects" for help on such rectangles and useful helper
   % functions:
-  [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray);
+  [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.gray);
   
   % hack, because something's weird with fonts in Mac Matlab 2013b? seems
   % that the window needs to be closed and them opened again.
@@ -405,24 +404,13 @@ try
     Screen('Preference','DefaultFontName',defaultFont);
     Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
-    [w, wRect] = Screen('OpenWindow',screenNumber, cfg.screen.gray);
+    [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.gray);
   end
   
   % store the screen dimensions
   cfg.screen.wRect = wRect;
   
-%   % set up the photo cell test rectangle
-%   if expParam.photoCellTest
-%     if ~isfield(cfg.stim,'photoCellRectSize')
-%       cfg.stim.photoCellRectSize = 50;
-%     end
-%     cfg.stim.photoCellRect = SetRect(0, 0, cfg.stim.photoCellRectSize, cfg.stim.photoCellRectSize);
-%     cfg.stim.photoCellRect = AlignRect(cfg.stim.photoCellRect,wRect,'center','right');
-%     cfg.stim.photoCellRectColor = uint8((rgb('White') * 255) + 0.5);
-%     %cfg.stim.photoCellRectColor = rgb('White');
-%   end
-  
-  % set up the photo cell test rectangle
+  % set up the photocell test rectangle
   if cfg.stim.photoCell
     if ~isfield(cfg.stim,'photoCellRectSize')
       cfg.stim.photoCellRectSize = 50;
@@ -433,38 +421,40 @@ try
     %cfg.stim.photoCellRectColor = rgb('White');
     
     % color for when stimuli are not on screen
-    %cfg.stim.photoCellAntiRect = SetRect(0, 0, photoCellRectSize, photoCellRectSize);
-    %cfg.stim.photoCellAntiRect = AlignRect(cfg.stim.photoCellRect,wRect,'bottom','right');
     cfg.stim.photoCellAntiRectColor = uint8((rgb('Black') * 255) + 0.5);
     %cfg.stim.photoCellAntiRectColor = rgb('Black');
   end
   
-  % midWidth=round(RectWidth(wRect)/2);    % get center coordinates
-  % midLength=round(RectHeight(wRect)/2);
-  
-  % Screen('FillRect', w, cfg.screen.gray);
-  
-  if ~expParam.photoCellTest
-    if ~manualGray
-      Screen('TextSize', w);
-      DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.gray in config_%s.m)! It is recommended to set this value.\nAutomatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue.',expParam.expName,cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
-      
-      if cfg.stim.photoCell
-        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
-      end
-      % put message on screen
-      Screen('Flip', w);
-      
-      RestrictKeysForKbCheck([]);
-      KbWait(-1,2);
-    end
-  else
-    Screen('TextSize', w);
-    DrawFormattedText(w,sprintf('Doing a photocell test.\nSetting experiment backdrop to the BlackIndex of this screen (%d).\n\nBlack text (e.g., instructions) may not be visible but should proceed automatically!\n\nPress any key to continue.',cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+  if ~manualGray
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.gray in config_%s.m)! It is recommended to set this value.\nHowever, I am automatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue with these settings.',expParam.expName,cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
     
     if cfg.stim.photoCell
       Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
     end
+    % put message on screen
+    Screen('Flip', w);
+    
+    RestrictKeysForKbCheck([]);
+    KbWait(-1,2);
+  end
+  
+  if expParam.photoCellTest
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    %DrawFormattedText(w,sprintf('Doing a photocell test.\nSetting experiment background color to the BlackIndex of this screen (%d).\n\nBlack text (e.g., instructions) may not be visible but should proceed automatically!\n\nPress any key to continue.',cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+    DrawFormattedText(w,'Doing a photocell test.\n\nAlign the photodiode with the black rectangle.\n\nThe experiment should proceed automatically!\n\nPress any key to continue.','center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+    
+    Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+    % put message on screen
+    Screen('Flip', w);
+    
+    RestrictKeysForKbCheck([]);
+    KbWait(-1,2);
+  elseif ~expParam.photoCellTest && cfg.stim.photoCell
+    Screen('TextSize', w, cfg.text.basicTextSize);
+    DrawFormattedText(w,'Using photocell.\n\nAlign the photodiode with the black rectangle.\n\nPress any key to continue.','center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+    
+    Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
     % put message on screen
     Screen('Flip', w);
     
