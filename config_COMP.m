@@ -198,8 +198,8 @@ if expParam.sessionNum == 1
   %% Screen, text, and symbol configuration for size and color
   
   % Choose a gray color value to be used as experiment backdrop
-  %cfg.screen.gray = 181;
-  cfg.screen.gray = 210;
+  %cfg.screen.bgColor = 181;
+  cfg.screen.bgColor = 210;
   
   % font sizes
   %

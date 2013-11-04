@@ -374,8 +374,8 @@ try
   
   % Set up the gray color value to be used as experiment background color
   if ~isfield(cfg.screen,'gray')
-    cfg.screen.gray = GrayIndex(screenNumber);
-    warning('You did not set a value for the background color (cfg.screen.gray in your config_%s.m)! It is recommended to set this value. Setting experiment backdrop to the GrayIndex of this screen (%d).',expParam.expName,cfg.screen.gray);
+    cfg.screen.bgColor = GrayIndex(screenNumber);
+    warning('You did not set a value for the background color (cfg.screen.bgColor in your config_%s.m)! It is recommended to set this value. Setting experiment backdrop to the GrayIndex of this screen (%d).',expParam.expName,cfg.screen.bgColor);
     manualGray = false;
   else
     manualGray = true;
@@ -384,8 +384,8 @@ try
     % override setting in config_EXPNAME to show white photocell rectangle
     cfg.stim.photoCell = true;
     
-    %cfg.screen.gray = BlackIndex(screenNumber);
-    %fprintf('Doing a photocell test. Setting experiment background color to the BlackIndex of this screen (%d).\n',cfg.screen.gray);
+    %cfg.screen.bgColor = BlackIndex(screenNumber);
+    %fprintf('Doing a photocell test. Setting experiment background color to the BlackIndex of this screen (%d).\n',cfg.screen.bgColor);
     %warning('Black text (e.g., instructions) may not be visible!');
   end
   
@@ -395,7 +395,7 @@ try
   % the window. 'wRect' is a rectangle defining the size of the window.
   % See "help PsychRects" for help on such rectangles and useful helper
   % functions:
-  [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.gray);
+  [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.bgColor);
   
   % hack, because something's weird with fonts in Mac Matlab 2013b? seems
   % that the window needs to be closed and them opened again.
@@ -404,7 +404,7 @@ try
     Screen('Preference','DefaultFontName',defaultFont);
     Screen('Preference','DefaultFontStyle',1);
     Screen('Preference','DefaultFontSize',18);
-    [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.gray);
+    [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.bgColor);
   end
   
   % store the screen dimensions
@@ -427,7 +427,7 @@ try
   
   if ~manualGray
     Screen('TextSize', w, cfg.text.basicTextSize);
-    DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.gray in config_%s.m)! It is recommended to set this value.\nHowever, I am automatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue with these settings.',expParam.expName,cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+    DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.bgColor in config_%s.m)! It is recommended to set this value.\nHowever, I am automatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue with these settings.',expParam.expName,cfg.screen.bgColor),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
     
     if cfg.stim.photoCell
       Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
@@ -441,7 +441,7 @@ try
   
   if expParam.photoCellTest
     Screen('TextSize', w, cfg.text.basicTextSize);
-    %DrawFormattedText(w,sprintf('Doing a photocell test.\nSetting experiment background color to the BlackIndex of this screen (%d).\n\nBlack text (e.g., instructions) may not be visible but should proceed automatically!\n\nPress any key to continue.',cfg.screen.gray),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
+    %DrawFormattedText(w,sprintf('Doing a photocell test.\nSetting experiment background color to the BlackIndex of this screen (%d).\n\nBlack text (e.g., instructions) may not be visible but should proceed automatically!\n\nPress any key to continue.',cfg.screen.bgColor),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
     DrawFormattedText(w,'Doing a photocell test.\n\nAlign the photodiode with the black rectangle.\n\nThe experiment should proceed automatically!\n\nPress any key to continue.','center','center',uint8((rgb('Red') * 255) + 0.5), 70);
     
     Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
