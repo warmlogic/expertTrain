@@ -721,17 +721,19 @@ for i = trialNum:length(studyStims_img)
         WaitSecs(0.0001);
       end
       
-      if expParam.photoCellTest
+      if phaseCfg.studyPresent == 2 && phaseCfg.study_bt_stim > 0
+        % if they are sequential, include a short delay between paired
+        % stimuli
+        
+        % short delay with the white photocell square off
         if cfg.stim.photoCell
           Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
         end
-        % need a short delay with the white photocell square off
         Screen('Flip', w);
-        WaitSecs(0.1);
-      end
-      
-      % if they overlap, put on the image stimulus and word rectangle
-      if phaseCfg.studyPresent == 3
+        WaitSecs(phaseCfg.study_bt_stim);
+      elseif phaseCfg.studyPresent == 3
+        % if they overlap, put on the image stimulus and word rectangle
+        
         % draw the image stimulus
         Screen('DrawTexture', w, studyImgTex(i), [], stimImgRect);
         if phaseCfg.fixDuringStim
@@ -803,13 +805,14 @@ for i = trialNum:length(studyStims_img)
         WaitSecs(0.0001);
       end
       
-      if expParam.photoCellTest
+      if phaseCfg.studyPresent == 2 && phaseCfg.study_bt_stim > 0
+        % if they are sequential, include a short delay between paired
+        % stimuli
         if cfg.stim.photoCell
           Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
         end
-        % need a short delay with the while photocell square off
         Screen('Flip', w);
-        WaitSecs(0.1);
+        WaitSecs(phaseCfg.study_bt_stim);
       end
       
       % draw the image stimulus
@@ -821,7 +824,7 @@ for i = trialNum:length(studyStims_img)
         %DrawFormattedText(w,cfg.text.fixSymbol,'center','center',cfg.text.fixationColor, cfg.text.instructCharWidth);
       end
       
-      % if they overlap, put on the word stimulus
+      % if they overlap, put the word stimulus on top
       if phaseCfg.studyPresent == 3
         % draw the word rectangle
         Screen('FillRect', w, cfg.text.wordBackgroundColor, wordRect);
@@ -836,7 +839,7 @@ for i = trialNum:length(studyStims_img)
         Screen('FillRect', w, cfg.stim.photoCellRectColor, cfg.stim.photoCellRect);
       end
       
-      % Show stimulus on screen at next possible display refresh cycle,
+      % Show stimuli on screen at next possible display refresh cycle,
       % and record stimulus onset time in 'stimOnset':
       [imgOn, stimImgOnset] = Screen('Flip', w);
       
