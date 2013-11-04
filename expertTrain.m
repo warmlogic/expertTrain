@@ -380,6 +380,7 @@ try
   else
     manualBgColor = true;
   end
+  
   if expParam.photoCellTest
     % override setting in config_EXPNAME to show white photocell rectangle
     cfg.stim.photoCell = true;
@@ -387,6 +388,11 @@ try
     %cfg.screen.bgColor = BlackIndex(screenNumber);
     %fprintf('Doing a photocell test. Setting experiment background color to the BlackIndex of this screen (%d).\n',cfg.screen.bgColor);
     %warning('Black text (e.g., instructions) may not be visible!');
+  end
+  
+  if cfg.stim.photoCell && ~useNS
+    warning('Photocell rectangle is only useful when recording in Net Station. Turning off photocell rectangle!!!\nTo stop this warning in the future, either set variable ''useNS'' to 1 (when running experiment), or turn off the photocell (cfg.stim.photoCell = false; in config_%s.m).',expParam.expName);
+    cfg.stim.photoCell = false;
   end
   
   % Open a double buffered fullscreen window on the stimulation screen
