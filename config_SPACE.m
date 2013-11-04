@@ -75,7 +75,7 @@ end
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','expo','multistudy','cued_recall'};
 % expParam.session.oneDay.phases = {'expo','multistudy','distract_math','cued_recall'};
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall'};
-% expParam.session.oneDay.phases = {'prac_multistudy','prac_distract_math','prac_cued_recall'};
+expParam.session.oneDay.phases = {'prac_multistudy','prac_distract_math','prac_cued_recall'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -630,6 +630,7 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.05;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
         
         % do we want to play feedback beeps?
@@ -893,6 +894,7 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.05;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
         
         % do we want to play feedback beeps?
