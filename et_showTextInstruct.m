@@ -75,7 +75,7 @@ end
 KbWait(-1,2);
 RestrictKeysForKbCheck([]);
 
-% Clear screen to background color (our 'gray' as set at the beginning):
+% Clear screen to background color (our 'bgColor' as set at the beginning):
 if cfg.stim.photoCell
   Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
 end

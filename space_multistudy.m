@@ -377,7 +377,7 @@ WaitSecs(5.000);
 if cfg.stim.photoCell
   Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
 end
-% Clear screen to background color (our 'gray' as set at the beginning):
+% Clear screen to background color (our 'bgColor' as set at the beginning):
 Screen('Flip', w);
 
 %% show the instructions

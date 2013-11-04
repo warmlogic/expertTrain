@@ -329,7 +329,7 @@ end
 Screen('Flip', w);
 % Wait before starting trial
 WaitSecs(5.000);
-% Clear screen to background color (our 'gray' as set at the beginning):
+% Clear screen to background color (our 'bgColor' as set at the beginning):
 if cfg.stim.photoCell
   Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
 end

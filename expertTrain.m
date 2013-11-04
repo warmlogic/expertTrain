@@ -372,13 +372,13 @@ try
   ListenChar(2);
   %end
   
-  % Set up the gray color value to be used as experiment background color
-  if ~isfield(cfg.screen,'gray')
+  % Set up the color value to be used as experiment background color
+  if ~isfield(cfg.screen,'bgColor')
     cfg.screen.bgColor = GrayIndex(screenNumber);
     warning('You did not set a value for the background color (cfg.screen.bgColor in your config_%s.m)! It is recommended to set this value. Setting experiment backdrop to the GrayIndex of this screen (%d).',expParam.expName,cfg.screen.bgColor);
-    manualGray = false;
+    manualBgColor = false;
   else
-    manualGray = true;
+    manualBgColor = true;
   end
   if expParam.photoCellTest
     % override setting in config_EXPNAME to show white photocell rectangle
@@ -390,7 +390,7 @@ try
   end
   
   % Open a double buffered fullscreen window on the stimulation screen
-  % 'screenNumber' and choose/draw a gray background. 'w' is the handle
+  % 'screenNumber' and choose/draw a background color. 'w' is the handle
   % used to direct all drawing commands to that window - the "Name" of
   % the window. 'wRect' is a rectangle defining the size of the window.
   % See "help PsychRects" for help on such rectangles and useful helper
@@ -425,7 +425,7 @@ try
     %cfg.stim.photoCellAntiRectColor = rgb('Black');
   end
   
-  if ~manualGray
+  if ~manualBgColor
     Screen('TextSize', w, cfg.text.basicTextSize);
     DrawFormattedText(w,sprintf('You did not set a value for the background color (cfg.screen.bgColor in config_%s.m)! It is recommended to set this value.\nHowever, I am automatically setting to GrayIndex of this screen (%d).\n\nPress any key to continue with these settings.',expParam.expName,cfg.screen.bgColor),'center','center',uint8((rgb('Red') * 255) + 0.5), 70);
     
