@@ -177,7 +177,7 @@ elseif nargin >= 3
       photoCellTest = logical(photoCellTest);
     end
     if photoCellTest && ~useNS
-      %error('If doing a photocell test, must use Net Station (set variable: ''useNS'' = 1)');
+      error('If doing a photocell test, must use Net Station (set variable: ''useNS'' = 1)');
     end
   end
 end
