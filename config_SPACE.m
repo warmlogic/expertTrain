@@ -75,7 +75,7 @@ end
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','expo','multistudy','cued_recall'};
 % expParam.session.oneDay.phases = {'expo','multistudy','distract_math','cued_recall'};
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall'};
-expParam.session.oneDay.phases = {'prac_multistudy','prac_distract_math','prac_cued_recall'};
+% expParam.session.oneDay.phases = {'prac_multistudy','prac_distract_math','prac_cued_recall'};
 
 % % debug
 % expParam.nSessions = 1;
