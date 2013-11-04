@@ -67,8 +67,11 @@ expParam.session.oneDay.phases = {...
   'expo','multistudy','distract_math','cued_recall'};
 
 if expParam.useNS
-  %preExpoImpedance = [1 3 5];
-  preExpoImpedance = [2 4 6];
+  % 6 experiment blocks
+  preExpoImpedance = [1 3 5];
+  
+  % 7 experiment blocks
+  %preExpoImpedance = [2 4 6];
 end
 
 % % debug
@@ -630,7 +633,7 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.05;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.02;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
         
         % do we want to play feedback beeps?
@@ -894,7 +897,7 @@ if expParam.sessionNum == 1
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.05;
+        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.02;
         cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
         
         % do we want to play feedback beeps?
