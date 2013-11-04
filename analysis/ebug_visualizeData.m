@@ -22,11 +22,11 @@ else
 end
 
 subjects = {
-  'EBUG001';
-%   'EBUG002';
-%   'EBUG003';
-%   'EBUG004';
-%   'EBUG005';
+%  'EBUG001';
+   'EBUG002';
+   'EBUG003';
+   'EBUG004';
+   'EBUG005';
   };
 
 saveFigs = true;
@@ -59,9 +59,9 @@ data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 
 % dataMeasure = 'rt';
-dataMeasure = 'rt_cor';
+% dataMeasure = 'rt_cor';
 % dataMeasure = 'rt_inc';
-% dataMeasure = 'acc';
+dataMeasure = 'acc';
 % dataMeasure = 'dp';
 
 tpCounter = 0;
@@ -128,7 +128,7 @@ set(gca,'XTickLabel',new_xlabel);
 legend({'Basic','Subordinate'},'Location',legendLoc);
 %legend({'Basic','Subordinate','Overall'},'Location',legendLoc);
 
-publishfig(gcf,0);
+%publishfig(gcf,0);
 
 if saveFigs
   print(gcf,'-dpng',fullfile(figsDir,sprintf('training_name_%s',dataMeasure)));

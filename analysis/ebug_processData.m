@@ -6,10 +6,10 @@ function [results] = ebug_processData(dataroot,subjects,onlyCompleteSub,printRes
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'EBUG001';
-    %     'EBUG002';
-    %     'EBUG003';
-    %     'EBUG004';
-    %     'EBUG005';
+         'EBUG002';
+         'EBUG003';
+         'EBUG004';
+         'EBUG005';
     };
 end
 
