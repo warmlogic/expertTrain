@@ -63,10 +63,11 @@ expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','rec
 % % demo - debug
 % expParam.nSessions = 2;
 % expParam.sesTypes = {'pretest','train1'};
-% expParam.session.pretest.phases = {'match','prac_recog'};
-% % expParam.session.pretest.phases = {'prac_match','prac_recog'};
+% % expParam.session.pretest.phases = {'match','prac_recog'};
+% expParam.session.pretest.phases = {'prac_match','prac_recog'};
 % % expParam.session.pretest.phases = {'prac_recog','recog'};
-% expParam.session.train1.phases = {'prac_name','nametrain','name'};
+% % expParam.session.train1.phases = {'prac_name','nametrain','name'};
+% expParam.session.train1.phases = {'prac_name'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -130,7 +131,7 @@ if expParam.sessionNum == 1
   
   % whether to present a white square during the stimulus
   cfg.stim.photoCell = true;
-  cfg.stim.photoCellRectSize = 50;
+  cfg.stim.photoCellRectSize = 30;
   
   % whether to preload images; if true, could use a lot of memory
   cfg.stim.preloadImages = false;
