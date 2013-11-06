@@ -683,7 +683,7 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
@@ -1421,7 +1421,7 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
@@ -1606,7 +1606,7 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
