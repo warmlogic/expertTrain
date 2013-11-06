@@ -150,7 +150,7 @@ end
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [0 3];
+ylimits = [0 4];
 
 % dataMeasure = 'acc';
 % dataLabel = 'Accuracy';
@@ -191,7 +191,7 @@ for p = 1:length(phases)
     end
     
     bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
-    bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    bw_groupnames = {'Pretest', 'Train 1', 'Posttest', 'One week later'};
     bw_legend = {'Trained','Untrained'};
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
@@ -201,7 +201,7 @@ for p = 1:length(phases)
     bw_errors = data_sem;
     h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
     set(h.legend,'Location','NorthWest');
-    axis([0.5 3.5 ylimits(1) ylimits(2)]);
+    axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
     publishfig(gcf,0);
     
     if saveFigs
@@ -210,13 +210,13 @@ for p = 1:length(phases)
   end
 end
 
-%% Match accuracy for training days
+%% Match accuracy for training days - bar graph
 
-% plot basic and subordinate data for pretest, posttest, posttest_delay
+% plot basic and subordinate data for training days
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [0 3];
+ylimits = [0 4];
 
 % dataMeasure = 'acc';
 % dataLabel = 'Accuracy';
@@ -257,7 +257,7 @@ for p = 1:length(phases)
     end
     
     bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
-    bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    bw_groupnames = {'train2', 'train3', 'train4', 'train5', 'train6'};
     bw_legend = {'Trained','Untrained'};
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
@@ -267,123 +267,76 @@ for p = 1:length(phases)
     bw_errors = data_sem;
     h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
     set(h.legend,'Location','NorthWest');
-    axis([0.5 3.5 ylimits(1) ylimits(2)]);
+    axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
     publishfig(gcf,0);
     
     if saveFigs
-      print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s',phases{p},dataMeasure,naming{n})));
+      print(gcf,'-dpng',fullfile(figsDir,sprintf('trainDays_trainUn_%s_%s_%s',phases{p},dataMeasure,naming{n})));
     end
   end
 end
 
+%% recognition accuracy for pretest, posttest, posttest_delay
 
-%% old stuff
+dataMeasure = 'dp';
+dataLabel = 'd''';
+ylimits = [0 3];
 
-% %% plot basic and subordinate RTs across training days
-% 
-% nTrainSes = 6;
-% phases = {'name_1','name_2','name_3','name_4'};
-% 
-% rt.overall = nan(length(subjects),nTrainSes,length(phases));
-% rt.basic = nan(length(subjects),nTrainSes,length(phases));
-% rt.subord = nan(length(subjects),nTrainSes,length(phases));
-% 
-% % dataField = 'rt';
-% dataMeasure = 'rt_cor';
-% 
-% for t = 1:nTrainSes
-%   sesName = sprintf('train%d',t);
-%   for p = 1:length(phases)
-%     if isfield(results.(sesName),phases{p})
-%       rt.overall(:,t,p) = results.(sesName).(phases{p}).overall.(dataMeasure);
-%       rt.basic(:,t,p) = results.(sesName).(phases{p}).basic.(dataMeasure);
-%       rt.subord(:,t,p) = results.(sesName).(phases{p}).subord.(dataMeasure);
-%     end
-%   end
-% end
-% 
-% for p = 1:length(phases)
-%   figure
-%   
-%   bRT_mean = nanmean(rt.basic(:,:,p),1);
-%   bRT_sem = nanstd(rt.basic(:,:,p),1) ./ sqrt(sum(~isnan(rt.basic(:,:,p))));
-%   %plot(1:nTrainSes,bRT_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
-%   errorbar(bRT_mean,bRT_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
-%   hold on
-%   
-%   sRT_mean = nanmean(rt.subord(:,:,p),1);
-%   sRT_sem = nanstd(rt.subord(:,:,p),1) ./ sqrt(sum(~isnan(rt.subord(:,:,p))));
-%   %plot(1:nTrainSes,sRT_mean,'ks-','LineWidth',2);
-%   errorbar(sRT_mean,sRT_sem,'ks-','LineWidth',2);
-%   
-%   % oRT_mean = nanmean(rt.overall(:,:,p),1);
-%   % oRT_sem = nanstd(rt.overall(:,:,p),1) ./ sqrt(sum(~isnan(rt.overall(:,:,p))));
-%   % % plot(1:nTrainSes,oRT_mean,'ro-','LineWidth',2);
-%   % errorbar(oRT_mean,oRT_sem,'ro-','LineWidth',2);
-%   hold off
-%   
-%   %axis([0.5 (nTrainSes + 0.5) 0 round(max(rt.overall(:))/100)*100]);
-%   axis([0.5 (nTrainSes + 0.5) 0 600]);
-%   title(sprintf('Naming phase %d: %s',p,strrep(dataMeasure,'_','\_')));
-%   xlabel('Training Day');
-%   ylabel('Response Time (ms)');
-%   
-%   legend({'Basic','Subordinate'},'Location','NorthEast');
-%   %legend({'Basic','Subordinate','Overall'});
-%   
-%   publishfig(gcf,0);
-% end
-
-% %% plot basic and subordinate accuracy across training days
-% 
-% nTrainSes = 6;
-% phases = {'name_1','name_2','name_3','name_4'};
-% 
-% acc.overall = nan(length(subjects),nTrainSes,length(phases));
-% acc.basic = nan(length(subjects),nTrainSes,length(phases));
-% acc.subord = nan(length(subjects),nTrainSes,length(phases));
-% 
 % dataMeasure = 'acc';
-% 
-% for t = 1:nTrainSes
-%   sesName = sprintf('train%d',t);
-%   for p = 1:length(phases)
-%     if isfield(results.(sesName),phases{p})
-%       acc.overall(:,t,p) = results.(sesName).(phases{p}).overall.(dataMeasure);
-%       acc.basic(:,t,p) = results.(sesName).(phases{p}).basic.(dataMeasure);
-%       acc.subord(:,t,p) = results.(sesName).(phases{p}).subord.(dataMeasure);
-%     end
-%   end
+% dataLabel = 'Accuracy';
+% ylimits = [0 1];
+
+sessions = {'pretest', 'posttest', 'posttest_delay'};
+phases = {'recog_1'};
+recogField = {'recogtest'};
+% naming = {'basic','subord'};
+
+data.(dataMeasure) = struct;
+data.(dataMeasure) = nan(length(subjects),length(sessions),length(phases),length(recogField));
+% for n = 1:length(naming)
+%   data.(dataMeasure).(naming{n}) = nan(length(subjects),length(sessions),length(phases),length(recogField));
 % end
-% 
-% for p = 1:length(phases)
-%   figure
-%   
-%   bAcc_mean = nanmean(acc.basic(:,:,p),1);
-%   bAcc_sem = nanstd(acc.basic(:,:,p),1) ./ sqrt(sum(~isnan(acc.basic(:,:,p))));
-%   %plot(1:nTrainSes,bAcc_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
-%   errorbar(bAcc_mean,bAcc_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
-%   hold on
-%   
-%   sAcc_mean = nanmean(acc.subord(:,:,p),1);
-%   sAcc_sem = nanstd(acc.subord(:,:,p),1) ./ sqrt(sum(~isnan(acc.subord(:,:,p))));
-%   %plot(1:nTrainSes,sAcc_mean,'ks-','LineWidth',2);
-%   errorbar(sAcc_mean,sAcc_sem,'ks-','LineWidth',2);
-%   
-%   % oAcc_mean = nanmean(acc.overall(:,:,p),1);
-%   % oAcc_sem = nanstd(acc.overall(:,:,p),1) ./ sqrt(sum(~isnan(acc.overall(:,:,p))));
-%   % % plot(1:nTrainSes,oAcc_mean,'ro-','LineWidth',2);
-%   % errorbar(oAcc_mean,oAcc_sem,'ro-','LineWidth',2);
-%   hold off
-%   
-%   %axis([0.5 6.5 0 round(max(acc.overall(:))/100)*100]);
-%   axis([0.5 6.5 0.5 1]);
-%   title(sprintf('Naming phase %d: %s',p,strrep(dataMeasure,'_','\_')));
-%   xlabel('Training Day');
-%   ylabel('Accuracy');
-%   
-%   legend({'Basic','Subordinate'},'Location','SouthEast');
-%   %legend({'Basic','Subordinate','Overall','Location','SouthEast'});
-%   
-%   publishfig(gcf,0);
-% end
+
+for s = 1:length(sessions)
+  sesName = sessions{s};
+  for p = 1:length(phases)
+    for t = 1:length(recogField)
+        data.(dataMeasure)(:,s,p,t) = results.(sesName).(phases{p}).(recogField{t}).(dataMeasure);
+    end
+  end
+end
+
+for p = 1:length(phases)
+    figure
+    data_mean = nan(length(sessions),length(recogField));
+    data_sem = nan(length(sessions),length(recogField));
+    
+    for t = 1:length(recogField)
+      for s = 1:length(sessions)
+        data_mean(s,t) = nanmean(data.(dataMeasure)(:,s,p,t),1);
+        data_sem(s,t) = nanstd(data.(dataMeasure)(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure)(:,s,p,t))));
+      end
+    end
+    
+    bw_title = sprintf('%s',strrep(phases{p},'_','\_'));
+    bw_groupnames = {'pretest', 'posttest', 'One week later'};
+    %bw_legend = {'Recognition'};
+    bw_legend = [];
+    %bw_xlabel = 'Test day';
+    bw_xlabel = [];
+    bw_ylabel = dataLabel;
+    bw_colormap = 'gray';
+    bw_data = data_mean;
+    bw_errors = data_sem;
+    bw_width = 0.5;
+    h = barweb(bw_data,bw_errors,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
+    %set(h.legend,'Location','NorthWest');
+    axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
+    publishfig(gcf,0);
+    
+    if saveFigs
+      print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_recog_%s_%s_%s',phases{p},dataMeasure,naming{n})));
+    end
+end
+
+
