@@ -200,7 +200,7 @@ for p = 1:length(phases)
     bw_errors = data_sem;
     h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
     set(h.legend,'Location','NorthWest');
-    axis([0.5 3.5 ylimits(1) ylimits(2)]);
+    axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
     publishfig(gcf,0);
     
     if saveFigs
@@ -274,7 +274,7 @@ for i = 1:length(imgConds)
       bw_errors = data_sem;
       h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
       set(h.legend,'Location','NorthWest');
-      axis([0.5 3.5 ylimits(1) ylimits(2)]);
+      axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
       publishfig(gcf,0);
       if saveFigs
         print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s',phases{p},dataMeasure,naming{n},imgConds{i})));
