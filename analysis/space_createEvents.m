@@ -81,7 +81,7 @@ switch phaseName
       'stimStr',[], 'stimNum',[], 'targ',[],...
       'spaced',[], 'lag',[],...
       'presNum',[], 'pairNum',[], 'pairOrd',[],...
-      'catStr',[], 'catNum',[],...
+      'i_catStr',[], 'i_catNum',[],...
       'resp',[], 'rt',[]);
     
     for i = 1:length(log)
@@ -197,7 +197,7 @@ switch phaseName
       'stimStr',logData{msS.stimStr}, 'stimNum',num2cell(single(logData{msS.stimNum})), 'targ',num2cell(logical(logData{msS.targ})),...
       'spaced',num2cell(logical(logData{msS.spaced})), 'lag',num2cell(single(logData{msS.lag})),...
       'presNum',num2cell(single(logData{msS.presNum})), 'pairNum',num2cell(single(logData{msS.pairNum})), 'pairOrd',num2cell(single(logData{msS.pairOrd})),...
-      'catStr',logData{msS.i_catStr}, 'catNum',num2cell(single(logData{msS.i_catNum})));
+      'i_catStr',logData{msS.i_catStr}, 'i_catNum',num2cell(single(logData{msS.i_catNum})));
     
     % only keep certain types of events
     log = log(ismember({log.type},{'STUDY_IMAGE', 'STUDY_WORD'}));
@@ -400,7 +400,7 @@ switch phaseName
       'type',logData{crS.type}, 'trial',num2cell(single(logData{crS.trial})),...
       'stimStr',logData{crS.i_stimStr}, 'stimNum',num2cell(single(logData{crS.i_stimNum})), 'targ',num2cell(logical(logData{crS.targ})),...
       'spaced',num2cell(logical(logData{crS.spaced})), 'lag',num2cell(single(logData{crS.lag})),...
-      'pairNum',num2cell(single(logData{crS.pairNum})), 'catStr',logData{crS.i_catStr}, 'catNum',num2cell(single(logData{crS.i_catNum})),...
+      'pairNum',num2cell(single(logData{crS.pairNum})), 'i_catStr',logData{crS.i_catStr}, 'i_catNum',num2cell(single(logData{crS.i_catNum})),...
       'recog_resp',[], 'recog_acc',[], 'recog_rt',[],...
       'new_resp',[], 'new_acc',[], 'new_rt',[],...
       'recall_origword',[], 'recall_resp',[], 'recall_spellCorr',[], 'recall_rt',[]);
@@ -416,7 +416,7 @@ switch phaseName
           log(i).recog_rt = single(logData{crS.recog_rt}(i));
           
           % find the corresponding RECOGTEST_RECOGSTIM
-          thisRecogStim = strcmp({log.type},'RECOGTEST_STIM') & [log.stimNum] == log(i).stimNum & [log.catNum] == log(i).catNum;
+          thisRecogStim = strcmp({log.type},'RECOGTEST_STIM') & [log.stimNum] == log(i).stimNum & [log.i_catNum] == log(i).i_catNum;
           if sum(thisRecogStim) == 1
             % put info in stimulus presentations
             log(thisRecogStim).recog_resp = log(i).recog_resp;
@@ -495,7 +495,7 @@ switch phaseName
       
       if propagateNewRecall
         % find the corresponding RECOGTEST_RECOGSTIM
-        thisRecogStim = strcmp({log.type},'RECOGTEST_STIM') & [log.stimNum] == log(i).stimNum & [log.catNum] == log(i).catNum;
+        thisRecogStim = strcmp({log.type},'RECOGTEST_STIM') & [log.stimNum] == log(i).stimNum & [log.i_catNum] == log(i).i_catNum;
         if sum(thisRecogStim) == 1
           % put info in stimulus presentations
           log(thisRecogStim).new_resp = log(i).new_resp;
@@ -511,7 +511,7 @@ switch phaseName
         end
         
         % find the corresponding RECOGTEST_RECOGRESP
-        thisRecogResp = strcmp({log.type},'RECOGTEST_RECOGRESP') & [log.stimNum] == log(i).stimNum & [log.catNum] == log(i).catNum;
+        thisRecogResp = strcmp({log.type},'RECOGTEST_RECOGRESP') & [log.stimNum] == log(i).stimNum & [log.i_catNum] == log(i).i_catNum;
         if sum(thisRecogResp) == 1
           % put info in the recognition response
           log(thisRecogResp).new_resp = log(i).new_resp;
