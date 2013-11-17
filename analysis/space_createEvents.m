@@ -22,7 +22,7 @@ end
 isPilotData = false;
 
 switch phaseName
-  case {'expo'}
+  case {'expo', 'prac_expo'}
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_expo_%d.txt',sesName,phaseName,phaseCount));
     
     formatStr = '%.6f%s%s%s%d%d%s%d%s%s%s%s%s%s%s%s%s%s';
@@ -82,7 +82,8 @@ switch phaseName
       'spaced',[], 'lag',[],...
       'presNum',[], 'pairNum',[], 'pairOrd',[],...
       'i_catStr',[], 'i_catNum',[],...
-      'resp',[], 'rt',[]);
+      'resp',[], 'rt',[],...
+      'cr_recog_acc', [], 'cr_recall_acc', []);
     
     for i = 1:length(log)
       switch log(i).type
@@ -145,7 +146,7 @@ switch phaseName
       events.isComplete = true;
     end
     
-  case {'multistudy'}
+  case {'multistudy', 'prac_multistudy'}
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_multistudy_%d.txt',sesName,phaseName,phaseCount));
     
     formatStr = '%.6f%s%s%s%d%d%s%d%s%d%d%d%d%d%d%d%s%d';
@@ -171,8 +172,8 @@ switch phaseName
       msS.presNum = 14;
       msS.pairNum = 15;
       msS.pairOrd = 16;
-      msS.i_catStr = 17;
-      msS.i_catNum = 18;
+      msS.catStr = 17;
+      msS.catNum = 18;
       
       % read the real file
       fid = fopen(logFile,'r');
@@ -197,7 +198,8 @@ switch phaseName
       'stimStr',logData{msS.stimStr}, 'stimNum',num2cell(single(logData{msS.stimNum})), 'targ',num2cell(logical(logData{msS.targ})),...
       'spaced',num2cell(logical(logData{msS.spaced})), 'lag',num2cell(single(logData{msS.lag})),...
       'presNum',num2cell(single(logData{msS.presNum})), 'pairNum',num2cell(single(logData{msS.pairNum})), 'pairOrd',num2cell(single(logData{msS.pairOrd})),...
-      'i_catStr',logData{msS.i_catStr}, 'i_catNum',num2cell(single(logData{msS.i_catNum})));
+      'catStr',logData{msS.catStr}, 'catNum',num2cell(single(logData{msS.catNum})),...
+      'cr_recog_acc', [], 'cr_recall_resp', [], 'cr_recall_acc', []);
     
     % only keep certain types of events
     log = log(ismember({log.type},{'STUDY_IMAGE', 'STUDY_WORD'}));
@@ -215,7 +217,7 @@ switch phaseName
       events.isComplete = true;
     end
     
-  case {'distract_math'}
+  case {'distract_math', 'prac_distract_math'}
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_distMath_%d.txt',sesName,phaseName,phaseCount));
     
     % this format string should work for view, stim, and resp trials
@@ -300,7 +302,7 @@ switch phaseName
       events.isComplete = true;
     end
     
-  case {'cued_recall'}
+  case {'cued_recall', 'prac_cued_recall'}
     % whether to interactively check the spelling of cued recall trials
     checkSpelling = true;
     
@@ -414,6 +416,19 @@ switch phaseName
           log(i).recog_resp = logData{crS.recog_resp}{i};
           log(i).recog_acc = logical(logData{crS.recog_acc}(i));
           log(i).recog_rt = single(logData{crS.recog_rt}(i));
+          
+          if isempty(log(i).recog_resp) || strcmp(log(i).recog_resp,'NO_RESPONSE')
+            log(i).new_resp = '';
+            log(i).new_acc = false;
+            log(i).new_rt = -1;
+            
+            log(i).recall_origword = '';
+            log(i).recall_resp = '';
+            log(i).recall_spellCorr = false;
+            log(i).recall_rt = -1;
+            
+            propagateNewRecall = true;
+          end
           
           % find the corresponding RECOGTEST_RECOGSTIM
           thisRecogStim = strcmp({log.type},'RECOGTEST_STIM') & [log.stimNum] == log(i).stimNum & [log.i_catNum] == log(i).i_catNum;
