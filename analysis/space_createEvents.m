@@ -112,7 +112,7 @@ switch phaseName
             log(i).resp = 1;
           else
           %elseif strcmp(logData{expoS.r_resp}{i},'NO_RESPONSE')
-            log(i).resp = -1;
+            log(i).resp = 0;
           end
           log(i).rt = single(str2double(logData{expoS.r_rt}(i)));
           
