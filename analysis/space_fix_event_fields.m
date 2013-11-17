@@ -10,6 +10,17 @@ function space_fix_event_fields
 %
 % Fix 2:
 % fix some cued recall empty fields when NO_RESPONSE occurs
+%
+% OR:
+%
+% Fix 3:
+% transfer event info in existing event files
+%
+% OR:
+%
+% Fix 4:
+% change expo rating negative ones to zeros
+%
 
 dataroot = '~/data/SPACE/Behavioral/Sessions';
 % subjects = {'SPACE001'};
@@ -18,7 +29,7 @@ subjects = {'SPACE001', 'SPACE002', 'SPACE003', 'SPACE004', 'SPACE005', 'SPACE00
 % sesDir = sprintf('session_%d',sesNum);
 sesName = 'oneDay';
 
-fixNum = 3;
+fixNum = 4;
 
 %% Fix 1
 
@@ -394,6 +405,57 @@ if fixNum == 3
       % set this phase as complete
       events.(sesName).(u_phases{up}).isComplete = true;
     end
+    
+    save(eventsFile,'events');
+    fprintf('\n');
+    
+  end % subject
+  
+end
+
+%% Fix 4 - change expo rating negative ones to zeros
+
+if fixNum == 4
+  phaseNames = {'expo'};
+  phaseCounts = 1:7;
+  
+  for sub = 1:length(subjects)
+    subject = subjects{sub};
+    fprintf('%s...',subject);
+    
+    eventsFile = fullfile(dataroot,subject,'events','events.mat');
+    eventsFile_backup = fullfile(dataroot,subject,'events','events_old.mat');
+    
+    if exist(eventsFile,'file')
+      unix(sprintf('cp %s %s',eventsFile,eventsFile_backup));
+      load(eventsFile);
+    else
+      error('Could not find events file: %s',eventsFile);
+    end
+    
+    for pn = 1:length(phaseNames)
+      phaseName = phaseNames{pn};
+      fprintf('%s...',phaseName);
+      
+      if strcmp(phaseName,'expo')
+        negOneInd = find([events.(sesName).(phaseName).data.resp] == -1);
+        if ~isempty(negOneInd)
+          for i = 1:length(negOneInd)
+            events.(sesName).(phaseName).data(negOneInd(i)).resp = 0;
+          end
+        end
+        
+        for phaseCount = phaseCounts
+          negOneInd = find([events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data.resp] == -1);
+          if ~isempty(negOneInd)
+            for i = 1:length(negOneInd)
+              events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data(negOneInd(i)).resp = 0;
+            end
+          end
+          
+        end % phaseCount
+      end
+    end % phaseNames
     
     save(eventsFile,'events');
     fprintf('\n');
