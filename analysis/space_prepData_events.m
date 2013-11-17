@@ -1,25 +1,21 @@
-function space_prepData_events(subjects,prep_eeg)
-% space_prepData_events(subjects,prep_eeg)
+function space_prepData_events(subjects)
+% space_prepData_events(subjects)
 %
 % Purpose
-%   Create behavioral events; if prep_eeg == 1: export Net Station events
+%   Create behavioral events
 %
 % Inputs
 %   subjects: a cell of subject numbers
-%
-%   prep_eeg: boolean, whether or not to prepare the EEG data
 %
 % Outputs
 %   Events (struct and NetStation) will be saved in:
 %     ~/data/SPACE/Behavioral/Sessions/subject/events
 %
 % Assumptions
-%   Each subject ran in both sessions (session_0 and session_1)
+%   Each subject ran in one session (oneDay)
 %
 %   The behavioral data is located in:
 %     ~/data/SPACE/Behavioral/Sessions/subject/session
-%
-% NB: EEG processing and NS event creation are not done yet
 %
 
 expName = 'SPACE';
@@ -99,26 +95,10 @@ if nargin == 0
 %     'SPACE043';
 %     'SPACE044';
 %     };
-  
-  prep_eeg = 0;
 end
-
-%sessions = {'session_0','session_1'};
-
-%matlabpool open
 
 for sub = 1:length(subjects)
   fprintf('Getting data for %s...\n',subjects{sub});
-  
-  if prep_eeg == 1
-    % find the bad channels for this subject and session
-    %       sesStruct = filterStruct(infoStruct,'ismember(subject,varargin{1}) & ismember(session,varargin{2})',subjects{sub},sessions{ses});
-    %       subSesBadChan = sesStruct.badChan;
-    %       if isempty(sesStruct)
-    %         error('no subject listing found for this session');
-    %       end
-    subSesBadChan = [];
-  end
   
   % set the subject events directory
   eventsOutdir_sub = fullfile(saveDir,subjects{sub},'events');
@@ -159,23 +139,201 @@ for sub = 1:length(subjects)
         % set the phase count
         phaseCount = uniquePhaseCounts(uniquePhaseInd);
         
-        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          %if ~lockFile(eventsOutfile_sub)
-          %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum,phaseName,phaseCount);
-          
-          % create the events
-          events = space_createEvents(events,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
-          
-          % release the lockFile
-          %releaseFile(eventsOutfile_sub);
-        end
+        %if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+        %if ~lockFile(eventsOutfile_sub)
+        %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum,phaseName,phaseCount);
         
+        % create the events
+        events = space_createEvents(events,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
+        
+        % release the lockFile
+        %releaseFile(eventsOutfile_sub);
+        %end
       end
       
-      % collapse phases
-      fprintf('\n');
+      %% put subsequent memory info in exposure events
       
-      fprintf('Collapsing phases together...');
+      sourceDestPhases = {'cued_recall', 'expo'};
+      sourceStimType = {'RECOGTEST_STIM'};
+      fn_ses = fieldnames(events.(sesName));
+      
+      fprintf('Putting %s info in %s events...\n',sourceDestPhases{1},sourceDestPhases{2});
+      
+      for fn = 1:length(fn_ses)
+        if ~isstrprop(fn_ses{fn}(end),'digit') && ~strcmp(fn_ses{fn}(end-1),'_')
+          continue
+        end
+        
+        if ~isempty(strfind(fn_ses{fn},sourceDestPhases{1}))
+          sourcePhase = fn_ses{fn};
+          
+          if isempty(strfind(fn_ses{fn},'prac_'))
+            phaseCount = str2double(strrep(fn_ses{fn},sprintf('%s_',sourceDestPhases{1}),''));
+            destPhase = sprintf('%s_%d',sourceDestPhases{2},phaseCount);
+          else
+            phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1})));
+            destPhase = sprintf('prac_%s_%d',sourceDestPhases{2},phaseCount);
+          end
+          
+          if isfield(events.(sesName),sourcePhase) && isfield(events.(sesName),destPhase)
+            % set apart the correct subset of source events
+            sourceEvents = events.(sesName).(sourcePhase).data(ismember({events.(sesName).(sourcePhase).data.type},sourceStimType));
+            
+            % go through the destination events
+            for ev = 1:length(events.(sesName).(destPhase).data)
+              %keyboard
+              if events.(sesName).(destPhase).data(ev).targ
+                % find the source event
+                sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(ev).stimNum & ...
+                  [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(ev).i_catNum);
+                
+                % transfer information
+                if ~isempty(sourceInd)
+                  if length(sourceInd) == 1
+                    events.(sesName).(destPhase).data(ev).cr_recog_acc = sourceEvents(sourceInd).recog_acc;
+                    if ~strcmp(sourceEvents(sourceInd).recall_resp,'NO_RESPONSE') && ~isempty(sourceEvents(sourceInd).recall_resp)
+                      events.(sesName).(destPhase).data(ev).cr_recall_resp = true;
+                    else
+                      events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                    end
+                    events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = sourceEvents(sourceInd).recall_spellCorr;
+                  else
+                    fprintf('Found more than one source event!\n');
+                    keyboard
+                  end
+                else
+                  % IMPORTANT: there will be no source event for single
+                  % presentation destination events (lag==-1) if single
+                  % presentation items are not tested
+                  % (cfg.stim.testOnePres=false). This should be changed if
+                  % we test single presentation items.
+                  
+                  if events.(sesName).(destPhase).data(ev).lag == -1
+                    events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                    events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                    events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+                  else
+                    fprintf('Did not find the source event!\n');
+                    keyboard
+                  end
+                end
+              else
+                events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+              end
+            end
+          else
+            fprintf('Source phase ''%s'' and/or destionation phase ''%s'' does not exist!\n',sourcePhase,destPhase);
+            keyboard
+          end
+        end
+      end
+      
+      %% put subsequent memory info in study events
+      
+      sourceDestPhases = {'cued_recall', 'multistudy'};
+      sourceStimType = {'RECOGTEST_STIM'};
+      fn_ses = fieldnames(events.(sesName));
+      
+      fprintf('Putting %s info in %s events...\n',sourceDestPhases{1},sourceDestPhases{2});
+      
+      for fn = 1:length(fn_ses)
+        if ~isstrprop(fn_ses{fn}(end),'digit') && ~strcmp(fn_ses{fn}(end-1),'_')
+          continue
+        end
+        
+        if ~isempty(strfind(fn_ses{fn},sourceDestPhases{1}))
+          sourcePhase = fn_ses{fn};
+          
+          if isempty(strfind(fn_ses{fn},'prac_'))
+            phaseCount = str2double(strrep(fn_ses{fn},sprintf('%s_',sourceDestPhases{1}),''));
+            destPhase = sprintf('%s_%d',sourceDestPhases{2},phaseCount);
+          else
+            phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1})));
+            destPhase = sprintf('prac_%s_%d',sourceDestPhases{2},phaseCount);
+          end
+          
+          if isfield(events.(sesName),sourcePhase) && isfield(events.(sesName),destPhase)
+            % set apart the correct subset of source events
+            sourceEvents = events.(sesName).(sourcePhase).data(ismember({events.(sesName).(sourcePhase).data.type},sourceStimType));
+            
+            % go through the destination events
+            for ev = 1:length(events.(sesName).(destPhase).data)
+              %keyboard
+              if events.(sesName).(destPhase).data(ev).targ
+                % find the source event
+                if strcmp(events.(sesName).(destPhase).data(ev).type,'STUDY_IMAGE')
+                  sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(ev).stimNum & ...
+                    [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(ev).catNum);
+                elseif strcmp(events.(sesName).(destPhase).data(ev).type,'STUDY_WORD')
+                  % find the image that went with this word
+                  imgInd = [events.(sesName).(destPhase).data.pairNum] == events.(sesName).(destPhase).data(ev).pairNum & ...
+                    [events.(sesName).(destPhase).data.presNum] == events.(sesName).(destPhase).data(ev).presNum & ...
+                    ismember({events.(sesName).(destPhase).data.type},'STUDY_IMAGE');
+                  if sum(imgInd) == 1
+                    sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(imgInd).stimNum & ...
+                      [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(imgInd).catNum & ...
+                      ismember(lower({sourceEvents.recall_origword}),lower(events.(sesName).(destPhase).data(ev).stimStr)));
+                    if isempty(sourceInd)
+                      % old stimuli called 'new' do not get recall_origword
+                      % assigned for some reason
+                      sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(imgInd).stimNum & ...
+                        [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(imgInd).catNum);
+                    end
+                  else
+                    fprintf('More than one image match found!\n');
+                    keyboard
+                  end
+                  %sourceInd = find(ismember(lower({sourceEvents.recall_origword}),lower(events.(sesName).(destPhase).data(ev).stimStr)));
+                end
+                
+                % transfer information
+                if ~isempty(sourceInd)
+                  if length(sourceInd) == 1
+                    events.(sesName).(destPhase).data(ev).cr_recog_acc = sourceEvents(sourceInd).recog_acc;
+                    if ~strcmp(sourceEvents(sourceInd).recall_resp,'NO_RESPONSE') && ~isempty(sourceEvents(sourceInd).recall_resp)
+                      events.(sesName).(destPhase).data(ev).cr_recall_resp = true;
+                    else
+                      events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                    end
+                    events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = sourceEvents(sourceInd).recall_spellCorr;
+                  else
+                    fprintf('Found more than one source event!\n');
+                    keyboard
+                  end
+                else
+                  % IMPORTANT: there will be no source event for single
+                  % presentation destination events (lag==-1) if single
+                  % presentation items are not tested
+                  % (cfg.stim.testOnePres=false). This should be changed if
+                  % we test single presentation items.
+                  
+                  if events.(sesName).(destPhase).data(ev).lag == -1
+                    events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                    events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                    events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+                  else
+                    fprintf('Did not find the source event!\n');
+                    keyboard
+                  end
+                end
+              else
+                events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+              end
+            end
+          else
+            fprintf('Source phase ''%s'' and/or destionation phase ''%s'' does not exist!\n',sourcePhase,destPhase);
+            keyboard
+          end
+        end
+      end
+      
+      %% collapse phases
+      
+      fprintf('\nCollapsing phases together...');
       % remove the phase numbers
       fn = fieldnames(events.(sesName));
       fn_trunc = fn;
@@ -237,40 +395,7 @@ for sub = 1:length(subjects)
   save(eventsOutfile_sub,'events');
   fprintf('Done.\n');
   
-  %% prep the EEG data
-  if prep_eeg == 1
-    for sesNum = 1:length(expParam.sesTypes)
-      fprintf('Prepping EEG data for %s...\n',expParam.sesTypes{sesNum});
-      % get this subject's session dir
-      subDir = fullfile(dataroot,subjects{sub});
-      sesDir = fullfile(subDir,sprintf('session_%d',sesNum));
-      
-      subEegDir = fullfile(sesDir,'eeg','eeg.noreref');
-      pfile = dir(fullfile(subEegDir,[subjects{sub},'*params.txt']));
-      
-      if ~exist(fullfile(subEegDir,pfile.name),'file')
-        curDir = pwd;
-        % cd to the session directory since prep_egi_data needs to be there
-        cd(sesDir);
-        % align the behavioral and EEG data
-        %
-        % TODO: make sure this works
-        prep_egi_data_CU(subjects{sub},sesDir,{fullfile(subDir,'events',sprintf('events_ses%d.mat',sesNum))},subSesBadChan,'mstime','HCGSN');
-        % go back to the previous working directory
-        cd(curDir);
-      end
-      
-      % export the events for netstation; saves to the session's events dir
-      %
-      % TODO: create/fix space_events2ns so it doesn't rely on events in
-      % session directory
-      fprintf('space_events2ns IS NOT DONE YET!!!\n');
-      space_events2ns(dataroot,subjects{sub},sesNum);
-      
-    end % ses
-    
-  end % prep_eeg
   fprintf('Done processing %s.\n',subjects{sub});
 end % sub
 
-%matlabpool close
+end % function
