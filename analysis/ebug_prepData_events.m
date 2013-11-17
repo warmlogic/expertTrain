@@ -104,16 +104,16 @@ for sub = 1:length(subjects)
         % set the phase count
         phaseCount = uniquePhaseCounts(uniquePhaseInd);
         
-        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-          %if ~lockFile(eventsOutfile_sub)
-          %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum,phaseName,phaseCount);
-          
-          % create the events
-          events = ebug_createEvents(events,cfg,expParam,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
-          
-          % release the lockFile
-          %releaseFile(eventsOutfile_sub);
-        end
+        %if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+        %if ~lockFile(eventsOutfile_sub)
+        %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum,phaseName,phaseCount);
+        
+        % create the events
+        events = ebug_createEvents(events,cfg,expParam,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
+        
+        % release the lockFile
+        %releaseFile(eventsOutfile_sub);
+        %end
         
       end
     end
