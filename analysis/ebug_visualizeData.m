@@ -10,11 +10,11 @@ expName = 'EBUG';
 
 %serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
 % Use Path below when curranlab server is mounted on another username
-serverDir = fullfile(filesep,'Volumes','curranlab-1','Data',expName,'Behavioral','Sessions');
+serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
 
 %serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
 % Use Path below when curranlab server is mounted on another username
-serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab-1','Data',expName,'Behavioral','Sessions');
+serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
 localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
 if exist(serverDir,'dir')
   dataroot = serverDir;
@@ -32,6 +32,9 @@ subjects = {
 %  'EBUG003';
    'EBUG004';
    'EBUG005';
+   'EBUG006';
+   'EBUG007';
+   'EBUG008';
   };
 
 saveFigs = true;
@@ -64,10 +67,10 @@ data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 
-dataMeasure = 'rt';
+% dataMeasure = 'rt';
 % dataMeasure = 'rt_cor';
 % dataMeasure = 'rt_inc';
-% dataMeasure = 'acc';
+dataMeasure = 'acc';
 % dataMeasure = 'dp';
 
 tpCounter = 0;
@@ -119,7 +122,7 @@ elseif strcmp(dataMeasure,'acc')
   ylabel('Accuracy');
   
 %   axis([0.5 (size(data.subord,2) + 0.5) 0.5 round(max(data.overall(:))*100)/100]);
-  axis([0.5 (size(data.subord,2) + 0.5) 0.4 1]);
+  axis([0.5 (size(data.subord,2) + 0.5) 0.3 1]);
   
   legendLoc = 'SouthEast';
 elseif strcmp(dataMeasure,'dp')
@@ -144,7 +147,7 @@ if saveFigs
   print(gcf,'-dpng',fullfile(figsDir,sprintf('training_name_%s',dataMeasure)));
 end
 
-%% Match accuracy for pretest, posttest, posttest_delay
+%% Matching accuracy for pretest, posttest, posttest_delay
 
 % plot basic and subordinate data for pretest, posttest, posttest_delay
 
@@ -220,7 +223,7 @@ ylimits = [0 4];
 
 % dataMeasure = 'acc';
 % dataLabel = 'Accuracy';
-% ylimits = [0 1];
+% ylimits = [0.5 1];
 
 sessions = {'train2', 'train3', 'train4', 'train5', 'train6'};
 phases = {'match_1','match_2'};
@@ -278,13 +281,13 @@ end
 
 %% recognition accuracy for pretest, posttest, posttest_delay
 
-dataMeasure = 'dp';
-dataLabel = 'd''';
-ylimits = [0 3];
+% dataMeasure = 'dp';
+% dataLabel = 'd''';
+% ylimits = [0 3];
 
-% dataMeasure = 'acc';
-% dataLabel = 'Accuracy';
-% ylimits = [0 1];
+dataMeasure = 'acc';
+dataLabel = 'Accuracy';
+ylimits = [0.5 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
 phases = {'recog_1'};
@@ -335,7 +338,7 @@ for p = 1:length(phases)
     publishfig(gcf,0);
     
     if saveFigs
-      print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_recog_%s_%s_%s',phases{p},dataMeasure,naming{n})));
+      print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_recog_%s_%s_%s',phases{p},dataMeasure,recogField{t})));
     end
 end
 
