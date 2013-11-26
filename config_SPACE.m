@@ -458,9 +458,9 @@ if expParam.sessionNum == 1
   % instruct: instructions
   % fixSize: fixation
   if ispc
-    cfg.text.basicTextSize = 18;
+    cfg.text.basicTextSize = 24;
     cfg.text.instructTextSize = 18;
-    cfg.text.fixSize = 18;
+    cfg.text.fixSize = 24;
   elseif ismac
     cfg.text.basicTextSize = 32;
     cfg.text.instructTextSize = 28;
