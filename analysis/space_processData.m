@@ -2,6 +2,9 @@ function [results] = space_processData(results,dataroot,subjects,collapsePhases,
 % function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
+%
+% e.g.,
+% [results] = space_processData([],[],[],true,true,true,true,false,true);
 
 if ~exist('results','var') || isempty(results)
   results = [];
