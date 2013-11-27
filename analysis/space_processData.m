@@ -17,7 +17,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE005';
     'SPACE006';
     'SPACE007';
-    'SPACE008';
+    %'SPACE008';
     'SPACE009';
     'SPACE010';
     'SPACE011';
