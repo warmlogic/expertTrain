@@ -345,12 +345,12 @@ if isempty(results)
                 end
                 
                 % image categories
-                catStrs = unique({targEvents.catStr},'stable');
-                if length(catStrs) > 1 && separateCategories
-                  for im = 1:length(catStrs)
+                i_catStrs = unique({targEvents.i_catStr},'stable');
+                if length(i_catStrs) > 1 && separateCategories
+                  for im = 1:length(i_catStrs)
                     for mf = 1:length(mainFields)
                       for df = 1:length(dataFields)
-                        results.(sesName).(fn).(lagStr).(catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                        results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
                       end
                     end
                   end
@@ -558,12 +558,12 @@ if isempty(results)
                       end
                       
                       % accuracy for the different image categories
-                      catStrs = unique({targEvents.catStr},'stable');
+                      i_catStrs = unique({targEvents.i_catStr},'stable');
                       % if there's only 1 image category, the results were
                       % printed above
-                      if length(catStrs) > 1 && separateCategories
+                      if length(i_catStrs) > 1 && separateCategories
                         fprintf('\n');
-                        for im = 1:length(catStrs)
+                        for im = 1:length(i_catStrs)
                           for mf = 1:length(mainFields)
                             thisField = mainFields{mf};
                             
@@ -571,11 +571,11 @@ if isempty(results)
                             theseEvents = targEvents(...
                               strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
                               ismember([targEvents.lag],lagConds(lc)) &...
-                              strcmpi({targEvents.catStr},catStrs{im}));
+                              strcmpi({targEvents.i_catStr},i_catStrs{im}));
                             %theseEvents = targEvents(...
                             %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
                             %  ismember([targEvents.lag],lagConds(lc)) &...
-                            %  strcmpi({targEvents.catStr},catStrs{im}) &...
+                            %  strcmpi({targEvents.i_catStr},i_catStrs{im}) &...
                             %  [targEvents.targ]);
                             
                             if strcmp(thisField,'recog')
@@ -601,11 +601,11 @@ if isempty(results)
                             nIncField = sprintf('%s_nInc',thisField);
                             rtField = sprintf('%s_rt',thisField);
                             
-                            results.(sesName).(fn).(lagStr).(catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(catStrs{im}),thisField,...
+                            results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),thisField,...
                               accField,hrField,farField,nCorField,nIncField,rtField);
-                            theseResults = results.(sesName).(fn).(lagStr).(catStrs{im}).(thisField);
+                            theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(thisField);
                             if printResults
-                              fprintf('\t%s %s\n',catStrs{im},thisField);
+                              fprintf('\t%s %s\n',i_catStrs{im},thisField);
                               fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
                               fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
                             end
@@ -775,9 +775,9 @@ for sesNum = 1:length(expParam.sesTypes)
               end
               
               % separate categories
-              catStrs = unique({targEvents.catStr},'stable');
-              if length(catStrs) > 1 && separateCategories
-                headerCell = {{lagStr},catStrs,mainToPrint};
+              i_catStrs = unique({targEvents.i_catStr},'stable');
+              if length(i_catStrs) > 1 && separateCategories
+                headerCell = {{lagStr},i_catStrs,mainToPrint};
                 [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
                 fprintf(fid,sprintf('\t%s\n',headerStr));
                 [headerStr] = setHeaderStr({generic_dataToPrint},1);
@@ -787,9 +787,9 @@ for sesNum = 1:length(expParam.sesTypes)
                 
                 for sub = 1:length(subjects)
                   dataStr = subjects{sub};
-                  for im = 1:length(catStrs)
+                  for im = 1:length(i_catStrs)
                     for mf = 1:length(mainToPrint)
-                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,catStrs{im},mainToPrint{mf}},results,sub,dataToPrint{mf});
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,dataToPrint{mf});
                     end
                   end
                   fprintf(fid,sprintf('%s\n',dataStr));
