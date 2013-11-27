@@ -26,11 +26,11 @@ behDataFolder = 'Behavioral';
 serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,behDataFolder,'Sessions');
 serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,behDataFolder,'Sessions');
 localDir = fullfile(getenv('HOME'),'data',expName,behDataFolder,'Sessions');
-if exist(serverDir,'dir')
+if isfield(dirs,'serverDir') && exist(serverDir,'dir')
   dataroot = serverDir;
-elseif exist(serverLocalDir,'dir')
+elseif isfield(dirs,'serverLocalDir') && exist(serverLocalDir,'dir')
   dataroot = serverLocalDir;
-elseif exist(localDir,'dir')
+elseif isfield(dirs,'localDir') && exist(localDir,'dir')
   dataroot = localDir;
 else
   error('No data directory found.');
@@ -46,59 +46,65 @@ if nargin == 0
     'SPACE005';
     'SPACE006';
     'SPACE007';
+    'SPACE008';
+    'SPACE009';
+    'SPACE010';
+    'SPACE011';
+    'SPACE012';
+    'SPACE013';
     };
   
-%   % behavioral pilot
-%   subjects = {
-%     'SPACE001';
-%     'SPACE002';
-%     'SPACE003';
-%     'SPACE004';
-%     'SPACE005';
-%     'SPACE006';
-%     'SPACE007';
-%     'SPACE008';
-%     'SPACE009';
-%     'SPACE010';
-%     'SPACE011';
-%     'SPACE012';
-%     'SPACE013';
-%     'SPACE014';
-%     'SPACE015';
-%     'SPACE016';
-%     'SPACE017';
-%     'SPACE018';
-%     'SPACE019';
-%     'SPACE020';
-%     'SPACE021';
-%     'SPACE022';
-%     'SPACE023';
-%     'SPACE024';
-%     'SPACE025';
-%     'SPACE026';
-%     'SPACE027';
-%     'SPACE028';
-%     'SPACE029';
-%     'SPACE030';
-%     'SPACE031';
-%     'SPACE032';
-%     'SPACE033';
-%     'SPACE034';
-%     'SPACE035';
-%     'SPACE036';
-%     'SPACE037';
-%     'SPACE038'; % responded "J" to almost all cued recall prompts
-%     'SPACE039';
-%     'SPACE040';
-%     'SPACE041';
-%     'SPACE042';
-%     'SPACE043';
-%     'SPACE044';
-%     };
+  %   % behavioral pilot
+  %   subjects = {
+  %     'SPACE001';
+  %     'SPACE002';
+  %     'SPACE003';
+  %     'SPACE004';
+  %     'SPACE005';
+  %     'SPACE006';
+  %     'SPACE007';
+  %     'SPACE008';
+  %     'SPACE009';
+  %     'SPACE010';
+  %     'SPACE011';
+  %     'SPACE012';
+  %     'SPACE013';
+  %     'SPACE014';
+  %     'SPACE015';
+  %     'SPACE016';
+  %     'SPACE017';
+  %     'SPACE018';
+  %     'SPACE019';
+  %     'SPACE020';
+  %     'SPACE021';
+  %     'SPACE022';
+  %     'SPACE023';
+  %     'SPACE024';
+  %     'SPACE025';
+  %     'SPACE026';
+  %     'SPACE027';
+  %     'SPACE028';
+  %     'SPACE029';
+  %     'SPACE030';
+  %     'SPACE031';
+  %     'SPACE032';
+  %     'SPACE033';
+  %     'SPACE034';
+  %     'SPACE035';
+  %     'SPACE036';
+  %     'SPACE037';
+  %     'SPACE038'; % responded "J" to almost all cued recall prompts
+  %     'SPACE039';
+  %     'SPACE040';
+  %     'SPACE041';
+  %     'SPACE042';
+  %     'SPACE043';
+  %     'SPACE044';
+  %     };
 end
 
 for sub = 1:length(subjects)
-  fprintf('Getting data for %s...\n',subjects{sub});
+  fprintf('Working on %s...\n',subjects{sub});
   
   % set the subject events directory
   eventsOutdir_sub = fullfile(saveDir,subjects{sub},'events');
@@ -106,16 +112,17 @@ for sub = 1:length(subjects)
     mkdir(eventsOutdir_sub);
   end
   
-  expParamFile = fullfile(dataroot,subjects{sub},'experimentParams.mat');
-  if exist(expParamFile,'file')
-    fprintf('Loading experiment parameter file for %s (%s).\n',subjects{sub},expParamFile);
-    load(expParamFile)
-  else
-    error('Experiment parameter file does not exist: %s',expParamFile);
-  end
-  
   eventsOutfile_sub = fullfile(eventsOutdir_sub,'events.mat');
   if ~exist(eventsOutfile_sub,'file')
+    
+    expParamFile = fullfile(dataroot,subjects{sub},'experimentParams.mat');
+    if exist(expParamFile,'file')
+      fprintf('Loading experiment parameter file for %s (%s).\n',subjects{sub},expParamFile);
+      load(expParamFile);
+    else
+      error('Experiment parameter file does not exist: %s',expParamFile);
+    end
+    
     fprintf('Creating events for %s (%s).\n',subjects{sub},eventsOutfile_sub);
     
     % initialize the events struct
@@ -171,7 +178,7 @@ for sub = 1:length(subjects)
             phaseCount = str2double(strrep(fn_ses{fn},sprintf('%s_',sourceDestPhases{1}),''));
             destPhase = sprintf('%s_%d',sourceDestPhases{2},phaseCount);
           else
-            phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1})));
+            phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1}),''));
             destPhase = sprintf('prac_%s_%d',sourceDestPhases{2},phaseCount);
           end
           
@@ -250,7 +257,7 @@ for sub = 1:length(subjects)
             phaseCount = str2double(strrep(fn_ses{fn},sprintf('%s_',sourceDestPhases{1}),''));
             destPhase = sprintf('%s_%d',sourceDestPhases{2},phaseCount);
           else
-            phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1})));
+            phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1}),''));
             destPhase = sprintf('prac_%s_%d',sourceDestPhases{2},phaseCount);
           end
           
