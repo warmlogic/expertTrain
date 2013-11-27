@@ -26,11 +26,11 @@ behDataFolder = 'Behavioral';
 serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,behDataFolder,'Sessions');
 serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,behDataFolder,'Sessions');
 localDir = fullfile(getenv('HOME'),'data',expName,behDataFolder,'Sessions');
-if isfield(dirs,'serverDir') && exist(serverDir,'dir')
+if exist('serverDir','var') && exist(serverDir,'dir')
   dataroot = serverDir;
-elseif isfield(dirs,'serverLocalDir') && exist(serverLocalDir,'dir')
+elseif exist('serverLocalDir','var') && exist(serverLocalDir,'dir')
   dataroot = serverLocalDir;
-elseif isfield(dirs,'localDir') && exist(localDir,'dir')
+elseif exist('localDir','var') && exist(localDir,'dir')
   dataroot = localDir;
 else
   error('No data directory found.');
