@@ -736,7 +736,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
         
         % instructions
-        nExemplars = cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames);
+        nExemplars = cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg * cfg.stim.nSpecies_recog * length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames);
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.recogIntro.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_recog_6_exp_intro.txt',expParam.expName)),...
           {'nBlocks','contKey'},{num2str(cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks),cfg.keys.instructContKey});
@@ -1474,7 +1474,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
         
         % instructions
-        nExemplars = cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg * cfg.stim.nSpecies * length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames);
+        nExemplars = cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg * cfg.stim.nSpecies_recog * length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames);
         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.recogIntro.text] = et_processTextInstruct(...
           fullfile(cfg.files.instructDir,sprintf('%s_recog_post_intro.txt',expParam.expName)),...
           {'nBlocks','nExemplars','contKey'},{num2str(cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks),num2str(nExemplars),cfg.keys.instructContKey});
