@@ -79,7 +79,7 @@ if ~isempty(speciesNums)
     extraSpecies = speciesNums(~ismember(speciesNums,theseSpecies));
     error('Species were specified that are not included in the full set:%s',sprintf(repmat(' %d',1,length(extraSpecies)),extraSpecies));
   elseif all(ismember(speciesNums,theseSpecies))
-    fprintf('Only choosing stimuli from these species numbers:%s\n',sprintf(repmat(' %d',1,length(speciesNums)),speciesNums));
+    fprintf('\tOnly choosing stimuli from these species numbers:%s\n',sprintf(repmat(' %d',1,length(speciesNums)),speciesNums));
     theseSpecies = speciesNums;
   end
 end
