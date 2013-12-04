@@ -31,16 +31,30 @@ speciesNumFieldNum = find(ismember(stim_fieldnames,'speciesNum'));
 phaseFamilyStimNeeded = cfg.stim.nSpecies * (cfg.stim.nTrained + cfg.stim.nUntrained);
 
 % are we doing a recognition phase?
-runRecogPhase = false;
+nRecogBlocks = 0;
 for s = 1:expParam.nSessions
-  if any(ismember(expParam.session.(expParam.sesTypes{s}).phases,'recog'))
-    runRecogPhase = true;
-    break
+  sesName = expParam.sesTypes{s};
+  
+  % counting the phases, in case any sessions have the same phase type
+  % multiple times
+  recogCount = 0;
+  
+  % for each phase in this session, see if any are recognition phases
+  for p = 1:length(expParam.session.(sesName).phases)
+    
+    phaseName = expParam.session.(sesName).phases{p};
+    
+    switch phaseName
+      
+      case {'recog'}
+        recogCount = recogCount + 1;
+        nRecogBlocks = nRecogBlocks + cfg.stim.(sesName).(phaseName)(recogCount).nBlocks;
+    end
   end
 end
-% figure out which stimulus numbers to use in recognition; currently the
-% same random selection is used across all families
-if runRecogPhase
+
+% figure out which species numbers to use in recognition
+if nRecogBlocks > 0
   if ~isfield(cfg.stim,'nSpecies_recog')
     cfg.stim.nSpecies_recog = cfg.stim.nSpecies;
   end
@@ -48,51 +62,76 @@ if runRecogPhase
     cfg.stim.yokeSpecies_recog = true;
   end
   
-  if cfg.stim.yokeSpecies_recog
-    if length(cfg.stim.nSpecies_recog) == 1
-      if cfg.stim.nSpecies_recog < cfg.stim.nSpecies
-        cfg.stim.stimNums_recog = sort(randperm(cfg.stim.nSpecies,cfg.stim.nSpecies_recog));
-      elseif cfg.stim.nSpecies_recog == cfg.stim.nSpecies
-        cfg.stim.stimNums_recog = 1:cfg.stim.nSpecies_recog;
-      elseif cfg.stim.nSpecies_recog > cfg.stim.nSpecies
-        error('More species specified for recognition (%d) than exist in the stimulus set (%d).',cfg.stim.nSpecies_recog,cfg.stim.nSpecies);
-      end
-    elseif length(cfg.stim.nSpecies_recog) > 1
-      cfg.stim.stimNums_recog = cfg.stim.nSpecies_recog;
-      % reset the nSpecies for recognition so we can use it to calculate
-      % stimulus counts
-      cfg.stim.nSpecies_recog = length(cfg.stim.nSpecies_recog);
-    end
-    if length(cfg.stim.familyNames) > 1
-      for f = 2:length(cfg.stim.familyNames)
-        cfg.stim.stimNums_recog = cat(1,cfg.stim.stimNums_recog,cfg.stim.stimNums_recog);
-      end
-    end
-  else
-    if length(cfg.stim.nSpecies_recog) == 1
-      if cfg.stim.nSpecies_recog > cfg.stim.nSpecies
-        error('More species specified for recognition (%d) than exist in the stimulus set (%d).',cfg.stim.nSpecies_recog,cfg.stim.nSpecies);
-      else
-        cfg.stim.stimNums_recog = nan(length(cfg.stim.familyNames),cfg.stim.nSpecies_recog);
-        for f = 1:length(cfg.stim.familyNames)
-          if cfg.stim.nSpecies_recog < cfg.stim.nSpecies
-            cfg.stim.stimNums_recog(f,:) = sort(randperm(cfg.stim.nSpecies,cfg.stim.nSpecies_recog));
-          elseif cfg.stim.nSpecies_recog == cfg.stim.nSpecies
-            cfg.stim.stimNums_recog(f,:) = 1:cfg.stim.nSpecies_recog;
+  if cfg.stim.nSpecies_recog < cfg.stim.nSpecies && mod(nRecogBlocks,2) ~= 0
+    error('Hack alert: currently need to have even number of blocks for proper recognition setup.');
+  end
+  
+  % initialize to store species per block
+  cfg.stim.speciesNums_recog = [];
+  
+  for nr = 2:2:nRecogBlocks
+    if cfg.stim.yokeSpecies_recog
+      if length(cfg.stim.nSpecies_recog) == 1
+        if cfg.stim.nSpecies_recog < cfg.stim.nSpecies
+          randSpecies = randperm(cfg.stim.nSpecies);
+          theseSpecNums_recog = sort(randSpecies(1:cfg.stim.nSpecies_recog));
+          randSpecies2 = randSpecies(~ismember(randSpecies,theseSpecNums_recog));
+          prevSpecNums_recog = sort(randSpecies2(1:cfg.stim.nSpecies_recog));
+        elseif cfg.stim.nSpecies_recog == cfg.stim.nSpecies
+          theseSpecNums_recog = 1:cfg.stim.nSpecies_recog;
+          prevSpecNums_recog = theseSpecNums_recog;
+        elseif cfg.stim.nSpecies_recog > cfg.stim.nSpecies
+          error('More species specified for recognition (%d) than exist in the stimulus set (%d).',cfg.stim.nSpecies_recog,cfg.stim.nSpecies);
+        end
+        
+        if length(cfg.stim.familyNames) > 1
+          for f = 2:length(cfg.stim.familyNames)
+            prevSpecNums_recog = cat(1,prevSpecNums_recog,prevSpecNums_recog);
+            theseSpecNums_recog = cat(1,theseSpecNums_recog,theseSpecNums_recog);
           end
         end
+        specNums_recog = cat(1,prevSpecNums_recog,theseSpecNums_recog);
+        
+      elseif size(cfg.stim.nSpecies_recog,2) > 1
+        specNums_recog = cfg.stim.nSpecies_recog;
+        % reset the nSpecies for recognition so we can use it to calculate
+        % stimulus counts
+        cfg.stim.nSpecies_recog = size(cfg.stim.nSpecies_recog,2);
       end
-    elseif length(cfg.stim.nSpecies_recog) > 1
-      if size(cfg.stim.nSpecies_recog,1) > 1 && size(cfg.stim.nSpecies_recog,1) == length(cfg.stim.familyNames)
-        cfg.stim.stimNums_recog = cfg.stim.nSpecies_recog;
-      else
-        error('If predefining recognition species choices per family, need to specify one row for each family');
+      cfg.stim.speciesNums_recog = cat(1,cfg.stim.speciesNums_recog,specNums_recog);
+    else
+      if length(cfg.stim.nSpecies_recog) == 1
+        if cfg.stim.nSpecies_recog > cfg.stim.nSpecies
+          error('More species specified for recognition (%d) than exist in the stimulus set (%d).',cfg.stim.nSpecies_recog,cfg.stim.nSpecies);
+        else
+          theseSpecNums_recog = nan(length(cfg.stim.familyNames),cfg.stim.nSpecies_recog);
+          prevSpecNums_recog = nan(length(cfg.stim.familyNames),cfg.stim.nSpecies_recog);
+          for f = 1:length(cfg.stim.familyNames)
+            if cfg.stim.nSpecies_recog < cfg.stim.nSpecies
+              randSpecies = randperm(cfg.stim.nSpecies);
+              theseSpecNums_recog(f,:) = sort(randSpecies(1:cfg.stim.nSpecies_recog));
+              randSpecies2 = randSpecies(~ismember(randSpecies,theseSpecNums_recog(f,:)));
+              prevSpecNums_recog(f,:) = sort(randSpecies2(1:cfg.stim.nSpecies_recog));
+            elseif cfg.stim.nSpecies_recog == cfg.stim.nSpecies
+              theseSpecNums_recog(f,:) = 1:cfg.stim.nSpecies_recog;
+              prevSpecNums_recog(f,:) = theseSpecNums_recog(f,:);
+            end
+          end
+          specNums_recog = cat(1,prevSpecNums_recog,theseSpecNums_recog);
+        end
+      elseif length(cfg.stim.nSpecies_recog) > 1
+        if size(cfg.stim.nSpecies_recog,1) > 1 && size(cfg.stim.nSpecies_recog,1) == length(cfg.stim.familyNames)
+          specNums_recog = cfg.stim.nSpecies_recog;
+        else
+          error('If predefining recognition species choices per family, need to specify one row for each family');
+        end
+        % reset the nSpecies for recognition so we can use it to calculate
+        % stimulus counts
+        cfg.stim.nSpecies_recog = length(cfg.stim.nSpecies_recog);
       end
-      % reset the nSpecies for recognition so we can use it to calculate
-      % stimulus counts
-      cfg.stim.nSpecies_recog = length(cfg.stim.nSpecies_recog);
+      cfg.stim.speciesNums_recog = cat(1,cfg.stim.speciesNums_recog,specNums_recog);
     end
-  end
+  end % for
 end
 
 % determine the number of independent recognition phases
@@ -163,6 +202,8 @@ end
 
 %% if there are recognition phases, get those stimuli
 
+% count how many times we use a recognition block
+recogBlockInd = 0;
 for s = 1:expParam.nSessions
   sesName = expParam.sesTypes{s};
   
@@ -187,12 +228,17 @@ for s = 1:expParam.nSessions
         if ~isfield(cfg.stim.(sesName).(phaseName)(recogCount),'usePrevPhase') || isempty(cfg.stim.(sesName).(phaseName)(recogCount).usePrevPhase)
           expParam.session.(sesName).(phaseName)(recogCount).allStims = cell(1,cfg.stim.(sesName).(phaseName)(recogCount).nBlocks);
           for b = 1:cfg.stim.(sesName).(phaseName)(recogCount).nBlocks
+            fprintf('Recognition, session %d (%s), block %d:\n',s,sesName,b);
+            
             for f = 1:length(cfg.stim.familyNames)
               if ismember(cfg.stim.familyNames{f},cfg.stim.(sesName).(phaseName)(recogCount).familyNames)
+                % set the right index for these species numbers
+                recogBlockInd = recogBlockInd + 1;
+                % get the stimuli for this block
                 [expParam.session.(sesName).(phaseName)(recogCount).allStims{b},stimStruct(f).fStims] = et_divvyStims(...
                   stimStruct(f).fStims,expParam.session.(sesName).(phaseName)(recogCount).allStims{b},...
                   cfg.stim.(sesName).(phaseName)(recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(recogCount).nTestLure,...
-                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false},[],cfg.stim.stimNums_recog(f,:));
+                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false},[],cfg.stim.speciesNums_recog(recogBlockInd,:));
               end
             end
           end
