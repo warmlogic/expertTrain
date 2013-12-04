@@ -343,19 +343,21 @@ try
   %% Begin PTB display setup
   
   % set some font display options; must be set before opening w with Screen
-  defaultFont = 'Courier New';
+  DefaultFontName = 'Courier New';
+  DefaultFontStyle = 1;
+  DefaultFontSize = 18;
   if ispc
-    Screen('Preference','DefaultFontName',defaultFont);
-    Screen('Preference','DefaultFontStyle',1);
-    Screen('Preference','DefaultFontSize',18);
+    Screen('Preference','DefaultFontName',DefaultFontName);
+    Screen('Preference','DefaultFontStyle',DefaultFontStyle);
+    Screen('Preference','DefaultFontSize',DefaultFontSize);
   elseif ismac
-    Screen('Preference','DefaultFontName',defaultFont);
-    Screen('Preference','DefaultFontStyle',1);
-    Screen('Preference','DefaultFontSize',18);
+    Screen('Preference','DefaultFontName',DefaultFontName);
+    Screen('Preference','DefaultFontStyle',DefaultFontStyle);
+    Screen('Preference','DefaultFontSize',DefaultFontSize);
   elseif isunix
-    Screen('Preference','DefaultFontName',defaultFont);
-    Screen('Preference','DefaultFontStyle',1);
-    Screen('Preference','DefaultFontSize',18);
+    Screen('Preference','DefaultFontName',DefaultFontName);
+    Screen('Preference','DefaultFontStyle',DefaultFontStyle);
+    Screen('Preference','DefaultFontSize',DefaultFontSize);
   end
   
   % Get screenNumber of stimulation display. We choose the display with
@@ -403,13 +405,14 @@ try
   % functions:
   [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.bgColor);
   
-  % hack, because something's weird with fonts in Mac Matlab 2013b? seems
-  % that the window needs to be closed and them opened again.
-  if ismac && ~isempty(strfind(version,'2013b'))
+  % Hack: something's weird with fonts in Mac Matlab (only 2013b? but
+  % possibly also 2012b). It seems that the window needs to be closed and
+  % opened again to get the font set correctly.
+  if ismac && (~isempty(strfind(version,'2013b')) || ~isempty(strfind(version,'2013b')))
     Screen('CloseAll');
-    Screen('Preference','DefaultFontName',defaultFont);
-    Screen('Preference','DefaultFontStyle',1);
-    Screen('Preference','DefaultFontSize',18);
+    Screen('Preference','DefaultFontName',DefaultFontName);
+    Screen('Preference','DefaultFontStyle',DefaultFontStyle);
+    Screen('Preference','DefaultFontSize',DefaultFontSize);
     [w, wRect] = Screen('OpenWindow', screenNumber, cfg.screen.bgColor);
   end
   
