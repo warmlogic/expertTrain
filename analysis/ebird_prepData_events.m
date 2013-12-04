@@ -27,11 +27,11 @@ expName = 'EBIRD';
 serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
 serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
 localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
-if exist(serverDir,'dir')
+if exist('serverDir','var') && exist(serverDir,'dir')
   dataroot = serverDir;
-elseif exist(serverLocalDir,'dir')
+elseif exist('serverLocalDir','var') && exist(serverLocalDir,'dir')
   dataroot = serverLocalDir;
-elseif exist(localDir,'dir')
+elseif exist('localDir','var') && exist(localDir,'dir')
   dataroot = localDir;
 else
   error('No data directory found.');
@@ -54,6 +54,13 @@ if nargin == 0
     'EBIRD012';
     'EBIRD013';
     'EBIRD014';
+    'EBIRD015';
+    'EBIRD016';
+    'EBIRD017';
+    'EBIRD018';
+    'EBIRD019';
+    'EBIRD020';
+    'EBIRD021';
     };
   
   prep_eeg = 0;
