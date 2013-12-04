@@ -1,5 +1,5 @@
-function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen)
-% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen)
+function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen,speciesNums)
+% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen,speciesNums)
 %
 % Description:
 %  Shuffle a stimulus set (origStims) and slice out a subset (nStims) of
@@ -23,6 +23,8 @@ function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rm
 %                for the new field(s). Optional (default = {}).
 %  maxChosen:    Integer. Upper limit for choosing stimuli. Used in case
 %                fewer than nStims x nSpecies are needed.
+%  speciesNums:  Vector of species numbers to choose from in case fewer
+%                than nSpecies are needed.
 %
 % Output:
 %  chosenStims: Struct containing the chosen stimuli from each available
@@ -47,6 +49,10 @@ if ~exist('maxChosen','var') || ~isnumeric(maxChosen)
   maxChosen = [];
 end
 
+if ~exist('speciesNums','var') || isempty(speciesNums)
+  speciesNums = [];
+end
+
 if isempty(origStims)
   error('There are no stimuli in origStims to divvy out! You might have run out of stimuli because rmStims=true and they all got divvied out for other phases.');
 end
@@ -66,6 +72,17 @@ end
 
 % only go through the species in the available stimuli
 theseSpecies = unique([origStims.speciesNum]);
+
+% make sure the denoted species numbers are in theseSpecies
+if ~isempty(speciesNums)
+  if ~all(ismember(speciesNums,theseSpecies))
+    extraSpecies = speciesNums(~ismember(speciesNums,theseSpecies));
+    error('Species were specified that are not included in the full set:%s',sprintf(repmat(' %d',1,length(extraSpecies)),extraSpecies));
+  elseif all(ismember(speciesNums,theseSpecies))
+    fprintf('Only choosing stimuli from these species numbers:%s\n',sprintf(repmat(' %d',1,length(speciesNums)),speciesNums));
+    theseSpecies = speciesNums;
+  end
+end
 
 % loop through every species
 chosenCount = 0;

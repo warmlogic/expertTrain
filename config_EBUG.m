@@ -160,6 +160,14 @@ if expParam.sessionNum == 1
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
   
+  % only use a subset of the species for recognition (random selection of X
+  % species if it is simply and integer, or pre-specify species numbers if
+  % it is a vector)
+  cfg.stim.nSpecies_recog = 8;
+  % whether all families should have the same random selection of species
+  % for recognition
+  cfg.stim.yokeSpecies_recog = true;
+  
   % whether to use the same species order across families
   cfg.stim.yokeSpecies = false;
   if cfg.stim.yokeSpecies
