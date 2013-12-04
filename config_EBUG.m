@@ -74,6 +74,13 @@ expParam.session.train1.phases = {'prac_name'};
 % expParam.sesTypes = {'train1'};
 % expParam.session.train1.phases = {'prac_name','nametrain','name'};
 
+% % debug
+% expParam.nSessions = 3;
+% expParam.sesTypes = {'pretest','posttest','posttest_delay'};
+% expParam.session.pretest.phases = {'recog'};
+% expParam.session.posttest.phases = {'recog'};
+% expParam.session.posttest_delay.phases = {'recog'};
+
 %% do some error checking
 
 possible_phases = {'match','name','recog','nametrain','viewname','prac_match','prac_name','prac_recog'};
@@ -163,7 +170,7 @@ if expParam.sessionNum == 1
   % only use a subset of the species for recognition (random selection of X
   % species if it is simply and integer, or pre-specify species numbers if
   % it is a vector)
-  cfg.stim.nSpecies_recog = 8;
+  cfg.stim.nSpecies_recog = 5;
   % whether all families should have the same random selection of species
   % for recognition
   cfg.stim.yokeSpecies_recog = true;
@@ -701,7 +708,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 8;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 16;
         % number of target and lure stimuli per species per family per study/test
         % block. Assumes all targets and lures are tested in a block.
         cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg = 2;
@@ -716,7 +723,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 4;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 8;
         end
         
         % durations, in seconds
@@ -1439,7 +1446,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 8;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 16;
         % number of target and lure stimuli per species per family. Assumes all
         % targets and lures are tested.
         cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg = 2;
@@ -1454,7 +1461,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 4;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 8;
         end
         
         % durations, in seconds
@@ -1624,7 +1631,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 8;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 16;
         % number of target and lure stimuli per species per family. Assumes all
         % targets and lures are tested.
         cfg.stim.(sesName).(phaseName)(phaseCount).nStudyTarg = 2;
@@ -1639,7 +1646,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 4;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 8;
         end
         
         % durations, in seconds
