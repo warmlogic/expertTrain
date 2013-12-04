@@ -5,14 +5,14 @@ function [results] = ebug_processData(dataroot,subjects,onlyCompleteSub,printRes
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
-%     'EBUG001';
-         'EBUG002';
-%          'EBUG003';
-         'EBUG004';
-         'EBUG005';
-         'EBUG006';
-         'EBUG007';
-         'EBUG008';
+      'EBUG001';
+      'EBUG002';
+      'EBUG003';
+      'EBUG004';
+      'EBUG005';
+      'EBUG006';
+      'EBUG007';
+      'EBUG008';
     };
 end
 
@@ -66,8 +66,6 @@ results = struct;
 
 dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
 mainFields = {'overall','basic','subord'};
-
-recogField = {'recogtest'};
 
 %% initialize to store the data
 
@@ -161,16 +159,16 @@ for sesNum = 1:length(expParam.sesTypes)
             nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
           end
           
-          for mf = 1:length(recogField)
+          for mf = 1:length(mainFields)
             for df = 1:length(dataFields)
-              results.(sesName).(fn).(recogField{mf}).(dataFields{df}) = nan(length(subjects),1);
+              results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
             end
           end
           if nBlocks > 1
             for b = 1:nBlocks
-              for mf = 1:length(recogField)
+              for mf = 1:length(mainFields)
                 for df = 1:length(dataFields)
-                  results.(sesName).(fn).(sprintf('b%d',b)).(recogField{mf}).(dataFields{df}) = nan(length(subjects),1);
+                  results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
                 end
               end
             end
@@ -443,7 +441,7 @@ for sub = 1:length(subjects)
                 % end
                 
                 % overall
-                thisField = recogField{1};
+                thisField = 'overall';
                 results.(sesName).(fn) = accAndRT(recogResp,sub,results.(sesName).(fn),thisField);
                 recogResults = results.(sesName).(fn).(thisField);
                 if printResults
@@ -451,6 +449,22 @@ for sub = 1:length(subjects)
                   fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogResults.rt(sub),recogResults.rt_cor(sub),recogResults.rt_inc(sub));
                 end
                 
+              % basic and subordinate
+                recogBasic = recogResp([recogResp.isSubord] == 0);
+                recogSubord = recogResp([recogResp.isSubord] == 1);
+                
+                thisField = 'basic';
+                results.(sesName).(fn) = accAndRT(recogBasic,sub,results.(sesName).(fn),thisField);
+                recogBasicResults = results.(sesName).(fn).(thisField);
+                thisField = 'subord';
+                results.(sesName).(fn) = accAndRT(recogSubord,sub,results.(sesName).(fn),thisField);
+                recogSubordResults = results.(sesName).(fn).(thisField);
+                if printResults
+                  fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',recogBasicResults.acc(sub),recogBasicResults.nCor(sub),(recogBasicResults.nCor(sub) + recogBasicResults.nInc(sub)),recogBasicResults.dp(sub));
+                  fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',recogSubordResults.acc(sub),recogSubordResults.nCor(sub),(recogSubordResults.nCor(sub) + recogSubordResults.nInc(sub)),recogSubordResults.dp(sub));
+                  fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBasicResults.rt(sub),recogBasicResults.rt_cor(sub),recogBasicResults.rt_inc(sub));
+                  fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogSubordResults.rt(sub),recogSubordResults.rt_cor(sub),recogSubordResults.rt_inc(sub));
+                end
                 
                 % if there's only 1 block, the results were printed above
                 if nBlocks > 1
@@ -461,7 +475,7 @@ for sub = 1:length(subjects)
                     % overall
                     recogBlock = recogResp([recogResp.block] == b);
                     
-                    thisField = recogField{1};
+                    thisField = 'overall';
                     results.(sesName).(fn).(blockStr) = accAndRT(recogBlock,sub,results.(sesName).(fn).(blockStr),thisField);
                     recogBlockResults = results.(sesName).(fn).(blockStr).(thisField);
                     if printResults
@@ -470,6 +484,24 @@ for sub = 1:length(subjects)
                       fprintf('\t');
                       fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockResults.rt(sub),recogBlockResults.rt_cor(sub),recogBlockResults.rt_inc(sub));
                     end
+                    
+                    % basic and subordinate for this block
+                    recogBlockBasic = recogBlock([recogBlock.isSubord] == 0);
+                    recogBlockSubord = recogBlock([recogBlock.isSubord] == 1);
+                    
+                    thisField = 'basic';
+                    results.(sesName).(fn).(blockStr) = accAndRT(recogBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
+                    recogBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
+                    thisField = 'subord';
+                    results.(sesName).(fn).(blockStr) = accAndRT(recogBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
+                    recogBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
+                    if printResults
+                      fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockBasicResults.acc(sub),recogBlockBasicResults.nCor(sub),(recogBlockBasicResults.nCor(sub) + recogBlockBasicResults.nInc(sub)),recogBlockBasicResults.dp(sub));
+                      fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockSubordResults.acc(sub),recogBlockSubordResults.nCor(sub),(recogBlockSubordResults.nCor(sub) + recogBlockSubordResults.nInc(sub)),recogBlockSubordResults.dp(sub));
+                      fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockBasicResults.rt(sub),recogBlockBasicResults.rt_cor(sub),recogBlockBasicResults.rt_inc(sub));
+                      fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockSubordResults.rt(sub),recogBlockSubordResults.rt_cor(sub),recogBlockSubordResults.rt_inc(sub));
+                    end
+                    
                   end
                 end
             end % switch phaseName
@@ -506,8 +538,6 @@ fid = fopen(fileName,'wt');
 
 mainToPrint = {'basic','subord'};
 dataToPrint = {'nTrials','nCor','acc','dp','rt','rt_cor','rt_inc'};
-
-recogToPrint = {'recogtest'};
 
 % use subject 1's files for initialization
 sub = 1;
@@ -650,7 +680,7 @@ for sesNum = 1:length(expParam.sesTypes)
             for b = 1:nBlocks
               blockStr{b} = sprintf('b%d',b);
             end
-            headerCell = {blockStr,recogToPrint};
+            headerCell = {blockStr,mainToPrint};
             [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
             fprintf(fid,sprintf('\t%s\n',headerStr));
             [headerStr] = setHeaderStr({dataToPrint},1);
@@ -662,15 +692,15 @@ for sesNum = 1:length(expParam.sesTypes)
             for sub = 1:length(subjects)
               dataStr = subjects{sub};
               for b = 1:nBlocks
-                for mf = 1:length(recogToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),recogToPrint{mf}},results,sub,dataToPrint);
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
                 end
               end
               fprintf(fid,sprintf('%s\n',dataStr));
             end
           else
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            headerCell = {recogToPrint};
+            headerCell = {mainToPrint};
             [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
             fprintf(fid,sprintf('\t%s\n',headerStr));
             [headerStr] = setHeaderStr({dataToPrint},1);
@@ -681,8 +711,8 @@ for sesNum = 1:length(expParam.sesTypes)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
               dataStr = subjects{sub};
-              for mf = 1:length(recogToPrint)
-                [dataStr] = setDataStr(dataStr,{sesName,fn,recogToPrint{mf}},results,sub,dataToPrint);
+              for mf = 1:length(mainToPrint)
+                [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
               end
               fprintf(fid,sprintf('%s\n',dataStr));
             end
