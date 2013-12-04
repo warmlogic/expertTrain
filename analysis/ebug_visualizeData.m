@@ -27,9 +27,9 @@ else
 end
 
 subjects = {
-%  'EBUG001';
+   'EBUG001';
    'EBUG002';
-%  'EBUG003';
+   'EBUG003';
    'EBUG004';
    'EBUG005';
    'EBUG006';
@@ -281,18 +281,17 @@ end
 
 %% recognition accuracy for pretest, posttest, posttest_delay
 
-% dataMeasure = 'dp';
-% dataLabel = 'd''';
-% ylimits = [0 3];
+dataMeasure = 'dp';
+dataLabel = 'd''';
+ylimits = [0 3];
 
-dataMeasure = 'acc';
-dataLabel = 'Accuracy';
-ylimits = [0.5 1];
+% dataMeasure = 'acc';
+% dataLabel = 'Accuracy';
+% ylimits = [0.5 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
 phases = {'recog_1'};
-recogField = {'recogtest'};
-% naming = {'basic','subord'};
+recogField = {'basic','subord'};
 
 data.(dataMeasure) = struct;
 data.(dataMeasure) = nan(length(subjects),length(sessions),length(phases),length(recogField));
@@ -301,12 +300,12 @@ data.(dataMeasure) = nan(length(subjects),length(sessions),length(phases),length
 % end
 
 for s = 1:length(sessions)
-  sesName = sessions{s};
-  for p = 1:length(phases)
-    for t = 1:length(recogField)
-        data.(dataMeasure)(:,s,p,t) = results.(sesName).(phases{p}).(recogField{t}).(dataMeasure);
+    sesName = sessions{s};
+    for p = 1:length(phases)
+        for t = 1:length(recogField)
+            data.(dataMeasure)(:,s,p,t) = results.(sesName).(phases{p}).(recogField{t}).(dataMeasure);
+        end
     end
-  end
 end
 
 for p = 1:length(phases)
@@ -315,30 +314,30 @@ for p = 1:length(phases)
     data_sem = nan(length(sessions),length(recogField));
     
     for t = 1:length(recogField)
-      for s = 1:length(sessions)
-        data_mean(s,t) = nanmean(data.(dataMeasure)(:,s,p,t),1);
-        data_sem(s,t) = nanstd(data.(dataMeasure)(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure)(:,s,p,t))));
-      end
-    end
-    
-    bw_title = sprintf('%s',strrep(phases{p},'_','\_'));
-    bw_groupnames = {'pretest', 'posttest', 'One week later'};
-    %bw_legend = {'Recognition'};
-    bw_legend = [];
-    %bw_xlabel = 'Test day';
-    bw_xlabel = [];
-    bw_ylabel = dataLabel;
-    bw_colormap = 'gray';
-    bw_data = data_mean;
-    bw_errors = data_sem;
-    bw_width = 0.5;
-    h = barweb(bw_data,bw_errors,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
-    %set(h.legend,'Location','NorthWest');
-    axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
-    publishfig(gcf,0);
-    
-    if saveFigs
-      print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_recog_%s_%s_%s',phases{p},dataMeasure,recogField{t})));
+        for s = 1:length(sessions)
+            data_mean(s,t) = nanmean(data.(dataMeasure)(:,s,p,t),1);
+            data_sem(s,t) = nanstd(data.(dataMeasure)(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure)(:,s,p,t))));
+        end
+        
+        bw_title = sprintf('%s',strrep(phases{p},'_','\_'));
+        bw_groupnames = {'pretest', 'posttest', 'One week later'};
+        %bw_legend = {'Recognition'};
+        bw_legend = {'Basic','Subord'};
+        %bw_xlabel = 'Test day';
+        bw_xlabel = [];
+        bw_ylabel = dataLabel;
+        bw_colormap = 'gray';
+        bw_data = data_mean;
+        bw_errors = data_sem;
+        bw_width = 0.5;
+        h = barweb(bw_data,bw_errors,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
+        set(h.legend,'Location','NorthWest');
+        axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
+        publishfig(gcf,0);
+        
+        if saveFigs
+            print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_recog_%s_%s_%s',phases{p},dataMeasure,recogField{t})));
+        end
     end
 end
 

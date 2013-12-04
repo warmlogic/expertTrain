@@ -60,14 +60,14 @@ expParam.session.train6.phases = {'match','name','match'};
 expParam.session.posttest.phases = {'match','prac_recog','recog'};
 expParam.session.posttest_delay.phases = {'prac_match','match','prac_recog','recog'};
 
-% % demo - debug
-% expParam.nSessions = 2;
-% expParam.sesTypes = {'pretest','train1'};
-% % expParam.session.pretest.phases = {'match','prac_recog'};
-% expParam.session.pretest.phases = {'prac_match','prac_recog'};
-% % expParam.session.pretest.phases = {'prac_recog','recog'};
-% % expParam.session.train1.phases = {'prac_name','nametrain','name'};
-% expParam.session.train1.phases = {'prac_name'};
+% demo - debug
+expParam.nSessions = 2;
+expParam.sesTypes = {'pretest','train1'};
+% expParam.session.pretest.phases = {'match','prac_recog'};
+expParam.session.pretest.phases = {'prac_match','prac_recog'};
+% expParam.session.pretest.phases = {'prac_recog','recog'};
+% expParam.session.train1.phases = {'prac_name','nametrain','name'};
+expParam.session.train1.phases = {'prac_name'};
 
 % % debug
 % expParam.nSessions = 1;
