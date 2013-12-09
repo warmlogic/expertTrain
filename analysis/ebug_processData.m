@@ -5,14 +5,21 @@ function [results] = ebug_processData(dataroot,subjects,onlyCompleteSub,printRes
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
-      'EBUG001';
-      'EBUG002';
-      'EBUG003';
-      'EBUG004';
-      'EBUG005';
-      'EBUG006';
-      'EBUG007';
-      'EBUG008';
+%       'EBUG001';
+%       'EBUG002';
+%       'EBUG003';
+%       'EBUG004';
+%       'EBUG005';
+%       'EBUG006';
+%       'EBUG007';
+%       'EBUG008';
+%       'EBUG009';
+      'EBUG090';
+      'EBUG091';
+      'EBUG092';
+      'EBUG093';
+      'EBUG094';
+      'EBUG095';
     };
 end
 
@@ -64,7 +71,7 @@ trainedConds = {1, 0};
 
 results = struct;
 
-dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
+dataFields = {'nTrials','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
 mainFields = {'overall','basic','subord'};
 
 %% initialize to store the data
@@ -445,7 +452,7 @@ for sub = 1:length(subjects)
                 results.(sesName).(fn) = accAndRT(recogResp,sub,results.(sesName).(fn),thisField);
                 recogResults = results.(sesName).(fn).(thisField);
                 if printResults
-                  fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',recogResults.acc(sub),recogResults.nCor(sub),(recogResults.nCor(sub) + recogResults.nInc(sub)),recogResults.dp(sub));
+                  fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogResults.acc(sub),recogResults.nCor(sub),(recogResults.nCor(sub) + recogResults.nInc(sub)),recogResults.dp(sub),recogResults.hr(sub),recogResults.far(sub));
                   fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogResults.rt(sub),recogResults.rt_cor(sub),recogResults.rt_inc(sub));
                 end
                 
@@ -460,8 +467,8 @@ for sub = 1:length(subjects)
                 results.(sesName).(fn) = accAndRT(recogSubord,sub,results.(sesName).(fn),thisField);
                 recogSubordResults = results.(sesName).(fn).(thisField);
                 if printResults
-                  fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',recogBasicResults.acc(sub),recogBasicResults.nCor(sub),(recogBasicResults.nCor(sub) + recogBasicResults.nInc(sub)),recogBasicResults.dp(sub));
-                  fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',recogSubordResults.acc(sub),recogSubordResults.nCor(sub),(recogSubordResults.nCor(sub) + recogSubordResults.nInc(sub)),recogSubordResults.dp(sub));
+                  fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogBasicResults.acc(sub),recogBasicResults.nCor(sub),(recogBasicResults.nCor(sub) + recogBasicResults.nInc(sub)),recogBasicResults.dp(sub),recogBasicResults.hr(sub),recogBasicResults.far(sub));
+                  fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogSubordResults.acc(sub),recogSubordResults.nCor(sub),(recogSubordResults.nCor(sub) + recogSubordResults.nInc(sub)),recogSubordResults.dp(sub),recogSubordResults.hr(sub),recogSubordResults.far(sub));
                   fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBasicResults.rt(sub),recogBasicResults.rt_cor(sub),recogBasicResults.rt_inc(sub));
                   fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogSubordResults.rt(sub),recogSubordResults.rt_cor(sub),recogSubordResults.rt_inc(sub));
                 end
@@ -537,7 +544,7 @@ fprintf('Saving results to file: %s.\n',fileName);
 fid = fopen(fileName,'wt');
 
 mainToPrint = {'basic','subord'};
-dataToPrint = {'nTrials','nCor','acc','dp','rt','rt_cor','rt_inc'};
+dataToPrint = {'nTrials','nCor','acc','dp','hr','far','rt','rt_cor','rt_inc'};
 
 % use subject 1's files for initialization
 sub = 1;
@@ -838,6 +845,9 @@ zhr = norminv(hr,0,1);
 zfar = norminv(far,0,1);
 
 inputStruct.(destField).dp(sub) = zhr - zfar;
+
+inputStruct.(destField).hr(sub) = hr;
+inputStruct.(destField).far(sub) = far;
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
 % % we don't need this
