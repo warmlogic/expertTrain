@@ -41,13 +41,19 @@ saveDir = dataroot;
 if nargin == 0
   subjects = {
 %     'EBUG001';
-    'EBUG002';
+%     'EBUG002';
 %     'EBUG003';
-    'EBUG004';
-    'EBUG005';
-    'EBUG006';
-    'EBUG007';
-    'EBUG008';
+%     'EBUG004';
+%     'EBUG005';
+%     'EBUG006';
+%     'EBUG007';
+%     'EBUG008';
+    'EBUG090';
+    'EBUG091';
+    'EBUG092';
+    'EBUG093';
+    'EBUG094';
+    'EBUG095';
     };
   
   prep_eeg = 0;
