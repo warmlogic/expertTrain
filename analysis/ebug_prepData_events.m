@@ -48,12 +48,13 @@ if nargin == 0
 %     'EBUG006';
 %     'EBUG007';
 %     'EBUG008';
-    'EBUG090';
-    'EBUG091';
-    'EBUG092';
-    'EBUG093';
-    'EBUG094';
-    'EBUG095';
+    'EBUG009';
+    'EBUG010';
+    'EBUG011';
+%     'EBUG092';
+%     'EBUG093';
+%     'EBUG094';
+%     'EBUG095';
     };
   
   prep_eeg = 0;
