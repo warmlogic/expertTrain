@@ -54,6 +54,10 @@ if nargin == 0
     'SPACE013';
     'SPACE014';
     'SPACE015';
+    'SPACE016';
+    'SPACE017';
+    'SPACE018';
+    'SPACE019';
     };
   
   %   % behavioral pilot
