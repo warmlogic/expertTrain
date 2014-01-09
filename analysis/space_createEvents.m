@@ -424,7 +424,7 @@ switch phaseName
             
             log(i).recall_origword = '';
             log(i).recall_resp = '';
-            log(i).recall_spellCorr = false;
+            log(i).recall_spellCorr = 0;
             log(i).recall_rt = -1;
             
             propagateNewRecall = true;
@@ -450,7 +450,7 @@ switch phaseName
           % didn't make a recall response
           log(i).recall_resp = '';
           log(i).recall_origword = '';
-          log(i).recall_spellCorr = false;
+          log(i).recall_spellCorr = 0;
           log(i).recall_rt = -1;
           
           propagateNewRecall = true;
@@ -461,7 +461,7 @@ switch phaseName
           log(i).recall_origword = logData{crS.recall_origword}{i};
           if log(i).targ
             if isempty(log(i).recall_resp) || strcmpi(log(i).recall_resp,'NO_RESPONSE')
-              log(i).recall_spellCorr = false;
+              log(i).recall_spellCorr = 0;
               % debug
               %fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
               %fprintf('\tNo recall response!!\n')
@@ -470,7 +470,7 @@ switch phaseName
                 % if we want to check the spelling on their recall responses
                 if strcmpi(log(i).recall_resp,log(i).recall_origword)
                   % auto spell check
-                  log(i).recall_spellCorr = true;
+                  log(i).recall_spellCorr = 1;
                 else
                   % manual spell check
                   fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
@@ -478,25 +478,42 @@ switch phaseName
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                   
                   while 1
-                    decision = input('                Correct or incorrect? (1 or 0?). ');
-                    if ~isempty(decision) && isnumeric(decision) && (decision == 1 || decision == 0)
-                      if decision
-                        fprintf('\t\tMarked correct!\n');
-                      else
-                        fprintf('\t\tMarked incorrect!\n');
+                    decision = input('                Correct, incorrect, or synonym?  (1, 0, or s?). ','s');
+                    if ~isempty(decision) && length(decision) == 1
+                      if isstrprop(decision,'digit') && (str2double(decision) == 1 || str2double(decision) == 0)
+                        decision = str2double(decision);
+                        if decision == 1
+                          %fprintf('\t\tMarked correct!\n');
+                          verify = input('                Press return to mark CORRECT. Type anything else to re-grade. ','s');
+                          if isempty(verify)
+                            break
+                          end
+                        elseif decision == 0
+                          %fprintf('\t\tMarked incorrect.\n');
+                          verify = input('                Press return to mark INCORRECT. Type anything else to re-grade. ','s');
+                          if isempty(verify)
+                            break
+                          end
+                        end
+                      elseif isstrprop(decision,'alpha') && strcmp(decision,'s')
+                        decision = 0.5;
+                        %fprintf('\t\tMarked as synonym!\n');
+                        verify = input('                Press return to mark as SYNONYM. Type anything else to re-grade. ','s');
+                        if isempty(verify)
+                          break
+                        end
                       end
-                      break
                     end
                   end
-                  log(i).recall_spellCorr = logical(decision);
+                  log(i).recall_spellCorr = decision;
                 end
               else
                 % if we don't want to check their spelling
-                log(i).recall_spellCorr = logical(logData{crS.recall_corrSpell}(i));
+                log(i).recall_spellCorr = logData{crS.recall_corrSpell}(i);
               end
             end
           else
-            log(i).recall_spellCorr = false;
+            log(i).recall_spellCorr = 0;
           end
           log(i).recall_rt = single(logData{crS.recall_rt}(i));
           
