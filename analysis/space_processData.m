@@ -26,6 +26,12 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE011';
     'SPACE012';
     'SPACE013';
+    'SPACE014';
+    'SPACE015';
+    'SPACE016';
+    'SPACE017';
+    'SPACE018';
+    'SPACE019';
     };
 end
 templateSubject = 'SPACE001';
@@ -235,10 +241,10 @@ end
 % %fprintf('newStims new acc %.3f\n',mean([newStims.new_acc]));
 %
 % fprintf('\n');
-% fprintf('Spaced recall acc (%d/%d) = %.3f\n',sum([spaced.recall_spellCorr]),length(spaced),mean([spaced.recall_spellCorr]));
-% fprintf('Massed recall acc (%d/%d) = %.3f\n',sum([massed.recall_spellCorr]),length(massed),mean([massed.recall_spellCorr]));
-% fprintf('onePres recall acc (%d/%d) = %.3f\n',sum([onePres.recall_spellCorr]),length(onePres),mean([onePres.recall_spellCorr]));
-% %fprintf('newStims recall acc %.3f\n',mean([newStims.recall_spellCorr]));
+% fprintf('Spaced recall acc (%d/%d) = %.3f\n',sum([spaced.recall_spellCorr] == 1),length(spaced),mean([spaced.recall_spellCorr] == 1));
+% fprintf('Massed recall acc (%d/%d) = %.3f\n',sum([massed.recall_spellCorr] == 1),length(massed),mean([massed.recall_spellCorr] == 1));
+% fprintf('onePres recall acc (%d/%d) = %.3f\n',sum([onePres.recall_spellCorr] == 1),length(onePres),mean([onePres.recall_spellCorr] == 1));
+% %fprintf('newStims recall acc %.3f\n',mean([newStims.recall_spellCorr] == 1));
 
 if isempty(results)
   
