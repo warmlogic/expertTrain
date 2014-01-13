@@ -256,8 +256,8 @@ if isempty(results)
   
   results = struct;
   
-  dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc'};
   mainFields = {'recog','recall'};
+  dataFields = {'nTrials','nCor','nInc','acc','dp','rt','rt_cor','rt_inc','hr','far'};
   
   % categories = [1, 2];
   % categoryStr = {'faces', 'houses'};
@@ -345,10 +345,18 @@ if isempty(results)
                   lagStr = 'multi?';
                 end
                 
+                          
                 if collapseCategories
                   for mf = 1:length(mainFields)
+                    mField = mainFields{mf};
                     for df = 1:length(dataFields)
-                      results.(sesName).(fn).(lagStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                      if strcmp(mField,'recall')
+                        dField = 'spellCorr';
+                      else
+                        dField = dataFields{df};
+                      end
+                      %results.(sesName).(fn).(lagStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                      results.(sesName).(fn).(lagStr).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),1);
                     end
                   end
                 end
@@ -358,8 +366,15 @@ if isempty(results)
                 if length(i_catStrs) > 1 && separateCategories
                   for im = 1:length(i_catStrs)
                     for mf = 1:length(mainFields)
+                      mField = mainFields{mf};
                       for df = 1:length(dataFields)
-                        results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                        if strcmp(mField,'recall')
+                          dField = 'spellCorr';
+                        else
+                          dField = dataFields{df};
+                        end
+                        %results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                        results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),1);
                       end
                     end
                   end
@@ -521,18 +536,18 @@ if isempty(results)
                       if collapseCategories
                         % overall, collapsing across categories
                         for mf = 1:length(mainFields)
-                          thisField = mainFields{mf};
+                          mField = mainFields{mf};
                           
                           % filter the events that we want
                           theseEvents = targEvents(...
-                           strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                           strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
                            ismember([targEvents.lag],lagConds(lc)));
                           %theseEvents = targEvents(...
-                          %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                          %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
                           %  ismember([targEvents.lag],lagConds(lc)) &...
                           %  [targEvents.targ]);
                           
-                          if strcmp(thisField,'recog')
+                          if strcmp(mField,'recog')
                             % exclude missed responses ({'NO_RESPONSE', 'none'})
                             theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
                           end
@@ -544,22 +559,36 @@ if isempty(results)
                           %  keyboard
                           %end
                           
-                          if strcmp(thisField,'recog')
-                            accField = sprintf('%s_acc',thisField);
-                          elseif strcmp(thisField,'recall')
-                            accField = sprintf('%s_spellCorr',thisField);
+                          if strcmp(mField,'recog')
+                            accField = sprintf('%s_acc',mField);
+                          elseif strcmp(mField,'recall')
+                            accField = sprintf('%s_spellCorr',mField);
                           end
-                          hrField = sprintf('%s_hr',thisField);
-                          farField = sprintf('%s_far',thisField);
-                          nCorField = sprintf('%s_nCor',thisField);
-                          nIncField = sprintf('%s_nInc',thisField);
-                          rtField = sprintf('%s_rt',thisField);
+                          hrField = sprintf('%s_hr',mField);
+                          farField = sprintf('%s_far',mField);
+                          dpField = sprintf('%s_dp',mField);
+                          nTrialsField = sprintf('%s_nTrials',mField);
+                          nCorField = sprintf('%s_nCor',mField);
+                          nIncField = sprintf('%s_nInc',mField);
+                          rtField = sprintf('%s_rt',mField);
+                          %if strcmp(mField,'recog')
+                          %  accField = 'acc';
+                          %elseif strcmp(mField,'recall')
+                          %  accField = 'spellCorr';
+                          %end
+                          %hrField = 'hr';
+                          %farField = 'far';
+                          %dpField = 'dp';
+                          %nTrialsField = 'nTrials';
+                          %nCorField = 'nCor';
+                          %nIncField = 'nInc';
+                          %rtField = 'rt';
                           
-                          results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),thisField,...
-                            accField,hrField,farField,nCorField,nIncField,rtField);
-                          theseResults = results.(sesName).(fn).(lagStr).(thisField);
+                          results.(sesName).(fn).(lagStr) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr),mField,...
+                            accField,hrField,farField,dpField,nTrialsField,nCorField,nIncField,rtField);
+                          theseResults = results.(sesName).(fn).(lagStr).(mField);
                           if printResults
-                            fprintf('\t%s\n',thisField);
+                            fprintf('\t%s\n',mField);
                             fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
                             fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
                           end
@@ -574,20 +603,20 @@ if isempty(results)
                         fprintf('\n');
                         for im = 1:length(i_catStrs)
                           for mf = 1:length(mainFields)
-                            thisField = mainFields{mf};
+                            mField = mainFields{mf};
                             
                             % filter the events that we want
                             theseEvents = targEvents(...
-                              strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                              strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
                               ismember([targEvents.lag],lagConds(lc)) &...
                               strcmpi({targEvents.i_catStr},i_catStrs{im}));
                             %theseEvents = targEvents(...
-                            %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',thisField)) &...
+                            %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
                             %  ismember([targEvents.lag],lagConds(lc)) &...
                             %  strcmpi({targEvents.i_catStr},i_catStrs{im}) &...
                             %  [targEvents.targ]);
                             
-                            if strcmp(thisField,'recog')
+                            if strcmp(mField,'recog')
                               % exclude missed responses ({'NO_RESPONSE', 'none'})
                               theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
                             end
@@ -599,22 +628,36 @@ if isempty(results)
                             %  keyboard
                             %end
                             
-                            if strcmp(thisField,'recog')
-                              accField = sprintf('%s_acc',thisField);
-                            elseif strcmp(thisField,'recall')
-                              accField = sprintf('%s_spellCorr',thisField);
+                            if strcmp(mField,'recog')
+                             accField = sprintf('%s_acc',mField);
+                            elseif strcmp(mField,'recall')
+                             accField = sprintf('%s_spellCorr',mField);
                             end
-                            hrField = sprintf('%s_hr',thisField);
-                            farField = sprintf('%s_far',thisField);
-                            nCorField = sprintf('%s_nCor',thisField);
-                            nIncField = sprintf('%s_nInc',thisField);
-                            rtField = sprintf('%s_rt',thisField);
+                            hrField = sprintf('%s_hr',mField);
+                            farField = sprintf('%s_far',mField);
+                            dpField = sprintf('%s_dp',mField);
+                            nTrialsField = sprintf('%s_nTrials',mField);
+                            nCorField = sprintf('%s_nCor',mField);
+                            nIncField = sprintf('%s_nInc',mField);
+                            rtField = sprintf('%s_rt',mField);
+                            %if strcmp(mField,'recog')
+                            %  accField = 'acc';
+                            %elseif strcmp(mField,'recall')
+                            %  accField = 'spellCorr';
+                            %end
+                            %hrField = 'hr';
+                            %farField = 'far';
+                            %dpField = 'dp';
+                            %nTrialsField = 'nTrials';
+                            %nCorField = 'nCor';
+                            %nIncField = 'nInc';
+                            %rtField = 'rt';
                             
-                            results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),thisField,...
-                              accField,hrField,farField,nCorField,nIncField,rtField);
-                            theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(thisField);
+                            results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(theseEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),mField,...
+                              accField,hrField,farField,dpField,nTrialsField,nCorField,nIncField,rtField);
+                            theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
                             if printResults
-                              fprintf('\t%s %s\n',i_catStrs{im},thisField);
+                              fprintf('\t%s %s\n',i_catStrs{im},mField);
                               fprintf('\t\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',theseResults.(accField)(sub),theseResults.(nCorField)(sub),(theseResults.(nCorField)(sub) + theseResults.(nIncField)(sub)),theseResults.dp(sub));
                               fprintf('\t\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',theseResults.(rtField)(sub),theseResults.(sprintf('%s_cor',rtField))(sub),theseResults.(sprintf('%s_inc',rtField))(sub));
                             end
@@ -669,12 +712,12 @@ fid = fopen(fileName,'wt');
 mainToPrint = {'recog','recall'};
 generic_dataToPrint = {'nCor','nInc','hr','far','dp','rt_cor','rt_inc'};
 dataToPrint = {...
-  {'recog_nCor','recog_nInc','recog_hr','recog_far','dp','recog_rt_cor','recog_rt_inc'},...
-  {'recall_nCor','recall_nInc','recall_hr','recall_far','dp','recall_rt_cor','recall_rt_inc'}};
+  {'recog_nCor','recog_nInc','recog_hr','recog_far','recog_dp','recog_rt_cor','recog_rt_inc'},...
+  {'recall_nCor','recall_nInc','recall_hr','recall_far','recall_dp','recall_rt_cor','recall_rt_inc'}};
 % generic_dataToPrint = {'nTrials','nCor','acc','hr','far','dp','rt','rt_cor','rt_inc'};
 % dataToPrint = {...
-%   {'nTrials','recog_nCor','recog_acc','recog_hr','recog_far','dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
-%   {'nTrials','recall_nCor','recall_spellCorr','recall_hr','recall_far','dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
+%   {'recog_nTrials','recog_nCor','recog_acc','recog_hr','recog_far','recog_dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
+%   {'recall_nTrials','recall_nCor','recall_spellCorr','recall_hr','recall_far','recall_dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
 
 % use a subject's files for initialization
 if length(subjects) > 5
@@ -929,7 +972,7 @@ end
 
 %% Calculate accuracy and reaction time
 
-function inputStruct = accAndRT(inputData,sub,inputStruct,destField,accField,hrField,farField,nCorField,nIncField,rtField)
+function inputStruct = accAndRT(inputData,sub,inputStruct,destField,accField,hrField,farField,dpField,nTrialsField,nCorField,nIncField,rtField)
 
 if ~exist('accField','var') || isempty(accField)
   accField = 'acc';
@@ -939,6 +982,12 @@ if ~exist('hrField','var') || isempty(hrField)
 end
 if ~exist('farField','var') || isempty(farField)
   farField = 'far';
+end
+if ~exist('dpField','var') || isempty(dpField)
+  dpField = 'dp';
+end
+if ~exist('nTrialsField','var') || isempty(nTrialsField)
+  nTrialsField = 'nCor';
 end
 if ~exist('nCorField','var') || isempty(nCorField)
   nCorField = 'nCor';
@@ -959,7 +1008,7 @@ inputStruct.(destField).(nCorField)(sub) = sum([inputData.(accField)] == 1);
 inputStruct.(destField).(nIncField)(sub) = sum([inputData.(accField)] == 0);
 
 nTrials = sum([inputData.(accField)] == 1 | [inputData.(accField)] == 0);
-inputStruct.(destField).nTrials(sub) = nTrials;
+inputStruct.(destField).(nTrialsField)(sub) = nTrials;
 
 % accuracy
 inputStruct.(destField).(accField)(sub) = inputStruct.(destField).(nCorField)(sub) / nTrials;
@@ -1007,7 +1056,7 @@ inputStruct.(destField).(farField)(sub) = far;
 zhr = norminv(hr,0,1);
 zfar = norminv(far,0,1);
 
-inputStruct.(destField).dp(sub) = zhr - zfar;
+inputStruct.(destField).(dpField)(sub) = zhr - zfar;
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
 % % we don't need this
