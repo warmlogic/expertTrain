@@ -32,6 +32,8 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE017';
     'SPACE018';
     'SPACE019';
+    'SPACE020';
+    'SPACE021';
     };
 end
 templateSubject = 'SPACE001';
