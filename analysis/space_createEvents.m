@@ -141,7 +141,7 @@ switch phaseName
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
     
-    % mark the subject as spacelete
+    % mark the subject as complete
     if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
       events.isComplete = true;
     end
@@ -212,7 +212,7 @@ switch phaseName
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
     
-    % mark the subject as spacelete
+    % mark the subject as complete
     if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
       events.isComplete = true;
     end
@@ -297,7 +297,7 @@ switch phaseName
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
     
-    % mark the subject as spacelete
+    % mark the subject as complete
     if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
       events.isComplete = true;
     end
