@@ -685,7 +685,7 @@ if isempty(results)
         
       end % for ses
     else
-      fprintf('\tprocessData: %s, %s: session is incomplete. Not including in results.\n',expParam.subject,sesName);
+      fprintf('\t%s has an incomplete session. Not including in results.\n',subjects{sub});
     end % onlyComplete check
   end % for sub
   fprintf('Done processing data for experiment %s.\n\n',expName);
