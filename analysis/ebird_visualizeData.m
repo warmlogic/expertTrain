@@ -11,31 +11,47 @@ expName = 'EBIRD';
 serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
 serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
 localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
-if exist(serverDir,'dir')
+if exist('serverDir','var') && exist(serverDir,'dir')
   dataroot = serverDir;
-elseif exist(serverLocalDir,'dir')
+elseif exist('serverLocalDir','var') && exist(serverLocalDir,'dir')
   dataroot = serverLocalDir;
-elseif exist(localDir,'dir')
+elseif exist('localDir','var') && exist(localDir,'dir')
   dataroot = localDir;
 else
   error('No data directory found.');
 end
 
 subjects = {
-  'EBIRD049';
-  'EBIRD002';
-  'EBIRD003';
-  'EBIRD004';
+  %'EBIRD049'; % Pilot. (due to short ses1 match, missing ses2 name)
+  %'EBIRD002'; % Pilot. (due to short ses1 match, missing ses2 name)
+  %'EBIRD003'; % Pilot. (due to missing ses7 name) - NB: LAST PILOT TO BE REPLACED
+  %'EBIRD004'; % DNF. Dropout. Last session: 8.
   'EBIRD005';
-  'EBIRD006';
+  %'EBIRD006'; % DNF. Dropout. Last session: 2.
   'EBIRD007';
   'EBIRD008';
   'EBIRD009';
   'EBIRD010';
   'EBIRD011';
   'EBIRD012';
-  'EBIRD013';
-  'EBIRD014';
+  %'EBIRD013'; % DNF. Dropout. Last session: 5. Lost session 6 in HD crash.
+  %'EBIRD014'; % DNF. Rejected. Last session: 1.
+  %'EBIRD015'; % DNF. Lost in HD crash.
+  %'EBIRD016'; % DNF. Lost in HD crash.
+  %'EBIRD017'; % DNF. Lost in HD crash.
+  'EBIRD018';
+  'EBIRD019';
+  'EBIRD020';
+  'EBIRD021';
+  %'EBIRD022'; % DNF. Dropout. Last session: 8.
+  %'EBIRD023'; % DNF. Dropout. Last session: 1.
+  'EBIRD024';
+  %'EBIRD025'; % In progress. Last session: 1.
+  %'EBIRD027'; % In progress. Last session: 8. Finishing week of 1/27.
+  %'EBIRD029'; % In progress. Last session: 1.
+  'EBIRD032';
+  'EBIRD034';
+  %'EBIRD042'; % In progress. Last session: 2.
   };
 
 saveFigs = true;
