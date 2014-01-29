@@ -60,6 +60,12 @@ if saveFigs
   if ~exist(figsDir,'dir')
     mkdir(figsDir);
   end
+  %figFormat = '-djpg90';
+  figFormat = '-dpng';
+  %figFormat = '-deps2';
+  %figFormat = '-depsc2';
+  
+  figRes = '-r150';
 end
 
 %% run the data processing script
@@ -69,10 +75,14 @@ end
 % saveResults = true;
 
 onlyCompleteSub = true;
-printResults = true;
+printResults = false;
 saveResults = true;
 
-[results] = ebird_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+[results] = ebird_processData([],dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+
+%% initialize
+
+data = struct;
 
 %% Plot basic and subordinate RTs across training days, all phases on one figure
 
@@ -83,11 +93,15 @@ data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 
-% dataMeasure = 'rt';
-dataMeasure = 'rt_cor';
-% dataMeasure = 'rt_inc';
-% dataMeasure = 'acc';
-% dataMeasure = 'dp';
+% dataMeasure = 'rt';ymin = 500; ymax = 2500;
+% dataMeasure = 'rt_cor';ymin = 500; ymax = 2500;
+% dataMeasure = 'rt_inc';ymin = 500; ymax = 2500;
+% dataMeasure = 'acc';ymin = 0.25; ymax = 1;
+dataMeasure = 'dp';ymin = -1; ymax = 5;
+
+% % use defaults, set below
+% ymin = [];
+% ymax = [];
 
 tpCounter = 0;
 for t = 1:nTrainSes
@@ -123,26 +137,48 @@ xlabel('Training Day');
 if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_cor') || strcmp(dataMeasure,'rt_inc')
   ylabel('Response Time (ms)');
   
-  axis([0.5 (size(data.subord,2) + 0.5) 800 round(max(data.overall(:))/100)*100 + 200]);
+  if ~exist('ymin','var') || isempty(ymin)
+    ymin = 500;
+  end
+  if ~exist('ymax','var') || isempty(ymax)
+    %ymax = ceil(nanmean(data.overall(:))/100)*100 + 500;
+    ymax = 2500;
+  end
+  
+  axis([0.5 (size(data.subord,2) + 0.5) ymin ymax]);
   %if ~strcmp(dataMeasure,'rt_inc')
   %  axis([0.5 (size(data.subord,2) + 0.5) 0 600]);
   %else
   %  axis([0.5 (size(data.subord,2) + 0.5) 0 1500]);
   %end
   
-  legendLoc = 'NorthEast';
+  legendLoc = 'NorthWest';
 elseif strcmp(dataMeasure,'acc')
   ylabel('Accuracy');
   
-  %axis([0.5 (size(data.subord,2) + 0.5) 0.5 round(max(data.overall(:))*100)/100]);
-  axis([0.5 (size(data.subord,2) + 0.5) 0.5 1]);
+  if ~exist('ymin','var') || isempty(ymin)
+    ymin = 0.25;
+  end
+  if ~exist('ymax','var') || isempty(ymax)
+    %ymax = round(max(data.overall(:))*100)/100;
+    ymax = 1;
+  end
+  
+  axis([0.5 (size(data.subord,2) + 0.5) ymin ymax]);
   
   legendLoc = 'SouthEast';
 elseif strcmp(dataMeasure,'dp')
   ylabel('d''');
   
-  %axis([0.5 (size(data.subord,2) + 0.5) 0 ceil(max(data.overall(:)))]);
-  axis([0.5 (size(data.subord,2) + 0.5) 0 5]);
+  if ~exist('ymin','var') || isempty(ymin)
+    ymin = -1;
+  end
+  if ~exist('ymax','var') || isempty(ymax)
+    %ymax = ceil(max(data.overall(:)));
+    ymax = 5;
+  end
+  
+  axis([0.5 (size(data.subord,2) + 0.5) ymin ymax]);
   
   legendLoc = 'SouthEast';
 end
@@ -156,7 +192,7 @@ legend({'Basic','Subordinate'},'Location',legendLoc);
 publishfig(gcf,0);
 
 if saveFigs
-  print(gcf,'-dpng',fullfile(figsDir,sprintf('training_name_%s',dataMeasure)));
+  print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('training_name_%s',dataMeasure)));
 end
 
 %% Collapse across image manipulation conditions: pretest, posttest, posttest_delay
@@ -220,7 +256,7 @@ for p = 1:length(phases)
     publishfig(gcf,0);
     
     if saveFigs
-      print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s',phases{p},dataMeasure,naming{n})));
+      print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s',phases{p},dataMeasure,naming{n})));
     end
   end
 end
@@ -231,7 +267,7 @@ end
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [0 4];
+ylimits = [0 3];
 
 % dataMeasure = 'acc';
 % dataLabel = 'Accuracy';
@@ -293,7 +329,7 @@ for i = 1:length(imgConds)
       axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
       publishfig(gcf,0);
       if saveFigs
-        print(gcf,'-dpng',fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s',phases{p},dataMeasure,naming{n},imgConds{i})));
+        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s',phases{p},dataMeasure,naming{n},imgConds{i})));
       end
     end
   end
