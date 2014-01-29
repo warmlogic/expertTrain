@@ -602,7 +602,9 @@ if isempty(results)
                       % if there's only 1 image category, the results were
                       % printed above
                       if length(i_catStrs) > 1 && separateCategories
-                        fprintf('\n');
+                        if printResults
+                          fprintf('\n');
+                        end
                         for im = 1:length(i_catStrs)
                           for mf = 1:length(mainFields)
                             mField = mainFields{mf};
