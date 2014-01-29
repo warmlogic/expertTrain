@@ -673,10 +673,10 @@ if isempty(results)
                 end % switch phaseName
                 
               else
-                fprintf('processData: %s, %s: phase %s is incomplete.\n',expParam.subject,sesName,fn);
+                fprintf('%s: %s, session_%d %s: phase %s is incomplete.\n',mfilename,expParam.subject,sesNum,sesName,fn);
               end % phaseName complete
             else
-              fprintf('processData: %s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
+              fprintf('%s: %s, %s: phase %s does not exist.\n',mfilename,expParam.subject,sesName,fn);
             end % field doesn't exist
           end % isExp
           
@@ -685,7 +685,7 @@ if isempty(results)
         
       end % for ses
     else
-      fprintf('\t%s has an incomplete session. Not including in results.\n',subjects{sub});
+      fprintf('\t%s has not completed all sessions. Not including in results.\n',subjects{sub});
     end % onlyComplete check
   end % for sub
   fprintf('Done processing data for experiment %s.\n\n',expName);

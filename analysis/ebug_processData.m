@@ -243,285 +243,286 @@ if isempty(results)
             % set the phase name with phase count
             fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
             
-            % collect data if this phase is complete
-            if events.(sesName).(fn).isComplete
+            if isfield(events.(sesName),fn)
               
-              switch phaseName
-                case {'match', 'prac_match'}
-                  for t = 1:length(trainedConds)
-                    fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
-                    
-                    % choose the training condition
-                    if length(trainedConds{t}) == 1
-                      if trainedConds{t} == 1
-                        if printResults
-                          fprintf('*** Trained ***\n');
+              % collect data if this phase is complete
+              if events.(sesName).(fn).isComplete
+                fprintf('%s, session_%d %s, %s\n',expParam.subject,sesNum,sesName,fn);
+                
+                switch phaseName
+                  case {'match', 'prac_match'}
+                    for t = 1:length(trainedConds)
+                      
+                      % choose the training condition
+                      if length(trainedConds{t}) == 1
+                        if trainedConds{t} == 1
+                          if printResults
+                            fprintf('*** Trained ***\n');
+                          end
+                          trainStr = 'trained';
+                        elseif trainedConds{t} == 0
+                          if printResults
+                            fprintf('*** Untrained ***\n');
+                          end
+                          trainStr = 'untrained';
                         end
-                        trainStr = 'trained';
-                      elseif trainedConds{t} == 0
+                      elseif length(trainedConds{t}) > 1
                         if printResults
-                          fprintf('*** Untrained ***\n');
+                          fprintf('Trained and untrained together\n');
                         end
-                        trainStr = 'untrained';
+                        trainStr = 'all';
                       end
-                    elseif length(trainedConds{t}) > 1
+                      
+                      % filter the events that we want
+                      matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+                      
+                      % exclude missed responses ('none')
+                      matchResp = matchResp(~ismember({matchResp.resp},'none'));
+                      % % set missing responses to incorrect
+                      % noRespInd = find(ismember({matchResp.resp},'none'));
+                      % if ~isempty(noRespInd)
+                      %   for nr = 1:length(noRespInd)
+                      %     matchResp(noRespInd(nr)).acc = 0;
+                      %   end
+                      % end
+                      
+                      % overall
+                      thisField = 'overall';
+                      results.(sesName).(fn).(trainStr) = accAndRT(matchResp,sub,results.(sesName).(fn).(trainStr),thisField);
+                      matchResults = results.(sesName).(fn).(trainStr).(thisField);
                       if printResults
-                        fprintf('Trained and untrained together\n');
+                        fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchResults.acc(sub),matchResults.nCor(sub),(matchResults.nCor(sub) + matchResults.nInc(sub)),matchResults.dp(sub));
+                        fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchResults.rt(sub),matchResults.rt_cor(sub),matchResults.rt_inc(sub));
                       end
-                      trainStr = 'all';
+                      
+                      % basic and subordinate
+                      matchBasic = matchResp([matchResp.isSubord] == 0);
+                      matchSubord = matchResp([matchResp.isSubord] == 1);
+                      
+                      thisField = 'basic';
+                      results.(sesName).(fn).(trainStr) = accAndRT(matchBasic,sub,results.(sesName).(fn).(trainStr),thisField);
+                      matchBasicResults = results.(sesName).(fn).(trainStr).(thisField);
+                      thisField = 'subord';
+                      results.(sesName).(fn).(trainStr) = accAndRT(matchSubord,sub,results.(sesName).(fn).(trainStr),thisField);
+                      matchSubordResults = results.(sesName).(fn).(trainStr).(thisField);
+                      if printResults
+                        fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchBasicResults.acc(sub),matchBasicResults.nCor(sub),(matchBasicResults.nCor(sub) + matchBasicResults.nInc(sub)),matchBasicResults.dp(sub));
+                        fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchSubordResults.acc(sub),matchSubordResults.nCor(sub),(matchSubordResults.nCor(sub) + matchSubordResults.nInc(sub)),matchSubordResults.dp(sub));
+                        fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchBasicResults.rt(sub),matchBasicResults.rt_cor(sub),matchBasicResults.rt_inc(sub));
+                        fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchSubordResults.rt(sub),matchSubordResults.rt_cor(sub),matchSubordResults.rt_inc(sub));
+                      end
+                      
+                      %                   % check out the RT distribution
+                      %                   distrib = 0:100:2000;
+                      %
+                      %                   figure;hist([matchResp.rt],distrib);
+                      %                   axis([min(distrib) max(distrib) 0 150]);
+                      %                   title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
+                      %                   ylabel('Number of trials');
+                      %                   xlabel('RT (ms) measured from ''?'' prompt');
+                      %
+                      %                   figure;hist([matchBasic.rt],distrib);
+                      %                   axis([min(distrib) max(distrib) 0 150]);
+                      %                   title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
+                      %                   ylabel('Number of trials');
+                      %                   xlabel('RT (ms) measured from ''?'' prompt');
+                      %
+                      %                   figure;hist([matchSubord.rt],distrib);
+                      %                   axis([min(distrib) max(distrib) 0 150]);
+                      %                   title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
+                      %                   ylabel('Number of trials');
+                      %                   xlabel('RT (ms) measured from ''?'' prompt');
+                      %
+                      %                   keyboard
+                      %                   close all
+                      %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
+                      
+                      
+                    end
+                    
+                  case {'name', 'nametrain', 'prac_name'}
+                    
+                    if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+                      nBlocks = 1;
+                    else
+                      nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
                     end
                     
                     % filter the events that we want
-                    matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+                    nameResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'NAME_RESP'));
                     
-                    % exclude missed responses ('none')
-                    matchResp = matchResp(~ismember({matchResp.resp},'none'));
-                    % % set missing responses to incorrect
-                    % noRespInd = find(ismember({matchResp.resp},'none'));
+                    % exclude missed responses (-1)
+                    nameResp = nameResp([nameResp.resp] ~= -1);
+                    % set missing response to incorrect
+                    % noRespInd = find([nameResp.resp] == -1);
                     % if ~isempty(noRespInd)
                     %   for nr = 1:length(noRespInd)
-                    %     matchResp(noRespInd(nr)).acc = 0;
+                    %     nameResp(noRespInd(nr)).acc = 0;
                     %   end
                     % end
                     
                     % overall
                     thisField = 'overall';
-                    results.(sesName).(fn).(trainStr) = accAndRT(matchResp,sub,results.(sesName).(fn).(trainStr),thisField);
-                    matchResults = results.(sesName).(fn).(trainStr).(thisField);
+                    results.(sesName).(fn) = accAndRT(nameResp,sub,results.(sesName).(fn),thisField);
+                    nameResults = results.(sesName).(fn).(thisField);
                     if printResults
-                      fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchResults.acc(sub),matchResults.nCor(sub),(matchResults.nCor(sub) + matchResults.nInc(sub)),matchResults.dp(sub));
-                      fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchResults.rt(sub),matchResults.rt_cor(sub),matchResults.rt_inc(sub));
+                      fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameResults.acc(sub),nameResults.nCor(sub),(nameResults.nCor(sub) + nameResults.nInc(sub)),nameResults.dp(sub));
+                      fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameResults.rt(sub),nameResults.rt_cor(sub),nameResults.rt_inc(sub));
                     end
                     
                     % basic and subordinate
-                    matchBasic = matchResp([matchResp.isSubord] == 0);
-                    matchSubord = matchResp([matchResp.isSubord] == 1);
+                    nameBasic = nameResp([nameResp.isSubord] == 0);
+                    nameSubord = nameResp([nameResp.isSubord] == 1);
                     
                     thisField = 'basic';
-                    results.(sesName).(fn).(trainStr) = accAndRT(matchBasic,sub,results.(sesName).(fn).(trainStr),thisField);
-                    matchBasicResults = results.(sesName).(fn).(trainStr).(thisField);
+                    results.(sesName).(fn) = accAndRT(nameBasic,sub,results.(sesName).(fn),thisField);
+                    nameBasicResults = results.(sesName).(fn).(thisField);
                     thisField = 'subord';
-                    results.(sesName).(fn).(trainStr) = accAndRT(matchSubord,sub,results.(sesName).(fn).(trainStr),thisField);
-                    matchSubordResults = results.(sesName).(fn).(trainStr).(thisField);
+                    results.(sesName).(fn) = accAndRT(nameSubord,sub,results.(sesName).(fn),thisField);
+                    nameSubordResults = results.(sesName).(fn).(thisField);
                     if printResults
-                      fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchBasicResults.acc(sub),matchBasicResults.nCor(sub),(matchBasicResults.nCor(sub) + matchBasicResults.nInc(sub)),matchBasicResults.dp(sub));
-                      fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchSubordResults.acc(sub),matchSubordResults.nCor(sub),(matchSubordResults.nCor(sub) + matchSubordResults.nInc(sub)),matchSubordResults.dp(sub));
-                      fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchBasicResults.rt(sub),matchBasicResults.rt_cor(sub),matchBasicResults.rt_inc(sub));
-                      fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchSubordResults.rt(sub),matchSubordResults.rt_cor(sub),matchSubordResults.rt_inc(sub));
+                      fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBasicResults.acc(sub),nameBasicResults.nCor(sub),(nameBasicResults.nCor(sub) + nameBasicResults.nInc(sub)),nameBasicResults.dp(sub));
+                      fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameSubordResults.acc(sub),nameSubordResults.nCor(sub),(nameSubordResults.nCor(sub) + nameSubordResults.nInc(sub)),nameSubordResults.dp(sub));
+                      fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBasicResults.rt(sub),nameBasicResults.rt_cor(sub),nameBasicResults.rt_inc(sub));
+                      fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameSubordResults.rt(sub),nameSubordResults.rt_cor(sub),nameSubordResults.rt_inc(sub));
                     end
                     
-                    %                   % check out the RT distribution
-                    %                   distrib = 0:100:2000;
-                    %
-                    %                   figure;hist([matchResp.rt],distrib);
-                    %                   axis([min(distrib) max(distrib) 0 150]);
-                    %                   title(sprintf('%s %s %s %s: all',subjects{sub},sesName,fn,trainStr));
-                    %                   ylabel('Number of trials');
-                    %                   xlabel('RT (ms) measured from ''?'' prompt');
-                    %
-                    %                   figure;hist([matchBasic.rt],distrib);
-                    %                   axis([min(distrib) max(distrib) 0 150]);
-                    %                   title(sprintf('%s %s %s %s: basic',subjects{sub},sesName,fn,trainStr));
-                    %                   ylabel('Number of trials');
-                    %                   xlabel('RT (ms) measured from ''?'' prompt');
-                    %
-                    %                   figure;hist([matchSubord.rt],distrib);
-                    %                   axis([min(distrib) max(distrib) 0 150]);
-                    %                   title(sprintf('%s %s %s %s: subord',subjects{sub},sesName,fn,trainStr));
-                    %                   ylabel('Number of trials');
-                    %                   xlabel('RT (ms) measured from ''?'' prompt');
-                    %
-                    %                   keyboard
-                    %                   close all
-                    %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
+                    % if there's only 1 block, the results were printed above
+                    if nBlocks > 1
+                      fprintf('\n');
+                      for b = 1:nBlocks
+                        blockStr = sprintf('b%d',b);
+                        
+                        % overall
+                        nameBlock = nameResp([nameResp.block] == b);
+                        
+                        thisField = 'overall';
+                        results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,sub,results.(sesName).(fn).(blockStr),thisField);
+                        nameBlockResults = results.(sesName).(fn).(blockStr).(thisField);
+                        if printResults
+                          fprintf('\tB%d:',b);
+                          fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameBlockResults.acc(sub),nameBlockResults.nCor(sub),(nameBlockResults.nCor(sub) + nameBlockResults.nInc(sub)),nameBlockResults.dp(sub));
+                          fprintf('\t');
+                          fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockResults.rt(sub),nameBlockResults.rt_cor(sub),nameBlockResults.rt_inc(sub));
+                        end
+                        
+                        % basic and subordinate for this block
+                        nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
+                        nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
+                        
+                        thisField = 'basic';
+                        results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
+                        nameBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
+                        thisField = 'subord';
+                        results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
+                        nameBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
+                        if printResults
+                          fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockBasicResults.acc(sub),nameBlockBasicResults.nCor(sub),(nameBlockBasicResults.nCor(sub) + nameBlockBasicResults.nInc(sub)),nameBlockBasicResults.dp(sub));
+                          fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockSubordResults.acc(sub),nameBlockSubordResults.nCor(sub),(nameBlockSubordResults.nCor(sub) + nameBlockSubordResults.nInc(sub)),nameBlockSubordResults.dp(sub));
+                          fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockBasicResults.rt(sub),nameBlockBasicResults.rt_cor(sub),nameBlockBasicResults.rt_inc(sub));
+                          fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockSubordResults.rt(sub),nameBlockSubordResults.rt_cor(sub),nameBlockSubordResults.rt_inc(sub));
+                        end
+                        
+                      end
+                    end
+                    
+                  case {'recog', 'prac_recog'}
+                    % set up recognition processing
+                    
+                    % decide whether we need blocks
+                    if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
+                      nBlocks = 1;
+                    else
+                      nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
+                    end
                     
                     
-                  end
-                  
-                case {'name', 'nametrain', 'prac_name'}
-                  fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
-                  
-                  if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-                    nBlocks = 1;
-                  else
-                    nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-                  end
-                  
-                  % filter the events that we want
-                  nameResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'NAME_RESP'));
-                  
-                  % exclude missed responses (-1)
-                  nameResp = nameResp([nameResp.resp] ~= -1);
-                  % set missing response to incorrect
-                  % noRespInd = find([nameResp.resp] == -1);
-                  % if ~isempty(noRespInd)
-                  %   for nr = 1:length(noRespInd)
-                  %     nameResp(noRespInd(nr)).acc = 0;
-                  %   end
-                  % end
-                  
-                  % overall
-                  thisField = 'overall';
-                  results.(sesName).(fn) = accAndRT(nameResp,sub,results.(sesName).(fn),thisField);
-                  nameResults = results.(sesName).(fn).(thisField);
-                  if printResults
-                    fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameResults.acc(sub),nameResults.nCor(sub),(nameResults.nCor(sub) + nameResults.nInc(sub)),nameResults.dp(sub));
-                    fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameResults.rt(sub),nameResults.rt_cor(sub),nameResults.rt_inc(sub));
-                  end
-                  
-                  % basic and subordinate
-                  nameBasic = nameResp([nameResp.isSubord] == 0);
-                  nameSubord = nameResp([nameResp.isSubord] == 1);
-                  
-                  thisField = 'basic';
-                  results.(sesName).(fn) = accAndRT(nameBasic,sub,results.(sesName).(fn),thisField);
-                  nameBasicResults = results.(sesName).(fn).(thisField);
-                  thisField = 'subord';
-                  results.(sesName).(fn) = accAndRT(nameSubord,sub,results.(sesName).(fn),thisField);
-                  nameSubordResults = results.(sesName).(fn).(thisField);
-                  if printResults
-                    fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBasicResults.acc(sub),nameBasicResults.nCor(sub),(nameBasicResults.nCor(sub) + nameBasicResults.nInc(sub)),nameBasicResults.dp(sub));
-                    fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameSubordResults.acc(sub),nameSubordResults.nCor(sub),(nameSubordResults.nCor(sub) + nameSubordResults.nInc(sub)),nameSubordResults.dp(sub));
-                    fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBasicResults.rt(sub),nameBasicResults.rt_cor(sub),nameBasicResults.rt_inc(sub));
-                    fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameSubordResults.rt(sub),nameSubordResults.rt_cor(sub),nameSubordResults.rt_inc(sub));
-                  end
-                  
-                  % if there's only 1 block, the results were printed above
-                  if nBlocks > 1
-                    fprintf('\n');
-                    for b = 1:nBlocks
-                      blockStr = sprintf('b%d',b);
-                      
-                      % overall
-                      nameBlock = nameResp([nameResp.block] == b);
-                      
-                      thisField = 'overall';
-                      results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,sub,results.(sesName).(fn).(blockStr),thisField);
-                      nameBlockResults = results.(sesName).(fn).(blockStr).(thisField);
-                      if printResults
-                        fprintf('\tB%d:',b);
-                        fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameBlockResults.acc(sub),nameBlockResults.nCor(sub),(nameBlockResults.nCor(sub) + nameBlockResults.nInc(sub)),nameBlockResults.dp(sub));
-                        fprintf('\t');
-                        fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockResults.rt(sub),nameBlockResults.rt_cor(sub),nameBlockResults.rt_inc(sub));
-                      end
-                      
-                      % basic and subordinate for this block
-                      nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
-                      nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
-                      
-                      thisField = 'basic';
-                      results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
-                      nameBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
-                      thisField = 'subord';
-                      results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
-                      nameBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
-                      if printResults
-                        fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockBasicResults.acc(sub),nameBlockBasicResults.nCor(sub),(nameBlockBasicResults.nCor(sub) + nameBlockBasicResults.nInc(sub)),nameBlockBasicResults.dp(sub));
-                        fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockSubordResults.acc(sub),nameBlockSubordResults.nCor(sub),(nameBlockSubordResults.nCor(sub) + nameBlockSubordResults.nInc(sub)),nameBlockSubordResults.dp(sub));
-                        fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockBasicResults.rt(sub),nameBlockBasicResults.rt_cor(sub),nameBlockBasicResults.rt_inc(sub));
-                        fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockSubordResults.rt(sub),nameBlockSubordResults.rt_cor(sub),nameBlockSubordResults.rt_inc(sub));
-                      end
-                      
+                    % filter RECOGTEST_RESP events
+                    % filter the events that we want
+                    recogResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RESP'));
+                    
+                    % exclude missed responses (-1)
+                    recogResp = recogResp(~ismember({recogResp.resp},'none'));
+                    % set missing response to incorrect
+                    % noRespInd = find(ismember({recogResp.resp},'none'));
+                    % if ~isempty(noRespInd)
+                    %   for nr = 1:length(noRespInd)
+                    %     recogResp(noRespInd(nr)).acc = 0;
+                    %   end
+                    % end
+                    
+                    % overall
+                    thisField = 'overall';
+                    results.(sesName).(fn) = accAndRT(recogResp,sub,results.(sesName).(fn),thisField);
+                    recogResults = results.(sesName).(fn).(thisField);
+                    if printResults
+                      fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogResults.acc(sub),recogResults.nCor(sub),(recogResults.nCor(sub) + recogResults.nInc(sub)),recogResults.dp(sub),recogResults.hr(sub),recogResults.far(sub));
+                      fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogResults.rt(sub),recogResults.rt_cor(sub),recogResults.rt_inc(sub));
                     end
-                  end
-                  
-                case {'recog', 'prac_recog'}
-                  % set up recognition processing
-                  
-                  % decide whether we need blocks
-                  
-                  fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
-                  
-                  if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
-                    nBlocks = 1;
-                  else
-                    nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
-                  end
-                  
-                  
-                  % filter RECOGTEST_RESP events
-                  % filter the events that we want
-                  recogResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RESP'));
-                  
-                  % exclude missed responses (-1)
-                  recogResp = recogResp(~ismember({recogResp.resp},'none'));
-                  % set missing response to incorrect
-                  % noRespInd = find(ismember({recogResp.resp},'none'));
-                  % if ~isempty(noRespInd)
-                  %   for nr = 1:length(noRespInd)
-                  %     recogResp(noRespInd(nr)).acc = 0;
-                  %   end
-                  % end
-                  
-                  % overall
-                  thisField = 'overall';
-                  results.(sesName).(fn) = accAndRT(recogResp,sub,results.(sesName).(fn),thisField);
-                  recogResults = results.(sesName).(fn).(thisField);
-                  if printResults
-                    fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogResults.acc(sub),recogResults.nCor(sub),(recogResults.nCor(sub) + recogResults.nInc(sub)),recogResults.dp(sub),recogResults.hr(sub),recogResults.far(sub));
-                    fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogResults.rt(sub),recogResults.rt_cor(sub),recogResults.rt_inc(sub));
-                  end
-                  
-                  % basic and subordinate
-                  recogBasic = recogResp([recogResp.isSubord] == 0);
-                  recogSubord = recogResp([recogResp.isSubord] == 1);
-                  
-                  thisField = 'basic';
-                  results.(sesName).(fn) = accAndRT(recogBasic,sub,results.(sesName).(fn),thisField);
-                  recogBasicResults = results.(sesName).(fn).(thisField);
-                  thisField = 'subord';
-                  results.(sesName).(fn) = accAndRT(recogSubord,sub,results.(sesName).(fn),thisField);
-                  recogSubordResults = results.(sesName).(fn).(thisField);
-                  if printResults
-                    fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogBasicResults.acc(sub),recogBasicResults.nCor(sub),(recogBasicResults.nCor(sub) + recogBasicResults.nInc(sub)),recogBasicResults.dp(sub),recogBasicResults.hr(sub),recogBasicResults.far(sub));
-                    fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogSubordResults.acc(sub),recogSubordResults.nCor(sub),(recogSubordResults.nCor(sub) + recogSubordResults.nInc(sub)),recogSubordResults.dp(sub),recogSubordResults.hr(sub),recogSubordResults.far(sub));
-                    fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBasicResults.rt(sub),recogBasicResults.rt_cor(sub),recogBasicResults.rt_inc(sub));
-                    fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogSubordResults.rt(sub),recogSubordResults.rt_cor(sub),recogSubordResults.rt_inc(sub));
-                  end
-                  
-                  % if there's only 1 block, the results were printed above
-                  if nBlocks > 1
-                    fprintf('\n');
-                    for b = 1:nBlocks
-                      blockStr = sprintf('b%d',b);
-                      
-                      % overall
-                      recogBlock = recogResp([recogResp.block] == b);
-                      
-                      thisField = 'overall';
-                      results.(sesName).(fn).(blockStr) = accAndRT(recogBlock,sub,results.(sesName).(fn).(blockStr),thisField);
-                      recogBlockResults = results.(sesName).(fn).(blockStr).(thisField);
-                      if printResults
-                        fprintf('\tB%d:',b);
-                        fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',recogBlockResults.acc(sub),recogBlockResults.nCor(sub),(recogBlockResults.nCor(sub) + recogBlockResults.nInc(sub)),recogBlockResults.dp(sub));
-                        fprintf('\t');
-                        fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockResults.rt(sub),recogBlockResults.rt_cor(sub),recogBlockResults.rt_inc(sub));
-                      end
-                      
-                      % basic and subordinate for this block
-                      recogBlockBasic = recogBlock([recogBlock.isSubord] == 0);
-                      recogBlockSubord = recogBlock([recogBlock.isSubord] == 1);
-                      
-                      thisField = 'basic';
-                      results.(sesName).(fn).(blockStr) = accAndRT(recogBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
-                      recogBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
-                      thisField = 'subord';
-                      results.(sesName).(fn).(blockStr) = accAndRT(recogBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
-                      recogBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
-                      if printResults
-                        fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockBasicResults.acc(sub),recogBlockBasicResults.nCor(sub),(recogBlockBasicResults.nCor(sub) + recogBlockBasicResults.nInc(sub)),recogBlockBasicResults.dp(sub));
-                        fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockSubordResults.acc(sub),recogBlockSubordResults.nCor(sub),(recogBlockSubordResults.nCor(sub) + recogBlockSubordResults.nInc(sub)),recogBlockSubordResults.dp(sub));
-                        fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockBasicResults.rt(sub),recogBlockBasicResults.rt_cor(sub),recogBlockBasicResults.rt_inc(sub));
-                        fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockSubordResults.rt(sub),recogBlockSubordResults.rt_cor(sub),recogBlockSubordResults.rt_inc(sub));
-                      end
-                      
+                    
+                    % basic and subordinate
+                    recogBasic = recogResp([recogResp.isSubord] == 0);
+                    recogSubord = recogResp([recogResp.isSubord] == 1);
+                    
+                    thisField = 'basic';
+                    results.(sesName).(fn) = accAndRT(recogBasic,sub,results.(sesName).(fn),thisField);
+                    recogBasicResults = results.(sesName).(fn).(thisField);
+                    thisField = 'subord';
+                    results.(sesName).(fn) = accAndRT(recogSubord,sub,results.(sesName).(fn),thisField);
+                    recogSubordResults = results.(sesName).(fn).(thisField);
+                    if printResults
+                      fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogBasicResults.acc(sub),recogBasicResults.nCor(sub),(recogBasicResults.nCor(sub) + recogBasicResults.nInc(sub)),recogBasicResults.dp(sub),recogBasicResults.hr(sub),recogBasicResults.far(sub));
+                      fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogSubordResults.acc(sub),recogSubordResults.nCor(sub),(recogSubordResults.nCor(sub) + recogSubordResults.nInc(sub)),recogSubordResults.dp(sub),recogSubordResults.hr(sub),recogSubordResults.far(sub));
+                      fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBasicResults.rt(sub),recogBasicResults.rt_cor(sub),recogBasicResults.rt_inc(sub));
+                      fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogSubordResults.rt(sub),recogSubordResults.rt_cor(sub),recogSubordResults.rt_inc(sub));
                     end
-                  end
-              end % switch phaseName
-              
+                    
+                    % if there's only 1 block, the results were printed above
+                    if nBlocks > 1
+                      fprintf('\n');
+                      for b = 1:nBlocks
+                        blockStr = sprintf('b%d',b);
+                        
+                        % overall
+                        recogBlock = recogResp([recogResp.block] == b);
+                        
+                        thisField = 'overall';
+                        results.(sesName).(fn).(blockStr) = accAndRT(recogBlock,sub,results.(sesName).(fn).(blockStr),thisField);
+                        recogBlockResults = results.(sesName).(fn).(blockStr).(thisField);
+                        if printResults
+                          fprintf('\tB%d:',b);
+                          fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',recogBlockResults.acc(sub),recogBlockResults.nCor(sub),(recogBlockResults.nCor(sub) + recogBlockResults.nInc(sub)),recogBlockResults.dp(sub));
+                          fprintf('\t');
+                          fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockResults.rt(sub),recogBlockResults.rt_cor(sub),recogBlockResults.rt_inc(sub));
+                        end
+                        
+                        % basic and subordinate for this block
+                        recogBlockBasic = recogBlock([recogBlock.isSubord] == 0);
+                        recogBlockSubord = recogBlock([recogBlock.isSubord] == 1);
+                        
+                        thisField = 'basic';
+                        results.(sesName).(fn).(blockStr) = accAndRT(recogBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
+                        recogBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
+                        thisField = 'subord';
+                        results.(sesName).(fn).(blockStr) = accAndRT(recogBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
+                        recogBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
+                        if printResults
+                          fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockBasicResults.acc(sub),recogBlockBasicResults.nCor(sub),(recogBlockBasicResults.nCor(sub) + recogBlockBasicResults.nInc(sub)),recogBlockBasicResults.dp(sub));
+                          fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockSubordResults.acc(sub),recogBlockSubordResults.nCor(sub),(recogBlockSubordResults.nCor(sub) + recogBlockSubordResults.nInc(sub)),recogBlockSubordResults.dp(sub));
+                          fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockBasicResults.rt(sub),recogBlockBasicResults.rt_cor(sub),recogBlockBasicResults.rt_inc(sub));
+                          fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockSubordResults.rt(sub),recogBlockSubordResults.rt_cor(sub),recogBlockSubordResults.rt_inc(sub));
+                        end
+                        
+                      end
+                    end
+                end % switch phaseName
+                
+              else
+                fprintf('%s: %s, session_%d %s: phase %s is incomplete.\n',mfilename,expParam.subject,sesNum,sesName,fn);
+              end % phaseName complete
             else
-              fprintf('%s, %s: phase %s is incomplete.\n',expParam.subject,sesName,fn);
-            end % phaseName complete
+              fprintf('%s: %s, %s: phase %s does not exist.\n',mfilename,expParam.subject,sesName,fn);
+            end % field doesn't exist
             
           end % isExp
           
@@ -529,7 +530,7 @@ if isempty(results)
         fprintf('\n');
       end % for ses
     else
-      fprintf('\t%s has an incomplete session. Not including in results.\n',subjects{sub});
+      fprintf('\t%s has not completed all sessions. Not including in results.\n',subjects{sub});
     end % onlyComplete check
   end % for sub
   fprintf('Done processing data for experiment %s.\n\n',expName);
