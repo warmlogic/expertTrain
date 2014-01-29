@@ -521,7 +521,7 @@ if isempty(results)
                 fprintf('%s: %s, session_%d %s: phase %s is incomplete.\n',mfilename,expParam.subject,sesNum,sesName,fn);
               end % phaseName complete
             else
-              fprintf('%s: %s, %s: phase %s does not exist.\n',mfilename,expParam.subject,sesName,fn);
+              fprintf('%s: %s, session_%d %s: phase %s does not exist.\n',mfilename,expParam.subject,sesNum,sesName,fn);
             end % field doesn't exist
             
           end % isExp
