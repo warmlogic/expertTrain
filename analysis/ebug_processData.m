@@ -389,7 +389,9 @@ if isempty(results)
                     
                     % if there's only 1 block, the results were printed above
                     if nBlocks > 1
-                      fprintf('\n');
+                      if printResults
+                        fprintf('\n');
+                      end
                       for b = 1:nBlocks
                         blockStr = sprintf('b%d',b);
                         
@@ -436,7 +438,6 @@ if isempty(results)
                       nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims);
                     end
                     
-                    
                     % filter RECOGTEST_RESP events
                     % filter the events that we want
                     recogResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_RESP'));
@@ -479,7 +480,9 @@ if isempty(results)
                     
                     % if there's only 1 block, the results were printed above
                     if nBlocks > 1
-                      fprintf('\n');
+                      if printResults
+                        fprintf('\n');
+                      end
                       for b = 1:nBlocks
                         blockStr = sprintf('b%d',b);
                         

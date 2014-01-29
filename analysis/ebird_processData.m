@@ -347,7 +347,9 @@ if isempty(results)
                       % if there's only 1 image manipulation condition, the
                       % results were printed above
                       if length(imgConds) > 1
-                        fprintf('\n');
+                        if printResults
+                          fprintf('\n');
+                        end
                         for im = 1:length(imgConds)
                           % overall for this manipulation
                           matchCond = matchResp(ismember({matchResp.imgCond},imgConds{im}));
