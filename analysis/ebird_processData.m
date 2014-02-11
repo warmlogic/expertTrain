@@ -644,7 +644,9 @@ if isempty(results)
   fprintf('Done processing data for experiment %s.\n\n',expName);
   if saveResults
     matFileName = fullfile(dataroot,sprintf('%s_behav_results.mat',expName));
+    fprintf('Saving results struct to %s...',matFileName);
     save(matFileName,'results');
+    fprintf('Done.\n');
   end
 end
 
