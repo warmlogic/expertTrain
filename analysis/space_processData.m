@@ -797,6 +797,8 @@ end % function
 
 function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
 
+fprintf('Saving results to file: %s...',fileName);
+
 % use a subject's files for initialization
 if length(subjects) > 5
   tempSub = templateSubject;
@@ -1035,7 +1037,6 @@ for sesNum = 1:length(expParam.sesTypes)
 end % sessions
 
 % close out the results file
-fprintf('Saving results to file: %s...',fileName);
 fclose(fid);
 fprintf('Done.\n');
 

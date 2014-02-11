@@ -659,7 +659,7 @@ end % function
 
 function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,fileName)
 
-fprintf('Saving results to file: %s.\n',fileName);
+fprintf('Saving results to file: %s...',fileName);
 
 % mainToPrint = {'basic','subord'};
 % % dataToPrint = {'nTrial','nCor','acc','dp','rt','rt_cor','rt_inc'};
@@ -896,7 +896,6 @@ for sesNum = 1:length(expParam.sesTypes)
 end
 
 % close out the results file
-fprintf('Saving %s...',fileName);
 fclose(fid);
 fprintf('Done.\n');
 
