@@ -1,10 +1,14 @@
-function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit)
-% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit)
+function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField)
+% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
 % e.g.,
-% [results] = space_processData([],[],[],true,true,true,true,false,true,true);
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true);
+
+if ~exist('prependDestField','var') || isempty(prependDestField)
+  prependDestField = true;
+end
 
 if ~exist('partialCredit','var') || isempty(partialCredit)
   partialCredit = true;
@@ -18,29 +22,29 @@ end
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'SPACE001';
-    'SPACE002';
-    'SPACE003';
-    'SPACE004';
-    'SPACE005';
-    'SPACE006';
-    'SPACE007';
-    %'SPACE008';
-    'SPACE009';
-    'SPACE010';
-    'SPACE011';
-    'SPACE012';
-    'SPACE013';
-    'SPACE014';
-    'SPACE015';
-    'SPACE016';
-    'SPACE017';
-    'SPACE018';
-    'SPACE019';
-    'SPACE020';
-    'SPACE021';
-    'SPACE022';
-    'SPACE027';
-    'SPACE029';
+%     'SPACE002';
+%     'SPACE003';
+%     'SPACE004';
+%     'SPACE005';
+%     'SPACE006';
+%     'SPACE007';
+%     %'SPACE008';
+%     'SPACE009';
+%     'SPACE010';
+%     'SPACE011';
+%     'SPACE012';
+%     'SPACE013';
+%     'SPACE014';
+%     'SPACE015';
+%     'SPACE016';
+%     'SPACE017';
+%     'SPACE018';
+%     'SPACE019';
+%     'SPACE020';
+%     'SPACE021';
+%     'SPACE022';
+%     'SPACE027';
+%     'SPACE029';
     };
 end
 templateSubject = 'SPACE001';
@@ -266,8 +270,12 @@ if isempty(results)
   results = struct;
   
   mainFields = {'recog','recall'};
-  %dataFields = {'nTrials','nCor','nInc','acc','hr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
-  dataFields = {'nTrials','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
+  %dataFields = {'nTrial','nCor','nInc','acc','hr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
+  %dataFields = {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
+  dataFields = {...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
+    {'nTrial','nTarg','nHit','nMiss','hr','mr','rt_hit','rt_miss'} ...
+    };
   
   % categories = [1, 2];
   % categoryStr = {'faces', 'houses'};
@@ -361,8 +369,8 @@ if isempty(results)
                 if collapseCategories
                   for mf = 1:length(mainFields)
                     mField = mainFields{mf};
-                    for df = 1:length(dataFields)
-                      dField = dataFields{df};
+                    for df = 1:length(dataFields{mf})
+                      dField = dataFields{mf}{df};
                       
                       %if strcmp(mField,'recall')
                       %  dField = 'spellCorr';
@@ -382,8 +390,8 @@ if isempty(results)
                   for im = 1:length(i_catStrs)
                     for mf = 1:length(mainFields)
                       mField = mainFields{mf};
-                      for df = 1:length(dataFields)
-                        dField = dataFields{df};
+                      for df = 1:length(dataFields{mf})
+                        dField = dataFields{mf}{df};
                         
                         %if strcmp(mField,'recall')
                         %  dField = 'spellCorr';
@@ -571,10 +579,10 @@ if isempty(results)
                         for mf = 1:length(mainFields)
                           mField = mainFields{mf};
                           
-%                           % filter the events that we want
-%                           theseEvents = targEvents(...
-%                             strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
-%                             ismember([targEvents.lag],lagConds(lc)));
+                          %                           % filter the events that we want
+                          %                           theseEvents = targEvents(...
+                          %                             strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
+                          %                             ismember([targEvents.lag],lagConds(lc)));
                           
                           % if single presentation items are not tested,
                           % there will be no targets with lag=-1, only
@@ -585,30 +593,27 @@ if isempty(results)
                           
                           if strcmp(mField,'recog')
                             accField = sprintf('%s_acc',mField);
-                            dpField = sprintf('%s_dp',mField);
+                            %dpField = sprintf('%s_dp',mField);
                           elseif strcmp(mField,'recall')
                             accField = sprintf('%s_spellCorr',mField);
-                            dpField = 'NA';
+                            %dpField = 'NA';
+                            lureEvents = [];
                           end
-                          if strcmp(mField,'recog')
-                            accField = sprintf('%s_acc',mField);
-                          elseif strcmp(mField,'recall')
-                            accField = sprintf('%s_spellCorr',mField);
-                          end
-                          hrField = sprintf('%s_hr',mField);
-                          mrField = sprintf('%s_mr',mField);
-                          crrField = sprintf('%s_crr',mField);
-                          farField = sprintf('%s_far',mField);
-                          nTrialsField = sprintf('%s_nTrials',mField);
-                          nTargField = sprintf('%s_nTarg',mField);
-                          nLureField = sprintf('%s_nLure',mField);
-                          nHitField = sprintf('%s_nHit',mField);
-                          nMissField = sprintf('%s_nMiss',mField);
-                          nCRField = sprintf('%s_nCR',mField);
-                          nFAField = sprintf('%s_nFA',mField);
-                          %nCorField = sprintf('%s_nCor',mField);
-                          %nIncField = sprintf('%s_nInc',mField);
-                          rtField = sprintf('%s_rt',mField);
+                          
+                          %hrField = sprintf('%s_hr',mField);
+                          %mrField = sprintf('%s_mr',mField);
+                          %crrField = sprintf('%s_crr',mField);
+                          %farField = sprintf('%s_far',mField);
+                          %nTrialField = sprintf('%s_nTrial',mField);
+                          %nTargField = sprintf('%s_nTarg',mField);
+                          %nLureField = sprintf('%s_nLure',mField);
+                          %nHitField = sprintf('%s_nHit',mField);
+                          %nMissField = sprintf('%s_nMiss',mField);
+                          %nCRField = sprintf('%s_nCR',mField);
+                          %nFAField = sprintf('%s_nFA',mField);
+                          % %nCorField = sprintf('%s_nCor',mField);
+                          % %nIncField = sprintf('%s_nInc',mField);
+                          %rtField = sprintf('%s_rt',mField);
                           
                           %if strcmp(mField,'recog')
                           %  accField = 'acc';
@@ -618,24 +623,68 @@ if isempty(results)
                           %hrField = 'hr';
                           %farField = 'far';
                           %dpField = 'dp';
-                          %nTrialsField = 'nTrials';
+                          %nTrialField = 'nTrial';
                           %nCorField = 'nCor';
                           %nIncField = 'nInc';
                           %rtField = 'rt';
                           
-                          results.(sesName).(fn).(lagStr) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr),partialCredit,mField,...
-                            accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
-
+                          results.(sesName).(fn).(lagStr) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr),...
+                            partialCredit,mField,accField,dataFields{mf},prependDestField);
+                          %hrField,mrField,crrField,farField,dpField,nTrialField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
+                          
                           theseResults = results.(sesName).(fn).(lagStr).(mField);
                           if printResults
                             fprintf('\t%s\n',mField);
+                            
+                            if prependDestField
+                              hrField = sprintf('%s_hr',mField);
+                            else
+                              hrField = 'hr';
+                            end
+                            if prependDestField
+                              nHitField = sprintf('%s_nHit',mField);
+                            else
+                              nHitField = 'nHit';
+                            end
+                            if prependDestField
+                              nTargField = sprintf('%s_nTarg',mField);
+                            else
+                              nTargField = 'nTarg';
+                            end
+                            
                             fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',theseResults.(hrField)(sub),theseResults.(nHitField)(sub),(theseResults.(nTargField)(sub)));
-                            if ~strcmp(dpField,'NA')
+                            if ~isempty(lureEvents)
+                              if prependDestField
+                                farField = sprintf('%s_far',mField);
+                              else
+                                farField = 'far';
+                              end
+                              if prependDestField
+                                nFAField = sprintf('%s_nFA',mField);
+                              else
+                                nFAField = 'nFA';
+                              end
+                              if prependDestField
+                                nLureField = sprintf('%s_nLure',mField);
+                              else
+                                nLureField = 'nLure';
+                              end
+                              if prependDestField
+                                dpField = sprintf('%s_dp',mField);
+                              else
+                                dpField = 'dp';
+                              end
                               fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',theseResults.(farField)(sub),theseResults.(nFAField)(sub),(theseResults.(nLureField)(sub)));
                               fprintf('\t\td'':\t\t%.2f\n',theseResults.(dpField)(sub));
                             end
+                            
+                            if prependDestField
+                              rtField = sprintf('%s_rt',mField);
+                            else
+                              rtField = 'rt';
+                            end
                             fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',theseResults.(sprintf('%s_hit',rtField))(sub),theseResults.(sprintf('%s_miss',rtField))(sub));
-                            if ~strcmp(dpField,'NA')
+                            if ~isempty(lureEvents)
                               fprintf(', cr: %.2f, fa: %.2f\n',theseResults.(sprintf('%s_cr',rtField))(sub),theseResults.(sprintf('%s_fa',rtField))(sub));
                             else
                               fprintf('\n');
@@ -662,21 +711,21 @@ if isempty(results)
                             % lure events don't have lag conditions
                             lureEvents = thisPhaseEv(~[thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & strcmpi({thisPhaseEv.i_catStr},i_catStrs{im}));
                             
-%                             % filter the events that we want
-%                             theseEvents = targEvents(...
-%                               strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
-%                               ismember([targEvents.lag],lagConds(lc)) &...
-%                               strcmpi({targEvents.i_catStr},i_catStrs{im}));
+                            %                             % filter the events that we want
+                            %                             theseEvents = targEvents(...
+                            %                               strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
+                            %                               ismember([targEvents.lag],lagConds(lc)) &...
+                            %                               strcmpi({targEvents.i_catStr},i_catStrs{im}));
                             %theseEvents = targEvents(...
                             %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
                             %  ismember([targEvents.lag],lagConds(lc)) &...
                             %  strcmpi({targEvents.i_catStr},i_catStrs{im}) &...
                             %  [targEvents.targ]);
                             
-%                             if strcmp(mField,'recog')
-%                               % exclude missed responses ({'NO_RESPONSE', 'none'})
-%                               theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
-%                             end
+                            %                             if strcmp(mField,'recog')
+                            %                               % exclude missed responses ({'NO_RESPONSE', 'none'})
+                            %                               theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
+                            %                             end
                             
                             % if single presentation items are not tested,
                             % there will be no targets with lag=-1, only
@@ -687,25 +736,26 @@ if isempty(results)
                             
                             if strcmp(mField,'recog')
                               accField = sprintf('%s_acc',mField);
-                              dpField = sprintf('%s_dp',mField);
+                              %dpField = sprintf('%s_dp',mField);
                             elseif strcmp(mField,'recall')
                               accField = sprintf('%s_spellCorr',mField);
-                              dpField = 'NA';
+                              lureEvents = [];
+                              %dpField = 'NA';
                             end
-                            hrField = sprintf('%s_hr',mField);
-                            mrField = sprintf('%s_mr',mField);
-                            crrField = sprintf('%s_crr',mField);
-                            farField = sprintf('%s_far',mField);
-                            nTrialsField = sprintf('%s_nTrials',mField);
-                            %nCorField = sprintf('%s_nCor',mField);
-                            %nIncField = sprintf('%s_nInc',mField);
-                            nTargField = sprintf('%s_nTarg',mField);
-                            nLureField = sprintf('%s_nLure',mField);
-                            nHitField = sprintf('%s_nHit',mField);
-                            nMissField = sprintf('%s_nMiss',mField);
-                            nCRField = sprintf('%s_nCR',mField);
-                            nFAField = sprintf('%s_nFA',mField);
-                            rtField = sprintf('%s_rt',mField);
+%                             hrField = sprintf('%s_hr',mField);
+%                             mrField = sprintf('%s_mr',mField);
+%                             crrField = sprintf('%s_crr',mField);
+%                             farField = sprintf('%s_far',mField);
+%                             nTrialField = sprintf('%s_nTrial',mField);
+%                             %nCorField = sprintf('%s_nCor',mField);
+%                             %nIncField = sprintf('%s_nInc',mField);
+%                             nTargField = sprintf('%s_nTarg',mField);
+%                             nLureField = sprintf('%s_nLure',mField);
+%                             nHitField = sprintf('%s_nHit',mField);
+%                             nMissField = sprintf('%s_nMiss',mField);
+%                             nCRField = sprintf('%s_nCR',mField);
+%                             nFAField = sprintf('%s_nFA',mField);
+%                             rtField = sprintf('%s_rt',mField);
                             
                             %if strcmp(mField,'recog')
                             %  accField = 'acc';
@@ -715,28 +765,89 @@ if isempty(results)
                             %hrField = 'hr';
                             %farField = 'far';
                             %dpField = 'dp';
-                            %nTrialsField = 'nTrials';
+                            %nTrialField = 'nTrial';
                             %nCorField = 'nCor';
                             %nIncField = 'nInc';
                             %rtField = 'rt';
                             
-                            results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),partialCredit,mField,...
-                              accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
+                            results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),...
+                              partialCredit,mField,accField,dataFields{mf},prependDestField);
+                              %hrField,mrField,crrField,farField,dpField,nTrialField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
+                            
                             theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
+%                             if printResults
+%                               fprintf('\t%s %s\n',i_catStrs{im},mField);
+%                               fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',theseResults.(hrField)(sub),theseResults.(nHitField)(sub),(theseResults.(nTargField)(sub)));
+%                               if ~strcmp(dpField,'NA')
+%                                 fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',theseResults.(farField)(sub),theseResults.(nFAField)(sub),(theseResults.(nLureField)(sub)));
+%                                 fprintf('\t\td'':\t\t%.2f\n',theseResults.(dpField)(sub));
+%                               end
+%                               fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',theseResults.(sprintf('%s_hit',rtField))(sub),theseResults.(sprintf('%s_miss',rtField))(sub));
+%                               if ~strcmp(dpField,'NA')
+%                                 fprintf(', cr: %.2f, fa: %.2f\n',theseResults.(sprintf('%s_cr',rtField))(sub),theseResults.(sprintf('%s_fa',rtField))(sub));
+%                               else
+%                                 fprintf('\n');
+%                               end
+%                             end
+                            
                             if printResults
                               fprintf('\t%s %s\n',i_catStrs{im},mField);
+                              
+                              if prependDestField
+                                hrField = sprintf('%s_hr',mField);
+                              else
+                                hrField = 'hr';
+                              end
+                              if prependDestField
+                                nHitField = sprintf('%s_nHit',mField);
+                              else
+                                nHitField = 'nHit';
+                              end
+                              if prependDestField
+                                nTargField = sprintf('%s_nTarg',mField);
+                              else
+                                nTargField = 'nTarg';
+                              end
+                              
                               fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',theseResults.(hrField)(sub),theseResults.(nHitField)(sub),(theseResults.(nTargField)(sub)));
-                              if ~strcmp(dpField,'NA')
+                              if ~isempty(lureEvents)
+                                if prependDestField
+                                  farField = sprintf('%s_far',mField);
+                                else
+                                  farField = 'far';
+                                end
+                                if prependDestField
+                                  nFAField = sprintf('%s_nFA',mField);
+                                else
+                                  nFAField = 'nFA';
+                                end
+                                if prependDestField
+                                  nLureField = sprintf('%s_nLure',mField);
+                                else
+                                  nLureField = 'nLure';
+                                end
+                                if prependDestField
+                                  dpField = sprintf('%s_dp',mField);
+                                else
+                                  dpField = 'dp';
+                                end
                                 fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',theseResults.(farField)(sub),theseResults.(nFAField)(sub),(theseResults.(nLureField)(sub)));
                                 fprintf('\t\td'':\t\t%.2f\n',theseResults.(dpField)(sub));
                               end
+                              
+                              if prependDestField
+                                rtField = sprintf('%s_rt',mField);
+                              else
+                                rtField = 'rt';
+                              end
                               fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',theseResults.(sprintf('%s_hit',rtField))(sub),theseResults.(sprintf('%s_miss',rtField))(sub));
-                              if ~strcmp(dpField,'NA')
+                              if ~isempty(lureEvents)
                                 fprintf(', cr: %.2f, fa: %.2f\n',theseResults.(sprintf('%s_cr',rtField))(sub),theseResults.(sprintf('%s_fa',rtField))(sub));
                               else
                                 fprintf('\n');
                               end
                             end
+                            
                           end % mf
                           
                         end % im
@@ -774,34 +885,32 @@ end
 
 if saveResults
   textFileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,results,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
+  printResultsToFile(dataroot,subjects,results,mainFields,dataFields,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
+function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
 
-fid = fopen(fileName,'wt');
-
-mainToPrint = {'recog','recall'};
-
-generic_dataToPrint = {'nTrials','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
-dataToPrint = {...
-  {'recog_nTrials','recog_nTarg','recog_nLure','recog_nHit','recog_nMiss','recog_nCR','recog_nFA','recog_hr','recog_mr','recog_crr','recog_far','recog_dp','recog_rt_hit','recog_rt_miss','recog_rt_cr','recog_rt_far'} ...
-  {'recall_nTrials','recall_nTarg','recall_nLure','recall_nHit','recall_nMiss','recall_nCR','recall_nFA','recall_hr','recall_mr','recall_crr','recall_far','recall_dp','recall_rt_hit','recall_rt_miss','recall_rt_cr','recall_rt_far'} ...
-  };
+% mainToPrint = {'recog','recall'};
+% 
+% generic_dataToPrint = {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
+% dataToPrint = {...
+%   {'recog_nTrial','recog_nTarg','recog_nLure','recog_nHit','recog_nMiss','recog_nCR','recog_nFA','recog_hr','recog_mr','recog_crr','recog_far','recog_dp','recog_rt_hit','recog_rt_miss','recog_rt_cr','recog_rt_far'} ...
+%   {'recall_nTrial','recall_nTarg','recall_nLure','recall_nHit','recall_nMiss','recall_nCR','recall_nFA','recall_hr','recall_mr','recall_crr','recall_far','recall_dp','recall_rt_hit','recall_rt_miss','recall_rt_cr','recall_rt_far'} ...
+%   };
 
 % generic_dataToPrint = {'nCor','nInc','hr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
 % dataToPrint = {...
 %   {'recog_nCor','recog_nInc','recog_hr','recog_far','recog_dp','recog_rt_hit','recog_rt_miss'},...
 %   {'recall_nCor','recall_nInc','recall_hr','recall_far','recall_dp','recall_rt_hit','recall_rt_miss'}};
 
-% generic_dataToPrint = {'nTrials','nCor','acc','hr','far','dp','rt','rt_cor','rt_inc'};
+% generic_dataToPrint = {'nTrial','nCor','acc','hr','far','dp','rt','rt_cor','rt_inc'};
 % dataToPrint = {...
-%   {'recog_nTrials','recog_nCor','recog_acc','recog_hr','recog_far','recog_dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
-%   {'recall_nTrials','recall_nCor','recall_spellCorr','recall_hr','recall_far','recall_dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
+%   {'recog_nTrial','recog_nCor','recog_acc','recog_hr','recog_far','recog_dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
+%   {'recall_nTrial','recall_nCor','recall_spellCorr','recall_hr','recall_far','recall_dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
 
 % use a subject's files for initialization
 if length(subjects) > 5
@@ -824,6 +933,8 @@ if exist(eventsFile,'file')
 else
   error('events file does not exist: %s',eventsFile);
 end
+
+fid = fopen(fileName,'wt');
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
@@ -893,18 +1004,36 @@ for sesNum = 1:length(expParam.sesTypes)
               
               if collapseCategories
                 % overall
+                nTabs = nan(1,length(dataToPrint));
+                nTabInd = 0;
+                for d = 1:length(dataToPrint)
+                  nTabInd = nTabInd + 1;
+                  nTabs(nTabInd) = length(dataToPrint{d});
+                end
                 headerCell = {{lagStr},mainToPrint};
-                [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
+                [headerStr] = setHeaderStr(headerCell,nTabs);
                 fprintf(fid,sprintf('\t%s\n',headerStr));
-                [headerStr] = setHeaderStr({generic_dataToPrint},1);
-                headerStr = sprintf('\t%s',headerStr);
-                headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-                fprintf(fid,sprintf('%s\n',headerStr));
                 
                 for sub = 1:length(subjects)
+                  % print the header string only before the first sub
+                  if sub == 1
+                    for mf = 1:length(mainToPrint)
+                      [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                      headerStr = sprintf('\t%s',headerStr);
+                      fprintf(fid,sprintf('%s',headerStr));
+                    end
+                  end
+                  fprintf(fid,'\n');
+                  
                   dataStr = subjects{sub};
                   for mf = 1:length(mainToPrint)
-                    [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,dataToPrint{mf});
+                    if prependDestField
+                      subDataToPrint = strcat(sprintf('%s_',mainToPrint{mf}),dataToPrint{mf});
+                    else
+                      subDataToPrint = dataToPrint{mf};
+                    end
+                    
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,subDataToPrint);
                   end
                   fprintf(fid,sprintf('%s\n',dataStr));
                 end
@@ -913,19 +1042,40 @@ for sesNum = 1:length(expParam.sesTypes)
               % separate categories
               i_catStrs = unique({targEvents.i_catStr},'stable');
               if length(i_catStrs) > 1 && separateCategories
+                nTabs = nan(1,length(dataToPrint) * length(i_catStrs));
+                nTabInd = 0;
+                for ic = 1:length(i_catStrs)
+                  for d = 1:length(dataToPrint)
+                    nTabInd = nTabInd + 1;
+                    nTabs(nTabInd) = length(dataToPrint{d});
+                  end
+                end
                 headerCell = {{lagStr},i_catStrs,mainToPrint};
-                [headerStr] = setHeaderStr(headerCell,length(generic_dataToPrint));
+                [headerStr] = setHeaderStr(headerCell,nTabs);
                 fprintf(fid,sprintf('\t%s\n',headerStr));
-                [headerStr] = setHeaderStr({generic_dataToPrint},1);
-                headerStr = sprintf('\t%s',headerStr);
-                headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-                fprintf(fid,sprintf('%s\n',headerStr));
                 
                 for sub = 1:length(subjects)
+                  % print the header string only before the first sub
+                  if sub == 1
+                    for ic = 1:length(i_catStrs)
+                      for mf = 1:length(mainToPrint)
+                        [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                        headerStr = sprintf('\t%s',headerStr);
+                        fprintf(fid,sprintf('%s',headerStr));
+                      end
+                    end
+                  end
+                  fprintf(fid,'\n');
+                  
                   dataStr = subjects{sub};
                   for im = 1:length(i_catStrs)
                     for mf = 1:length(mainToPrint)
-                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,dataToPrint{mf});
+                      if prependDestField
+                        subDataToPrint = strcat(sprintf('%s_',mainToPrint{mf}),dataToPrint{mf});
+                      else
+                        subDataToPrint = dataToPrint{mf};
+                      end
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,subDataToPrint);
                     end
                   end
                   fprintf(fid,sprintf('%s\n',dataStr));
@@ -1030,8 +1180,12 @@ for i = 2:size(headerMat,1)
     thisStr = cat(2,thisStr,' ',headerMat{i,j});
   end
   thisStr = thisStr(2:end);
-  if ~isempty(nTabs) && nTabs > 0
-    thisStr = sprintf('%s%s',repmat('\t',1,nTabs),thisStr);
+  if ~isempty(nTabs)
+    if length(nTabs) > 1 && nTabs(i-1) > 0
+      thisStr = sprintf('%s%s',repmat('\t',1,nTabs(i-1)),thisStr);
+    elseif length(nTabs) == 1 && nTabs > 0
+      thisStr = sprintf('%s%s',repmat('\t',1,nTabs),thisStr);
+    end
   end
   headerStr = sprintf('%s%s',headerStr,thisStr);
 end
@@ -1056,59 +1210,64 @@ end
 
 %% Calculate accuracy and reaction time
 
-function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField)
-% function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,hrField,farField,dpField,nTrialsField,nCorField,nIncField,rtField)
+function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,dataFields,prependDestField)
+%function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,hrField,mrField,crrField,farField,dpField,nTrialField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField)
+% function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,hrField,farField,dpField,nTrialField,nCorField,nIncField,rtField)
 
-if ~exist('partialCredit','var') || isempty(partialCredit)
-  partialCredit = true;
-end
-if ~exist('accField','var') || isempty(accField)
-  accField = 'acc';
-end
-if ~exist('hrField','var') || isempty(hrField)
-  hrField = 'hr';
-end
-if ~exist('mrField','var') || isempty(mrField)
-  mrField = 'mr';
-end
-if ~exist('crrField','var') || isempty(crrField)
-  crrField = 'crr';
-end
-if ~exist('farField','var') || isempty(farField)
-  farField = 'far';
-end
-if ~exist('dpField','var') || isempty(dpField)
-  dpField = 'dp';
-end
-if ~exist('nTrialsField','var') || isempty(nTrialsField)
-  nTrialsField = 'nTrials';
-end
-if ~exist('nTargField','var') || isempty(nTargField)
-  nTargField = 'nTarg';
-end
-if ~exist('nLureField','var') || isempty(nLureField)
-  nLureField = 'nLure';
-end
-if ~exist('nHitField','var') || isempty(nHitField)
-  nHitField = 'nHit';
-end
-if ~exist('nMissField','var') || isempty(nMissField)
-  nMissField = 'nMiss';
-end
-if ~exist('nCRField','var') || isempty(nCRField)
-  nCRField = 'nCR';
-end
-if ~exist('nFAField','var') || isempty(nFAField)
-  nFAField = 'nFA';
-end
-% if ~exist('nCorField','var') || isempty(nCorField)
-%   nCorField = 'nCor';
+% if ~exist('partialCredit','var') || isempty(partialCredit)
+%   partialCredit = true;
 % end
-% if ~exist('nIncField','var') || isempty(nIncField)
-%   nIncField = 'nInc';
+% if ~exist('accField','var') || isempty(accField)
+%   accField = 'acc';
 % end
-if ~exist('rtField','var') || isempty(rtField)
-  rtField = 'rt';
+% if ~exist('hrField','var') || isempty(hrField)
+%   hrField = 'hr';
+% end
+% if ~exist('mrField','var') || isempty(mrField)
+%   mrField = 'mr';
+% end
+% if ~exist('crrField','var') || isempty(crrField)
+%   crrField = 'crr';
+% end
+% if ~exist('farField','var') || isempty(farField)
+%   farField = 'far';
+% end
+% if ~exist('dpField','var') || isempty(dpField)
+%   dpField = 'dp';
+% end
+% if ~exist('nTrialField','var') || isempty(nTrialField)
+%   nTrialField = 'nTrial';
+% end
+% if ~exist('nTargField','var') || isempty(nTargField)
+%   nTargField = 'nTarg';
+% end
+% if ~exist('nLureField','var') || isempty(nLureField)
+%   nLureField = 'nLure';
+% end
+% if ~exist('nHitField','var') || isempty(nHitField)
+%   nHitField = 'nHit';
+% end
+% if ~exist('nMissField','var') || isempty(nMissField)
+%   nMissField = 'nMiss';
+% end
+% if ~exist('nCRField','var') || isempty(nCRField)
+%   nCRField = 'nCR';
+% end
+% if ~exist('nFAField','var') || isempty(nFAField)
+%   nFAField = 'nFA';
+% end
+% % if ~exist('nCorField','var') || isempty(nCorField)
+% %   nCorField = 'nCor';
+% % end
+% % if ~exist('nIncField','var') || isempty(nIncField)
+% %   nIncField = 'nInc';
+% % end
+% if ~exist('rtField','var') || isempty(rtField)
+%   rtField = 'rt';
+% end
+
+if ~exist('prependDestField','var') || isempty(prependDestField)
+  prependDestField = false;
 end
 
 if ~isfield(inputStruct,destField)
@@ -1116,47 +1275,105 @@ if ~isfield(inputStruct,destField)
 end
 
 % trial counts
-nTrials = length(targEv) + length(lureEv);
-inputStruct.(destField).(nTrialsField)(sub) = nTrials;
+thisStr = 'nTrial';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  nTrial = length(targEv) + length(lureEv);
+  inputStruct.(destField).(thisField)(sub) = nTrial;
+end
 
-inputStruct.(destField).(nTargField)(sub) = length(targEv);
-inputStruct.(destField).(nLureField)(sub) = length(lureEv);
+thisStr = 'nTarg';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = length(targEv);
+end
+
+if ~isempty(lureEv)
+  thisStr = 'nLure';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = length(lureEv);
+  end
+end
 
 % separate events
 if partialCredit
   hitEv = targEv([targEv.(accField)] > 0);
   missEv = targEv([targEv.(accField)] == 0);
   
-  if ~strcmp(dpField,'NA')
+  if ~isempty(lureEv)
     crEv = lureEv([lureEv.(accField)] > 0);
     faEv = lureEv([lureEv.(accField)] == 0);
-  else
-    crEv = [];
-    faEv = [];
   end
 else
   hitEv = targEv([targEv.(accField)] == 1);
   missEv = targEv([targEv.(accField)] < 1);
   
-  if ~strcmp(dpField,'NA')
+  if ~isempty(lureEv)
     crEv = lureEv([lureEv.(accField)] == 1);
     faEv = lureEv([lureEv.(accField)] < 1);
-  else
-    crEv = [];
-    faEv = [];
   end
 end
 
 % inputStruct.(destField).(nCorField)(sub) = length(hitEv) + length(crEv);
 % inputStruct.(destField).(nIncField)(sub) = length(missEv) + length(faEv);
 
-inputStruct.(destField).(nHitField)(sub) = length(hitEv);
-inputStruct.(destField).(nMissField)(sub) = length(missEv);
-inputStruct.(destField).(nCRField)(sub) = length(crEv);
-inputStruct.(destField).(nFAField)(sub) = length(faEv);
+thisStr = 'nHit';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = length(hitEv);
+end
+
+thisStr = 'nMiss';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = length(missEv);
+end
+
+if ~isempty(lureEv)
+  thisStr = 'nCR';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = length(crEv);
+  end
+  
+  thisStr = 'nFA';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = length(faEv);
+  end
+end
 
 % % overall accuracy
-% inputStruct.(destField).(accField)(sub) = inputStruct.(destField).(nCorField)(sub) / nTrials;
+% inputStruct.(destField).(accField)(sub) = inputStruct.(destField).(nCorField)(sub) / nTrial;
 
 % d-prime; adjust for perfect performance, choose 1 of 2 strategies
 % (Macmillan & Creelman, 2005; p. 8-9)
@@ -1164,7 +1381,7 @@ strategy = 2;
 
 hr = length(hitEv) / length(targEv);
 mr = length(missEv) / length(targEv);
-if ~strcmp(dpField,'NA')
+if ~isempty(lureEv)
   crr = length(crEv) / length(lureEv);
   far = length(faEv) / length(lureEv);
 end
@@ -1186,7 +1403,7 @@ elseif hr == 0
     hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
   end
 end
-if ~strcmp(dpField,'NA')
+if ~isempty(lureEv)
   if far == 1
     warning('FAR is 1! Correcting...');
     if strategy == 1
@@ -1206,16 +1423,59 @@ if ~strcmp(dpField,'NA')
   end
 end
 
-inputStruct.(destField).(hrField)(sub) = hr;
-inputStruct.(destField).(mrField)(sub) = mr;
-if ~strcmp(dpField,'NA')
-  inputStruct.(destField).(farField)(sub) = far;
-  inputStruct.(destField).(crrField)(sub) = crr;
+thisStr = 'hr';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = hr;
+end
+
+thisStr = 'mr';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = mr;
+end
+
+if ~isempty(lureEv)
+  thisStr = 'far';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = far;
+  end
   
-  zhr = norminv(hr,0,1);
-  zfar = norminv(far,0,1);
+  thisStr = 'crr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = crr;
+  end
   
-  inputStruct.(destField).(dpField)(sub) = zhr - zfar;
+  thisStr = 'dp';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    zhr = norminv(hr,0,1);
+    zfar = norminv(far,0,1);
+    
+    inputStruct.(destField).(thisField)(sub) = zhr - zfar;
+  end
 end
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
@@ -1224,15 +1484,65 @@ end
 % % Find da: Macmillan & Creelman (2005), p. 61--62
 % %
 % % slope of zROC
-% s = zhr/-zfar;
-% inputStruct.(destField).da(sub) = (2 / (1 + (s^2)))^(1/2) * (zhr - (s*zfar));
+% thisStr = 'da';
+% if any(strcmp(thisStr,dataFields))
+%   if prependDestField
+%     thisField = sprintf('%s_%s',destField,thisStr);
+%   else
+%     thisField = thisStr;
+%   end
+%   s = zhr/-zfar;
+%   inputStruct.(destField).(thisField)(sub) = (2 / (1 + (s^2)))^(1/2) * (zhr - (s*zfar));
+% end
 
-% RT
-inputStruct.(destField).(sprintf('%s_hit',rtField))(sub) = mean([hitEv.(rtField)]);
-inputStruct.(destField).(sprintf('%s_miss',rtField))(sub) = mean([missEv.(rtField)]);
-if ~strcmp(dpField,'NA')
-  inputStruct.(destField).(sprintf('%s_cr',rtField))(sub) = mean([crEv.(rtField)]);
-  inputStruct.(destField).(sprintf('%s_fa',rtField))(sub) = mean([faEv.(rtField)]);
+% Response Times
+rtStr = 'rt';
+if prependDestField
+  rtField = sprintf('%s_%s',destField,rtStr);
+else
+  rtField = rtStr;
+end
+
+thisStr = 'rt_hit';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = mean([hitEv.(rtField)]);
+end
+
+thisStr = 'rt_miss';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = mean([missEv.(rtField)]);
+end
+
+if ~isempty(lureEv)
+  thisStr = 'rt_cr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = mean([crEv.(rtField)]);
+  end
+  
+  thisStr = 'rt_fa';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = mean([faEv.(rtField)]);
+  end
 end
 
 end
