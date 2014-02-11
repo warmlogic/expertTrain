@@ -84,7 +84,7 @@ if isempty(results)
     {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
     {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
     };
-%   dataFields = {'nTrial','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
+  %   dataFields = {'nTrial','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
   
   % set field names
   accField = 'acc';
@@ -844,8 +844,8 @@ for sesNum = 1:length(expParam.sesTypes)
                   %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
                   fprintf(fid,sprintf('%s',headerStr));
                 end
+                fprintf(fid,'\n');
               end
-              fprintf(fid,'\n');
               
               if completeStatus(sub)
                 dataStr = subjects{sub};
@@ -895,8 +895,8 @@ for sesNum = 1:length(expParam.sesTypes)
                     fprintf(fid,sprintf('%s',headerStr));
                   end
                 end
+                fprintf(fid,'\n');
               end
-              fprintf(fid,'\n');
               
               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
               if completeStatus(sub)
@@ -930,8 +930,8 @@ for sesNum = 1:length(expParam.sesTypes)
                   %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
                   fprintf(fid,sprintf('%s',headerStr));
                 end
+                fprintf(fid,'\n');
               end
-              fprintf(fid,'\n');
               
               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
               if completeStatus(sub)
@@ -980,8 +980,8 @@ for sesNum = 1:length(expParam.sesTypes)
                     fprintf(fid,sprintf('%s',headerStr));
                   end
                 end
+                fprintf(fid,'\n');
               end
-              fprintf(fid,'\n');
               
               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
               if completeStatus(sub)
@@ -1015,8 +1015,8 @@ for sesNum = 1:length(expParam.sesTypes)
                   %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
                   fprintf(fid,sprintf('%s',headerStr));
                 end
+                fprintf(fid,'\n');
               end
-              fprintf(fid,'\n');
               
               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
               if completeStatus(sub)
@@ -1204,17 +1204,21 @@ if hr == 1
   warning('HR is 1.0! Correcting...');
   if strategy == 1
     hr = 1 - (1 / (2 * length(targEv)));
+    mr = 1 / (2 * length(targEv));
   elseif strategy == 2
     % (Hautus, 1995; Miller, 1996)
     hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
+    mr = (length(missEv) + 0.5) / (length(targEv) + 1);
   end
 elseif hr == 0
   warning('HR is 0! Correcting...');
   if strategy == 1
     hr = 1 / (2 * length(targEv));
+    mr = 1 - (1 / (2 * length(targEv)));
   elseif strategy == 2
     % (Hautus, 1995; Miller, 1996)
     hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
+    mr = (length(missEv) + 0.5) / (length(targEv) + 1);
   end
 end
 if ~isempty(lureEv)
@@ -1222,17 +1226,21 @@ if ~isempty(lureEv)
     warning('FAR is 1! Correcting...');
     if strategy == 1
       far = 1 - (1 / (2 * length(lureEv)));
+      crr = 1 / (2 * length(lureEv));
     elseif strategy == 2
       % (Hautus, 1995; Miller, 1996)
       far = (length(faEv) + 0.5) / (length(lureEv) + 1);
+      crr = (length(crEv) + 0.5) / (length(lureEv) + 1);
     end
   elseif far == 0
     warning('FAR is 0! Correcting...');
     if strategy == 1
       far = 1 / (2 * length(lureEv));
+      crr = 1 - (1 / (2 * length(lureEv)));
     elseif strategy == 2
       % (Hautus, 1995; Miller, 1996)
       far = (length(faEv) + 0.5) / (length(lureEv) + 1);
+      crr = (length(crEv) + 0.5) / (length(lureEv) + 1);
     end
   end
 end
