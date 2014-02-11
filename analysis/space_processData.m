@@ -22,29 +22,29 @@ end
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'SPACE001';
-%     'SPACE002';
-%     'SPACE003';
-%     'SPACE004';
-%     'SPACE005';
-%     'SPACE006';
-%     'SPACE007';
-%     %'SPACE008';
-%     'SPACE009';
-%     'SPACE010';
-%     'SPACE011';
-%     'SPACE012';
-%     'SPACE013';
-%     'SPACE014';
-%     'SPACE015';
-%     'SPACE016';
-%     'SPACE017';
-%     'SPACE018';
-%     'SPACE019';
-%     'SPACE020';
-%     'SPACE021';
-%     'SPACE022';
-%     'SPACE027';
-%     'SPACE029';
+    'SPACE002';
+    'SPACE003';
+    'SPACE004';
+    'SPACE005';
+    'SPACE006';
+    'SPACE007';
+    %'SPACE008';
+    'SPACE009';
+    'SPACE010';
+    'SPACE011';
+    'SPACE012';
+    'SPACE013';
+    'SPACE014';
+    'SPACE015';
+    'SPACE016';
+    'SPACE017';
+    'SPACE018';
+    'SPACE019';
+    'SPACE020';
+    'SPACE021';
+    'SPACE022';
+    'SPACE027';
+    'SPACE029';
     };
 end
 templateSubject = 'SPACE001';
@@ -270,8 +270,6 @@ if isempty(results)
   results = struct;
   
   mainFields = {'recog','recall'};
-  %dataFields = {'nTrial','nCor','nInc','acc','hr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
-  %dataFields = {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
   dataFields = {...
     {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
     {'nTrial','nTarg','nHit','nMiss','hr','mr','rt_hit','rt_miss'} ...
@@ -372,13 +370,6 @@ if isempty(results)
                     for df = 1:length(dataFields{mf})
                       dField = dataFields{mf}{df};
                       
-                      %if strcmp(mField,'recall')
-                      %  dField = 'spellCorr';
-                      %else
-                      %  dField = dataFields{df};
-                      %end
-                      
-                      %results.(sesName).(fn).(lagStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
                       results.(sesName).(fn).(lagStr).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),1);
                     end
                   end
@@ -393,13 +384,6 @@ if isempty(results)
                       for df = 1:length(dataFields{mf})
                         dField = dataFields{mf}{df};
                         
-                        %if strcmp(mField,'recall')
-                        %  dField = 'spellCorr';
-                        %else
-                        %  dField = dataFields{df};
-                        %end
-                        
-                        %results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
                         results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),1);
                       end
                     end
@@ -516,12 +500,6 @@ if isempty(results)
                     % exclude missed responses ({'NO_RESPONSE', 'none'})
                     thisPhaseEv = thisPhaseEv(~ismember({thisPhaseEv.recog_resp},{'NO_RESPONSE', 'none'}));
                     
-                    %targEvents = theseEvents([theseEvents.targ]);
-                    %lureEvents = theseEvents(~[theseEvents.targ]);
-                    
-                    %testStimEvents = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'RECOGTEST_STIM'));
-                    %testEvents = events.(sesName).(fn).data;
-                    
                     if sum(lagConds > 0) > 1
                       error('%s does not yet support multiple lag conditions!',mfilename);
                     end
@@ -593,47 +571,16 @@ if isempty(results)
                           
                           if strcmp(mField,'recog')
                             accField = sprintf('%s_acc',mField);
-                            %dpField = sprintf('%s_dp',mField);
                           elseif strcmp(mField,'recall')
                             accField = sprintf('%s_spellCorr',mField);
-                            %dpField = 'NA';
                             lureEvents = [];
                           end
                           
-                          %hrField = sprintf('%s_hr',mField);
-                          %mrField = sprintf('%s_mr',mField);
-                          %crrField = sprintf('%s_crr',mField);
-                          %farField = sprintf('%s_far',mField);
-                          %nTrialField = sprintf('%s_nTrial',mField);
-                          %nTargField = sprintf('%s_nTarg',mField);
-                          %nLureField = sprintf('%s_nLure',mField);
-                          %nHitField = sprintf('%s_nHit',mField);
-                          %nMissField = sprintf('%s_nMiss',mField);
-                          %nCRField = sprintf('%s_nCR',mField);
-                          %nFAField = sprintf('%s_nFA',mField);
-                          % %nCorField = sprintf('%s_nCor',mField);
-                          % %nIncField = sprintf('%s_nInc',mField);
-                          %rtField = sprintf('%s_rt',mField);
-                          
-                          %if strcmp(mField,'recog')
-                          %  accField = 'acc';
-                          %elseif strcmp(mField,'recall')
-                          %  accField = 'spellCorr';
-                          %end
-                          %hrField = 'hr';
-                          %farField = 'far';
-                          %dpField = 'dp';
-                          %nTrialField = 'nTrial';
-                          %nCorField = 'nCor';
-                          %nIncField = 'nInc';
-                          %rtField = 'rt';
-                          
                           results.(sesName).(fn).(lagStr) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr),...
                             partialCredit,mField,accField,dataFields{mf},prependDestField);
-                          %hrField,mrField,crrField,farField,dpField,nTrialField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                           
-                          theseResults = results.(sesName).(fn).(lagStr).(mField);
                           if printResults
+                          theseResults = results.(sesName).(fn).(lagStr).(mField);
                             fprintf('\t%s\n',mField);
                             
                             if prependDestField
@@ -736,61 +683,17 @@ if isempty(results)
                             
                             if strcmp(mField,'recog')
                               accField = sprintf('%s_acc',mField);
-                              %dpField = sprintf('%s_dp',mField);
                             elseif strcmp(mField,'recall')
                               accField = sprintf('%s_spellCorr',mField);
                               lureEvents = [];
-                              %dpField = 'NA';
                             end
-%                             hrField = sprintf('%s_hr',mField);
-%                             mrField = sprintf('%s_mr',mField);
-%                             crrField = sprintf('%s_crr',mField);
-%                             farField = sprintf('%s_far',mField);
-%                             nTrialField = sprintf('%s_nTrial',mField);
-%                             %nCorField = sprintf('%s_nCor',mField);
-%                             %nIncField = sprintf('%s_nInc',mField);
-%                             nTargField = sprintf('%s_nTarg',mField);
-%                             nLureField = sprintf('%s_nLure',mField);
-%                             nHitField = sprintf('%s_nHit',mField);
-%                             nMissField = sprintf('%s_nMiss',mField);
-%                             nCRField = sprintf('%s_nCR',mField);
-%                             nFAField = sprintf('%s_nFA',mField);
-%                             rtField = sprintf('%s_rt',mField);
-                            
-                            %if strcmp(mField,'recog')
-                            %  accField = 'acc';
-                            %elseif strcmp(mField,'recall')
-                            %  accField = 'spellCorr';
-                            %end
-                            %hrField = 'hr';
-                            %farField = 'far';
-                            %dpField = 'dp';
-                            %nTrialField = 'nTrial';
-                            %nCorField = 'nCor';
-                            %nIncField = 'nInc';
-                            %rtField = 'rt';
                             
                             results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),...
                               partialCredit,mField,accField,dataFields{mf},prependDestField);
-                              %hrField,mrField,crrField,farField,dpField,nTrialField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
-                            
-                            theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
-%                             if printResults
-%                               fprintf('\t%s %s\n',i_catStrs{im},mField);
-%                               fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',theseResults.(hrField)(sub),theseResults.(nHitField)(sub),(theseResults.(nTargField)(sub)));
-%                               if ~strcmp(dpField,'NA')
-%                                 fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',theseResults.(farField)(sub),theseResults.(nFAField)(sub),(theseResults.(nLureField)(sub)));
-%                                 fprintf('\t\td'':\t\t%.2f\n',theseResults.(dpField)(sub));
-%                               end
-%                               fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',theseResults.(sprintf('%s_hit',rtField))(sub),theseResults.(sprintf('%s_miss',rtField))(sub));
-%                               if ~strcmp(dpField,'NA')
-%                                 fprintf(', cr: %.2f, fa: %.2f\n',theseResults.(sprintf('%s_cr',rtField))(sub),theseResults.(sprintf('%s_fa',rtField))(sub));
-%                               else
-%                                 fprintf('\n');
-%                               end
-%                             end
-                            
+                              
                             if printResults
+                              theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
+                              
                               fprintf('\t%s %s\n',i_catStrs{im},mField);
                               
                               if prependDestField
@@ -893,24 +796,6 @@ end % function
 %% print to file
 
 function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
-
-% mainToPrint = {'recog','recall'};
-% 
-% generic_dataToPrint = {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
-% dataToPrint = {...
-%   {'recog_nTrial','recog_nTarg','recog_nLure','recog_nHit','recog_nMiss','recog_nCR','recog_nFA','recog_hr','recog_mr','recog_crr','recog_far','recog_dp','recog_rt_hit','recog_rt_miss','recog_rt_cr','recog_rt_far'} ...
-%   {'recall_nTrial','recall_nTarg','recall_nLure','recall_nHit','recall_nMiss','recall_nCR','recall_nFA','recall_hr','recall_mr','recall_crr','recall_far','recall_dp','recall_rt_hit','recall_rt_miss','recall_rt_cr','recall_rt_far'} ...
-%   };
-
-% generic_dataToPrint = {'nCor','nInc','hr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
-% dataToPrint = {...
-%   {'recog_nCor','recog_nInc','recog_hr','recog_far','recog_dp','recog_rt_hit','recog_rt_miss'},...
-%   {'recall_nCor','recall_nInc','recall_hr','recall_far','recall_dp','recall_rt_hit','recall_rt_miss'}};
-
-% generic_dataToPrint = {'nTrial','nCor','acc','hr','far','dp','rt','rt_cor','rt_inc'};
-% dataToPrint = {...
-%   {'recog_nTrial','recog_nCor','recog_acc','recog_hr','recog_far','recog_dp','recog_rt','recog_rt_cor','recog_rt_inc'},...
-%   {'recall_nTrial','recall_nCor','recall_spellCorr','recall_hr','recall_far','recall_dp','recall_rt','recall_rt_cor','recall_rt_inc'}};
 
 % use a subject's files for initialization
 if length(subjects) > 5
@@ -1211,60 +1096,6 @@ end
 %% Calculate accuracy and reaction time
 
 function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,dataFields,prependDestField)
-%function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,hrField,mrField,crrField,farField,dpField,nTrialField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField)
-% function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,hrField,farField,dpField,nTrialField,nCorField,nIncField,rtField)
-
-% if ~exist('partialCredit','var') || isempty(partialCredit)
-%   partialCredit = true;
-% end
-% if ~exist('accField','var') || isempty(accField)
-%   accField = 'acc';
-% end
-% if ~exist('hrField','var') || isempty(hrField)
-%   hrField = 'hr';
-% end
-% if ~exist('mrField','var') || isempty(mrField)
-%   mrField = 'mr';
-% end
-% if ~exist('crrField','var') || isempty(crrField)
-%   crrField = 'crr';
-% end
-% if ~exist('farField','var') || isempty(farField)
-%   farField = 'far';
-% end
-% if ~exist('dpField','var') || isempty(dpField)
-%   dpField = 'dp';
-% end
-% if ~exist('nTrialField','var') || isempty(nTrialField)
-%   nTrialField = 'nTrial';
-% end
-% if ~exist('nTargField','var') || isempty(nTargField)
-%   nTargField = 'nTarg';
-% end
-% if ~exist('nLureField','var') || isempty(nLureField)
-%   nLureField = 'nLure';
-% end
-% if ~exist('nHitField','var') || isempty(nHitField)
-%   nHitField = 'nHit';
-% end
-% if ~exist('nMissField','var') || isempty(nMissField)
-%   nMissField = 'nMiss';
-% end
-% if ~exist('nCRField','var') || isempty(nCRField)
-%   nCRField = 'nCR';
-% end
-% if ~exist('nFAField','var') || isempty(nFAField)
-%   nFAField = 'nFA';
-% end
-% % if ~exist('nCorField','var') || isempty(nCorField)
-% %   nCorField = 'nCor';
-% % end
-% % if ~exist('nIncField','var') || isempty(nIncField)
-% %   nIncField = 'nInc';
-% % end
-% if ~exist('rtField','var') || isempty(rtField)
-%   rtField = 'rt';
-% end
 
 if ~exist('prependDestField','var') || isempty(prependDestField)
   prependDestField = false;
@@ -1327,9 +1158,6 @@ else
   end
 end
 
-% inputStruct.(destField).(nCorField)(sub) = length(hitEv) + length(crEv);
-% inputStruct.(destField).(nIncField)(sub) = length(missEv) + length(faEv);
-
 thisStr = 'nHit';
 if any(strcmp(thisStr,dataFields))
   if prependDestField
@@ -1371,9 +1199,6 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = length(faEv);
   end
 end
-
-% % overall accuracy
-% inputStruct.(destField).(accField)(sub) = inputStruct.(destField).(nCorField)(sub) / nTrial;
 
 % d-prime; adjust for perfect performance, choose 1 of 2 strategies
 % (Macmillan & Creelman, 2005; p. 8-9)
