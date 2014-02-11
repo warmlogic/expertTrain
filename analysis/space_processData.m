@@ -45,6 +45,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE022';
     'SPACE027';
     'SPACE029';
+    'SPACE037';
     };
 end
 templateSubject = 'SPACE001';
@@ -909,8 +910,8 @@ for sesNum = 1:length(expParam.sesTypes)
                       headerStr = sprintf('\t%s',headerStr);
                       fprintf(fid,sprintf('%s',headerStr));
                     end
+                    fprintf(fid,'\n');
                   end
-                  fprintf(fid,'\n');
                   
                   dataStr = subjects{sub};
                   for mf = 1:length(mainToPrint)
