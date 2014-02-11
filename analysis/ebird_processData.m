@@ -956,7 +956,6 @@ end
 
 %% Calculate accuracy and reaction time
 
-% function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,destField,accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField)
 function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,destField,accField,dataFields,prependDestField)
 
 if ~isfield(inputStruct,destField)
@@ -966,62 +965,6 @@ end
 if ~exist('prependDestField','var') || isempty(prependDestField)
   prependDestField = false;
 end
-
-% if ~exist('accField','var') || isempty(accField)
-%   accField = 'acc';
-% end
-% if ~exist('hrField','var') || isempty(hrField)
-%   hrField = 'hr';
-% end
-% if ~exist('mrField','var') || isempty(mrField)
-%   mrField = 'mr';
-% end
-% if ~exist('crrField','var') || isempty(crrField)
-%   crrField = 'crr';
-% end
-% if ~exist('farField','var') || isempty(farField)
-%   farField = 'far';
-% end
-% if ~exist('dpField','var') || isempty(dpField)
-%   dpField = 'dp';
-% end
-% if ~exist('nTrialsField','var') || isempty(nTrialsField)
-%   nTrialsField = 'nTrial';
-% end
-% if ~exist('nTargField','var') || isempty(nTargField)
-%   nTargField = 'nTarg';
-% end
-% if ~exist('nLureField','var') || isempty(nLureField)
-%   nLureField = 'nLure';
-% end
-% if ~exist('nHitField','var') || isempty(nHitField)
-%   nHitField = 'nHit';
-% end
-% if ~exist('nMissField','var') || isempty(nMissField)
-%   nMissField = 'nMiss';
-% end
-% if ~exist('nCRField','var') || isempty(nCRField)
-%   nCRField = 'nCR';
-% end
-% if ~exist('nFAField','var') || isempty(nFAField)
-%   nFAField = 'nFA';
-% end
-% % if ~exist('nCorField','var') || isempty(nCorField)
-% %   nCorField = 'nCor';
-% % end
-% % if ~exist('nIncField','var') || isempty(nIncField)
-% %   nIncField = 'nInc';
-% % end
-% if ~exist('rtField','var') || isempty(rtField)
-%   rtField = 'rt';
-% end
-
-% trial counts
-% inputStruct.(destField).nCor(sub) = sum([signalEv.acc] == 1);
-% inputStruct.(destField).nInc(sub) = sum([signalEv.acc] == 0);
-
-% nTrial = sum([signalEv.(accField)] == 1 | [signalEv.(accField)] == 0);
-% inputStruct.(destField).nTrial(sub) = nTrial;
 
 % trial counts
 thisStr = 'nTrial';
@@ -1064,11 +1007,6 @@ if ~isempty(lureEv)
   crEv = lureEv([lureEv.(accField)] == 1);
   faEv = lureEv([lureEv.(accField)] == 0);
 end
-
-% inputStruct.(destField).(nHitField)(sub) = length(hitEv);
-% inputStruct.(destField).(nMissField)(sub) = length(missEv);
-% inputStruct.(destField).(nCRField)(sub) = length(crEv);
-% inputStruct.(destField).(nFAField)(sub) = length(faEv);
 
 thisStr = 'nHit';
 if any(strcmp(thisStr,dataFields))
