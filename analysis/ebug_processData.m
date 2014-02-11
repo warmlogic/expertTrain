@@ -77,8 +77,30 @@ if isempty(results)
   
   results = struct;
   
-  dataFields = {'nTrials','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
   mainFields = {'overall','basic','subord'};
+  
+  dataFields = {...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
+    };
+%   dataFields = {'nTrial','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
+  
+  % set field names
+  accField = 'acc';
+  dpField = 'dp';
+  hrField = 'hr';
+  %mrField = 'mr';
+  %crrField = 'crr';
+  farField = 'far';
+  %nTrialsField = 'nTrial';
+  nTargField = 'nTarg';
+  nLureField = 'nLure';
+  nHitField = 'nHit';
+  %nMissField = 'nMiss';
+  %nCRField = 'nCR';
+  nFAField = 'nFA';
+  rtField = 'rt';
   
   %% initialize to store the data
   
@@ -135,8 +157,8 @@ if isempty(results)
               end
               
               for mf = 1:length(mainFields)
-                for df = 1:length(dataFields)
-                  results.(sesName).(fn).(trainStr).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                for df = 1:length(dataFields{mf})
+                  results.(sesName).(fn).(trainStr).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),1);
                 end
               end
               
@@ -150,15 +172,15 @@ if isempty(results)
             end
             
             for mf = 1:length(mainFields)
-              for df = 1:length(dataFields)
-                results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+              for df = 1:length(dataFields{mf})
+                results.(sesName).(fn).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),1);
               end
             end
             if nBlocks > 1
               for b = 1:nBlocks
                 for mf = 1:length(mainFields)
-                  for df = 1:length(dataFields)
-                    results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                  for df = 1:length(dataFields{mf})
+                    results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),1);
                   end
                 end
               end
@@ -173,15 +195,15 @@ if isempty(results)
             end
             
             for mf = 1:length(mainFields)
-              for df = 1:length(dataFields)
-                results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+              for df = 1:length(dataFields{mf})
+                results.(sesName).(fn).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),1);
               end
             end
             if nBlocks > 1
               for b = 1:nBlocks
                 for mf = 1:length(mainFields)
-                  for df = 1:length(dataFields)
-                    results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                  for df = 1:length(dataFields{mf})
+                    results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),1);
                   end
                 end
               end
@@ -196,6 +218,8 @@ if isempty(results)
   
   fprintf('Processing data for experiment %s...\n',expName);
   
+  completeStatus = true(1,length(subjects));
+  
   for sub = 1:length(subjects)
     subDir = fullfile(dataroot,subjects{sub});
     fprintf('Processing %s in %s...\n',subjects{sub},subDir);
@@ -207,6 +231,11 @@ if isempty(results)
       fprintf('Done.\n');
     else
       error('events file does not exist: %s',eventsFile);
+    end
+    
+    % if we only want complete subjects and this one is not done, set to F
+    if onlyCompleteSub && ~events.isComplete
+      completeStatus(sub) = false;
     end
     
     % do we only want to get data from subjects who have completed the exp?
@@ -287,29 +316,84 @@ if isempty(results)
                       % end
                       
                       % overall
-                      thisField = 'overall';
-                      results.(sesName).(fn).(trainStr) = accAndRT(matchResp,sub,results.(sesName).(fn).(trainStr),thisField);
-                      matchResults = results.(sesName).(fn).(trainStr).(thisField);
-                      if printResults
-                        fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',matchResults.acc(sub),matchResults.nCor(sub),(matchResults.nCor(sub) + matchResults.nInc(sub)),matchResults.dp(sub));
-                        fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchResults.rt(sub),matchResults.rt_cor(sub),matchResults.rt_inc(sub));
+                      destField = 'overall';
+                      if ismember(destField,mainFields)
+                        matchRespSame = matchResp([matchResp.sameSpecies] == 1);
+                        matchRespDiff = matchResp([matchResp.sameSpecies] == 0);
+                        
+                        results.(sesName).(fn).(trainStr) = accAndRT(matchRespSame,matchRespDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
+                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
+                        
+                        if printResults
+                          matchResults = results.(sesName).(fn).(trainStr).(destField);
+                          
+                          fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',matchResults.(hrField)(sub),matchResults.(nHitField)(sub),matchResults.(nTargField)(sub));
+                          if ~isempty(matchRespDiff)
+                            fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',matchResults.(farField)(sub),matchResults.(nFAField)(sub),(matchResults.(nLureField)(sub)));
+                            fprintf('\t\td'':\t\t%.2f\n',matchResults.(dpField)(sub));
+                          end
+                          fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',matchResults.(sprintf('%s_hit',rtField))(sub),matchResults.(sprintf('%s_miss',rtField))(sub));
+                          if ~isempty(matchRespDiff)
+                            fprintf(', cr: %.2f, fa: %.2f\n',matchResults.(sprintf('%s_cr',rtField))(sub),matchResults.(sprintf('%s_fa',rtField))(sub));
+                          else
+                            fprintf('\n');
+                          end
+                        end
                       end
                       
                       % basic and subordinate
-                      matchBasic = matchResp([matchResp.isSubord] == 0);
-                      matchSubord = matchResp([matchResp.isSubord] == 1);
+                      destField = 'basic';
+                      if ismember(destField,mainFields)
+                        matchBasic = matchResp([matchResp.isSubord] == 0);
+                        matchBasicSame = matchBasic([matchBasic.sameSpecies] == 1);
+                        matchBasicDiff = matchBasic([matchBasic.sameSpecies] == 0);
+                        
+                        results.(sesName).(fn).(trainStr) = accAndRT(matchBasicSame,matchBasicDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
+                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
+                        
+                        if printResults
+                          matchBasicResults = results.(sesName).(fn).(trainStr).(destField);
+                          
+                          fprintf('\tBasic\n');
+                          fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',matchBasicResults.(hrField)(sub),matchBasicResults.(nHitField)(sub),matchBasicResults.(nTargField)(sub));
+                          if ~isempty(matchBasicDiff)
+                            fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',matchBasicResults.(farField)(sub),matchBasicResults.(nFAField)(sub),(matchBasicResults.(nLureField)(sub)));
+                            fprintf('\t\td'':\t\t%.2f\n',matchBasicResults.(dpField)(sub));
+                          end
+                          fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',matchBasicResults.(sprintf('%s_hit',rtField))(sub),matchBasicResults.(sprintf('%s_miss',rtField))(sub));
+                          if ~isempty(matchBasicDiff)
+                            fprintf(', cr: %.2f, fa: %.2f\n',matchBasicResults.(sprintf('%s_cr',rtField))(sub),matchBasicResults.(sprintf('%s_fa',rtField))(sub));
+                          else
+                            fprintf('\n');
+                          end
+                        end
+                      end
                       
-                      thisField = 'basic';
-                      results.(sesName).(fn).(trainStr) = accAndRT(matchBasic,sub,results.(sesName).(fn).(trainStr),thisField);
-                      matchBasicResults = results.(sesName).(fn).(trainStr).(thisField);
-                      thisField = 'subord';
-                      results.(sesName).(fn).(trainStr) = accAndRT(matchSubord,sub,results.(sesName).(fn).(trainStr),thisField);
-                      matchSubordResults = results.(sesName).(fn).(trainStr).(thisField);
-                      if printResults
-                        fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',matchBasicResults.acc(sub),matchBasicResults.nCor(sub),(matchBasicResults.nCor(sub) + matchBasicResults.nInc(sub)),matchBasicResults.dp(sub));
-                        fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',matchSubordResults.acc(sub),matchSubordResults.nCor(sub),(matchSubordResults.nCor(sub) + matchSubordResults.nInc(sub)),matchSubordResults.dp(sub));
-                        fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchBasicResults.rt(sub),matchBasicResults.rt_cor(sub),matchBasicResults.rt_inc(sub));
-                        fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',matchSubordResults.rt(sub),matchSubordResults.rt_cor(sub),matchSubordResults.rt_inc(sub));
+                      destField = 'subord';
+                      if ismember(destField,mainFields)
+                        matchSubord = matchResp([matchResp.isSubord] == 1);
+                        matchSubordSame = matchSubord([matchSubord.sameSpecies] == 1);
+                        matchSubordDiff = matchSubord([matchSubord.sameSpecies] == 0);
+                        
+                        results.(sesName).(fn).(trainStr) = accAndRT(matchSubordSame,matchSubordDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
+                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
+                        
+                        if printResults
+                          matchSubordResults = results.(sesName).(fn).(trainStr).(destField);
+                          
+                          fprintf('\tSubordinate\n')
+                          fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',matchSubordResults.(hrField)(sub),matchSubordResults.(nHitField)(sub),matchSubordResults.(nTargField)(sub));
+                          if ~isempty(matchSubordDiff)
+                            fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',matchSubordResults.(farField)(sub),matchSubordResults.(nFAField)(sub),(matchSubordResults.(nLureField)(sub)));
+                            fprintf('\t\td'':\t\t%.2f\n',matchSubordResults.(dpField)(sub));
+                          end
+                          fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',matchSubordResults.(sprintf('%s_hit',rtField))(sub),matchSubordResults.(sprintf('%s_miss',rtField))(sub));
+                          if ~isempty(matchSubordDiff)
+                            fprintf(', cr: %.2f, fa: %.2f\n',matchSubordResults.(sprintf('%s_cr',rtField))(sub),matchSubordResults.(sprintf('%s_fa',rtField))(sub));
+                          else
+                            fprintf('\n');
+                          end
+                        end
                       end
                       
                       %                   % check out the RT distribution
@@ -362,29 +446,40 @@ if isempty(results)
                     % end
                     
                     % overall
-                    thisField = 'overall';
-                    results.(sesName).(fn) = accAndRT(nameResp,sub,results.(sesName).(fn),thisField);
-                    nameResults = results.(sesName).(fn).(thisField);
-                    if printResults
-                      fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameResults.acc(sub),nameResults.nCor(sub),(nameResults.nCor(sub) + nameResults.nInc(sub)),nameResults.dp(sub));
-                      fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameResults.rt(sub),nameResults.rt_cor(sub),nameResults.rt_inc(sub));
+                    destField = 'overall';
+                    if ismember(destField,mainFields)
+                      results.(sesName).(fn) = accAndRT(nameResp,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      if printResults
+                        nameResults = results.(sesName).(fn).(destField);
+                        fprintf('\tOverall\n');
+                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameResults.(hrField)(sub),nameResults.(nHitField)(sub),nameResults.(nTargField)(sub));
+                        fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameResults.(sprintf('%s_hit',rtField))(sub),nameResults.(sprintf('%s_miss',rtField))(sub));
+                      end
                     end
                     
                     % basic and subordinate
-                    nameBasic = nameResp([nameResp.isSubord] == 0);
-                    nameSubord = nameResp([nameResp.isSubord] == 1);
+                    destField = 'basic';
+                    if ismember(destField,mainFields)
+                      nameBasic = nameResp([nameResp.isSubord] == 0);
+                      results.(sesName).(fn) = accAndRT(nameBasic,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      if printResults
+                        nameBasicResults = results.(sesName).(fn).(destField);
+                        fprintf('\tBasic\n');
+                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameBasicResults.(hrField)(sub),nameBasicResults.(nHitField)(sub),nameBasicResults.(nTargField)(sub));
+                        fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBasicResults.(sprintf('%s_hit',rtField))(sub),nameBasicResults.(sprintf('%s_miss',rtField))(sub));
+                      end
+                    end
                     
-                    thisField = 'basic';
-                    results.(sesName).(fn) = accAndRT(nameBasic,sub,results.(sesName).(fn),thisField);
-                    nameBasicResults = results.(sesName).(fn).(thisField);
-                    thisField = 'subord';
-                    results.(sesName).(fn) = accAndRT(nameSubord,sub,results.(sesName).(fn),thisField);
-                    nameSubordResults = results.(sesName).(fn).(thisField);
-                    if printResults
-                      fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBasicResults.acc(sub),nameBasicResults.nCor(sub),(nameBasicResults.nCor(sub) + nameBasicResults.nInc(sub)),nameBasicResults.dp(sub));
-                      fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameSubordResults.acc(sub),nameSubordResults.nCor(sub),(nameSubordResults.nCor(sub) + nameSubordResults.nInc(sub)),nameSubordResults.dp(sub));
-                      fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBasicResults.rt(sub),nameBasicResults.rt_cor(sub),nameBasicResults.rt_inc(sub));
-                      fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameSubordResults.rt(sub),nameSubordResults.rt_cor(sub),nameSubordResults.rt_inc(sub));
+                    destField = 'subord';
+                    if ismember(destField,mainFields)
+                      nameSubord = nameResp([nameResp.isSubord] == 1);
+                      results.(sesName).(fn) = accAndRT(nameSubord,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      if printResults
+                        nameSubordResults = results.(sesName).(fn).(destField);
+                        fprintf('\tSubordinate\n')
+                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameSubordResults.(hrField)(sub),nameSubordResults.(nHitField)(sub),nameSubordResults.(nTargField)(sub));
+                        fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameSubordResults.(sprintf('%s_hit',rtField))(sub),nameSubordResults.(sprintf('%s_miss',rtField))(sub));
+                      end
                     end
                     
                     % if there's only 1 block, the results were printed above
@@ -395,34 +490,46 @@ if isempty(results)
                       for b = 1:nBlocks
                         blockStr = sprintf('b%d',b);
                         
-                        % overall
                         nameBlock = nameResp([nameResp.block] == b);
                         
-                        thisField = 'overall';
-                        results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,sub,results.(sesName).(fn).(blockStr),thisField);
-                        nameBlockResults = results.(sesName).(fn).(blockStr).(thisField);
-                        if printResults
-                          fprintf('\tB%d:',b);
-                          fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',nameBlockResults.acc(sub),nameBlockResults.nCor(sub),(nameBlockResults.nCor(sub) + nameBlockResults.nInc(sub)),nameBlockResults.dp(sub));
-                          fprintf('\t');
-                          fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockResults.rt(sub),nameBlockResults.rt_cor(sub),nameBlockResults.rt_inc(sub));
+                        % overall
+                        destField = 'overall';
+                        if ismember(destField,mainFields)
+                          results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          if printResults
+                            nameBlockResults = results.(sesName).(fn).(blockStr).(destField);
+                            fprintf('\tB%d:',b);
+                            fprintf('\tOverall\n');
+                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',nameBlockResults.(hrField)(sub),nameBlockResults.(nHitField)(sub),nameBlockResults.(nTargField)(sub));
+                            fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockResults.(sprintf('%s_hit',rtField))(sub),nameBlockResults.(sprintf('%s_miss',rtField))(sub));
+                          end
                         end
                         
                         % basic and subordinate for this block
-                        nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
-                        nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
+                        destField = 'basic';
+                        if ismember(destField,mainFields)
+                          nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
+                          results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          if printResults
+                            nameBlockBasicResults = results.(sesName).(fn).(blockStr).(destField);
+                            fprintf('\tB%d:',b);
+                            fprintf('\tBasic\n');
+                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',nameBlockBasicResults.(hrField)(sub),nameBlockBasicResults.(nHitField)(sub),nameBlockBasicResults.(nTargField)(sub));
+                            fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockBasicResults.(sprintf('%s_hit',rtField))(sub),nameBlockBasicResults.(sprintf('%s_miss',rtField))(sub));
+                          end
+                        end
                         
-                        thisField = 'basic';
-                        results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
-                        nameBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
-                        thisField = 'subord';
-                        results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
-                        nameBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
-                        if printResults
-                          fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockBasicResults.acc(sub),nameBlockBasicResults.nCor(sub),(nameBlockBasicResults.nCor(sub) + nameBlockBasicResults.nInc(sub)),nameBlockBasicResults.dp(sub));
-                          fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',nameBlockSubordResults.acc(sub),nameBlockSubordResults.nCor(sub),(nameBlockSubordResults.nCor(sub) + nameBlockSubordResults.nInc(sub)),nameBlockSubordResults.dp(sub));
-                          fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockBasicResults.rt(sub),nameBlockBasicResults.rt_cor(sub),nameBlockBasicResults.rt_inc(sub));
-                          fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',nameBlockSubordResults.rt(sub),nameBlockSubordResults.rt_cor(sub),nameBlockSubordResults.rt_inc(sub));
+                        destField = 'subord';
+                        if ismember(destField,mainFields)
+                          nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
+                          results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          if printResults
+                            nameBlockSubordResults = results.(sesName).(fn).(blockStr).(destField);
+                            fprintf('\tB%d:',b);
+                            fprintf('\tSubordinate\n')
+                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',nameBlockSubordResults.(hrField)(sub),nameBlockSubordResults.(nHitField)(sub),nameBlockSubordResults.(nTargField)(sub));
+                            fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockSubordResults.(sprintf('%s_hit',rtField))(sub),nameBlockSubordResults.(sprintf('%s_miss',rtField))(sub));
+                          end
                         end
                         
                       end
@@ -452,30 +559,80 @@ if isempty(results)
                     %   end
                     % end
                     
+                    targEvents = recogResp([recogResp.targ]);
+                    lureEvents = recogResp(~[recogResp.targ]);
+                    
                     % overall
-                    thisField = 'overall';
-                    results.(sesName).(fn) = accAndRT(recogResp,sub,results.(sesName).(fn),thisField);
-                    recogResults = results.(sesName).(fn).(thisField);
-                    if printResults
-                      fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogResults.acc(sub),recogResults.nCor(sub),(recogResults.nCor(sub) + recogResults.nInc(sub)),recogResults.dp(sub),recogResults.hr(sub),recogResults.far(sub));
-                      fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogResults.rt(sub),recogResults.rt_cor(sub),recogResults.rt_inc(sub));
+                    destField = 'overall';
+                    if ismember(destField,mainFields)
+                      results.(sesName).(fn) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      if printResults
+                        recogResults = results.(sesName).(fn).(destField);
+                        
+                        fprintf('\tOverall\n');
+                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',recogResults.(hrField)(sub),recogResults.(nHitField)(sub),recogResults.(nTargField)(sub));
+                        if ~isempty(lureEvents)
+                          fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',recogResults.(farField)(sub),recogResults.(nFAField)(sub),(recogResults.(nLureField)(sub)));
+                          fprintf('\t\td'':\t\t%.2f\n',recogResults.(dpField)(sub));
+                        end
+                        fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',recogResults.(sprintf('%s_hit',rtField))(sub),recogResults.(sprintf('%s_miss',rtField))(sub));
+                        if ~isempty(lureEvents)
+                          fprintf(', cr: %.2f, fa: %.2f\n',recogResults.(sprintf('%s_cr',rtField))(sub),recogResults.(sprintf('%s_fa',rtField))(sub));
+                        else
+                          fprintf('\n');
+                        end
+                      end
                     end
                     
                     % basic and subordinate
-                    recogBasic = recogResp([recogResp.isSubord] == 0);
-                    recogSubord = recogResp([recogResp.isSubord] == 1);
+                    destField = 'basic';
+                    if ismember(destField,mainFields)
+                      recogBasic = recogResp([recogResp.isSubord] == 0);
+                      targBasicEvents = recogBasic([recogBasic.targ]);
+                      lureBasicEvents = recogBasic(~[recogBasic.targ]);
+                      
+                      results.(sesName).(fn) = accAndRT(targBasicEvents,lureBasicEvents,sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      if printResults
+                        recogBasicResults = results.(sesName).(fn).(destField);
+                        
+                        fprintf('\tBasic\n');
+                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',recogBasicResults.(hrField)(sub),recogBasicResults.(nHitField)(sub),recogBasicResults.(nTargField)(sub));
+                        if ~isempty(lureBasicEvents)
+                          fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',recogBasicResults.(farField)(sub),recogBasicResults.(nFAField)(sub),(recogBasicResults.(nLureField)(sub)));
+                          fprintf('\t\td'':\t\t%.2f\n',recogBasicResults.(dpField)(sub));
+                        end
+                        fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',recogBasicResults.(sprintf('%s_hit',rtField))(sub),recogBasicResults.(sprintf('%s_miss',rtField))(sub));
+                        if ~isempty(lureBasicEvents)
+                          fprintf(', cr: %.2f, fa: %.2f\n',recogBasicResults.(sprintf('%s_cr',rtField))(sub),recogBasicResults.(sprintf('%s_fa',rtField))(sub));
+                        else
+                          fprintf('\n');
+                        end
+                      end
+                    end
                     
-                    thisField = 'basic';
-                    results.(sesName).(fn) = accAndRT(recogBasic,sub,results.(sesName).(fn),thisField);
-                    recogBasicResults = results.(sesName).(fn).(thisField);
-                    thisField = 'subord';
-                    results.(sesName).(fn) = accAndRT(recogSubord,sub,results.(sesName).(fn),thisField);
-                    recogSubordResults = results.(sesName).(fn).(thisField);
-                    if printResults
-                      fprintf('\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogBasicResults.acc(sub),recogBasicResults.nCor(sub),(recogBasicResults.nCor(sub) + recogBasicResults.nInc(sub)),recogBasicResults.dp(sub),recogBasicResults.hr(sub),recogBasicResults.far(sub));
-                      fprintf('\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f (hr=%.2f, far=%.2f)\n',recogSubordResults.acc(sub),recogSubordResults.nCor(sub),(recogSubordResults.nCor(sub) + recogSubordResults.nInc(sub)),recogSubordResults.dp(sub),recogSubordResults.hr(sub),recogSubordResults.far(sub));
-                      fprintf('\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBasicResults.rt(sub),recogBasicResults.rt_cor(sub),recogBasicResults.rt_inc(sub));
-                      fprintf('\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogSubordResults.rt(sub),recogSubordResults.rt_cor(sub),recogSubordResults.rt_inc(sub));
+                    destField = 'subord';
+                    if ismember(destField,mainFields)
+                      recogSubord = recogResp([recogResp.isSubord] == 1);
+                      targSubordEvents = recogSubord([recogSubord.targ]);
+                      lureSubordEvents = recogSubord(~[recogSubord.targ]);
+                      
+                      results.(sesName).(fn) = accAndRT(targSubordEvents,lureSubordEvents,sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      if printResults
+                        recogSubordResults = results.(sesName).(fn).(destField);
+                        
+                        fprintf('\tSubordinate\n');
+                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',recogSubordResults.(hrField)(sub),recogSubordResults.(nHitField)(sub),recogSubordResults.(nTargField)(sub));
+                        if ~isempty(lureSubordEvents)
+                          fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',recogSubordResults.(farField)(sub),recogSubordResults.(nFAField)(sub),(recogSubordResults.(nLureField)(sub)));
+                          fprintf('\t\td'':\t\t%.2f\n',recogSubordResults.(dpField)(sub));
+                        end
+                        fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',recogSubordResults.(sprintf('%s_hit',rtField))(sub),recogSubordResults.(sprintf('%s_miss',rtField))(sub));
+                        if ~isempty(lureSubordEvents)
+                          fprintf(', cr: %.2f, fa: %.2f\n',recogSubordResults.(sprintf('%s_cr',rtField))(sub),recogSubordResults.(sprintf('%s_fa',rtField))(sub));
+                        else
+                          fprintf('\n');
+                        end
+                      end
                     end
                     
                     % if there's only 1 block, the results were printed above
@@ -486,34 +643,84 @@ if isempty(results)
                       for b = 1:nBlocks
                         blockStr = sprintf('b%d',b);
                         
-                        % overall
                         recogBlock = recogResp([recogResp.block] == b);
+                        targBlockEvents = recogBlock([recogBlock.targ]);
+                        lureBlockEvents = recogBlock(~[recogBlock.targ]);
                         
-                        thisField = 'overall';
-                        results.(sesName).(fn).(blockStr) = accAndRT(recogBlock,sub,results.(sesName).(fn).(blockStr),thisField);
-                        recogBlockResults = results.(sesName).(fn).(blockStr).(thisField);
-                        if printResults
-                          fprintf('\tB%d:',b);
-                          fprintf('\tAccuracy:\t%.4f (%d/%d), d''=%.2f\n',recogBlockResults.acc(sub),recogBlockResults.nCor(sub),(recogBlockResults.nCor(sub) + recogBlockResults.nInc(sub)),recogBlockResults.dp(sub));
-                          fprintf('\t');
-                          fprintf('\tRespTime:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockResults.rt(sub),recogBlockResults.rt_cor(sub),recogBlockResults.rt_inc(sub));
+                        % overall
+                        destField = 'overall';
+                        if ismember(destField,mainFields)
+                          results.(sesName).(fn).(blockStr) = accAndRT(targBlockEvents,lureBlockEvents,sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          if printResults
+                            recogBlockResults = results.(sesName).(fn).(blockStr).(destField);
+                            
+                            fprintf('\tB%d:',b);
+                            fprintf('\tOverall\n');
+                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',recogBlockResults.(hrField)(sub),recogBlockResults.(nHitField)(sub),recogBlockResults.(nTargField)(sub));
+                            if ~isempty(lureBlockEvents)
+                              fprintf('\t\t\tFA-Rate:\t%.4f (%d/%d)\n',recogBlockResults.(farField)(sub),recogBlockResults.(nFAField)(sub),(recogBlockResults.(nLureField)(sub)));
+                              fprintf('\t\t\td'':\t\t%.2f\n',recogBlockResults.(dpField)(sub));
+                            end
+                            fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f',recogBlockResults.(sprintf('%s_hit',rtField))(sub),recogBlockResults.(sprintf('%s_miss',rtField))(sub));
+                            if ~isempty(lureBlockEvents)
+                              fprintf(', cr: %.2f, fa: %.2f\n',recogBlockResults.(sprintf('%s_cr',rtField))(sub),recogBlockResults.(sprintf('%s_fa',rtField))(sub));
+                            else
+                              fprintf('\n');
+                            end
+                          end
                         end
                         
                         % basic and subordinate for this block
-                        recogBlockBasic = recogBlock([recogBlock.isSubord] == 0);
-                        recogBlockSubord = recogBlock([recogBlock.isSubord] == 1);
+                        destField = 'basic';
+                        if ismember(destField,mainFields)
+                          recogBlockBasic = recogBlock([recogBlock.isSubord] == 0);
+                          targBlockBasicEvents = recogBlockBasic([recogBlockBasic.targ]);
+                          lureBlockBasicEvents = recogBlockBasic(~[recogBlockBasic.targ]);
+                          
+                          results.(sesName).(fn).(blockStr) = accAndRT(targBlockBasicEvents,lureBlockBasicEvents,sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          if printResults
+                            recogBlockBasicResults = results.(sesName).(fn).(blockStr).(destField);
+                            
+                            fprintf('\tB%d:',b);
+                            fprintf('\tBasic\n');
+                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',recogBlockBasicResults.(hrField)(sub),recogBlockBasicResults.(nHitField)(sub),recogBlockBasicResults.(nTargField)(sub));
+                            if ~isempty(lureBlockBasicEvents)
+                              fprintf('\t\t\tFA-Rate:\t%.4f (%d/%d)\n',recogBlockBasicResults.(farField)(sub),recogBlockBasicResults.(nFAField)(sub),(recogBlockBasicResults.(nLureField)(sub)));
+                              fprintf('\t\t\td'':\t\t%.2f\n',recogBlockBasicResults.(dpField)(sub));
+                            end
+                            fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f',recogBlockBasicResults.(sprintf('%s_hit',rtField))(sub),recogBlockBasicResults.(sprintf('%s_miss',rtField))(sub));
+                            if ~isempty(lureBlockBasicEvents)
+                              fprintf(', cr: %.2f, fa: %.2f\n',recogBlockBasicResults.(sprintf('%s_cr',rtField))(sub),recogBlockBasicResults.(sprintf('%s_fa',rtField))(sub));
+                            else
+                              fprintf('\n');
+                            end
+                          end
+                        end
                         
-                        thisField = 'basic';
-                        results.(sesName).(fn).(blockStr) = accAndRT(recogBlockBasic,sub,results.(sesName).(fn).(blockStr),thisField);
-                        recogBlockBasicResults = results.(sesName).(fn).(blockStr).(thisField);
-                        thisField = 'subord';
-                        results.(sesName).(fn).(blockStr) = accAndRT(recogBlockSubord,sub,results.(sesName).(fn).(blockStr),thisField);
-                        recogBlockSubordResults = results.(sesName).(fn).(blockStr).(thisField);
-                        if printResults
-                          fprintf('\t\t\tBasic acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockBasicResults.acc(sub),recogBlockBasicResults.nCor(sub),(recogBlockBasicResults.nCor(sub) + recogBlockBasicResults.nInc(sub)),recogBlockBasicResults.dp(sub));
-                          fprintf('\t\t\tSubord acc:\t%.4f (%d/%d), d''=%.2f\n',recogBlockSubordResults.acc(sub),recogBlockSubordResults.nCor(sub),(recogBlockSubordResults.nCor(sub) + recogBlockSubordResults.nInc(sub)),recogBlockSubordResults.dp(sub));
-                          fprintf('\t\t\tBasic RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockBasicResults.rt(sub),recogBlockBasicResults.rt_cor(sub),recogBlockBasicResults.rt_inc(sub));
-                          fprintf('\t\t\tSubord RT:\t%.2f ms (cor: %.2f, inc: %.2f)\n',recogBlockSubordResults.rt(sub),recogBlockSubordResults.rt_cor(sub),recogBlockSubordResults.rt_inc(sub));
+                        destField = 'subord';
+                        if ismember(destField,mainFields)
+                          recogBlockSubord = recogBlock([recogBlock.isSubord] == 1);
+                          targBlockSubordEvents = recogBlockSubord([recogBlockSubord.targ]);
+                          lureBlockSubordEvents = recogBlockSubord(~[recogBlockSubord.targ]);
+                          
+                          results.(sesName).(fn).(blockStr) = accAndRT(targBlockSubordEvents,lureBlockSubordEvents,sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          if printResults
+                            recogBlockSubordResults = results.(sesName).(fn).(blockStr).(destField);
+                            
+                            fprintf('\tB%d:',b);
+                            fprintf('\tSubordinate\n');
+                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',recogBlockSubordResults.(hrField)(sub),recogBlockSubordResults.(nHitField)(sub),recogBlockSubordResults.(nTargField)(sub));
+                            if ~isempty(lureBlockSubordEvents)
+                              fprintf('\t\t\tFA-Rate:\t%.4f (%d/%d)\n',recogBlockSubordResults.(farField)(sub),recogBlockSubordResults.(nFAField)(sub),(recogBlockSubordResults.(nLureField)(sub)));
+                              fprintf('\t\t\td'':\t\t%.2f\n',recogBlockSubordResults.(dpField)(sub));
+                            end
+                            fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f',recogBlockSubordResults.(sprintf('%s_hit',rtField))(sub),recogBlockSubordResults.(sprintf('%s_miss',rtField))(sub));
+                            if ~isempty(lureBlockSubordEvents)
+                              fprintf(', cr: %.2f, fa: %.2f\n',recogBlockSubordResults.(sprintf('%s_cr',rtField))(sub),recogBlockSubordResults.(sprintf('%s_fa',rtField))(sub));
+                            else
+                              fprintf('\n');
+                            end
+                          end
                         end
                         
                       end
@@ -545,21 +752,19 @@ end
 
 if saveResults
   fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,trainedConds,results,fileName);
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,fileName);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,trainedConds,results,fileName)
+function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,fileName)
 
-fprintf('Saving results to file: %s.\n',fileName);
+fprintf('Saving results to file: %s...',fileName);
 
-fid = fopen(fileName,'wt');
-
-mainToPrint = {'basic','subord'};
-dataToPrint = {'nTrials','nCor','acc','dp','hr','far','rt','rt_cor','rt_inc'};
+% mainToPrint = {'basic','subord'};
+% dataToPrint = {'nTrial','nCor','acc','dp','hr','far','rt','rt_cor','rt_inc'};
 
 % use subject 1's files for initialization
 sub = 1;
@@ -576,6 +781,8 @@ if exist(eventsFile,'file')
 else
   error('events file does not exist: %s',eventsFile);
 end
+
+fid = fopen(fileName,'wt');
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
@@ -618,26 +825,40 @@ for sesNum = 1:length(expParam.sesTypes)
               trainStr = 'all';
             end
             
+            nTabs = nan(1,length(dataToPrint));
+            nTabInd = 0;
+            for d = 1:length(dataToPrint)
+              nTabInd = nTabInd + 1;
+              nTabs(nTabInd) = length(dataToPrint{d});
+            end
             headerCell = {{trainStr},mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            [headerStr] = setHeaderStr(headerCell,nTabs);
             fprintf(fid,sprintf('\t%s\n',headerStr));
-            [headerStr] = setHeaderStr({dataToPrint},1);
-            headerStr = sprintf('\t%s',headerStr);
-            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            fprintf(fid,sprintf('%s\n',headerStr));
             
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for mf = 1:length(mainToPrint)
-                [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint);
+              % print the header string only before the first sub
+              if sub == 1
+                for mf = 1:length(mainToPrint)
+                  [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                  headerStr = sprintf('\t%s',headerStr);
+                  %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                  fprintf(fid,sprintf('%s',headerStr));
+                end
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
+              fprintf(fid,'\n');
+              
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,dataToPrint{mf});
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
             end
           end
           if t ~= length(trainedConds)
             fprintf(fid,'\n');
           end
-          %           end
           
         case {'name', 'nametrain', 'prac_name'}
           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
@@ -651,41 +872,75 @@ for sesNum = 1:length(expParam.sesTypes)
             for b = 1:nBlocks
               blockStr{b} = sprintf('b%d',b);
             end
+            nTabs = nan(1,length(dataToPrint) * nBlocks);
+            nTabInd = 0;
+            for b = 1:nBlocks
+              for d = 1:length(dataToPrint)
+                nTabInd = nTabInd + 1;
+                nTabs(nTabInd) = length(dataToPrint{d});
+              end
+            end
             headerCell = {blockStr,mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            [headerStr] = setHeaderStr(headerCell,nTabs);
             fprintf(fid,sprintf('\t%s\n',headerStr));
-            [headerStr] = setHeaderStr({dataToPrint},1);
-            headerStr = sprintf('\t%s',headerStr);
-            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            fprintf(fid,sprintf('%s\n',headerStr));
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for b = 1:nBlocks
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
+              % print the header string only before the first sub
+              if sub == 1
+                for b = 1:nBlocks
+                  for mf = 1:length(mainToPrint)
+                    [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                    headerStr = sprintf('\t%s',headerStr);
+                    %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                    fprintf(fid,sprintf('%s',headerStr));
+                  end
                 end
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
+              fprintf(fid,'\n');
+              
+              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for b = 1:nBlocks
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint{mf});
+                  end
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
             end
           else
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            nTabs = nan(1,length(dataToPrint));
+            nTabInd = 0;
+            for d = 1:length(dataToPrint)
+              nTabInd = nTabInd + 1;
+              nTabs(nTabInd) = length(dataToPrint{d});
+            end
             headerCell = {mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            [headerStr] = setHeaderStr(headerCell,nTabs);
             fprintf(fid,sprintf('\t%s\n',headerStr));
-            [headerStr] = setHeaderStr({dataToPrint},1);
-            headerStr = sprintf('\t%s',headerStr);
-            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            fprintf(fid,sprintf('%s\n',headerStr));
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for mf = 1:length(mainToPrint)
-                [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+              % print the header string only before the first sub
+              if sub == 1
+                for mf = 1:length(mainToPrint)
+                  [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                  headerStr = sprintf('\t%s',headerStr);
+                  %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                  fprintf(fid,sprintf('%s',headerStr));
+                end
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
+              fprintf(fid,'\n');
+              
+              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint{mf});
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
             end
             
           end
@@ -702,41 +957,75 @@ for sesNum = 1:length(expParam.sesTypes)
             for b = 1:nBlocks
               blockStr{b} = sprintf('b%d',b);
             end
+            nTabs = nan(1,length(dataToPrint) * nBlocks);
+            nTabInd = 0;
+            for b = 1:nBlocks
+              for d = 1:length(dataToPrint)
+                nTabInd = nTabInd + 1;
+                nTabs(nTabInd) = length(dataToPrint{d});
+              end
+            end
             headerCell = {blockStr,mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            [headerStr] = setHeaderStr(headerCell,nTabs);
             fprintf(fid,sprintf('\t%s\n',headerStr));
-            [headerStr] = setHeaderStr({dataToPrint},1);
-            headerStr = sprintf('\t%s',headerStr);
-            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            fprintf(fid,sprintf('%s\n',headerStr));
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for b = 1:nBlocks
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
+              % print the header string only before the first sub
+              if sub == 1
+                for b = 1:nBlocks
+                  for mf = 1:length(mainToPrint)
+                    [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                    headerStr = sprintf('\t%s',headerStr);
+                    %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                    fprintf(fid,sprintf('%s',headerStr));
+                  end
                 end
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
+              fprintf(fid,'\n');
+              
+              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for b = 1:nBlocks
+                  for mf = 1:length(mainToPrint)
+                    [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint{mf});
+                  end
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
             end
           else
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            nTabs = nan(1,length(dataToPrint));
+            nTabInd = 0;
+            for d = 1:length(dataToPrint)
+              nTabInd = nTabInd + 1;
+              nTabs(nTabInd) = length(dataToPrint{d});
+            end
             headerCell = {mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+            [headerStr] = setHeaderStr(headerCell,nTabs);
             fprintf(fid,sprintf('\t%s\n',headerStr));
-            [headerStr] = setHeaderStr({dataToPrint},1);
-            headerStr = sprintf('\t%s',headerStr);
-            headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            fprintf(fid,sprintf('%s\n',headerStr));
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             for sub = 1:length(subjects)
-              dataStr = subjects{sub};
-              for mf = 1:length(mainToPrint)
-                [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+              % print the header string only before the first sub
+              if sub == 1
+                for mf = 1:length(mainToPrint)
+                  [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                  headerStr = sprintf('\t%s',headerStr);
+                  %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                  fprintf(fid,sprintf('%s',headerStr));
+                end
               end
-              fprintf(fid,sprintf('%s\n',dataStr));
+              fprintf(fid,'\n');
+              
+              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              if completeStatus(sub)
+                dataStr = subjects{sub};
+                for mf = 1:length(mainToPrint)
+                  [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint{mf});
+                end
+                fprintf(fid,sprintf('%s\n',dataStr));
+              end
             end
             
           end
@@ -747,7 +1036,6 @@ for sesNum = 1:length(expParam.sesTypes)
 end
 
 % close out the results file
-fprintf('Saving %s...',fileName);
 fclose(fid);
 fprintf('Done.\n');
 
@@ -777,8 +1065,12 @@ for i = 2:size(headerMat,1)
     thisStr = cat(2,thisStr,' ',headerMat{i,j});
   end
   thisStr = thisStr(2:end);
-  if ~isempty(nTabs) && nTabs > 0
-    thisStr = sprintf('%s%s',repmat('\t',1,nTabs),thisStr);
+  if ~isempty(nTabs)
+    if length(nTabs) > 1 && nTabs(i-1) > 0
+      thisStr = sprintf('%s%s',repmat('\t',1,nTabs(i-1)),thisStr);
+    elseif length(nTabs) == 1 && nTabs > 0
+      thisStr = sprintf('%s%s',repmat('\t',1,nTabs),thisStr);
+    end
   end
   headerStr = sprintf('%s%s',headerStr,thisStr);
 end
@@ -803,66 +1095,202 @@ end
 
 %% Calculate accuracy and reaction time
 
-function inputStruct = accAndRT(inputData,sub,inputStruct,destField)
+function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,destField,accField,dataFields,prependDestField)
 
 if ~isfield(inputStruct,destField)
   error('input structure does not have field called ''%s''!',destField);
 end
 
+if ~exist('prependDestField','var') || isempty(prependDestField)
+  prependDestField = false;
+end
+
 % trial counts
-inputStruct.(destField).nCor(sub) = sum([inputData.acc] == 1);
-inputStruct.(destField).nInc(sub) = sum([inputData.acc] == 0);
+thisStr = 'nTrial';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  nTrial = length(targEv) + length(lureEv);
+  inputStruct.(destField).(thisField)(sub) = nTrial;
+end
 
-nTrials = sum([inputData.acc] == 1 | [inputData.acc] == 0);
-inputStruct.(destField).nTrials(sub) = nTrials;
+thisStr = 'nTarg';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = length(targEv);
+end
 
-% accuracy
-inputStruct.(destField).acc(sub) = inputStruct.(destField).nCor(sub) / nTrials;
+if ~isempty(lureEv)
+  thisStr = 'nLure';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = length(lureEv);
+  end
+end
+
+hitEv = targEv([targEv.(accField)] == 1);
+missEv = targEv([targEv.(accField)] == 0);
+
+if ~isempty(lureEv)
+  crEv = lureEv([lureEv.(accField)] == 1);
+  faEv = lureEv([lureEv.(accField)] == 0);
+end
+
+thisStr = 'nHit';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = length(hitEv);
+end
+
+thisStr = 'nMiss';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = length(missEv);
+end
+
+if ~isempty(lureEv)
+  thisStr = 'nCR';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = length(crEv);
+  end
+  
+  thisStr = 'nFA';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = length(faEv);
+  end
+end
 
 % d-prime; adjust for perfect performance, choose 1 of 2 strategies
 % (Macmillan & Creelman, 2005; p. 8-9)
 strategy = 2;
 
-hr = sum([inputData.acc] == 1) / nTrials;
-far = sum([inputData.acc] == 0) / nTrials;
+hr = length(hitEv) / length(targEv);
+mr = length(missEv) / length(targEv);
+if ~isempty(lureEv)
+  crr = length(crEv) / length(lureEv);
+  far = length(faEv) / length(lureEv);
+end
+
 if hr == 1
+  warning('HR is 1.0! Correcting...');
   if strategy == 1
-    hr = 1 - (1 / (2 * nTrials));
+    hr = 1 - (1 / (2 * length(targEv)));
   elseif strategy == 2
     % (Hautus, 1995; Miller, 1996)
-    hr = (sum([inputData.acc] == 1) + 0.5) / (nTrials + 1);
+    hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
   end
 elseif hr == 0
+  warning('HR is 0! Correcting...');
   if strategy == 1
-    hr = 1 / (2 * nTrials);
+    hr = 1 / (2 * length(targEv));
   elseif strategy == 2
     % (Hautus, 1995; Miller, 1996)
-    hr = (sum([inputData.acc] == 1) + 0.5) / (nTrials + 1);
+    hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
   end
 end
-if far == 1
-  if strategy == 1
-    far = 1 - (1 / (2 * nTrials));
-  elseif strategy == 2
-    % (Hautus, 1995; Miller, 1996)
-    far = (sum([inputData.acc] == 0) + 0.5) / (nTrials + 1);
-  end
-elseif far == 0
-  if strategy == 1
-    far = 1 / (2 * nTrials);
-  elseif strategy == 2
-    % (Hautus, 1995; Miller, 1996)
-    far = (sum([inputData.acc] == 0) + 0.5) / (nTrials + 1);
+if ~isempty(lureEv)
+  if far == 1
+    warning('FAR is 1! Correcting...');
+    if strategy == 1
+      far = 1 - (1 / (2 * length(lureEv)));
+    elseif strategy == 2
+      % (Hautus, 1995; Miller, 1996)
+      far = (length(faEv) + 0.5) / (length(lureEv) + 1);
+    end
+  elseif far == 0
+    warning('FAR is 0! Correcting...');
+    if strategy == 1
+      far = 1 / (2 * length(lureEv));
+    elseif strategy == 2
+      % (Hautus, 1995; Miller, 1996)
+      far = (length(faEv) + 0.5) / (length(lureEv) + 1);
+    end
   end
 end
 
-zhr = norminv(hr,0,1);
-zfar = norminv(far,0,1);
+thisStr = 'hr';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = hr;
+end
 
-inputStruct.(destField).dp(sub) = zhr - zfar;
+thisStr = 'mr';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = mr;
+end
 
-inputStruct.(destField).hr(sub) = hr;
-inputStruct.(destField).far(sub) = far;
+if ~isempty(lureEv)
+  thisStr = 'far';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = far;
+  end
+  
+  thisStr = 'crr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = crr;
+  end
+  
+  thisStr = 'dp';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    zhr = norminv(hr,0,1);
+    zfar = norminv(far,0,1);
+    
+    inputStruct.(destField).(thisField)(sub) = zhr - zfar;
+  end
+end
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
 % % we don't need this
@@ -870,13 +1298,65 @@ inputStruct.(destField).far(sub) = far;
 % % Find da: Macmillan & Creelman (2005), p. 61--62
 % %
 % % slope of zROC
-% s = zhr/-zfar;
-% inputStruct.(destField).da(sub) = (2 / (1 + (s^2)))^(1/2) * (zhr - (s*zfar));
+% thisStr = 'da';
+% if any(strcmp(thisStr,dataFields))
+%   if prependDestField
+%     thisField = sprintf('%s_%s',destField,thisStr);
+%   else
+%     thisField = thisStr;
+%   end
+%   s = zhr/-zfar;
+%   inputStruct.(destField).(thisField)(sub) = (2 / (1 + (s^2)))^(1/2) * (zhr - (s*zfar));
+% end
 
-% RT
-inputStruct.(destField).rt(sub) = mean([inputData.rt]);
-inputStruct.(destField).rt_cor(sub) = mean([inputData([inputData.acc] == 1).rt]);
-inputStruct.(destField).rt_inc(sub) = mean([inputData([inputData.acc] == 0).rt]);
-
+% Response Times
+rtStr = 'rt';
+if prependDestField
+  rtField = sprintf('%s_%s',destField,rtStr);
+else
+  rtField = rtStr;
 end
 
+thisStr = 'rt_hit';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = mean([hitEv.(rtField)]);
+end
+
+thisStr = 'rt_miss';
+if any(strcmp(thisStr,dataFields))
+  if prependDestField
+    thisField = sprintf('%s_%s',destField,thisStr);
+  else
+    thisField = thisStr;
+  end
+  inputStruct.(destField).(thisField)(sub) = mean([missEv.(rtField)]);
+end
+
+if ~isempty(lureEv)
+  thisStr = 'rt_cr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = mean([crEv.(rtField)]);
+  end
+  
+  thisStr = 'rt_fa';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    inputStruct.(destField).(thisField)(sub) = mean([faEv.(rtField)]);
+  end
+end
+
+end
