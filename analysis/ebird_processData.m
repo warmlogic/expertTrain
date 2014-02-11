@@ -31,12 +31,12 @@ if ~exist('subjects','var') || isempty(subjects)
     %'EBIRD022'; % DNF. Dropout. Last session: 8.
     %'EBIRD023'; % DNF. Dropout. Last session: 1.
     'EBIRD024';
-    %'EBIRD025'; % In progress. Last session: 1.
-    %'EBIRD027'; % In progress. Last session: 8. Finishing week of 1/27.
-    %'EBIRD029'; % In progress. Last session: 1.
+    %'EBIRD025'; % In progress. Last session: 8.
+    'EBIRD027';
+    %'EBIRD029'; % In progress. Last session: 8.
     'EBIRD032';
     'EBIRD034';
-    %'EBIRD042'; % In progress. Last session: 2.
+    %'EBIRD042'; % In progress. Last session: 8.
     };
 end
 
