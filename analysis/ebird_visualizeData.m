@@ -211,10 +211,18 @@ ylimits = [0 3];
 % dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0 1];
 
-sessions = {'pretest', 'posttest', 'posttest_delay'};
-phases = {'match_1'};
-training = {'trained','untrained'};
-naming = {'basic','subord'};
+% dataMeasure = 'c';
+% dataLabel = 'Response bias (criterion; c)';
+% ylimits = [-0.5 0.5];
+
+% dataMeasure = 'Br';
+% dataLabel = 'Response bias (Br)';
+% ylimits = [0 1];
+
+% sessions = {'pretest', 'posttest', 'posttest_delay'};
+% phases = {'match_1'};
+% training = {'trained','untrained'};
+% naming = {'basic','subord'};
 
 data.(dataMeasure) = struct;
 for n = 1:length(naming)
