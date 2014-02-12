@@ -93,13 +93,14 @@ data = struct;
 nTrainSes = 6;
 phases = {'name_1','name_2','name_3','name_4'};
 
+% - 2 because pretest session only has two naming phases
 data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 
 % dataMeasure = 'rt';ymin = 500; ymax = 2500;
-% dataMeasure = 'rt_cor';ymin = 500; ymax = 2500;
-% dataMeasure = 'rt_inc';ymin = 500; ymax = 2500;
+% dataMeasure = 'rt_hit';ymin = 500; ymax = 2500;
+% dataMeasure = 'rt_miss';ymin = 500; ymax = 2500;
 dataMeasure = 'hr';ymin = 0.25; ymax = 1;
 
 % % use defaults, set below
@@ -137,7 +138,7 @@ hold off
 
 title(sprintf('Naming phase: %s',strrep(dataMeasure,'_','\_')));
 xlabel('Training Day');
-if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_cor') || strcmp(dataMeasure,'rt_inc')
+if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_hit') || strcmp(dataMeasure,'rt_miss')
   ylabel('Response Time (ms)');
   
   if ~exist('ymin','var') || isempty(ymin)
@@ -156,8 +157,8 @@ if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_cor') || strcmp(dataMeasur
   %end
   
   legendLoc = 'NorthWest';
-elseif strcmp(dataMeasure,'acc')
-  ylabel('Accuracy');
+elseif strcmp(dataMeasure,'hr')
+  ylabel('Accuracy (Hit Rate)');
   
   if ~exist('ymin','var') || isempty(ymin)
     ymin = 0.25;
@@ -206,8 +207,8 @@ dataMeasure = 'dp';
 dataLabel = 'd''';
 ylimits = [0 3];
 
-% dataMeasure = 'acc';
-% dataLabel = 'Accuracy';
+% dataMeasure = 'hr';
+% dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
@@ -272,8 +273,8 @@ dataMeasure = 'dp';
 dataLabel = 'd''';
 ylimits = [0 3];
 
-% dataMeasure = 'acc';
-% dataLabel = 'Accuracy';
+% dataMeasure = 'hr';
+% dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
