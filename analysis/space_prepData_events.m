@@ -37,7 +37,7 @@ else
 end
 saveDir = dataroot;
 
-if nargin == 0
+if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'SPACE001';
     'SPACE002';
