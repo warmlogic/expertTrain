@@ -537,11 +537,6 @@ if isempty(results)
                     destField = 'overall';
                     if ismember(destField,mainFields)
                       results.(sesName).(fn) = accAndRT(nameResp,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
-                      %for rmf = 1:length(rmfieldNoNoise)
-                      %  if isfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf})
-                      %    results.(sesName).(fn).(destField) = rmfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf});
-                      %  end
-                      %end
                       if printResults
                         nameResults = results.(sesName).(fn).(destField);
                         fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameResults.(hrField)(sub),nameResults.(nHitField)(sub),nameResults.(nTargField)(sub));
@@ -554,11 +549,6 @@ if isempty(results)
                     if ismember(destField,mainFields)
                       nameBasic = nameResp([nameResp.isSubord] == 0);
                       results.(sesName).(fn) = accAndRT(nameBasic,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
-                      %for rmf = 1:length(rmfieldNoNoise)
-                      %  if isfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf})
-                      %    results.(sesName).(fn).(destField) = rmfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf});
-                      %  end
-                      %end
                       if printResults
                         nameBasicResults = results.(sesName).(fn).(destField);
                         fprintf('\tBasic\n');
@@ -571,11 +561,6 @@ if isempty(results)
                     if ismember(destField,mainFields)
                       nameSubord = nameResp([nameResp.isSubord] == 1);
                       results.(sesName).(fn) = accAndRT(nameSubord,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
-                      %for rmf = 1:length(rmfieldNoNoise)
-                      %  if isfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf})
-                      %    results.(sesName).(fn).(destField) = rmfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf});
-                      %  end
-                      %end
                       if printResults
                         nameSubordResults = results.(sesName).(fn).(destField);
                         fprintf('\tSubordinate\n')
@@ -596,11 +581,6 @@ if isempty(results)
                         destField = 'overall';
                         if ismember(destField,mainFields)
                           results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
-                          %for rmf = 1:length(rmfieldNoNoise)
-                          %  if isfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf})
-                          %    results.(sesName).(fn).(blockStr).(destField) = rmfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf});
-                          %  end
-                          %end
                           if printResults
                             nameBlockResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
@@ -614,11 +594,6 @@ if isempty(results)
                         if ismember(destField,mainFields)
                           nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
                           results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
-                          %for rmf = 1:length(rmfieldNoNoise)
-                          %  if isfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf})
-                          %    results.(sesName).(fn).(blockStr).(destField) = rmfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf});
-                          %  end
-                          %end
                           if printResults
                             nameBlockBasicResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
@@ -632,11 +607,6 @@ if isempty(results)
                         if ismember(destField,mainFields)
                           nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
                           results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
-                          %for rmf = 1:length(rmfieldNoNoise)
-                          %  if isfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf})
-                          %    results.(sesName).(fn).(blockStr).(destField) = rmfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf});
-                          %  end
-                          %end
                           if printResults
                             nameBlockSubordResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
