@@ -660,10 +660,6 @@ function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,result
 
 fprintf('Saving results to file: %s...',fileName);
 
-% mainToPrint = {'basic','subord'};
-% % dataToPrint = {'nTrial','nCor','acc','dp','rt','rt_cor','rt_inc'};
-% dataToPrint = {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_far'};
-
 % use subject 1's files for initialization
 sub = 1;
 subDir = fullfile(dataroot,subjects{sub});
