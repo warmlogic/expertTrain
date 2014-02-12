@@ -7,25 +7,6 @@ function [results] = ebug_processData(results,dataroot,subjects,onlyCompleteSub,
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
-<<<<<<< HEAD
-    %       'EBUG001';
-    %       'EBUG002';
-    %       'EBUG003';
-    %       'EBUG004';
-    %       'EBUG005';
-    %       'EBUG006';
-    %       'EBUG007';
-    %       'EBUG008';
-    'EBUG009';
-    %       'EBUG010';
-    'EBUG011';
-    %       'EBUG090';
-    %       'EBUG091';
-    %       'EBUG092';
-    %       'EBUG093';
-    %       'EBUG094';
-    %       'EBUG095';
-=======
       'EBUG001';
       'EBUG002';
       'EBUG003';
@@ -43,7 +24,6 @@ if ~exist('subjects','var') || isempty(subjects)
 %       'EBUG093';
 %       'EBUG094';
 %       'EBUG095';
->>>>>>> Accommodated diff. # of recog blocks for diff. subjects
     };
 end
 
@@ -88,42 +68,7 @@ if ~exist('saveResults','var') || isempty(saveResults)
   saveResults = true;
 end
 
-<<<<<<< HEAD
 if isempty(results)
-=======
-%% some constants
-
-%trainedConds = {1, 0, [1 0]};
-trainedConds = {1, 0};
-
-results = struct;
-
-dataFields = {'nTrials','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
-mainFields = {'overall','basic','subord'};
-
-%% initialize to store the data
-
-% use subject 1's files for initialization
-ini_sub = 10;
-subDir = fullfile(dataroot,subjects{ini_sub});
-expParamFile = fullfile(subDir,'experimentParams.mat');
-if exist(expParamFile,'file')
-  load(expParamFile)
-else
-  error('initialization experiment parameter file does not exist: %s',expParamFile);
-end
-eventsFile = fullfile(subDir,'events','events.mat');
-if exist(eventsFile,'file')
-  load(eventsFile,'events');
-else
-  error('initialization events file does not exist: %s',eventsFile);
-end
-
-for sesNum = 1:length(expParam.sesTypes)
-  % set the subject events file
-  sesName = expParam.sesTypes{sesNum};
->>>>>>> Accommodated diff. # of recog blocks for diff. subjects
-  
   %% some constants
   
   %trainedConds = {1, 0, [1 0]};
@@ -162,8 +107,8 @@ for sesNum = 1:length(expParam.sesTypes)
   %% initialize to store the data
   
   % use subject 1's files for initialization
-  sub = 1;
-  subDir = fullfile(dataroot,subjects{sub});
+  ini_sub = 10;
+  subDir = fullfile(dataroot,subjects{ini_sub});
   expParamFile = fullfile(subDir,'experimentParams.mat');
   if exist(expParamFile,'file')
     load(expParamFile)
@@ -808,26 +753,14 @@ end
 
 if saveResults
   fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-<<<<<<< HEAD
-  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,fileName);
-=======
-  printResultsToFile(dataroot,subjects,trainedConds,results,fileName,ini_sub);
->>>>>>> Accommodated diff. # of recog blocks for diff. subjects
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,fileName,ini_sub);
 end
 
 end % function
 
 %% print to file
 
-<<<<<<< HEAD
-function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,fileName)
-=======
-function printResultsToFile(dataroot,subjects,trainedConds,results,fileName,ini_sub)
-
-fprintf('Saving results to file: %s.\n',fileName);
-
-fid = fopen(fileName,'wt');
->>>>>>> Accommodated diff. # of recog blocks for diff. subjects
+function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,fileName,ini_sub)
 
 fprintf('Saving results to file: %s...',fileName);
 
