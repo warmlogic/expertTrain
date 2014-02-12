@@ -46,12 +46,12 @@ subjects = {
   %'EBIRD022'; % DNF. Dropout. Last session: 8.
   %'EBIRD023'; % DNF. Dropout. Last session: 1.
   'EBIRD024';
-  %'EBIRD025'; % In progress. Last session: 1.
-  %'EBIRD027'; % In progress. Last session: 8. Finishing week of 1/27.
-  %'EBIRD029'; % In progress. Last session: 1.
+  %'EBIRD025'; % In progress. Last session: 8.
+  'EBIRD027';
+  %'EBIRD029'; % In progress. Last session: 8.
   'EBIRD032';
   'EBIRD034';
-  %'EBIRD042'; % In progress. Last session: 2.
+  %'EBIRD042'; % In progress. Last session: 8.
   };
 
 saveFigs = true;
@@ -80,6 +80,10 @@ saveResults = true;
 
 [results] = ebird_processData([],dataroot,subjects,onlyCompleteSub,printResults,saveResults);
 
+%% or just load the behavioral data
+
+load(fullfile(dataroot,'EBIRD_behav_results.mat'));
+
 %% initialize
 
 data = struct;
@@ -96,8 +100,7 @@ data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 % dataMeasure = 'rt';ymin = 500; ymax = 2500;
 % dataMeasure = 'rt_cor';ymin = 500; ymax = 2500;
 % dataMeasure = 'rt_inc';ymin = 500; ymax = 2500;
-% dataMeasure = 'acc';ymin = 0.25; ymax = 1;
-dataMeasure = 'dp';ymin = -1; ymax = 5;
+dataMeasure = 'hr';ymin = 0.25; ymax = 1;
 
 % % use defaults, set below
 % ymin = [];
