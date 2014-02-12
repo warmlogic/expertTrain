@@ -89,8 +89,8 @@ if isempty(results)
   
   results = struct;
   
-  %mainFields = {'overall','basic','subord'};
-  mainFields = {'basic','subord'};
+  mainFields = {'overall','basic','subord'};
+  %mainFields = {'basic','subord'};
   
   %dataFields = {'nTrial','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
   dataFields = {...
