@@ -8,9 +8,9 @@
 
 expName = 'EBUG';
 
-%serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
-% Use Path below when curranlab server is mounted on another username
 serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
+% Use Path below when curranlab server is mounted on another username
+% serverDir = fullfile(filesep,'Volumes','curranlab-1','Data',expName,'Behavioral','Sessions');
 
 %serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
 % Use Path below when curranlab server is mounted on another username
