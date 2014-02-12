@@ -10,7 +10,7 @@ expName = 'EBUG';
 
 %serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
 % Use Path below when curranlab server is mounted on another username
-serverDir = fullfile(filesep,'Volumes','curranlab-1','Data',expName,'Behavioral','Sessions');
+serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
 
 %serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
 % Use Path below when curranlab server is mounted on another username
@@ -73,8 +73,8 @@ data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 % dataMeasure = 'rt';
 % dataMeasure = 'rt_cor';
 % dataMeasure = 'rt_inc';
-dataMeasure = 'acc';
-% dataMeasure = 'dp';
+% dataMeasure = 'acc';
+dataMeasure = 'dp';
 
 tpCounter = 0;
 for t = 1:nTrainSes
@@ -286,7 +286,7 @@ end
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [0 3];
+ylimits = [0 2];
 
 % dataMeasure = 'acc';
 % dataLabel = 'Accuracy';

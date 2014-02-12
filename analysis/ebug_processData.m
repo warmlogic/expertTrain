@@ -61,7 +61,7 @@ end
 
 % find where the data is stored
 if ~exist('dataroot','var') || isempty(dataroot)
-  serverDir = fullfile(filesep,'Volumes','curranlab-1','Data',expName,'Behavioral','Sessions');
+  serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
   serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
   localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
   if exist('serverDir','var') && exist(serverDir,'dir')
