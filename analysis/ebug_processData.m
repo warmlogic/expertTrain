@@ -80,11 +80,14 @@ if isempty(results)
   mainFields = {'overall','basic','subord'};
   
   dataFields = {...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
     };
-  %   dataFields = {'nTrial','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
+  
+  % % remove these fields when there's no noise distribution (i.e., naming
+  % % task)
+  % rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
   
   % set field names
   accField = 'acc';
@@ -322,7 +325,6 @@ if isempty(results)
                         matchRespDiff = matchResp([matchResp.sameSpecies] == 0);
                         
                         results.(sesName).(fn).(trainStr) = accAndRT(matchRespSame,matchRespDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
-                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                         
                         if printResults
                           matchResults = results.(sesName).(fn).(trainStr).(destField);
@@ -349,7 +351,6 @@ if isempty(results)
                         matchBasicDiff = matchBasic([matchBasic.sameSpecies] == 0);
                         
                         results.(sesName).(fn).(trainStr) = accAndRT(matchBasicSame,matchBasicDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
-                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                         
                         if printResults
                           matchBasicResults = results.(sesName).(fn).(trainStr).(destField);
@@ -376,7 +377,6 @@ if isempty(results)
                         matchSubordDiff = matchSubord([matchSubord.sameSpecies] == 0);
                         
                         results.(sesName).(fn).(trainStr) = accAndRT(matchSubordSame,matchSubordDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
-                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                         
                         if printResults
                           matchSubordResults = results.(sesName).(fn).(trainStr).(destField);
@@ -1107,6 +1107,9 @@ if ~exist('prependDestField','var') || isempty(prependDestField)
   prependDestField = false;
 end
 
+% concatenate the events together for certain measures
+allEv = cat(1,targEv,lureEv);
+
 % trial counts
 thisStr = 'nTrial';
 if any(strcmp(thisStr,dataFields))
@@ -1115,8 +1118,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  nTrial = length(targEv) + length(lureEv);
-  inputStruct.(destField).(thisField)(sub) = nTrial;
+  inputStruct.(destField).(thisField)(sub) = length(allEv);
 end
 
 thisStr = 'nTarg';
@@ -1300,6 +1302,50 @@ if ~isempty(lureEv)
     
     inputStruct.(destField).(thisField)(sub) = zhr - zfar;
   end
+  
+  % response bias (criterion) (Macmillan & Creelman, 2005, p. 29)
+  thisStr = 'c';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    c = -0.5 * (norminv(hr,0,1) + norminv(far,0,1));
+    
+    inputStruct.(destField).(thisField)(sub) = c;
+  end
+  
+  % From Mecklinger et al. (2007) and Corwin (1994)
+  %
+  % discrimination index
+  thisStr = 'Pr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    Pr = hr - far;
+    
+    inputStruct.(destField).(thisField)(sub) = Pr;
+  end
+  
+  % From Mecklinger et al. (2007) and Corwin (1994)
+  %
+  % response bias index
+  thisStr = 'Br';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    Pr = hr - far;
+    Br = far / (1 - Pr);
+    
+    inputStruct.(destField).(thisField)(sub) = Br;
+  end
 end
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
@@ -1325,6 +1371,11 @@ if prependDestField
   rtField = sprintf('%s_%s',destField,rtStr);
 else
   rtField = rtStr;
+end
+
+thisStr = 'rt';
+if any(strcmp(thisStr,dataFields))
+  inputStruct.(destField).(rtField)(sub) = mean([allEv.(rtField)]);
 end
 
 thisStr = 'rt_hit';

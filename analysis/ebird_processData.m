@@ -92,12 +92,15 @@ if isempty(results)
   mainFields = {'overall','basic','subord'};
   %mainFields = {'basic','subord'};
   
-  %dataFields = {'nTrial','nCor','nInc','acc','dp','hr','far','rt','rt_cor','rt_inc'};
   dataFields = {...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
     };
+  
+  % % remove these fields when there's no noise distribution (i.e., naming
+  % % task)
+  % rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
   
   % set field names
   accField = 'acc';
@@ -321,7 +324,6 @@ if isempty(results)
                         matchRespDiff = matchResp([matchResp.sameSpecies] == 0);
                         
                         results.(sesName).(fn).(trainStr) = accAndRT(matchRespSame,matchRespDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
-                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                         
                         if printResults
                           matchResults = results.(sesName).(fn).(trainStr).(destField);
@@ -348,7 +350,6 @@ if isempty(results)
                         matchBasicDiff = matchBasic([matchBasic.sameSpecies] == 0);
                         
                         results.(sesName).(fn).(trainStr) = accAndRT(matchBasicSame,matchBasicDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
-                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                         
                         if printResults
                           matchBasicResults = results.(sesName).(fn).(trainStr).(destField);
@@ -375,7 +376,6 @@ if isempty(results)
                         matchSubordDiff = matchSubord([matchSubord.sameSpecies] == 0);
                         
                         results.(sesName).(fn).(trainStr) = accAndRT(matchSubordSame,matchSubordDiff,sub,results.(sesName).(fn).(trainStr),destField,accField,dataFields{mf});
-                        %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                         
                         if printResults
                           matchSubordResults = results.(sesName).(fn).(trainStr).(destField);
@@ -438,7 +438,6 @@ if isempty(results)
                             matchCondDiff = matchCond([matchCond.sameSpecies] == 0);
                             
                             results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCondSame,matchCondDiff,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),destField,accField,dataFields{mf});
-                            %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                             
                             if printResults
                               matchCondResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(destField);
@@ -465,7 +464,6 @@ if isempty(results)
                             matchCondBasicDiff = matchCondBasic([matchCondBasic.sameSpecies] == 0);
                             
                             results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCondBasicSame,matchCondBasicDiff,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),destField,accField,dataFields{mf});
-                            %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                             
                             if printResults
                               matchCondBasicResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(destField);
@@ -491,7 +489,6 @@ if isempty(results)
                             matchCondSubordDiff = matchCondSubord([matchCondSubord.sameSpecies] == 0);
                             
                             results.(sesName).(fn).(trainStr).(imgConds{im}) = accAndRT(matchCondSubordSame,matchCondSubordDiff,sub,results.(sesName).(fn).(trainStr).(imgConds{im}),destField,accField,dataFields{mf});
-                            %accField,hrField,mrField,crrField,farField,dpField,nTrialsField,nTargField,nLureField,nHitField,nMissField,nCRField,nFAField,rtField);
                             
                             if printResults
                               matchCondSubordResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(destField);
@@ -540,6 +537,11 @@ if isempty(results)
                     destField = 'overall';
                     if ismember(destField,mainFields)
                       results.(sesName).(fn) = accAndRT(nameResp,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      %for rmf = 1:length(rmfieldNoNoise)
+                      %  if isfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf})
+                      %    results.(sesName).(fn).(destField) = rmfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf});
+                      %  end
+                      %end
                       if printResults
                         nameResults = results.(sesName).(fn).(destField);
                         fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameResults.(hrField)(sub),nameResults.(nHitField)(sub),nameResults.(nTargField)(sub));
@@ -552,6 +554,11 @@ if isempty(results)
                     if ismember(destField,mainFields)
                       nameBasic = nameResp([nameResp.isSubord] == 0);
                       results.(sesName).(fn) = accAndRT(nameBasic,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      %for rmf = 1:length(rmfieldNoNoise)
+                      %  if isfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf})
+                      %    results.(sesName).(fn).(destField) = rmfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf});
+                      %  end
+                      %end
                       if printResults
                         nameBasicResults = results.(sesName).(fn).(destField);
                         fprintf('\tBasic\n');
@@ -564,6 +571,11 @@ if isempty(results)
                     if ismember(destField,mainFields)
                       nameSubord = nameResp([nameResp.isSubord] == 1);
                       results.(sesName).(fn) = accAndRT(nameSubord,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
+                      %for rmf = 1:length(rmfieldNoNoise)
+                      %  if isfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf})
+                      %    results.(sesName).(fn).(destField) = rmfield(results.(sesName).(fn).(destField),rmfieldNoNoise{rmf});
+                      %  end
+                      %end
                       if printResults
                         nameSubordResults = results.(sesName).(fn).(destField);
                         fprintf('\tSubordinate\n')
@@ -584,6 +596,11 @@ if isempty(results)
                         destField = 'overall';
                         if ismember(destField,mainFields)
                           results.(sesName).(fn).(blockStr) = accAndRT(nameBlock,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          %for rmf = 1:length(rmfieldNoNoise)
+                          %  if isfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf})
+                          %    results.(sesName).(fn).(blockStr).(destField) = rmfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf});
+                          %  end
+                          %end
                           if printResults
                             nameBlockResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
@@ -597,6 +614,11 @@ if isempty(results)
                         if ismember(destField,mainFields)
                           nameBlockBasic = nameBlock([nameBlock.isSubord] == 0);
                           results.(sesName).(fn).(blockStr) = accAndRT(nameBlockBasic,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          %for rmf = 1:length(rmfieldNoNoise)
+                          %  if isfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf})
+                          %    results.(sesName).(fn).(blockStr).(destField) = rmfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf});
+                          %  end
+                          %end
                           if printResults
                             nameBlockBasicResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
@@ -610,6 +632,11 @@ if isempty(results)
                         if ismember(destField,mainFields)
                           nameBlockSubord = nameBlock([nameBlock.isSubord] == 1);
                           results.(sesName).(fn).(blockStr) = accAndRT(nameBlockSubord,[],sub,results.(sesName).(fn).(blockStr),destField,accField,dataFields{mf});
+                          %for rmf = 1:length(rmfieldNoNoise)
+                          %  if isfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf})
+                          %    results.(sesName).(fn).(blockStr).(destField) = rmfield(results.(sesName).(fn).(blockStr).(destField),rmfieldNoNoise{rmf});
+                          %  end
+                          %end
                           if printResults
                             nameBlockSubordResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
@@ -967,6 +994,9 @@ if ~exist('prependDestField','var') || isempty(prependDestField)
   prependDestField = false;
 end
 
+% concatenate the events together for certain measures
+allEv = cat(1,targEv,lureEv);
+
 % trial counts
 thisStr = 'nTrial';
 if any(strcmp(thisStr,dataFields))
@@ -975,8 +1005,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  nTrial = length(targEv) + length(lureEv);
-  inputStruct.(destField).(thisField)(sub) = nTrial;
+  inputStruct.(destField).(thisField)(sub) = length(allEv);
 end
 
 thisStr = 'nTarg';
@@ -1160,6 +1189,50 @@ if ~isempty(lureEv)
     
     inputStruct.(destField).(thisField)(sub) = zhr - zfar;
   end
+  
+  % response bias (criterion) (Macmillan & Creelman, 2005, p. 29)
+  thisStr = 'c';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    c = -0.5 * (norminv(hr,0,1) + norminv(far,0,1));
+    
+    inputStruct.(destField).(thisField)(sub) = c;
+  end
+  
+  % From Mecklinger et al. (2007) and Corwin (1994)
+  %
+  % discrimination index
+  thisStr = 'Pr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    Pr = hr - far;
+    
+    inputStruct.(destField).(thisField)(sub) = Pr;
+  end
+  
+  % From Mecklinger et al. (2007) and Corwin (1994)
+  %
+  % response bias index
+  thisStr = 'Br';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    Pr = hr - far;
+    Br = far / (1 - Pr);
+    
+    inputStruct.(destField).(thisField)(sub) = Br;
+  end
 end
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
@@ -1185,6 +1258,11 @@ if prependDestField
   rtField = sprintf('%s_%s',destField,rtStr);
 else
   rtField = rtStr;
+end
+
+thisStr = 'rt';
+if any(strcmp(thisStr,dataFields))
+  inputStruct.(destField).(rtField)(sub) = mean([allEv.(rtField)]);
 end
 
 thisStr = 'rt_hit';

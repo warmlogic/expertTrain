@@ -272,9 +272,13 @@ if isempty(results)
   
   mainFields = {'recog','recall'};
   dataFields = {...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt_hit','rt_miss','rt_cr','rt_fa'} ...
-    {'nTrial','nTarg','nHit','nMiss','hr','mr','rt_hit','rt_miss'} ...
+    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+    {'nTrial','nTarg','nHit','nMiss','hr','mr','rt','rt_hit','rt_miss'} ...
     };
+  
+  % % remove these fields when there's no noise distribution (i.e., recall
+  % % events)
+  % rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
   
   % categories = [1, 2];
   % categoryStr = {'faces', 'houses'};
@@ -1107,6 +1111,9 @@ if ~isfield(inputStruct,destField)
   error('input structure does not have field called ''%s''!',destField);
 end
 
+% concatenate the events together for certain measures
+allEv = cat(1,targEv,lureEv);
+
 % trial counts
 thisStr = 'nTrial';
 if any(strcmp(thisStr,dataFields))
@@ -1115,8 +1122,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  nTrial = length(targEv) + length(lureEv);
-  inputStruct.(destField).(thisField)(sub) = nTrial;
+  inputStruct.(destField).(thisField)(sub) = length(allEv);
 end
 
 thisStr = 'nTarg';
@@ -1203,7 +1209,7 @@ if ~isempty(lureEv)
 end
 
 % d-prime; adjust for perfect performance, choose 1 of 2 strategies
-% (Macmillan & Creelman, 2005; p. 8-9)
+% (Macmillan & Creelman, 2005, p. 8-9)
 strategy = 2;
 
 hr = length(hitEv) / length(targEv);
@@ -1311,6 +1317,50 @@ if ~isempty(lureEv)
     
     inputStruct.(destField).(thisField)(sub) = zhr - zfar;
   end
+  
+  % response bias (criterion) (Macmillan & Creelman, 2005, p. 29)
+  thisStr = 'c';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    c = -0.5 * (norminv(hr,0,1) + norminv(far,0,1));
+    
+    inputStruct.(destField).(thisField)(sub) = c;
+  end
+  
+  % From Mecklinger et al. (2007) and Corwin (1994)
+  %
+  % discrimination index
+  thisStr = 'Pr';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    Pr = hr - far;
+    
+    inputStruct.(destField).(thisField)(sub) = Pr;
+  end
+  
+  % From Mecklinger et al. (2007) and Corwin (1994)
+  %
+  % response bias index
+  thisStr = 'Br';
+  if any(strcmp(thisStr,dataFields))
+    if prependDestField
+      thisField = sprintf('%s_%s',destField,thisStr);
+    else
+      thisField = thisStr;
+    end
+    Pr = hr - far;
+    Br = far / (1 - Pr);
+    
+    inputStruct.(destField).(thisField)(sub) = Br;
+  end
 end
 
 % % If there are only two points, the slope will always be 1, and d'=da, so
@@ -1336,6 +1386,11 @@ if prependDestField
   rtField = sprintf('%s_%s',destField,rtStr);
 else
   rtField = rtStr;
+end
+
+thisStr = 'rt';
+if any(strcmp(thisStr,dataFields))
+  inputStruct.(destField).(rtField)(sub) = mean([allEv.(rtField)]);
 end
 
 thisStr = 'rt_hit';
