@@ -1,11 +1,21 @@
+<<<<<<< HEAD
 function [results] = ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults)
 % function [results] = ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults)
+=======
+function [results] = ebug_processData(~,dataroot,subjects,onlyCompleteSub,printResults,saveResults)
+% function [results] = ebug_processData(results,dataroot,subjects,onlyCompleteSub,printResults,saveResults)
+>>>>>>> minor
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
 % e.g., [results] = ebug_processData([],[],[],true,false,false,true);
 
+<<<<<<< HEAD
 if nargin ~= 7
+=======
+[results] = ebug_processData([],[],[],false,false,true);
+if nargin ~=6
+>>>>>>> minor
   error('Incorrect number of input arguments. Look at the function in edit mode, or check the help for an example, and try again');
 end
 
