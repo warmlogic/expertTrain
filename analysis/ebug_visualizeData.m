@@ -58,7 +58,15 @@ onlyCompleteSub = false;
 printResults = true;
 saveResults = true;
 
-[results] = ebug_processData(dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+[results] = ebug_processData([],dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+
+%% or just load the behavioral data
+
+load(fullfile(dataroot,'EBIRD_behav_results.mat'));
+
+%% initialize
+
+data = struct;
 
 %% Plot basic and subordinate RTs across training days, all phases on one figure
 
@@ -71,10 +79,9 @@ data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 
 % dataMeasure = 'rt';
-% dataMeasure = 'rt_cor';
-% dataMeasure = 'rt_inc';
-% dataMeasure = 'acc';
-dataMeasure = 'dp';
+% dataMeasure = 'rt_hit';
+% dataMeasure = 'rt_miss';
+dataMeasure = 'hr';
 
 tpCounter = 0;
 for t = 1:nTrainSes
@@ -107,7 +114,7 @@ hold off
 
 title(sprintf('Naming phase: %s',strrep(dataMeasure,'_','\_')));
 xlabel('Training Day');
-if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_cor') || strcmp(dataMeasure,'rt_inc')
+if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_hit') || strcmp(dataMeasure,'rt_miss')
   ylabel('Response Time (ms)');
   
 %   axis([0.5 (size(data.subord,2) + 0.5) 800 round(max(data.overall(:))/100)*100 + 200]);
@@ -121,19 +128,11 @@ if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_cor') || strcmp(dataMeasur
   %end
   
   legendLoc = 'NorthEast';
-elseif strcmp(dataMeasure,'acc')
+elseif strcmp(dataMeasure,'hr')
   ylabel('Accuracy');
   
 %   axis([0.5 (size(data.subord,2) + 0.5) 0.5 round(max(data.overall(:))*100)/100]);
   axis([0.5 (size(data.subord,2) + 0.5) 0.3 1]);
-  
-  legendLoc = 'SouthEast';
-elseif strcmp(dataMeasure,'dp')
-  ylabel('d''');
-  
-%   axis([0.5 (size(data.subord,2) + 0.5) 0 ceil(max(data.overall(:)))]);
-%   axis([0.5 (size(data.subord,2) + 0.5) 0 5]);
-   axis([0.5 (size(data.subord,2) + 0.5) -1 6]);
   
   legendLoc = 'SouthEast';
 end
@@ -158,8 +157,8 @@ dataMeasure = 'dp';
 dataLabel = 'd''';
 ylimits = [0 4];
 
-% dataMeasure = 'acc';
-% dataLabel = 'Accuracy';
+% dataMeasure = 'hr';
+% dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0 1];
 
 sessions = {'pretest', 'train1', 'posttest', 'posttest_delay'};
@@ -224,8 +223,8 @@ dataMeasure = 'dp';
 dataLabel = 'd''';
 ylimits = [0 4];
 
-% dataMeasure = 'acc';
-% dataLabel = 'Accuracy';
+% dataMeasure = 'hr';
+% dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0.5 1];
 
 sessions = {'train2', 'train3', 'train4', 'train5', 'train6'};
@@ -288,8 +287,8 @@ dataMeasure = 'dp';
 dataLabel = 'd''';
 ylimits = [0 2];
 
-% dataMeasure = 'acc';
-% dataLabel = 'Accuracy';
+% dataMeasure = 'hr';
+% dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0.5 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
