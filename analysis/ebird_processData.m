@@ -5,6 +5,10 @@ function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub
 %
 % e.g., [results] = ebird_processData([],[],[],true,false,true);
 
+if nargin ~=6
+  error('Incorrect number of input arguments. Look at the function in edit mode, or check the help for an example, and try again');
+end
+
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     %'EBIRD049'; % Pilot. (due to short ses1 match, missing ses2 name)

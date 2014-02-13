@@ -5,6 +5,10 @@ function [results] = ebug_processData(results,dataroot,subjects,onlyCompleteSub,
 %
 % e.g., [results] = ebug_processData([],[],[],true,false,true);
 
+if nargin ~=6
+  error('Incorrect number of input arguments. Look at the function in edit mode, or check the help for an example, and try again');
+end
+
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
       'EBUG001';
