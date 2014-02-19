@@ -85,6 +85,8 @@ collapsePhases = false;
 
 load(fullfile(dataroot,'EBIRD_behav_results.mat'));
 
+% load(fullfile(dataroot,'EBIRD_behav_results_collapsed.mat'));
+
 %% initialize
 
 data = struct;

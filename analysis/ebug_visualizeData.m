@@ -63,7 +63,9 @@ collapsePhases = false;
 
 %% or just load the behavioral data
 
-load(fullfile(dataroot,'EBIRD_behav_results.mat'));
+load(fullfile(dataroot,'EBUG_behav_results.mat'));
+
+% load(fullfile(dataroot,'EBUG_behav_results_collapsed.mat'));
 
 %% initialize
 
