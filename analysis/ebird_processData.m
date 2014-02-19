@@ -1,11 +1,11 @@
-function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,printResults,saveResults)
-% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,printResults,saveResults)
+function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults)
+% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
-% e.g., [results] = ebird_processData([],[],[],true,false,true);
+% e.g., [results] = ebird_processData([],[],[],true,false,false,true);
 
-if nargin ~=6
+if nargin ~= 7
   error('Incorrect number of input arguments. Look at the function in edit mode, or check the help for an example, and try again');
 end
 
@@ -71,6 +71,10 @@ if ~exist('dataroot','var') || isempty(dataroot)
     error('No data directory found.');
   end
   %saveDir = dataroot;
+end
+
+if ~exist('collapsePhases','var') || isempty(collapsePhases)
+  collapsePhases = false;
 end
 
 if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
@@ -147,7 +151,13 @@ if isempty(results)
     uniquePhaseNames = unique(expParam.session.(sesName).phases);
     uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
     
-    for pha = 1:length(expParam.session.(sesName).phases)
+    if collapsePhases
+      processThesePhases = uniquePhaseNames;
+    else
+      processThesePhases = expParam.session.(sesName).phases;
+    end
+    
+    for pha = 1:length(processThesePhases)
       phaseName = expParam.session.(sesName).phases{pha};
       
       % find out where this phase occurs in the list of unique phases
@@ -159,8 +169,12 @@ if isempty(results)
       
       if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
         
-        % set the phase name with phase count
-        fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+        if collapsePhases
+          fn = phaseName;
+        else
+          % set the phase name with phase count
+          fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+        end
         
         switch phaseName
           case {'match', 'prac_match'}
@@ -263,7 +277,13 @@ if isempty(results)
         uniquePhaseNames = unique(expParam.session.(sesName).phases);
         uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
         
-        for pha = 1:length(expParam.session.(sesName).phases)
+        if collapsePhases
+          processThesePhases = uniquePhaseNames;
+        else
+          processThesePhases = expParam.session.(sesName).phases;
+        end
+        
+        for pha = 1:length(processThesePhases)
           phaseName = expParam.session.(sesName).phases{pha};
           
           % find out where this phase occurs in the list of unique phases
@@ -275,8 +295,12 @@ if isempty(results)
           
           if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
             
-            % set the phase name with phase count
-            fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+            if collapsePhases
+              fn = phaseName;
+            else
+              % set the phase name with phase count
+              fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+            end
             
             if isfield(events.(sesName),fn)
               
@@ -653,14 +677,14 @@ end
 
 if saveResults
   fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,fileName);
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,fileName,collapsePhases);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,fileName)
+function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,collapsePhases,fileName)
 
 fprintf('Saving results to file: %s...',fileName);
 
@@ -691,7 +715,13 @@ for sesNum = 1:length(expParam.sesTypes)
   
   fprintf(fid,'session\t%s\n',sesName);
   
-  for pha = 1:length(expParam.session.(sesName).phases)
+  if collapsePhases
+    processThesePhases = uniquePhaseNames;
+  else
+    processThesePhases = expParam.session.(sesName).phases;
+  end
+  
+  for pha = 1:length(processThesePhases)
     phaseName = expParam.session.(sesName).phases{pha};
     
     % find out where this phase occurs in the list of unique phases
@@ -703,8 +733,12 @@ for sesNum = 1:length(expParam.sesTypes)
     
     if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
       
-      % set the phase name with phase count
-      fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+      if collapsePhases
+        fn = phaseName;
+      else
+        % set the phase name with phase count
+        fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+      end
       
       fprintf(fid,'phase\t%s\n',fn);
       

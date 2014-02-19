@@ -57,8 +57,9 @@ end
 onlyCompleteSub = false;
 printResults = true;
 saveResults = true;
+collapsePhases = false;
 
-[results] = ebug_processData([],dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+[results] = ebug_processData([],dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% or just load the behavioral data
 

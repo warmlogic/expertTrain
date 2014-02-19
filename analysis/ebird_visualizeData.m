@@ -77,8 +77,9 @@ end
 onlyCompleteSub = true;
 printResults = false;
 saveResults = true;
+collapsePhases = false;
 
-[results] = ebird_processData([],dataroot,subjects,onlyCompleteSub,printResults,saveResults);
+[results] = ebird_processData([],dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% or just load the behavioral data
 

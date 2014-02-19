@@ -123,7 +123,42 @@ for sub = 1:length(subjects)
         %end
         
       end
-    end
+      
+      %% collapse phases
+      
+      fprintf('\nCollapsing within-session same phases together...');
+      % remove the phase numbers
+      fn = fieldnames(events.(sesName));
+      fn_trunc = fn;
+      for p = 1:length(fn_trunc)
+        startPN = strfind(fn_trunc{p},'_');
+        if length(fn_trunc{p}(startPN(end):end)) == 2
+          fn_trunc{p} = fn_trunc{p}(1:startPN(end) - 1);
+        end
+      end
+      % get the unique phase types
+      u_phases = unique(fn_trunc);
+      for up = 1:length(u_phases)
+        for p = 1:length(fn)
+          % if it's the same phase type, concatenate the events. Can use
+          % phaseCount field to divide them later.
+          if strncmp(u_phases{up},fn{p},length(u_phases{up}))
+            thisPhase = events.(sesName).(fn{p}).data;
+            if str2double(fn{p}(end)) == 1
+              events.(sesName).(u_phases{up}).data = thisPhase;
+            else
+              events.(sesName).(u_phases{up}).data = cat(1,events.(sesName).(u_phases{up}).data,thisPhase);
+            end
+          end
+          
+        end
+        % set this phase as complete
+        events.(sesName).(u_phases{up}).isComplete = true;
+      end
+      fprintf('Done.\n');
+      
+    end % sesNum
+    
 %   else
 %     %fprintf('%s already exists! Skipping this subject!\n',eventsOutfile_sub);
 %     %continue
