@@ -352,7 +352,7 @@ for sub = 1:length(subjects)
       
       %% collapse phases
       
-      fprintf('\nCollapsing phases together...');
+      fprintf('\nCollapsing within-session same phases together...');
       % remove the phase numbers
       fn = fieldnames(events.(sesName));
       fn_trunc = fn;
