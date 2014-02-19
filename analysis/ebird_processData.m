@@ -1160,7 +1160,10 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = zhr - zfar;
   end
   
-  % response bias (criterion) (Macmillan & Creelman, 2005, p. 29)
+  % response bias: c (criterion) (Macmillan & Creelman, 2005, p. 29)
+  %
+  % positive/conservative bias indicates a tendency to say 'new', whereas
+  % negative/liberal bias indicates a tendency to say 'old'
   thisStr = 'c';
   if any(strcmp(thisStr,dataFields))
     if prependDestField
@@ -1173,9 +1176,16 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = c;
   end
   
-  % From Mecklinger et al. (2007) and Corwin (1994)
+  % discrimination index (Pr)
   %
-  % discrimination index
+  % Mecklinger et al. (2007): Source-retrieval requirements influence late
+  % ERP and EEG memory effects
+  %
+  % Corwin (1994): On measuring discrimination and response bias: Unequal
+  % numbers of targets and distractors and two classes of distractors
+  %
+  % Snodgrass & Corwin (1988): Pragmatics of measuring recognition memory:
+  % applications to dementia and amnesia
   thisStr = 'Pr';
   if any(strcmp(thisStr,dataFields))
     if prependDestField
@@ -1188,9 +1198,16 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = Pr;
   end
   
-  % From Mecklinger et al. (2007) and Corwin (1994)
+  % response bias index (Br)
   %
-  % response bias index
+  % Mecklinger et al. (2007): Source-retrieval requirements influence late
+  % ERP and EEG memory effects
+  %
+  % Corwin (1994): On measuring discrimination and response bias: Unequal
+  % numbers of targets and distractors and two classes of distractors
+  %
+  % Snodgrass & Corwin (1988): Pragmatics of measuring recognition memory:
+  % applications to dementia and amnesia
   thisStr = 'Br';
   if any(strcmp(thisStr,dataFields))
     if prependDestField
