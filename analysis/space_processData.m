@@ -888,7 +888,7 @@ for sesNum = 1:length(expParam.sesTypes)
         switch phaseName
           case {'cued_recall'}
             targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
-            lagConds = unique([targEvents.lag]);
+            lagConds = unique([targEvents.lag],'stable');
             
             % lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
             
