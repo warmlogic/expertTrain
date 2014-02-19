@@ -139,8 +139,8 @@ if isempty(results)
     % set the subject events file
     sesName = expParam.sesTypes{sesNum};
     
-    uniquePhaseNames = unique(expParam.session.(sesName).phases);
-    uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+    uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+    uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
     
     if collapsePhases
       processThesePhases = uniquePhaseNames;
@@ -279,8 +279,8 @@ if isempty(results)
         % set the subject events file
         sesName = expParam.sesTypes{sesNum};
         
-        uniquePhaseNames = unique(expParam.session.(sesName).phases);
-        uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+        uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+        uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
         
         if collapsePhases
           processThesePhases = uniquePhaseNames;
@@ -855,8 +855,8 @@ for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
   sesName = expParam.sesTypes{sesNum};
   
-  uniquePhaseNames = unique(expParam.session.(sesName).phases);
-  uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
+  uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+  uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
   
   fprintf(fid,'session\t%s\n',sesName);
   

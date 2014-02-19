@@ -314,7 +314,7 @@ if isempty(results)
     sesName = expParam.sesTypes{sesNum};
     
     uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
-    uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases,'stable')));
+    uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
     
     if collapsePhases
       processThesePhases = uniquePhaseNames;
@@ -353,7 +353,7 @@ if isempty(results)
               targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
               %lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
               
-              lagConds = unique([targEvents.lag]);
+              lagConds = unique([targEvents.lag],'stable');
               
               for lc = 1:length(lagConds)
                 % choose the training condition
@@ -460,7 +460,7 @@ if isempty(results)
         sesName = expParam.sesTypes{sesNum};
         
         uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
-        uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases,'stable')));
+        uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
         
         if collapsePhases
           processThesePhases = uniquePhaseNames;
@@ -502,7 +502,7 @@ if isempty(results)
                     thisPhaseEv = events.(sesName).(fn).data;
                     % this phase events; how many lag conditions occurred
                     % for targets (during study)?
-                    lagConds = unique([thisPhaseEv([thisPhaseEv.targ]).lag]);
+                    lagConds = unique([thisPhaseEv([thisPhaseEv.targ]).lag],'stable');
                     
                     % exclude missed responses ({'NO_RESPONSE', 'none'})
                     thisPhaseEv = thisPhaseEv(~ismember({thisPhaseEv.recog_resp},{'NO_RESPONSE', 'none'}));
@@ -847,7 +847,7 @@ for sesNum = 1:length(expParam.sesTypes)
   sesName = expParam.sesTypes{sesNum};
   
   uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
-  uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases,'stable')));
+  uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
   
   fprintf(fid,'session\t%s\n',sesName);
   
