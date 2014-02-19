@@ -64,8 +64,12 @@ collapsePhases = false;
 %% or just load the behavioral data
 
 load(fullfile(dataroot,'EBUG_behav_results.mat'));
+% collapsePhases = false;
+% ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 % load(fullfile(dataroot,'EBUG_behav_results_collapsed.mat'));
+% % collapsePhases = true;
+% % ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% initialize
 

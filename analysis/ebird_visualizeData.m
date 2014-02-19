@@ -84,8 +84,12 @@ collapsePhases = false;
 %% or just load the behavioral data
 
 load(fullfile(dataroot,'EBIRD_behav_results.mat'));
+% collapsePhases = false;
+% ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 % load(fullfile(dataroot,'EBIRD_behav_results_collapsed.mat'));
+% % collapsePhases = true;
+% % ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% initialize
 
