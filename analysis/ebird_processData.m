@@ -95,27 +95,29 @@ if ~exist('saveResults','var') || isempty(saveResults)
   saveResults = true;
 end
 
+%% some constants
+
+%trainedConds = {1, 0, [1 0]};
+trainedConds = {1, 0};
+
+results = struct;
+
+mainFields = {'overall','basic','subord'};
+%mainFields = {'basic','subord'};
+
+dataFields = {...
+  {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+  {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+  {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+  };
+
+% % remove these fields when there's no noise distribution (i.e., naming
+% % task)
+% rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
+
+%% process the data
+
 if isempty(results)
-  %% some constants
-  
-  %trainedConds = {1, 0, [1 0]};
-  trainedConds = {1, 0};
-  
-  results = struct;
-  
-  mainFields = {'overall','basic','subord'};
-  %mainFields = {'basic','subord'};
-  
-  dataFields = {...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
-    };
-  
-  % % remove these fields when there's no noise distribution (i.e., naming
-  % % task)
-  % rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
-  
   % set field names
   accField = 'acc';
   dpField = 'dp';
@@ -684,6 +686,31 @@ if isempty(results)
     save(matFileName,'results');
     fprintf('Done.\n');
   end
+else
+  completeStatus = true(1,length(subjects));
+  
+  if onlyCompleteSub
+    fprintf('Loading events to check whether each subject has completed all sessions...\n');
+    for sub = 1:length(subjects)
+      subDir = fullfile(dataroot,subjects{sub});
+      
+      fprintf('Loading events for %s...',subjects{sub});
+      eventsFile = fullfile(subDir,'events','events.mat');
+      if exist(eventsFile,'file')
+        load(eventsFile,'events');
+      else
+        error('events file does not exist: %s',eventsFile);
+      end
+      
+      % if we only want complete subjects and this one is not done, set to F
+      if ~events.isComplete
+        fprintf('Incomplete!\n');
+        completeStatus(sub) = false;
+      else
+        fprintf('Complete!\n');
+      end
+    end
+  end
 end
 
 if saveResults
@@ -694,7 +721,7 @@ if saveResults
   end
   textFileName = fullfile(dataroot,textFileName);
   
-  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,textFileName,collapsePhases);
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,textFileName,collapsePhases,templateSubIndex);
 end
 
 end % function
