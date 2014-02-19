@@ -235,10 +235,16 @@ ylimits = [0 3];
 
 % dataMeasure = 'c';
 % dataLabel = 'Response bias (criterion; c)';
-% ylimits = [-0.5 0.5];
+% ylimits = [-0.6 0.6];
+% % positive/conservative bias indicates a tendency to say 'new', whereas
+% % negative/liberal bias indicates a tendency to say 'old'
 
 % dataMeasure = 'Br';
-% dataLabel = 'Response bias (Br)';
+% dataLabel = 'Response bias index (Br)';
+% ylimits = [0 1];
+
+% dataMeasure = 'Pr';
+% dataLabel = 'Discrimination index (Pr)';
 % ylimits = [0 1];
 
 data.(dataMeasure) = struct;
@@ -300,6 +306,20 @@ ylimits = [0 3];
 
 % dataMeasure = 'hr';
 % dataLabel = 'Accuracy (Hit Rate)';
+% ylimits = [0 1];
+
+% dataMeasure = 'c';
+% dataLabel = 'Response bias (criterion; c)';
+% ylimits = [-0.6 0.6];
+% % positive/conservative bias indicates a tendency to say 'new', whereas
+% % negative/liberal bias indicates a tendency to say 'old'
+
+% dataMeasure = 'Br';
+% dataLabel = 'Response bias index (Br)';
+% ylimits = [0 1];
+
+% dataMeasure = 'Pr';
+% dataLabel = 'Discrimination index (Pr)';
 % ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
