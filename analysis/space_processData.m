@@ -48,6 +48,8 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE037';
     };
 end
+
+% use a specific subject's files as a template for loading data
 templateSubject = 'SPACE001';
 
 % if ~exist('subjects','var') || isempty(subjects)
@@ -285,15 +287,15 @@ if isempty(results)
   
   %% initialize to store the data
   
-  % use a subject's files for initialization
+  % use a specific subject's files as a template for loading data
   if length(subjects) > 5
-    tempSub = templateSubject;
+    templateSubIndex = templateSubject;
   else
-    tempSub = subjects{end};
+    templateSubIndex = subjects{end};
   end
-  tempSub = ismember(subjects,tempSub);
+  templateSubIndex = ismember(subjects,templateSubIndex);
   
-  subDir = fullfile(dataroot,subjects{tempSub});
+  subDir = fullfile(dataroot,subjects{templateSubIndex});
   expParamFile = fullfile(subDir,'experimentParams.mat');
   if exist(expParamFile,'file')
     load(expParamFile,'expParam','cfg')
@@ -784,7 +786,13 @@ if isempty(results)
   fprintf('Done processing data for experiment %s.\n\n',expName);
   
   if saveResults
-    matFileName = fullfile(dataroot,sprintf('%s_behav_results.mat',expName));
+    if collapsePhases
+      matFileName = sprintf('%s_behav_results_collapsed.mat',expName);
+    else
+      matFileName = sprintf('%s_behav_results.mat',expName);
+    end
+    matFileName = fullfile(dataroot,matFileName);
+    
     fprintf('Saving results struct to %s...',matFileName);
     save(matFileName,'results');
     fprintf('Done.\n');
@@ -792,7 +800,13 @@ if isempty(results)
 end
 
 if saveResults
-  textFileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
+  if collapsePhases
+    textFileName = sprintf('%s_behav_results_collapsed.txt',expName);
+  else
+    textFileName = sprintf('%s_behav_results.txt',expName);
+  end
+  textFileName = fullfile(dataroot,textFileName);
+  
   printResultsToFile(dataroot,subjects,results,mainFields,dataFields,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
 end
 
@@ -800,11 +814,11 @@ end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,fileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
+function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
 
-fprintf('Saving results to file: %s...',fileName);
+fprintf('Saving results to text file: %s...',textFileName);
 
-% use a subject's files for initialization
+% use a specific subject's files as a template for loading data
 if length(subjects) > 5
   tempSub = templateSubject;
 else
@@ -826,7 +840,7 @@ else
   error('events file does not exist: %s',eventsFile);
 end
 
-fid = fopen(fileName,'wt');
+fid = fopen(textFileName,'wt');
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file

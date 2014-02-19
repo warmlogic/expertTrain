@@ -32,6 +32,12 @@ if ~exist('subjects','var') || isempty(subjects)
     };
 end
 
+% use a specific subject's files as a template for loading data
+templateSubIndex = 10;
+if templateSubIndex > length(subjects)
+  error('Cannot access subject number %d for templateSubIndex, not enough subjects (there are %d).',templateSubIndex,length(subjects));
+end
+
 % try to determine the experiment name by removing the subject number
 if ~isempty(subjects)
   zs = strfind(subjects{1},'0');
@@ -111,9 +117,8 @@ if isempty(results)
   
   %% initialize to store the data
   
-  % use subject 1's files for initialization
-  ini_sub = 10;
-  subDir = fullfile(dataroot,subjects{ini_sub});
+  % use a specific subject's files as a template for loading data
+  subDir = fullfile(dataroot,subjects{templateSubIndex});
   expParamFile = fullfile(subDir,'experimentParams.mat');
   if exist(expParamFile,'file')
     load(expParamFile)
@@ -769,7 +774,13 @@ if isempty(results)
   end % for sub
   fprintf('Done processing data for experiment %s.\n\n',expName);
   if saveResults
-    matFileName = fullfile(dataroot,sprintf('%s_behav_results.mat',expName));
+    if collapsePhases
+      matFileName = sprintf('%s_behav_results_collapsed.mat',expName);
+    else
+      matFileName = sprintf('%s_behav_results.mat',expName);
+    end
+    matFileName = fullfile(dataroot,matFileName);
+    
     fprintf('Saving results struct to %s...',matFileName);
     save(matFileName,'results');
     fprintf('Done.\n');
@@ -777,20 +788,26 @@ if isempty(results)
 end
 
 if saveResults
-  fileName = fullfile(dataroot,sprintf('%s_behav_results.txt',expName));
-  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,fileName,collapsePhases,ini_sub);
+  if collapsePhases
+    textFileName = sprintf('%s_behav_results_collapsed.txt',expName);
+  else
+    textFileName = sprintf('%s_behav_results.txt',expName);
+  end
+  textFileName = fullfile(dataroot,textFileName);
+  
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,textFileName,collapsePhases,templateSubIndex);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,fileName,collapsePhases,ini_sub)
+function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,textFileName,collapsePhases,templateSubIndex)
 
-fprintf('Saving results to file: %s...',fileName);
+fprintf('Saving results to file: %s...',textFileName);
 
-% use subject 1's files for initialization
-subDir = fullfile(dataroot,subjects{ini_sub});
+% use a specific subject's files as a template for loading data
+subDir = fullfile(dataroot,subjects{templateSubIndex});
 expParamFile = fullfile(subDir,'experimentParams.mat');
 if exist(expParamFile,'file')
   load(expParamFile)
@@ -804,7 +821,7 @@ else
   error('events file does not exist: %s',eventsFile);
 end
 
-fid = fopen(fileName,'wt');
+fid = fopen(textFileName,'wt');
 
 for sesNum = 1:length(expParam.sesTypes)
   % set the subject events file
