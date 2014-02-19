@@ -323,7 +323,7 @@ if isempty(results)
     end
     
     for pha = 1:length(processThesePhases)
-      phaseName = expParam.session.(sesName).phases{pha};
+      phaseName = processThesePhases{pha};
       
       % find out where this phase occurs in the list of unique phases
       uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
@@ -858,7 +858,7 @@ for sesNum = 1:length(expParam.sesTypes)
   end
   
   for pha = 1:length(processThesePhases)
-    phaseName = expParam.session.(sesName).phases{pha};
+    phaseName = processThesePhases{pha};
     
     % find out where this phase occurs in the list of unique phases
     uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
