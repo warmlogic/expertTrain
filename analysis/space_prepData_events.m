@@ -352,7 +352,7 @@ for sub = 1:length(subjects)
       
       %% collapse phases
       
-      fprintf('\nCollapsing within-session same phases together...');
+      fprintf('\nCollapsing same phases together within ''%s'' session...',sesName);
       % remove the phase numbers
       fn = fieldnames(events.(sesName));
       fn_trunc = fn;
@@ -369,11 +369,16 @@ for sub = 1:length(subjects)
           % if it's the same phase type, concatenate the events. Can use
           % phaseCount field to divide them later.
           if strncmp(u_phases{up},fn{p},length(u_phases{up}))
-            thisPhase = events.(sesName).(fn{p}).data;
-            if str2double(fn{p}(end)) == 1
-              events.(sesName).(u_phases{up}).data = thisPhase;
+            if events.(sesName).(fn{p}).isComplete
+              thisPhase = events.(sesName).(fn{p}).data;
+              if str2double(fn{p}(end)) == 1
+                events.(sesName).(u_phases{up}).data = thisPhase;
+              else
+                events.(sesName).(u_phases{up}).data = cat(1,events.(sesName).(u_phases{up}).data,thisPhase);
+              end
             else
-              events.(sesName).(u_phases{up}).data = cat(1,events.(sesName).(u_phases{up}).data,thisPhase);
+              fprintf('\n');
+              warning('%s %s %s is not complete. Not collapsing!',subjects{sub},sesName,fn{p});
             end
           end
           
