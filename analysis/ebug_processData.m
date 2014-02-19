@@ -84,8 +84,6 @@ end
 %trainedConds = {1, 0, [1 0]};
 trainedConds = {1, 0};
 
-results = struct;
-
 mainFields = {'overall','basic','subord'};
 
 dataFields = {...
@@ -101,6 +99,9 @@ dataFields = {...
 %% process the data
 
 if isempty(results)
+  
+  results = struct;
+  
   % set field names
   accField = 'acc';
   dpField = 'dp';
