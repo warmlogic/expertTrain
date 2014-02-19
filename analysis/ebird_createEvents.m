@@ -137,6 +137,7 @@ switch phaseName
         error('Log file seems to be empty, something is wrong: %s',logFile);
       end
     else
+      fprintf('\n');
       %error('Log file file not found: %s',logFile);
       warning('Log file file not found: %s',logFile);
       events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = false;
@@ -329,6 +330,7 @@ switch phaseName
           error('Log file seems to be empty, something is wrong: %s',logFile);
         end
       else
+        fprintf('\n');
         %error('Log file file not found: %s',logFile);
         warning('Log file file not found: %s',logFile);
         events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = false;
