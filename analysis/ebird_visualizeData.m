@@ -68,6 +68,10 @@ if saveFigs
   figRes = '-r150';
 end
 
+%% are we collapsing phases or not?
+
+collapsePhases = true;
+
 %% run the data processing script
 
 % onlyCompleteSub = false;
@@ -77,19 +81,20 @@ end
 onlyCompleteSub = true;
 printResults = false;
 saveResults = true;
-collapsePhases = false;
 
 [results] = ebird_processData([],dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% or just load the behavioral data
 
-load(fullfile(dataroot,'EBIRD_behav_results.mat'));
-% collapsePhases = false;
-% ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
+if collapsePhases
+  load(fullfile(dataroot,'EBIRD_behav_results_collapsed.mat'));
+else
+  load(fullfile(dataroot,'EBIRD_behav_results.mat'));
+end
 
-% load(fullfile(dataroot,'EBIRD_behav_results_collapsed.mat'));
-% % collapsePhases = true;
-% % ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
+%% rerun to print data again
+
+% ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% initialize
 
@@ -98,14 +103,24 @@ data = struct;
 %% Plot basic and subordinate RTs across training days, all phases on one figure
 
 nTrainSes = 6;
-phases = {'name_1','name_2','name_3','name_4'};
+if collapsePhases
+  phases = {'name'};
+else
+  phases = {'name_1','name_2','name_3','name_4'};
+end
 
 plotOverall = false;
 
-% - 2 because pretest session only has two naming phases
-data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
-data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
-data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
+if collapsePhases
+  data.overall = nan(length(subjects),(nTrainSes * length(phases)));
+  data.basic = nan(length(subjects),(nTrainSes * length(phases)));
+  data.subord = nan(length(subjects),(nTrainSes * length(phases)));
+else
+  % - 2 because pretest session only has two naming phases
+  data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
+  data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
+  data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
+end
 
 % dataMeasure = 'rt';ymin = 500; ymax = 2000;
 % dataMeasure = 'rt_hit';ymin = 500; ymax = 2000;
@@ -148,7 +163,11 @@ end
 
 hold off
 
-title(sprintf('Naming phase: %s',strrep(dataMeasure,'_','\_')));
+if collapsePhases
+  title(sprintf('Naming phases (collapsed): %s',strrep(dataMeasure,'_','\_')));
+else
+  title(sprintf('Naming phases: %s',strrep(dataMeasure,'_','\_')));
+end
 xlabel('Training Day');
 if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_hit') || strcmp(dataMeasure,'rt_miss')
   ylabel('Response Time (ms)');
@@ -198,7 +217,11 @@ elseif strcmp(dataMeasure,'hr')
 %   
 %   legendLoc = 'SouthEast';
 end
-new_xlabel = [ones(1,length(phases)/2) ones(1,length(phases))*2 ones(1,length(phases))*3 ones(1,length(phases))*4 ones(1,length(phases))*5 ones(1,length(phases))*6];
+if collapsePhases
+  new_xlabel = [ones(1,length(phases)) ones(1,length(phases))*2 ones(1,length(phases))*3 ones(1,length(phases))*4 ones(1,length(phases))*5 ones(1,length(phases))*6];
+else
+  new_xlabel = [ones(1,length(phases)/2) ones(1,length(phases))*2 ones(1,length(phases))*3 ones(1,length(phases))*4 ones(1,length(phases))*5 ones(1,length(phases))*6];
+end
 set(gca,'XTick',1:length(new_xlabel));
 set(gca,'XTickLabel',new_xlabel);
 
@@ -220,7 +243,12 @@ end
 publishfig(gcf,0);
 
 if saveFigs
-  print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('training_name_%s',dataMeasure)));
+  if collapsePhases
+    collapseStr = '_collapsed';
+  else
+    collapseStr = '';
+  end
+  print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('training_name_%s%s',collapseStr,dataMeasure)));
 end
 
 %% Collapse across image manipulation conditions: pretest, posttest, posttest_delay
@@ -228,7 +256,11 @@ end
 % plot basic and subordinate data for pretest, posttest, posttest_delay
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
-phases = {'match_1'};
+if collapsePhases
+  phases = {'match'};
+else
+  phases = {'match_1'};
+end
 training = {'trained','untrained'};
 naming = {'basic','subord'};
 
@@ -330,7 +362,11 @@ ylimits = [0 3];
 % ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
-phases = {'match_1'};
+if collapsePhases
+  phases = {'match'};
+else
+  phases = {'match_1'};
+end
 training = {'trained','untrained'};
 naming = {'basic','subord'};
 imgConds = {'normal','color','g','g_hi8','g_lo8'};
