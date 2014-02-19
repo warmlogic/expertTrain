@@ -93,15 +93,17 @@ data = struct;
 nTrainSes = 6;
 phases = {'name_1','name_2','name_3','name_4'};
 
+plotOverall = false;
+
 % - 2 because pretest session only has two naming phases
 data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.subord = nan(length(subjects),(nTrainSes * length(phases) - 2));
 
-% dataMeasure = 'rt';ymin = 500; ymax = 2500;
-% dataMeasure = 'rt_hit';ymin = 500; ymax = 2500;
-% dataMeasure = 'rt_miss';ymin = 500; ymax = 2500;
-dataMeasure = 'hr';ymin = 0.25; ymax = 1;
+% dataMeasure = 'rt';ymin = 500; ymax = 2000;
+% dataMeasure = 'rt_hit';ymin = 500; ymax = 2000;
+% dataMeasure = 'rt_miss';ymin = 500; ymax = 2000;
+dataMeasure = 'hr';ymin = 0.3; ymax = 1;
 
 % % use defaults, set below
 % ymin = [];
@@ -124,16 +126,19 @@ figure
 
 basic_mean = nanmean(data.basic,1);
 basic_sem = nanstd(data.basic,1) ./ sqrt(sum(~isnan(data.basic)));
-errorbar(basic_mean,basic_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
+hb = errorbar(basic_mean,basic_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 hold on
 
 subordData_mean = nanmean(data.subord,1);
 subordData_sem = nanstd(data.subord,1) ./ sqrt(sum(~isnan(data.subord)));
-errorbar(subordData_mean,subordData_sem,'ks-','LineWidth',2);
+hs = errorbar(subordData_mean,subordData_sem,'ks-','LineWidth',2);
 
-% overall_mean = nanmean(data.overall,1);
-% overall_sem = nanstd(data.overall,1) ./ sqrt(sum(~isnan(data.overall)));
-% errorbar(overall_mean,overall_sem,'ro-','LineWidth',2);
+if plotOverall
+  overall_mean = nanmean(data.overall,1);
+  overall_sem = nanstd(data.overall,1) ./ sqrt(sum(~isnan(data.overall)));
+  ho = errorbar(overall_mean,overall_sem,'ro-','LineWidth',2);
+end
+
 hold off
 
 title(sprintf('Naming phase: %s',strrep(dataMeasure,'_','\_')));
@@ -171,27 +176,39 @@ elseif strcmp(dataMeasure,'hr')
   axis([0.5 (size(data.subord,2) + 0.5) ymin ymax]);
   
   legendLoc = 'SouthEast';
-elseif strcmp(dataMeasure,'dp')
-  ylabel('d''');
-  
-  if ~exist('ymin','var') || isempty(ymin)
-    ymin = -1;
-  end
-  if ~exist('ymax','var') || isempty(ymax)
-    %ymax = ceil(max(data.overall(:)));
-    ymax = 5;
-  end
-  
-  axis([0.5 (size(data.subord,2) + 0.5) ymin ymax]);
-  
-  legendLoc = 'SouthEast';
+% elseif strcmp(dataMeasure,'dp')
+%   ylabel('d''');
+%   
+%   if ~exist('ymin','var') || isempty(ymin)
+%     ymin = -1;
+%   end
+%   if ~exist('ymax','var') || isempty(ymax)
+%     %ymax = ceil(max(data.overall(:)));
+%     ymax = 5;
+%   end
+%   
+%   axis([0.5 (size(data.subord,2) + 0.5) ymin ymax]);
+%   
+%   legendLoc = 'SouthEast';
 end
 new_xlabel = [ones(1,length(phases)/2) ones(1,length(phases))*2 ones(1,length(phases))*3 ones(1,length(phases))*4 ones(1,length(phases))*5 ones(1,length(phases))*6];
 set(gca,'XTick',1:length(new_xlabel));
 set(gca,'XTickLabel',new_xlabel);
 
-legend({'Basic','Subordinate'},'Location',legendLoc);
-%legend({'Basic','Subordinate','Overall'},'Location',legendLoc);
+% put the legend in a reasonable order
+if strcmp(dataMeasure,'hr')
+  if plotOverall
+    legend([hb hs ho],{'Basic','Subordinate','Overall'},'Location',legendLoc);
+  else
+    legend([hb hs],{'Basic','Subordinate'},'Location',legendLoc);
+  end
+elseif strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_hit') || strcmp(dataMeasure,'rt_miss')
+  if plotOverall
+    legend([hs ho hb],{'Subordinate','Overall','Basic'},'Location',legendLoc);
+  else
+    legend([hs hb],{'Subordinate','Basic'},'Location',legendLoc);
+  end
+end
 
 publishfig(gcf,0);
 
@@ -202,6 +219,11 @@ end
 %% Collapse across image manipulation conditions: pretest, posttest, posttest_delay
 
 % plot basic and subordinate data for pretest, posttest, posttest_delay
+
+sessions = {'pretest', 'posttest', 'posttest_delay'};
+phases = {'match_1'};
+training = {'trained','untrained'};
+naming = {'basic','subord'};
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
@@ -218,11 +240,6 @@ ylimits = [0 3];
 % dataMeasure = 'Br';
 % dataLabel = 'Response bias (Br)';
 % ylimits = [0 1];
-
-% sessions = {'pretest', 'posttest', 'posttest_delay'};
-% phases = {'match_1'};
-% training = {'trained','untrained'};
-% naming = {'basic','subord'};
 
 data.(dataMeasure) = struct;
 for n = 1:length(naming)
