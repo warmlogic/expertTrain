@@ -12,16 +12,16 @@ end
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
       'EBUG001';
-%       'EBUG002';
-%       'EBUG003';
-%       'EBUG004';
-%       'EBUG005';
-%       'EBUG006';
-%       'EBUG007';
-%       'EBUG008';
-%       'EBUG009';
-%       'EBUG010';
-%       'EBUG011';
+      'EBUG002';
+      'EBUG003';
+      'EBUG004';
+      'EBUG005';
+      'EBUG006';
+      'EBUG007';
+      'EBUG008';
+      'EBUG009';
+      'EBUG010';
+      'EBUG011';
       'EBUG012';
 %       'EBUG090';
 %       'EBUG091';

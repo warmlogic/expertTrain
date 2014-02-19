@@ -27,17 +27,33 @@ else
 end
 
 subjects = {
-   'EBUG001';
-   'EBUG002';
-   'EBUG003';
-   'EBUG004';
-   'EBUG005';
-   'EBUG006';
-   'EBUG007';
-   'EBUG008';
-   'EBUG009';
-   'EBUG010';
-   'EBUG011';
+    'EBUG001';
+    'EBUG002';
+    'EBUG003';
+    'EBUG004';
+    'EBUG005';
+    'EBUG006';
+    'EBUG007';
+    'EBUG008';
+    'EBUG009';
+    'EBUG010';
+    'EBUG011';
+    'EBUG012';
+    'EBUG013';
+    'EBUG014';
+    'EBUG015';
+    'EBUG016';
+    'EBUG017';
+    'EBUG018';
+    'EBUG019';
+    'EBUG020';
+    'EBUG021';
+    'EBUG022';
+    'EBUG023';
+%     'EBUG092';
+%     'EBUG093';
+%     'EBUG094';
+%     'EBUG095';
   };
 
 saveFigs = true;
@@ -54,7 +70,7 @@ end
 % printResults = true;
 % saveResults = true;
 
-onlyCompleteSub = false;
+onlyCompleteSub = true;
 printResults = true;
 saveResults = true;
 collapsePhases = false;
@@ -292,7 +308,7 @@ end
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [0 2];
+ylimits = [0 1];
 
 % dataMeasure = 'hr';
 % dataLabel = 'Accuracy (Hit Rate)';
