@@ -148,7 +148,7 @@ figure
 
 basic_mean = nanmean(data.basic,1);
 basic_sem = nanstd(data.basic,1) ./ sqrt(sum(~isnan(data.basic)));
-hb = errorbar(basic_mean,basic_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
+hb = errorbar(basic_mean,basic_sem,'ro-','LineWidth',2);
 hold on
 
 subordData_mean = nanmean(data.subord,1);
@@ -158,7 +158,7 @@ hs = errorbar(subordData_mean,subordData_sem,'ks-','LineWidth',2);
 if plotOverall
   overall_mean = nanmean(data.overall,1);
   overall_sem = nanstd(data.overall,1) ./ sqrt(sum(~isnan(data.overall)));
-  ho = errorbar(overall_mean,overall_sem,'ro-','LineWidth',2);
+  ho = errorbar(overall_mean,overall_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 end
 
 hold off
