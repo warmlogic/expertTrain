@@ -204,7 +204,7 @@ if isempty(results)
                 end
               end
               
-              imgConds = unique({events.(sesName).(fn).data.imgCond},'stable');
+              imgConds = unique({events.(sesName).(fn).data.imgCond},'sorted');
               if length(imgConds) > 1
                 for im = 1:length(imgConds)
                   for mf = 1:length(mainFields)
@@ -457,7 +457,7 @@ if isempty(results)
                       %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
                       
                       % accuracy for the different image manipulation conditions
-                      imgConds = unique({matchResp.imgCond},'stable');
+                      imgConds = unique({matchResp.imgCond},'sorted');
                       % if there's only 1 image manipulation condition, the
                       % results were printed above
                       if length(imgConds) > 1
@@ -803,7 +803,7 @@ for sesNum = 1:length(expParam.sesTypes)
             
             matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
             
-            imgConds = unique({matchResp.imgCond},'stable');
+            imgConds = unique({matchResp.imgCond},'sorted');
             if length(imgConds) > 1
               nTabs = nan(1,length(dataToPrint) * length(imgConds));
               nTabInd = 0;

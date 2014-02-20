@@ -353,7 +353,7 @@ if isempty(results)
               targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
               %lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
               
-              lagConds = unique([targEvents.lag],'stable');
+              lagConds = unique([targEvents.lag],'sorted');
               
               for lc = 1:length(lagConds)
                 % choose the training condition
@@ -383,7 +383,7 @@ if isempty(results)
                 end
                 
                 % image categories
-                i_catStrs = unique({targEvents.i_catStr},'stable');
+                i_catStrs = unique({targEvents.i_catStr},'sorted');
                 if length(i_catStrs) > 1 && separateCategories
                   for im = 1:length(i_catStrs)
                     for mf = 1:length(mainFields)
@@ -502,7 +502,7 @@ if isempty(results)
                     thisPhaseEv = events.(sesName).(fn).data;
                     % this phase events; how many lag conditions occurred
                     % for targets (during study)?
-                    lagConds = unique([thisPhaseEv([thisPhaseEv.targ]).lag],'stable');
+                    lagConds = unique([thisPhaseEv([thisPhaseEv.targ]).lag],'sorted');
                     
                     % exclude missed responses ({'NO_RESPONSE', 'none'})
                     thisPhaseEv = thisPhaseEv(~ismember({thisPhaseEv.recog_resp},{'NO_RESPONSE', 'none'}));
@@ -648,7 +648,7 @@ if isempty(results)
                       end
                       
                       % accuracy for the different image categories
-                      i_catStrs = unique({targEvents.i_catStr},'stable');
+                      i_catStrs = unique({targEvents.i_catStr},'sorted');
                       % if there's only 1 image category, the results were
                       % printed above
                       if length(i_catStrs) > 1 && separateCategories
@@ -888,7 +888,7 @@ for sesNum = 1:length(expParam.sesTypes)
         switch phaseName
           case {'cued_recall'}
             targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
-            lagConds = unique([targEvents.lag],'stable');
+            lagConds = unique([targEvents.lag],'sorted');
             
             % lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
             
@@ -946,7 +946,7 @@ for sesNum = 1:length(expParam.sesTypes)
               end
               
               % separate categories
-              i_catStrs = unique({targEvents.i_catStr},'stable');
+              i_catStrs = unique({targEvents.i_catStr},'sorted');
               if length(i_catStrs) > 1 && separateCategories
                 nTabs = nan(1,length(dataToPrint) * length(i_catStrs));
                 nTabInd = 0;
