@@ -213,6 +213,36 @@ switch phaseName
     % only keep certain types of events
     log = log(ismember({log.type},{'MATCH_STIM1','MATCH_STIM2','MATCH_RESP'}));
     
+    % hack: set up the proper training status based on normal images
+    if strcmp(phaseName,'match')
+      fprintf('\n\tSetting correct training status for manipulated images based on trained normal images...');
+      normalStimTrained = log(ismember({log.imgCond},'normal') & [log.trained] == 1);
+      normalStimUntrained = log(ismember({log.imgCond},'normal') & [log.trained] == 0);
+      
+      % remove training status from all non-normal stimuli
+      % log(~ismember({log.imgCond},'normal')).trained = [];
+      
+      for i = 1:length(log)
+        if ~strcmp(log(i).imgCond,'normal')
+          log(i).trained = [];
+          
+          uScoreIndex = strfind(log(i).familyStr,'_');
+          thisFamily = log(i).familyStr(1:uScoreIndex(1));
+          thisStim = normalStimTrained(ismember({normalStimTrained.type},'MATCH_RESP') & ismember({normalStimTrained.familyStr},thisFamily) & ismember({normalStimTrained.speciesStr},log(i).speciesStr) & [normalStimTrained.exemplarNum] == log(i).exemplarNum);
+          if isempty(thisStim)
+            thisStim = normalStimUntrained(ismember({normalStimUntrained.type},'MATCH_RESP') & ismember({normalStimUntrained.familyStr},thisFamily) & ismember({normalStimUntrained.speciesStr},log(i).speciesStr) & [normalStimUntrained.exemplarNum] == log(i).exemplarNum);
+          end
+          if ~isempty(thisStim)
+            log(i).trained = thisStim.trained;
+          else
+            keyboard
+          end
+          
+        end
+      end
+      fprintf('Done.\n');
+    end
+    
     % store the log struct in the events struct
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
