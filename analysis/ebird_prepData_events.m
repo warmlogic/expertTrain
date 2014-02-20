@@ -39,20 +39,20 @@ saveDir = dataroot;
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
-    'EBIRD049'; % Pilot. (due to short ses1 match, missing ses2 name)
-    'EBIRD002'; % Pilot. (due to short ses1 match, missing ses2 name)
-    'EBIRD003'; % Pilot. (due to missing ses7 name) - NB: LAST PILOT TO BE REPLACED
-    'EBIRD004'; % DNF. Dropout. Last session: 8.
+    %'EBIRD049'; % Pilot. (due to short ses1 match, missing ses2 name)
+    %'EBIRD002'; % Pilot. (due to short ses1 match, missing ses2 name)
+    %'EBIRD003'; % Pilot. (due to missing ses7 name) - NB: LAST PILOT TO BE REPLACED
+    %'EBIRD004'; % DNF. Dropout. Last session: 8.
     'EBIRD005';
-    'EBIRD006'; % DNF. Dropout. Last session: 2.
+    %'EBIRD006'; % DNF. Dropout. Last session: 2.
     'EBIRD007';
     'EBIRD008';
     'EBIRD009';
     'EBIRD010';
     'EBIRD011';
     'EBIRD012';
-    'EBIRD013'; % DNF. Dropout. Last session: 5. Lost session 6 in HD crash.
-    'EBIRD014'; % DNF. Rejected. Last session: 1.
+    %'EBIRD013'; % DNF. Dropout. Last session: 5. Lost session 6 in HD crash.
+    %'EBIRD014'; % DNF. Rejected. Last session: 1.
     %'EBIRD015'; % DNF. Lost in HD crash.
     %'EBIRD016'; % DNF. Lost in HD crash.
     %'EBIRD017'; % DNF. Lost in HD crash.
@@ -60,8 +60,8 @@ if ~exist('subjects','var') || isempty(subjects)
     'EBIRD019';
     'EBIRD020';
     'EBIRD021';
-    'EBIRD022'; % DNF. Dropout. Last session: 8.
-    'EBIRD023'; % DNF. Dropout. Last session: 1.
+    %'EBIRD022'; % DNF. Dropout. Last session: 8.
+    %'EBIRD023'; % DNF. Dropout. Last session: 1.
     'EBIRD024';
     'EBIRD025';
     'EBIRD027';
