@@ -1128,10 +1128,6 @@ if ~isempty(lureEv)
   end
 end
 
-% d-prime; adjust for perfect performance, choose 1 of 2 strategies
-% (Macmillan & Creelman, 2005; p. 8-9)
-strategy = 2;
-
 hr = length(hitEv) / length(targEv);
 mr = length(missEv) / length(targEv);
 if ~isempty(lureEv)
@@ -1139,28 +1135,34 @@ if ~isempty(lureEv)
   far = length(faEv) / length(lureEv);
 end
 
-if hr == 1
-  warning('HR is 1.0! Correcting...');
-  if strategy == 1
-    hr = 1 - (1 / (2 * length(targEv)));
-    mr = 1 / (2 * length(targEv));
-  elseif strategy == 2
-    % (Hautus, 1995; Miller, 1996)
-    hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
-    mr = (length(missEv) + 0.5) / (length(targEv) + 1);
-  end
-elseif hr == 0
-  warning('HR is 0! Correcting...');
-  if strategy == 1
-    hr = 1 / (2 * length(targEv));
-    mr = 1 - (1 / (2 * length(targEv)));
-  elseif strategy == 2
-    % (Hautus, 1995; Miller, 1996)
-    hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
-    mr = (length(missEv) + 0.5) / (length(targEv) + 1);
-  end
-end
+% only adjust HR if also adjusting FAR
 if ~isempty(lureEv)
+  % d-prime; adjust for perfect performance, choose 1 of 2 strategies
+  % (Macmillan & Creelman, 2005; p. 8-9)
+  strategy = 2;
+  
+  if hr == 1
+    warning('HR is 1.0! Correcting...');
+    if strategy == 1
+      hr = 1 - (1 / (2 * length(targEv)));
+      mr = 1 / (2 * length(targEv));
+    elseif strategy == 2
+      % (Hautus, 1995; Miller, 1996)
+      hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
+      mr = (length(missEv) + 0.5) / (length(targEv) + 1);
+    end
+  elseif hr == 0
+    warning('HR is 0! Correcting...');
+    if strategy == 1
+      hr = 1 / (2 * length(targEv));
+      mr = 1 - (1 / (2 * length(targEv)));
+    elseif strategy == 2
+      % (Hautus, 1995; Miller, 1996)
+      hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
+      mr = (length(missEv) + 0.5) / (length(targEv) + 1);
+    end
+  end
+  
   if far == 1
     warning('FAR is 1! Correcting...');
     if strategy == 1
