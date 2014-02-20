@@ -225,24 +225,24 @@ switch phaseName
         if ~strcmp(log(i).imgCond,'normal')
           %log(i).trained = [];
           
-          uScoreIndex = strfind(log(i).familyStr,'_');
-          thisFamily = log(i).familyStr(1:uScoreIndex(1));
+          thisFamily = strrep(log(i).familyStr,strcat(log(i).imgCond,'_'),'');
           
-          thisStim = normalStim(ismember({normalStim.type},'MATCH_STIM1') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+          thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM1') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
           
-          if length(thisStim) == 1
-            log(i).trained = thisStim.trained;
-          elseif isempty(thisStim)
-            keyboard
-            thisStim = normalStim(ismember({normalStim.type},'MATCH_STIM2') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
-            if length(thisStim) == 1
-              log(i).trained = thisStim.trained;
-            elseif isempty(thisStim)
-              keyboard
-              thisStim = normalStim(ismember({normalStim.type},'MATCH_RESP') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
-              if length(thisStim) == 1
-                log(i).trained = thisStim.trained;
-              elseif isempty(thisStim)
+          if length(thisNormalStim) == 1
+            log(i).trained = thisNormalStim.trained;
+          elseif isempty(thisNormalStim)
+            keyboard % debug
+            thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM2') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+            if length(thisNormalStim) == 1
+              log(i).trained = thisNormalStim.trained;
+            elseif isempty(thisNormalStim)
+              keyboard % debug
+              thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_RESP') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+              if length(thisNormalStim) == 1
+                log(i).trained = thisNormalStim.trained;
+              elseif isempty(thisNormalStim)
+                fprintf('\n\tCould not find a matching stim!\n');
                 keyboard
               end
             end
