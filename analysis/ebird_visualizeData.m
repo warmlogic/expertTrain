@@ -350,7 +350,7 @@ dataLabel = 'd''';
 ylimits = [0 3];
 
 % dataMeasure = 'hr';
-% dataLabel = 'Accuracy (Hit Rate)';
+% dataLabel = 'Hit Rate';
 % ylimits = [0 1];
 
 % dataMeasure = 'c';
