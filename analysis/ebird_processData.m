@@ -193,27 +193,15 @@ if isempty(results)
               if trainedConds{t}(1) == true && trainedConds{t}(2) == true
                 trainStr = 'TT';
                 %trainStr = 'trainTrain';
-                if printResults
-                  fprintf('*** Trained + Trained ***\n');
-                end
               elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
                 trainStr = 'UU';
                 %trainStr = 'untrainedUntrained';
-                if printResults
-                  fprintf('*** Untrained + Untrained ***\n');
-                end
               elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
                 trainStr = 'TU';
                 %trainStr = 'trainedUntrained';
-                if printResults
-                  fprintf('*** Trained + Untrained ***\n');
-                end
               elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
                 trainStr = 'UT';
                 %trainStr = 'untrainedTrained';
-                if printResults
-                  fprintf('*** Untrained + Trained ***\n');
-                end
               else
                 keyboard
               end
@@ -398,13 +386,6 @@ if isempty(results)
 %                         trainStr = 'all';
 %                       end
                       
-                      % TODO: the MATCH_RESP event has the same stimulus as
-                      % the MATCH_STIM2 event. This training status may not
-                      % reflect the same status as MATCH_STIM1 because
-                      % training status of image manipulation conditions
-                      % was mis-assigned. What to do? Only keep events
-                      % where both stimuli had the same training status?
-                      
                       % filter the events that we want
                       matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP'));
                       trainedInd = false(size(matchResp));
@@ -431,6 +412,10 @@ if isempty(results)
                       %   end
                       % end
                       
+                      if printResults
+                        fprintf('all imgConds together:\n');
+                      end
+                      
                       % overall
                       destField = 'overall';
                       if ismember(destField,mainFields)
@@ -442,6 +427,7 @@ if isempty(results)
                         if printResults
                           matchResults = results.(sesName).(fn).(trainStr).(destField);
                           
+                          fprintf('\tOverall\n');
                           fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',matchResults.(hrField)(sub),matchResults.(nHitField)(sub),matchResults.(nTargField)(sub));
                           if ~isempty(matchRespDiff)
                             fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',matchResults.(farField)(sub),matchResults.(nFAField)(sub),(matchResults.(nLureField)(sub)));
@@ -543,6 +529,9 @@ if isempty(results)
                           fprintf('\n');
                         end
                         for im = 1:length(imgConds)
+                          if printResults
+                            fprintf('%s:\n',imgConds{im});
+                          end
                           matchCond = matchResp(ismember({matchResp.imgCond},imgConds{im}));
                           
                           % overall for this manipulation
@@ -555,7 +544,7 @@ if isempty(results)
                             
                             if printResults
                               matchCondResults = results.(sesName).(fn).(trainStr).(imgConds{im}).(destField);
-                              fprintf('\t%s:',imgConds{im});
+                              fprintf('\tOverall\n');
                               fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',matchCondResults.(hrField)(sub),matchCondResults.(nHitField)(sub),matchCondResults.(nTargField)(sub));
                               if ~isempty(matchCondDiff)
                                 fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',matchCondResults.(farField)(sub),matchCondResults.(nFAField)(sub),(matchCondResults.(nLureField)(sub)));
@@ -573,7 +562,6 @@ if isempty(results)
                           % basic and subordinate for this manipulation
                           destField = 'basic';
                           if ismember(destField,mainFields)
-                            matchCondBasic = matchResp([matchCond.isSubord] == 0);
                             matchCondBasic = matchCond([matchCond.isSubord] == 0);
                             matchCondBasicSame = matchCondBasic([matchCondBasic.sameSpecies] == 1);
                             matchCondBasicDiff = matchCondBasic([matchCondBasic.sameSpecies] == 0);
@@ -599,7 +587,6 @@ if isempty(results)
                           
                           destField = 'subord';
                           if ismember(destField,mainFields)
-                            matchCondSubord = matchResp([matchCond.isSubord] == 1);
                             matchCondSubord = matchCond([matchCond.isSubord] == 1);
                             matchCondSubordSame = matchCondSubord([matchCondSubord.sameSpecies] == 1);
                             matchCondSubordDiff = matchCondSubord([matchCondSubord.sameSpecies] == 0);
@@ -655,6 +642,7 @@ if isempty(results)
                       results.(sesName).(fn) = accAndRT(nameResp,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
                       if printResults
                         nameResults = results.(sesName).(fn).(destField);
+                        fprintf('\tOverall\n');
                         fprintf('\t\tAccuracy:\t%.4f (%d/%d)\n',nameResults.(hrField)(sub),nameResults.(nHitField)(sub),nameResults.(nTargField)(sub));
                         fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameResults.(sprintf('%s_hit',rtField))(sub),nameResults.(sprintf('%s_miss',rtField))(sub));
                       end
@@ -700,6 +688,7 @@ if isempty(results)
                           if printResults
                             nameBlockResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
+                            fprintf('\t\tOverall\n');
                             fprintf('\t\tAccuracy:\t%.4f (%d/%d)\n',nameBlockResults.(hrField)(sub),nameBlockResults.(nHitField)(sub),nameBlockResults.(nTargField)(sub));
                             fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockResults.(sprintf('%s_hit',rtField))(sub),nameBlockResults.(sprintf('%s_miss',rtField))(sub));
                           end
