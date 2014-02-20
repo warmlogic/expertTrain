@@ -98,7 +98,9 @@ end
 %% some constants
 
 %trainedConds = {1, 0, [1 0]};
-trainedConds = {1, 0};
+% trainedConds = {1, 0};
+
+trainedConds = {[true true], [false false], [true false], [false true]};
 
 mainFields = {'overall','basic','subord'};
 %mainFields = {'basic','subord'};
@@ -188,15 +190,43 @@ if isempty(results)
           case {'match', 'prac_match'}
             for t = 1:length(trainedConds)
               % choose the training condition
-              if length(trainedConds{t}) == 1
-                if trainedConds{t} == 1
-                  trainStr = 'trained';
-                elseif trainedConds{t} == 0
-                  trainStr = 'untrained';
+              if trainedConds{t}(1) == true && trainedConds{t}(2) == true
+                trainStr = 'TT';
+                %trainStr = 'trainTrain';
+                if printResults
+                  fprintf('*** Trained + Trained ***\n');
                 end
-              elseif length(trainedConds{t}) > 1
-                trainStr = 'all';
+              elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
+                trainStr = 'UU';
+                %trainStr = 'untrainedUntrained';
+                if printResults
+                  fprintf('*** Untrained + Untrained ***\n');
+                end
+              elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
+                trainStr = 'TU';
+                %trainStr = 'trainedUntrained';
+                if printResults
+                  fprintf('*** Trained + Untrained ***\n');
+                end
+              elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
+                trainStr = 'UT';
+                %trainStr = 'untrainedTrained';
+                if printResults
+                  fprintf('*** Untrained + Trained ***\n');
+                end
+              else
+                keyboard
               end
+              
+%               if length(trainedConds{t}) == 1
+%                 if trainedConds{t} == 1
+%                   trainStr = 'trained';
+%                 elseif trainedConds{t} == 0
+%                   trainStr = 'untrained';
+%                 end
+%               elseif length(trainedConds{t}) > 1
+%                 trainStr = 'all';
+%               end
               
               for mf = 1:length(mainFields)
                 for df = 1:length(dataFields{mf})
@@ -321,27 +351,75 @@ if isempty(results)
                     for t = 1:length(trainedConds)
                       
                       % choose the training condition
-                      if length(trainedConds{t}) == 1
-                        if trainedConds{t} == 1
-                          if printResults
-                            fprintf('*** Trained ***\n');
-                          end
-                          trainStr = 'trained';
-                        elseif trainedConds{t} == 0
-                          if printResults
-                            fprintf('*** Untrained ***\n');
-                          end
-                          trainStr = 'untrained';
-                        end
-                      elseif length(trainedConds{t}) > 1
+                      if trainedConds{t}(1) == true && trainedConds{t}(2) == true
+                        trainStr = 'TT';
+                        %trainStr = 'trainTrain';
                         if printResults
-                          fprintf('Trained and untrained together\n');
+                          fprintf('*** Trained + Trained ***\n');
                         end
-                        trainStr = 'all';
+                      elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
+                        trainStr = 'UU';
+                        %trainStr = 'untrainedUntrained';
+                        if printResults
+                          fprintf('*** Untrained + Untrained ***\n');
+                        end
+                      elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
+                        trainStr = 'TU';
+                        %trainStr = 'trainedUntrained';
+                        if printResults
+                          fprintf('*** Trained + Untrained ***\n');
+                        end
+                      elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
+                        trainStr = 'UT';
+                        %trainStr = 'untrainedTrained';
+                        if printResults
+                          fprintf('*** Untrained + Trained ***\n');
+                        end
+                      else
+                        keyboard
                       end
                       
+%                       if length(trainedConds{t}) == 1
+%                         if trainedConds{t} == 1
+%                           if printResults
+%                             fprintf('*** Trained ***\n');
+%                           end
+%                           trainStr = 'trained';
+%                         elseif trainedConds{t} == 0
+%                           if printResults
+%                             fprintf('*** Untrained ***\n');
+%                           end
+%                           trainStr = 'untrained';
+%                         end
+%                       elseif length(trainedConds{t}) > 1
+%                         if printResults
+%                           fprintf('Trained and untrained together\n');
+%                         end
+%                         trainStr = 'all';
+%                       end
+                      
+                      % TODO: the MATCH_RESP event has the same stimulus as
+                      % the MATCH_STIM2 event. This training status may not
+                      % reflect the same status as MATCH_STIM1 because
+                      % training status of image manipulation conditions
+                      % was mis-assigned. What to do? Only keep events
+                      % where both stimuli had the same training status?
+                      
                       % filter the events that we want
-                      matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+                      matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP'));
+                      trainedInd = false(size(matchResp));
+                      for ti = 1:length(matchResp)
+                        if matchResp(ti).trained(1) == trainedConds{t}(1) && matchResp(ti).trained(2) == trainedConds{t}(2)
+                          trainedInd(ti) = true;
+                        end
+                      end
+                      matchResp = matchResp(trainedInd);
+                      
+                      %matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+                      
+                      % get the image conditions before excluding missed
+                      % responses to make sure we don't miss any conditions
+                      imgConds = unique({matchResp.imgCond},'sorted');
                       
                       % exclude missed responses ('none')
                       matchResp = matchResp(~ismember({matchResp.resp},'none'));
@@ -457,7 +535,7 @@ if isempty(results)
                       %                   % figure();print(gcf,'-dpng',fullfile('~/Desktop',sprintf('rtDist_%s_%s_%s_%s',subjects{sub},sesName,fn,trainStr)));
                       
                       % accuracy for the different image manipulation conditions
-                      imgConds = unique({matchResp.imgCond},'sorted');
+                      %
                       % if there's only 1 image manipulation condition, the
                       % results were printed above
                       if length(imgConds) > 1
@@ -543,10 +621,10 @@ if isempty(results)
                             end
                           end
                           
-                        end
+                        end % for imgConds
                       end
                       
-                    end
+                    end % for trainedConds
                     
                   case {'name', 'nametrain', 'prac_name'}
                     
@@ -652,7 +730,7 @@ if isempty(results)
                           end
                         end
                         
-                      end
+                      end % for b
                     end
                     
                 end % switch phaseName
@@ -791,17 +869,45 @@ for sesNum = 1:length(expParam.sesTypes)
           for t = 1:length(trainedConds)
             
             % choose the training condition
-            if length(trainedConds{t}) == 1
-              if trainedConds{t} == 1
-                trainStr = 'trained';
-              elseif trainedConds{t} == 0
-                trainStr = 'untrained';
-              end
-            elseif length(trainedConds{t}) > 1
-              trainStr = 'all';
+            if trainedConds{t}(1) == true && trainedConds{t}(2) == true
+              trainStr = 'TT';
+              %trainStr = 'trainTrain';
+            elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
+              trainStr = 'UU';
+              %trainStr = 'untrainedUntrained';
+            elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
+              trainStr = 'TU';
+              %trainStr = 'trainedUntrained';
+            elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
+              trainStr = 'UT';
+              %trainStr = 'untrainedTrained';
+            else
+              keyboard
             end
             
-            matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+%             if length(trainedConds{t}) == 1
+%               if trainedConds{t} == 1
+%                 trainStr = 'trained';
+%               elseif trainedConds{t} == 0
+%                 trainStr = 'untrained';
+%               end
+%             elseif length(trainedConds{t}) > 1
+%               trainStr = 'all';
+%             end
+            
+            % the only purpose of getting matchResp events here is to get
+            % the image conditions below; no need to exclude 'none'
+            % responses
+            matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP'));
+            trainedInd = false(size(matchResp));
+            for ti = 1:length(matchResp)
+              if matchResp(ti).trained(1) == trainedConds{t}(1) && matchResp(ti).trained(2) == trainedConds{t}(2)
+                trainedInd(ti) = true;
+              end
+            end
+            matchResp = matchResp(trainedInd);
+            
+            %matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
             
             imgConds = unique({matchResp.imgCond},'sorted');
             if length(imgConds) > 1

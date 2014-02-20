@@ -261,7 +261,8 @@ if collapsePhases
 else
   phases = {'match_1'};
 end
-training = {'trained','untrained'};
+% training = {'trained','untrained'};
+training = {'TT','UU','TU','UT'};
 naming = {'basic','subord'};
 
 dataMeasure = 'dp';
@@ -269,7 +270,11 @@ dataLabel = 'd''';
 ylimits = [0 3];
 
 % dataMeasure = 'hr';
-% dataLabel = 'Accuracy (Hit Rate)';
+% dataLabel = 'Hit Rate';
+% ylimits = [0 1];
+
+% dataMeasure = 'far';
+% dataLabel = 'False alarm rate';
 % ylimits = [0 1];
 
 % dataMeasure = 'c';
@@ -317,7 +322,8 @@ for p = 1:length(phases)
     
     bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
     bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
-    bw_legend = {'Trained','Untrained'};
+    %bw_legend = {'Trained','Untrained'};
+    bw_legend = {'TT','UU','TU','UT'};
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
     bw_ylabel = dataLabel;
@@ -367,7 +373,8 @@ if collapsePhases
 else
   phases = {'match_1'};
 end
-training = {'trained','untrained'};
+% training = {'trained','untrained'};
+training = {'TT','UU','TU','UT'};
 naming = {'basic','subord'};
 imgConds = {'normal','color','g','g_hi8','g_lo8'};
 
@@ -409,7 +416,8 @@ for i = 1:length(imgConds)
       
       bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
       bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
-      bw_legend = {'Trained','Untrained'};
+      %bw_legend = {'Trained','Untrained'};
+      bw_legend = {'TT','UU','TU','UT'};
       %bw_xlabel = 'Test day';
       bw_xlabel = [];
       bw_ylabel = dataLabel;
