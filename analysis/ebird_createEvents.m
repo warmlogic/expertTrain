@@ -222,36 +222,93 @@ switch phaseName
       % log(~ismember({log.imgCond},'normal')).trained = [];
       
       for i = 1:length(log)
-        if ~strcmp(log(i).imgCond,'normal')
+        if ~strcmp(log(i).imgCond,'normal') && ismember({log(i).type},{'MATCH_STIM1', 'MATCH_STIM2'})
           %log(i).trained = [];
           
           thisFamily = strrep(log(i).familyStr,strcat(log(i).imgCond,'_'),'');
           
-          thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM1') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+          %thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM1') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+          thisNormalStim = normalStim(ismember({normalStim.type},log(i).type) & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
           
           if length(thisNormalStim) == 1
             log(i).trained = thisNormalStim.trained;
+            
+%             % debug
+%             if log(i).isSubord ~= thisNormalStim.isSubord
+%               keyboard
+%             end
+%             
+%             if strcmp(log(i).type,'MATCH_STIM1')
+%               otherType = 'MATCH_STIM2';
+%             elseif strcmp(log(i).type,'MATCH_STIM2')
+%               otherType = 'MATCH_STIM1';
+%             end
+%             otherStim = log(ismember({log.type},otherType) & [log.trial] == log(i).trial);
+%             
+%             if length(otherStim) == 1
+%               if log(i).sameSpecies ~= otherStim.sameSpecies
+%                 fprintf('Same species status is different\n');
+%                 keyboard
+%               end
+%               if log(i).sameSpecies && ~strcmp(log(i).speciesStr, otherStim.speciesStr)
+%                 fprintf('Same species but numbers are different\n');
+%                 keyboard
+%               elseif ~log(i).sameSpecies && strcmp(log(i).speciesStr, otherStim.speciesStr)
+%                 fprintf('Not same species but numbers are the same\n');
+%                 keyboard
+%               end
+%             else
+%               keyboard
+%             end
+            
           elseif isempty(thisNormalStim)
             keyboard % debug
-            thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM2') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
-            if length(thisNormalStim) == 1
-              log(i).trained = thisNormalStim.trained;
-            elseif isempty(thisNormalStim)
-              keyboard % debug
-              thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_RESP') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
-              if length(thisNormalStim) == 1
-                log(i).trained = thisNormalStim.trained;
-              elseif isempty(thisNormalStim)
-                fprintf('\n\tCould not find a matching stim!\n');
-                keyboard
-              end
-            end
+            %thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM2') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+            %if length(thisNormalStim) == 1
+            %  log(i).trained = thisNormalStim.trained;
+            %elseif isempty(thisNormalStim)
+            %  keyboard % debug
+            %thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_RESP') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
+            %if length(thisNormalStim) == 1
+            %  log(i).trained = thisNormalStim.trained;
+            %elseif isempty(thisNormalStim)
+            fprintf('\n\tCould not find a matching stim!\n');
+            keyboard
+            %end
+            %end
+          elseif length(thisNormalStim) > 1
+            fprintf('\n\tFound multiple matching stims!\n');
+            keyboard
+          else
+            keyboard
           end
           
         end
       end
       fprintf('Done.\n');
+    else
+      fprintf('\n');
     end
+    
+    % combine the training status for the two stimuli in the response event
+    fprintf('\tCombining stimulus training status in response event...');
+    for i = 1:length(log)
+      switch log(i).type
+        case {'MATCH_RESP'}
+          log(i).trained = [log(i-2).trained log(i-1).trained];
+          
+%           % debug: see if isSubord field is accurate
+%           if log(i-2).isSubord ~= log(i-1).isSubord
+%             keyboard
+%           end
+%           
+%           % debug: see if sameSpecies field is accurate
+%           if log(i-2).sameSpecies ~= log(i-1).sameSpecies
+%             keyboard
+%           end
+      end
+    end
+    fprintf('Done.\n');
     
     % store the log struct in the events struct
     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
