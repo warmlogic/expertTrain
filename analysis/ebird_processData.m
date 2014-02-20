@@ -575,7 +575,7 @@ if isempty(results)
                       results.(sesName).(fn) = accAndRT(nameResp,[],sub,results.(sesName).(fn),destField,accField,dataFields{mf});
                       if printResults
                         nameResults = results.(sesName).(fn).(destField);
-                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameResults.(hrField)(sub),nameResults.(nHitField)(sub),nameResults.(nTargField)(sub));
+                        fprintf('\t\tAccuracy:\t%.4f (%d/%d)\n',nameResults.(hrField)(sub),nameResults.(nHitField)(sub),nameResults.(nTargField)(sub));
                         fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameResults.(sprintf('%s_hit',rtField))(sub),nameResults.(sprintf('%s_miss',rtField))(sub));
                       end
                     end
@@ -588,7 +588,7 @@ if isempty(results)
                       if printResults
                         nameBasicResults = results.(sesName).(fn).(destField);
                         fprintf('\tBasic\n');
-                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameBasicResults.(hrField)(sub),nameBasicResults.(nHitField)(sub),nameBasicResults.(nTargField)(sub));
+                        fprintf('\t\tAccuracy:\t%.4f (%d/%d)\n',nameBasicResults.(hrField)(sub),nameBasicResults.(nHitField)(sub),nameBasicResults.(nTargField)(sub));
                         fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBasicResults.(sprintf('%s_hit',rtField))(sub),nameBasicResults.(sprintf('%s_miss',rtField))(sub));
                       end
                     end
@@ -600,7 +600,7 @@ if isempty(results)
                       if printResults
                         nameSubordResults = results.(sesName).(fn).(destField);
                         fprintf('\tSubordinate\n')
-                        fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameSubordResults.(hrField)(sub),nameSubordResults.(nHitField)(sub),nameSubordResults.(nTargField)(sub));
+                        fprintf('\t\tAccuracy:\t%.4f (%d/%d)\n',nameSubordResults.(hrField)(sub),nameSubordResults.(nHitField)(sub),nameSubordResults.(nTargField)(sub));
                         fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameSubordResults.(sprintf('%s_hit',rtField))(sub),nameSubordResults.(sprintf('%s_miss',rtField))(sub));
                       end
                     end
@@ -620,7 +620,7 @@ if isempty(results)
                           if printResults
                             nameBlockResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
-                            fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',nameBlockResults.(hrField)(sub),nameBlockResults.(nHitField)(sub),nameBlockResults.(nTargField)(sub));
+                            fprintf('\t\tAccuracy:\t%.4f (%d/%d)\n',nameBlockResults.(hrField)(sub),nameBlockResults.(nHitField)(sub),nameBlockResults.(nTargField)(sub));
                             fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockResults.(sprintf('%s_hit',rtField))(sub),nameBlockResults.(sprintf('%s_miss',rtField))(sub));
                           end
                         end
@@ -634,7 +634,7 @@ if isempty(results)
                             nameBlockBasicResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
                             fprintf('\t\tBasic\n');
-                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',nameBlockBasicResults.(hrField)(sub),nameBlockBasicResults.(nHitField)(sub),nameBlockBasicResults.(nTargField)(sub));
+                            fprintf('\t\t\tAccuracy:\t%.4f (%d/%d)\n',nameBlockBasicResults.(hrField)(sub),nameBlockBasicResults.(nHitField)(sub),nameBlockBasicResults.(nTargField)(sub));
                             fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockBasicResults.(sprintf('%s_hit',rtField))(sub),nameBlockBasicResults.(sprintf('%s_miss',rtField))(sub));
                           end
                         end
@@ -647,7 +647,7 @@ if isempty(results)
                             nameBlockSubordResults = results.(sesName).(fn).(blockStr).(destField);
                             fprintf('\tB%d:',b);
                             fprintf('\t\tSubordinate\n')
-                            fprintf('\t\t\tHitRate:\t%.4f (%d/%d)\n',nameBlockSubordResults.(hrField)(sub),nameBlockSubordResults.(nHitField)(sub),nameBlockSubordResults.(nTargField)(sub));
+                            fprintf('\t\t\tAccuracy:\t%.4f (%d/%d)\n',nameBlockSubordResults.(hrField)(sub),nameBlockSubordResults.(nHitField)(sub),nameBlockSubordResults.(nTargField)(sub));
                             fprintf('\t\t\tRespTime:\thit: %.2f, miss: %.2f\n',nameBlockSubordResults.(sprintf('%s_hit',rtField))(sub),nameBlockSubordResults.(sprintf('%s_miss',rtField))(sub));
                           end
                         end

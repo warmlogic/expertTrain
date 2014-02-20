@@ -189,7 +189,7 @@ if strcmp(dataMeasure,'rt') || strcmp(dataMeasure,'rt_hit') || strcmp(dataMeasur
   
   legendLoc = 'NorthWest';
 elseif strcmp(dataMeasure,'hr')
-  ylabel('Accuracy (Hit Rate)');
+  ylabel('Accuracy');
   
   if ~exist('ymin','var') || isempty(ymin)
     ymin = 0.25;
