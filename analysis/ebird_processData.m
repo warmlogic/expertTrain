@@ -574,6 +574,7 @@ if isempty(results)
                           destField = 'basic';
                           if ismember(destField,mainFields)
                             matchCondBasic = matchResp([matchCond.isSubord] == 0);
+                            matchCondBasic = matchCond([matchCond.isSubord] == 0);
                             matchCondBasicSame = matchCondBasic([matchCondBasic.sameSpecies] == 1);
                             matchCondBasicDiff = matchCondBasic([matchCondBasic.sameSpecies] == 0);
                             
@@ -599,6 +600,7 @@ if isempty(results)
                           destField = 'subord';
                           if ismember(destField,mainFields)
                             matchCondSubord = matchResp([matchCond.isSubord] == 1);
+                            matchCondSubord = matchCond([matchCond.isSubord] == 1);
                             matchCondSubordSame = matchCondSubord([matchCondSubord.sameSpecies] == 1);
                             matchCondSubordDiff = matchCondSubord([matchCondSubord.sameSpecies] == 0);
                             
