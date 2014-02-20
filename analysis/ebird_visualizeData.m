@@ -70,7 +70,7 @@ end
 
 %% are we collapsing phases or not?
 
-collapsePhases = true;
+collapsePhases = false;
 
 %% run the data processing script
 
