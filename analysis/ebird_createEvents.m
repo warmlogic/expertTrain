@@ -217,8 +217,6 @@ switch phaseName
     if strcmp(phaseName,'match')
       fprintf('\n\tSetting correct training status for manipulated images based on trained normal images...');
       normalStim = log(ismember({log.imgCond},'normal'));
-      %normalStimTrained = log(ismember({log.imgCond},'normal') & [log.trained] == 1);
-      %normalStimUntrained = log(ismember({log.imgCond},'normal') & [log.trained] == 0);
       
       % remove training status from all non-normal stimuli
       % log(~ismember({log.imgCond},'normal')).trained = [];
@@ -235,10 +233,12 @@ switch phaseName
           if length(thisStim) == 1
             log(i).trained = thisStim.trained;
           elseif isempty(thisStim)
+            keyboard
             thisStim = normalStim(ismember({normalStim.type},'MATCH_STIM2') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
             if length(thisStim) == 1
               log(i).trained = thisStim.trained;
             elseif isempty(thisStim)
+              keyboard
               thisStim = normalStim(ismember({normalStim.type},'MATCH_RESP') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
               if length(thisStim) == 1
                 log(i).trained = thisStim.trained;
@@ -247,35 +247,6 @@ switch phaseName
               end
             end
           end
-          
-%           thisStimTrained = normalStimTrained(ismember({normalStimTrained.type},'MATCH_STIM1') & ismember({normalStimTrained.familyStr},thisFamily) & ismember({normalStimTrained.speciesStr},log(i).speciesStr) & [normalStimTrained.exemplarNum] == log(i).exemplarNum);
-%           thisStimUntrained = normalStimUntrained(ismember({normalStimUntrained.type},'MATCH_STIM1') & ismember({normalStimUntrained.familyStr},thisFamily) & ismember({normalStimUntrained.speciesStr},log(i).speciesStr) & [normalStimUntrained.exemplarNum] == log(i).exemplarNum);
-%           
-%           if length(thisStimTrained) == 1 && isempty(thisStimUntrained)
-%             log(i).trained = thisStimTrained.trained;
-%           elseif isempty(thisStimTrained) && length(thisStimUntrained) == 1
-%             log(i).trained = thisStimUntrained.trained;
-%           elseif isempty(thisStimTrained) && isempty(thisStimUntrained)
-%             keyboard
-%             thisStimTrained = normalStimTrained(ismember({normalStimTrained.type},'MATCH_STIM2') & ismember({normalStimTrained.familyStr},thisFamily) & ismember({normalStimTrained.speciesStr},log(i).speciesStr) & [normalStimTrained.exemplarNum] == log(i).exemplarNum);
-%             thisStimUntrained = normalStimUntrained(ismember({normalStimUntrained.type},'MATCH_STIM2') & ismember({normalStimUntrained.familyStr},thisFamily) & ismember({normalStimUntrained.speciesStr},log(i).speciesStr) & [normalStimUntrained.exemplarNum] == log(i).exemplarNum);
-%             if length(thisStimTrained) == 1 && isempty(thisStimUntrained)
-%               log(i).trained = thisStimTrained.trained;
-%             elseif isempty(thisStimTrained) && length(thisStimUntrained) == 1
-%               log(i).trained = thisStimUntrained.trained;
-%             elseif isempty(thisStimTrained) && isempty(thisStimUntrained)
-%               keyboard
-%               thisStimTrained = normalStimTrained(ismember({normalStimTrained.type},'MATCH_RESP') & ismember({normalStimTrained.familyStr},thisFamily) & ismember({normalStimTrained.speciesStr},log(i).speciesStr) & [normalStimTrained.exemplarNum] == log(i).exemplarNum);
-%               thisStimUntrained = normalStimUntrained(ismember({normalStimUntrained.type},'MATCH_RESP') & ismember({normalStimUntrained.familyStr},thisFamily) & ismember({normalStimUntrained.speciesStr},log(i).speciesStr) & [normalStimUntrained.exemplarNum] == log(i).exemplarNum);
-%               if length(thisStimTrained) == 1 && isempty(thisStimUntrained)
-%                 log(i).trained = thisStimTrained.trained;
-%               elseif isempty(thisStimTrained) && length(thisStimUntrained) == 1
-%                 log(i).trained = thisStimUntrained.trained;
-%               elseif isempty(thisStimTrained) && isempty(thisStimUntrained)
-%                 keyboard
-%               end
-%             end
-%           end
           
         end
       end
