@@ -186,6 +186,9 @@ end
 
 %% Decide which will be the trained and untrained stimuli from each family
 
+% TODO: make an option to yoke exemplars across species to training status
+% is the same (e.g., cfg.stim.yokeExemplars_train = [1 1 1 1 1 2 2 2 2 2];)
+
 for f = 1:length(cfg.stim.familyNames)
   % trained
   expParam.session.(sprintf('f%dTrained',f)) = [];
