@@ -186,21 +186,115 @@ end
 
 %% Decide which will be the trained and untrained stimuli from each family
 
-% TODO: make an option to yoke exemplars across species to training status
+% TODO: make an option to yoke exemplars across species so training status
 % is the same (e.g., cfg.stim.yokeExemplars_train = [1 1 1 1 1 2 2 2 2 2];)
 
+
+% initialize to store trained/untrained exemplars
+cfg.stim.exemplarNums_train = [];
+cfg.stim.exemplarNums_untrain = [];
+
+if ~isfield(cfg.stim,'yokeTrainedExemplars')
+  cfg.stim.yokeTrainedExemplars = false;
+end
+
+% if cfg.stim.yokeTrainedExemplars
+%   if length(cfg.stim.nExemplars_train) == 1
+%     if cfg.stim.nExemplars_train < cfg.stim.nTrained
+%       randExemplars = randperm(cfg.stim.nTrained);
+%       theseExempNums_train = sort(randExemplars(1:cfg.stim.nExemplars_train));
+%       randExemplars2 = randExemplars(~ismember(randExemplars,theseExempNums_train));
+%       prevExempNums_train = sort(randExemplars2(1:cfg.stim.nExemplars_train));
+%     elseif cfg.stim.nExemplars_train == cfg.stim.nTrained
+%       theseExempNums_train = 1:cfg.stim.nExemplars_train;
+%       prevExempNums_train = theseExempNums_train;
+%     elseif cfg.stim.nExemplars_train > cfg.stim.nTrained
+%       error('More exemplars specified for training (%d) than exist in the stimulus set (%d).',cfg.stim.nExemplars_train,(cfg.stim.nTrained + cfg.stim.nUntrained));
+%     end
+%     
+%     if length(cfg.stim.familyNames) > 1
+%       for f = 2:length(cfg.stim.familyNames)
+%         prevExempNums_train = cat(1,prevExempNums_train,prevExempNums_train);
+%         theseExempNums_train = cat(1,theseExempNums_train,theseExempNums_train);
+%       end
+%     end
+%     exempNums_train = cat(1,prevExempNums_train,theseExempNums_train);
+%     
+%   elseif size(cfg.stim.nExemplars_train,2) > 1
+%     exempNums_train = cfg.stim.nExemplars_train;
+%     % reset the nExemplars for training so we can use it to calculate
+%     % stimulus counts
+%     cfg.stim.nExemplars_train = size(cfg.stim.nExemplars_train,2);
+%   end
+%   cfg.stim.exemplarNums_train = cat(1,cfg.stim.exemplarNums_train,exempNums_train);
+% else
+%   if length(cfg.stim.nExemplars_train) == 1
+%     if cfg.stim.nExemplars_train > cfg.stim.nTrained
+%       error('More exemplars specified for training (%d) than exist in the stimulus set (%d).',cfg.stim.nExemplars_train,(cfg.stim.nTrained + cfg.stim.nUntrained));
+%     else
+%       theseExempNums_train = nan(length(cfg.stim.familyNames),cfg.stim.nExemplars_train);
+%       prevExempNums_train = nan(length(cfg.stim.familyNames),cfg.stim.nExemplars_train);
+%       for f = 1:length(cfg.stim.familyNames)
+%         if cfg.stim.nExemplars_train < cfg.stim.nTrained
+%           randExemplars = randperm(cfg.stim.nTrained);
+%           theseExempNums_train(f,:) = sort(randExemplars(1:cfg.stim.nExemplars_train));
+%           randExemplars2 = randExemplars(~ismember(randExemplars,theseExempNums_train(f,:)));
+%           prevExempNums_train(f,:) = sort(randExemplars2(1:cfg.stim.nExemplars_train));
+%         elseif cfg.stim.nExemplars_train == cfg.stim.nTrained
+%           theseExempNums_train(f,:) = 1:cfg.stim.nExemplars_train;
+%           prevExempNums_train(f,:) = theseExempNums_train(f,:);
+%         end
+%       end
+%       exempNums_train = cat(1,prevExempNums_train,theseExempNums_train);
+%     end
+%   elseif length(cfg.stim.nExemplars_train) > 1
+%     if size(cfg.stim.nExemplars_train,1) > 1 && size(cfg.stim.nExemplars_train,1) == length(cfg.stim.familyNames)
+%       exempNums_train = cfg.stim.nExemplars_train;
+%     else
+%       error('If predefining training exemplar choices per species, need to specify one row for each species');
+%     end
+%     % reset the nExemplars for trainnition so we can use it to calculate
+%     % stimulus counts
+%     cfg.stim.nExemplars_train = length(cfg.stim.nExemplars_train);
+%   end
+%   cfg.stim.exemplarNums_train = cat(1,cfg.stim.exemplarNums_train,exempNums_train);
+% end
+
 for f = 1:length(cfg.stim.familyNames)
+  if f == 1 || cfg.stim.yokeExemplars_train(f) ~= cfg.stim.yokeExemplars_train(f-1)
+    exemplarNums_trained = [];
+    exemplarNums_untrained = [];
+  end
+  
   % trained
   expParam.session.(sprintf('f%dTrained',f)) = [];
   [expParam.session.(sprintf('f%dTrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nTrained,...
-    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, true});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, true},[],[],exemplarNums_trained);
   
   % untrained
   expParam.session.(sprintf('f%dUntrained',f)) = [];
   [expParam.session.(sprintf('f%dUntrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nUntrained,...
-    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, false});
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, false},[],[],exemplarNums_untrained);
+  
+  if cfg.stim.yokeTrainedExemplars
+    if f == 1 || cfg.stim.yokeExemplars_train(f) ~= cfg.stim.yokeExemplars_train(f-1)
+      % set up a matrix of one row per species in the first family denoting
+      % the exemplar numbers
+      exemplarNums_trained = nan(cfg.stim.nSpecies,cfg.stim.nTrained);
+      exemplarNums_untrained = nan(cfg.stim.nSpecies,cfg.stim.nUntrained);
+      
+      for s = 1:cfg.stim.nSpecies
+        theseTrained = expParam.session.(sprintf('f%dTrained',f))([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == s);
+        theseUntrained = expParam.session.(sprintf('f%dUntrained',f))([expParam.session.(sprintf('f%dUntrained',f)).speciesNum] == s);
+        
+        exemplarNums_trained(s,:) = unique([theseTrained.exemplarNum]);
+        exemplarNums_untrained(s,:) = unique([theseUntrained.exemplarNum]);
+      end
+    end
+    
+  end
 end
 
 %% if there are recognition phases, get those stimuli
@@ -241,7 +335,7 @@ for s = 1:expParam.nSessions
                 [expParam.session.(sesName).(phaseName)(recogCount).allStims{b},stimStruct(f).fStims] = et_divvyStims(...
                   stimStruct(f).fStims,expParam.session.(sesName).(phaseName)(recogCount).allStims{b},...
                   cfg.stim.(sesName).(phaseName)(recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(recogCount).nTestLure,...
-                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false},[],cfg.stim.speciesNums_recog(recogBlockInd,:));
+                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false},[],cfg.stim.exemplarNums_recog(recogBlockInd,:));
               end
             end
           end

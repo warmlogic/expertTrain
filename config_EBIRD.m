@@ -173,6 +173,13 @@ if expParam.sessionNum == 1
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
   
+  % yoke exemplars across species within these family groups so training
+  % status is the same
+  cfg.stim.yokeTrainedExemplars = true;
+  if cfg.stim.yokeTrainedExemplars
+    cfg.stim.yokeExemplars_train = [1 1 1 1 1 2 2 2 2 2];
+  end
+  
   % save an individual stimulus list for each subject
   cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
   

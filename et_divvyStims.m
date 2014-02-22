@@ -1,5 +1,5 @@
-function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen,speciesNums)
-% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen,speciesNums)
+function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen,speciesNums,exemplarNums)
+% [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rmStims,shuffleFirst,newField,newValue,maxChosen,speciesNums,exemplarNums)
 %
 % Description:
 %  Shuffle a stimulus set (origStims) and slice out a subset (nStims) of
@@ -25,6 +25,8 @@ function [chosenStims,origStims] = et_divvyStims(origStims,chosenStims,nStims,rm
 %                fewer than nStims x nSpecies are needed.
 %  speciesNums:  Vector of species numbers to choose from in case fewer
 %                than nSpecies are needed.
+%  exemplarNums: Matrix of exemplar numbers (one row per species) to choose
+%                from
 %
 % Output:
 %  chosenStims: Struct containing the chosen stimuli from each available
@@ -51,6 +53,10 @@ end
 
 if ~exist('speciesNums','var') || isempty(speciesNums)
   speciesNums = [];
+end
+
+if ~exist('exemplarNums','var') || isempty(exemplarNums)
+  exemplarNums = [];
 end
 
 if isempty(origStims)
@@ -88,7 +94,11 @@ end
 chosenCount = 0;
 for s = 1:length(theseSpecies)
   % which indices does this species occupy?
-  sInd = find([origStims.speciesNum] == theseSpecies(s));
+  if ~isempty(exemplarNums)
+    sInd = find([origStims.speciesNum] == theseSpecies(s) & ismember([origStims.exemplarNum],exemplarNums(s,:)));
+  else
+    sInd = find([origStims.speciesNum] == theseSpecies(s));
+  end
   
   % shuffle the stimulus index
   if shuffleFirst
