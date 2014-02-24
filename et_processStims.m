@@ -202,19 +202,20 @@ if ~isfield(cfg.stim,'yokeTrainedExemplars')
 end
 
 for f = 1:length(cfg.stim.familyNames)
-  % initialize to store trained/untrained exemplars
+  % initialize to store trained/untrained exemplar numbers (only used it
+  % cfg.stim.yokeTrainedExemplars == true)
   if f == 1 || cfg.stim.yokeExemplars_train(f) ~= cfg.stim.yokeExemplars_train(f-1)
     exemplarNums_trained = [];
     exemplarNums_untrained = [];
   end
   
-  % trained
+  % choose the trained stimuli for this family
   expParam.session.(sprintf('f%dTrained',f)) = [];
   [expParam.session.(sprintf('f%dTrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nTrained,...
     cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, true},[],[],exemplarNums_trained);
   
-  % untrained
+  % choose the untrained stimuli for this family
   expParam.session.(sprintf('f%dUntrained',f)) = [];
   [expParam.session.(sprintf('f%dUntrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nUntrained,...
@@ -227,6 +228,9 @@ for f = 1:length(cfg.stim.familyNames)
       exemplarNums_trained = nan(cfg.stim.nSpecies,cfg.stim.nTrained);
       exemplarNums_untrained = nan(cfg.stim.nSpecies,cfg.stim.nUntrained);
       
+      % if this is the first family, or we need a new grouping, get the
+      % species numbers that were chosen so we can apply them to the other
+      % families in this grouping
       for s = 1:cfg.stim.nSpecies
         theseTrained = expParam.session.(sprintf('f%dTrained',f))([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == s);
         theseUntrained = expParam.session.(sprintf('f%dUntrained',f))([expParam.session.(sprintf('f%dUntrained',f)).speciesNum] == s);
