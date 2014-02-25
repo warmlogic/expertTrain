@@ -64,6 +64,10 @@ if saveFigs
   end
 end
 
+%% collapse results?
+
+collapsePhases = true;
+
 %% run the data processing script
 
 % onlyCompleteSub = false;
@@ -73,19 +77,18 @@ end
 onlyCompleteSub = true;
 printResults = true;
 saveResults = true;
-collapsePhases = false;
 
 [results] = ebug_processData([],dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
 
 %% or just load the behavioral data
 
-load(fullfile(dataroot,'EBUG_behav_results.mat'));
-% collapsePhases = false;
-% ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
-
-% load(fullfile(dataroot,'EBUG_behav_results_collapsed.mat'));
-% % collapsePhases = true;
-% % ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
+if collapsePhases
+    % ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
+    load(fullfile(dataroot,'EBUG_behav_results_collapsed.mat'));
+else
+    % ebug_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults);
+    load(fullfile(dataroot,'EBUG_behav_results.mat'));
+end
 
 %% initialize
 
@@ -251,7 +254,11 @@ ylimits = [0 4];
 % ylimits = [0.5 1];
 
 sessions = {'train2', 'train3', 'train4', 'train5', 'train6'};
-phases = {'match_1','match_2'};
+if collapsePhases
+    phases = {'match'};
+else
+    phases = {'match_1','match_2'};
+end
 training = {'trained','untrained'};
 naming = {'basic','subord'};
 
@@ -308,7 +315,7 @@ end
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [0 1];
+ylimits = [0 0.8];
 
 % dataMeasure = 'hr';
 % dataLabel = 'Accuracy (Hit Rate)';
