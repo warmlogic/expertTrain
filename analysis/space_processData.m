@@ -1222,10 +1222,6 @@ if ~isempty(lureEv)
   end
 end
 
-% d-prime; adjust for perfect performance, choose 1 of 2 strategies
-% (Macmillan & Creelman, 2005, p. 8-9)
-strategy = 2;
-
 hr = length(hitEv) / length(targEv);
 mr = length(missEv) / length(targEv);
 if ~isempty(lureEv)
@@ -1233,28 +1229,34 @@ if ~isempty(lureEv)
   far = length(faEv) / length(lureEv);
 end
 
-if hr == 1
-  warning('HR is 1.0! Correcting...');
-  if strategy == 1
-    hr = 1 - (1 / (2 * length(targEv)));
-    mr = 1 / (2 * length(targEv));
-  elseif strategy == 2
-    % (Hautus, 1995; Miller, 1996)
-    hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
-    mr = (length(missEv) + 0.5) / (length(targEv) + 1);
-  end
-elseif hr == 0
-  warning('HR is 0! Correcting...');
-  if strategy == 1
-    hr = 1 / (2 * length(targEv));
-    mr = 1 - (1 / (2 * length(targEv)));
-  elseif strategy == 2
-    % (Hautus, 1995; Miller, 1996)
-    hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
-    mr = (length(missEv) + 0.5) / (length(targEv) + 1);
-  end
-end
+% only adjust HR if also adjusting FAR
 if ~isempty(lureEv)
+  % d-prime; adjust for perfect performance, choose 1 of 2 strategies
+  % (Macmillan & Creelman, 2005; p. 8-9)
+  strategy = 2;
+  
+  if hr == 1
+    warning('HR is 1.0! Correcting...');
+    if strategy == 1
+      hr = 1 - (1 / (2 * length(targEv)));
+      mr = 1 / (2 * length(targEv));
+    elseif strategy == 2
+      % (Hautus, 1995; Miller, 1996)
+      hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
+      mr = (length(missEv) + 0.5) / (length(targEv) + 1);
+    end
+  elseif hr == 0
+    warning('HR is 0! Correcting...');
+    if strategy == 1
+      hr = 1 / (2 * length(targEv));
+      mr = 1 - (1 / (2 * length(targEv)));
+    elseif strategy == 2
+      % (Hautus, 1995; Miller, 1996)
+      hr = (length(hitEv) + 0.5) / (length(targEv) + 1);
+      mr = (length(missEv) + 0.5) / (length(targEv) + 1);
+    end
+  end
+  
   if far == 1
     warning('FAR is 1! Correcting...');
     if strategy == 1
@@ -1332,7 +1334,10 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = zhr - zfar;
   end
   
-  % response bias (criterion) (Macmillan & Creelman, 2005, p. 29)
+  % response bias: c (criterion) (Macmillan & Creelman, 2005, p. 29)
+  %
+  % positive/conservative bias indicates a tendency to say 'new', whereas
+  % negative/liberal bias indicates a tendency to say 'old'
   thisStr = 'c';
   if any(strcmp(thisStr,dataFields))
     if prependDestField
@@ -1345,9 +1350,16 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = c;
   end
   
-  % From Mecklinger et al. (2007) and Corwin (1994)
+  % discrimination index (Pr)
   %
-  % discrimination index
+  % Mecklinger et al. (2007): Source-retrieval requirements influence late
+  % ERP and EEG memory effects
+  %
+  % Corwin (1994): On measuring discrimination and response bias: Unequal
+  % numbers of targets and distractors and two classes of distractors
+  %
+  % Snodgrass & Corwin (1988): Pragmatics of measuring recognition memory:
+  % applications to dementia and amnesia
   thisStr = 'Pr';
   if any(strcmp(thisStr,dataFields))
     if prependDestField
@@ -1360,9 +1372,16 @@ if ~isempty(lureEv)
     inputStruct.(destField).(thisField)(sub) = Pr;
   end
   
-  % From Mecklinger et al. (2007) and Corwin (1994)
+  % response bias index (Br)
   %
-  % response bias index
+  % Mecklinger et al. (2007): Source-retrieval requirements influence late
+  % ERP and EEG memory effects
+  %
+  % Corwin (1994): On measuring discrimination and response bias: Unequal
+  % numbers of targets and distractors and two classes of distractors
+  %
+  % Snodgrass & Corwin (1988): Pragmatics of measuring recognition memory:
+  % applications to dementia and amnesia
   thisStr = 'Br';
   if any(strcmp(thisStr,dataFields))
     if prependDestField
