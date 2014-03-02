@@ -64,6 +64,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE027';
     'SPACE029';
     'SPACE037';
+    'SPACE039';
     };
   
   %   % behavioral pilot
