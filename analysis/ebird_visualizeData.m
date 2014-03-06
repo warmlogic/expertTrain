@@ -1047,7 +1047,7 @@ for p = 1:length(phases)
   end
 end
 
-%% NEW: d' - break pre/post tests into different graphs - training x img cond - not complete
+%% NEW: d' - break pre/post tests into different graphs - training x img cond
 
 % pretest only will collapse across training
 
@@ -1074,7 +1074,8 @@ ylimits = [0 4];
 % ylimits = [0 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
-sesStr = {'Pretest','Posttest','Delay'};
+sesStr = {'Pretest', 'Posttest','Delay'};
+
 if collapsePhases
   phases = {'match'};
 else
@@ -1085,22 +1086,16 @@ end
 % naming = {'basic','subord'};
 naming = {'subord'};
 
-% training = {'TT','UU'};
-% imgConds = {'normal','color','g','g_hi8','g_lo8'};
-% groupname = 'All';
+training = {'TT','UU','TU','UT'};
+trainStr = {'Trained','Untrained','TU','UT'};
 
-training = {'TT'};
-% training = {'UU'};
-imgConds = {'normal','color','g'};
-groupname = 'Color';
+% imgConds = {'normal','color','g'};
+% groupname = 'Color';
 
-% training = {'TT'};
-% % training = {'UU'};
-% % training = {'TT','UU','TU','UT'};
-% imgConds = {'g','g_hi8','g_lo8'};
-% groupname = 'SpatialFreq';
+imgConds = {'g','g_hi8','g_lo8'};
+groupname = 'SpatialFreq';
 
-data = nan(length(sessions),length(imgConds),length(training),length(phases),length(subjects));
+data = nan(length(training),length(imgConds),length(sessions),length(phases),length(subjects));
 
 for s = 1:length(sessions)
   for p = 1:length(phases)
@@ -1110,7 +1105,7 @@ for s = 1:length(sessions)
       
       for t = 1:length(training)
         for n = 1:length(naming)
-          data(s,i,t,p,:) = results.(sessions{s}).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasure);
+          data(t,i,s,p,:) = results.(sessions{s}).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasure);
         end
       end
       
@@ -1123,27 +1118,31 @@ end
 
 % make some plots
 for p = 1:length(phases)
-  for t = 1:length(training)
+  for s = 1:length(sessions)
     for n = 1:length(naming)
       figure
       
-      data_mean = nanmean(data,5);
-      data_sem = nanstd(data,0,5) ./ sqrt(length(subjects));
+      if strcmp(sessions{s},'pretest')
+        data_mean = nanmean(nanmean(data(:,:,s,:,:),1),5);
+        data_sem = nanstd(nanmean(data(:,:,s,:,:),1),0,5) ./ sqrt(length(subjects));
+      else
+        data_mean = nanmean(data(:,:,s,:,:),5);
+        data_sem = nanstd(data(:,:,s,:,:),0,5) ./ sqrt(length(subjects));
+      end
       
       bw_legend = imgConds;
       
-      if strcmp(training{t},'TT')
-        trainStr = 'trained';
-      elseif strcmp(training{t},'UU')
-        trainStr = 'untrained';
-      else
-        trainStr = training{t};
-      end
-      
-      bw_title = sprintf('%s: %s, %s',groupname,trainStr,naming{n});
+      bw_title = sprintf('%s: %s, %s',groupname,sesStr{s},naming{n});
       %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
       %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
-      bw_groupnames = sesStr;
+      if strcmp(sessions{s},'pretest')
+        bw_groupnames = [];
+        axis_x = 1.5;
+      else
+        bw_groupnames = trainStr;
+        %axis_x = length(training) + 1.5;
+        axis_x = length(training) + 0.5;
+      end
       %bw_xlabel = 'Test day';
       bw_xlabel = [];
       bw_ylabel = dataLabel;
@@ -1153,14 +1152,18 @@ for p = 1:length(phases)
         bw_colormap = 'gray';
       end
       bw_data = data_mean;
-      bw_errors =data_sem;
+      bw_errors = data_sem;
       h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
       set(h.legend,'Location','NorthEast');
-      axis([0.5 (length(imgConds)+1.5) ylimits(1) ylimits(2)]);
+      axis([0.5 axis_x ylimits(1) ylimits(2)]);
+      
+      if length(sessions) == 1 && strcmp(sessions{s},'pretest')
+        xlabel('Collapsed');
+      end
       publishfig(gcf,0);
       
       if saveFigs
-        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s_%s',phases{p},dataMeasure,training{t},naming{n},groupname)));
+        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s_%s',phases{p},dataMeasure,sessions{s},naming{n},groupname)));
       end
     end
   end
