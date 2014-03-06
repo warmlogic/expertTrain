@@ -125,16 +125,16 @@ end
 figure
 
 basic_mean = nanmean(data.basic,1);
-basic_sem = nanstd(data.basic,1) ./ sqrt(sum(~isnan(data.basic)));
+basic_sem = nanstd(data.basic,0,1) ./ sqrt(sum(~isnan(data.basic)));
 errorbar(basic_mean,basic_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 hold on
 
 subordData_mean = nanmean(data.subord,1);
-subordData_sem = nanstd(data.subord,1) ./ sqrt(sum(~isnan(data.subord)));
+subordData_sem = nanstd(data.subord,0,1) ./ sqrt(sum(~isnan(data.subord)));
 errorbar(subordData_mean,subordData_sem,'ks-','LineWidth',2);
 
 % overall_mean = nanmean(data.overall,1);
-% overall_sem = nanstd(data.overall,1) ./ sqrt(sum(~isnan(data.overall)));
+% overall_sem = nanstd(data.overall,0,1) ./ sqrt(sum(~isnan(data.overall)));
 % errorbar(overall_mean,overall_sem,'ro-','LineWidth',2);
 hold off
 
@@ -217,7 +217,7 @@ for p = 1:length(phases)
     for t = 1:length(training)
       for s = 1:length(sessions)
         data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t),1);
-        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
+        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
       end
     end
     
@@ -287,7 +287,7 @@ for p = 1:length(phases)
     for t = 1:length(training)
       for s = 1:length(sessions)
         data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t),1);
-        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
+        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
       end
     end
     
@@ -348,7 +348,7 @@ for p = 1:length(phases)
     for t = 1:length(recogField)
         for s = 1:length(sessions)
             data_mean(s,t) = nanmean(data.(dataMeasure)(:,s,p,t),1);
-            data_sem(s,t) = nanstd(data.(dataMeasure)(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure)(:,s,p,t))));
+            data_sem(s,t) = nanstd(data.(dataMeasure)(:,s,p,t),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure)(:,s,p,t))));
         end
         
         bw_title = sprintf('%s',strrep(phases{p},'_','\_'));

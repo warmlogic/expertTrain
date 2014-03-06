@@ -147,17 +147,17 @@ end
 figure
 
 basic_mean = nanmean(data.basic,1);
-basic_sem = nanstd(data.basic,1) ./ sqrt(sum(~isnan(data.basic)));
+basic_sem = nanstd(data.basic,0,1) ./ sqrt(sum(~isnan(data.basic)));
 hb = errorbar(basic_mean,basic_sem,'ro-','LineWidth',2);
 hold on
 
 subordData_mean = nanmean(data.subord,1);
-subordData_sem = nanstd(data.subord,1) ./ sqrt(sum(~isnan(data.subord)));
+subordData_sem = nanstd(data.subord,0,1) ./ sqrt(sum(~isnan(data.subord)));
 hs = errorbar(subordData_mean,subordData_sem,'ks-','LineWidth',2);
 
 if plotOverall
   overall_mean = nanmean(data.overall,1);
-  overall_sem = nanstd(data.overall,1) ./ sqrt(sum(~isnan(data.overall)));
+  overall_sem = nanstd(data.overall,0,1) ./ sqrt(sum(~isnan(data.overall)));
   ho = errorbar(overall_mean,overall_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 end
 
@@ -317,12 +317,12 @@ for p = 1:length(phases)
     for t = 1:length(training)
       for s = 1:length(sessions)
         data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t),1);
-        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
+        data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
       end
     end
     
     bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
-    bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
     %bw_legend = {'Trained','Untrained'};
     %bw_legend = {'TT','UU','TU','UT'};
     bw_legend = training;
@@ -414,12 +414,12 @@ for i = 1:length(imgConds)
       for t = 1:length(training)
         for s = 1:length(sessions)
           data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t,i),1);
-          data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
+          data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
         end
       end
       
       bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
-      bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+      bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
       %bw_legend = {'Trained','Untrained'};
       %bw_legend = {'TT','UU','TU','UT'};
       bw_legend = training;
@@ -524,7 +524,7 @@ for p = 1:length(phases)
           bw_legend{counter} = sprintf('%s %s',strrep(imgConds{i},'_','-'),training{t});
           
           data_mean(s,counter) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t,i),1);
-          data_sem(s,counter) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
+          data_sem(s,counter) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
         end
       end
     end
@@ -532,7 +532,7 @@ for p = 1:length(phases)
     %for i = 1:length(imgConds)
     
     bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
-    bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
     %bw_legend = {'Trained','Untrained'};
     %bw_legend = {'TT','UU','TU','UT'};
     %bw_legend = training;
@@ -625,7 +625,7 @@ for p = 1:length(phases)
     for n = 1:length(naming)
       %for s = 1:length(sessions)
       %  data_mean(s,t) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t),1);
-      %  data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
+      %  data_sem(s,t) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t))));
       %end
       
       %sesDiffStr = cell(size(sesDiff));
@@ -637,14 +637,14 @@ for p = 1:length(phases)
         
         thisDiff = data.(dataMeasure).(naming{n})(:,firstInd,p,t) - data.(dataMeasure).(naming{n})(:,secondInd,p,t);
         data_mean(s,n) = nanmean(thisDiff);
-        data_sem(s,n) = nanstd(thisDiff) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,1,p,t))));
+        data_sem(s,n) = nanstd(thisDiff,0) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,1,p,t))));
       end
     end
     
     sesDiffStr = sprintf('%s: %s - %s (%s)',training{t},sesDiff{1}{1},sesDiff{1}{2},strrep(phases{p},'_','\_'));
     bw_title = sesDiffStr;
     %bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
-    %bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
     bw_groupnames = imgConds;
     %bw_legend = {'Trained','Untrained'};
     %bw_legend = {'TT','UU','TU','UT'};
@@ -751,10 +751,10 @@ for p = 1:length(phases)
           
           thisDiff = data.(dataMeasure).(naming{n})(:,firstInd,p,t,i) - data.(dataMeasure).(naming{n})(:,secondInd,p,t,i);
           data_mean(s,n,i) = nanmean(thisDiff);
-          data_sem(s,n,i) = nanstd(thisDiff) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,firstInd,p,t,i))));
+          data_sem(s,n,i) = nanstd(thisDiff,0) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,firstInd,p,t,i))));
           
           %data_mean(s,t,i) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t,i),1);
-          %data_sem(s,t,i) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
+          %data_sem(s,t,i) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
         end
       end
       
@@ -764,7 +764,7 @@ for p = 1:length(phases)
     sesDiffStr = sprintf('%s: %s - %s (%s)',training{t},sesDiff{1}{1},sesDiff{1}{2},strrep(phases{p},'_','\_'));
     bw_title = sesDiffStr;
     %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
-    %bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
     bw_groupnames = imgConds;
     %bw_legend = {'Trained','Untrained'};
     %bw_legend = {'TT','UU','TU','UT'};
@@ -888,13 +888,13 @@ for p = 1:length(phases)
           
           thisDiff = data.(dataMeasure).(naming{n})(:,firstInd,p,t,i) - data.(dataMeasure).(naming{n})(:,secondInd,p,t,i);
           %data_mean(s,t,i) = nanmean(thisDiff);
-          %data_sem(s,t,i) = nanstd(thisDiff) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,firstInd,p,t,i))));
+          %data_sem(s,t,i) = nanstd(thisDiff,0) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,firstInd,p,t,i))));
           
           data_mean(i,condCounter) = nanmean(thisDiff);
-          data_sem(i,condCounter) = nanstd(thisDiff) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,firstInd,p,t,i))));
+          data_sem(i,condCounter) = nanstd(thisDiff,0) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,firstInd,p,t,i))));
           
           %data_mean(s,t,i) = nanmean(data.(dataMeasure).(naming{n})(:,s,p,t,i),1);
-          %data_sem(s,t,i) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
+          %data_sem(s,t,i) = nanstd(data.(dataMeasure).(naming{n})(:,s,p,t,i),0,1) ./ sqrt(sum(~isnan(data.(dataMeasure).(naming{n})(:,s,p,t,i))));
         end
       end % i
     end % t
@@ -903,7 +903,7 @@ for p = 1:length(phases)
     sesDiffStr = sprintf('%s: %s, %s',naming{n},strrep(phases{p},'_','\_'),groupname);
     bw_title = sesDiffStr;
     %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
-    %bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
+    %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
     bw_groupnames = imgConds;
     %bw_legend = {'Trained','Untrained'};
     %bw_legend = {'TT','UU','TU','UT'};
@@ -912,8 +912,11 @@ for p = 1:length(phases)
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
     bw_ylabel = dataLabel;
-    %bw_colormap = 'gray';
-    bw_colormap = 'linspecer';
+    if exist('linspecer','file')
+      bw_colormap = 'linspecer';
+    else
+      bw_colormap = 'gray';
+    end
     bw_data = data_mean;
     bw_errors =data_sem;
     h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
@@ -923,6 +926,242 @@ for p = 1:length(phases)
     
     if saveFigs
       print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%sDiff_%s_%s_%dtrain',phases{p},dataMeasure,naming{n},groupname,length(training))));
+    end
+  end
+end
+
+%% NEW: d' - subordinate only for a training condition - pre/post/delay x img cond
+
+dataMeasure = 'dp';
+dataLabel = 'd''';
+ylimits = [0 4];
+
+% dataMeasure = 'hr';
+% dataLabel = 'Hit Rate';
+% ylimits = [0 1];
+
+% dataMeasure = 'c';
+% dataLabel = 'Response bias (criterion; c)';
+% ylimits = [-0.6 0.6];
+% % positive/conservative bias indicates a tendency to say 'new', whereas
+% % negative/liberal bias indicates a tendency to say 'old'
+
+% dataMeasure = 'Br';
+% dataLabel = 'Response bias index (Br)';
+% ylimits = [0 1];
+
+% dataMeasure = 'Pr';
+% dataLabel = 'Discrimination index (Pr)';
+% ylimits = [0 1];
+
+sessions = {'pretest', 'posttest', 'posttest_delay'};
+sesStr = {'Pretest','Posttest','Delay'};
+if collapsePhases
+  phases = {'match'};
+else
+  phases = {'match_1'};
+end
+% training = {'trained','untrained'};
+
+% naming = {'basic','subord'};
+naming = {'subord'};
+
+% training = {'TT','UU'};
+% imgConds = {'normal','color','g','g_hi8','g_lo8'};
+% groupname = 'All';
+
+training = {'TT'};
+% training = {'UU'};
+imgConds = {'normal','color','g'};
+groupname = 'Color';
+
+% training = {'TT'};
+% % training = {'UU'};
+% % training = {'TT','UU','TU','UT'};
+% imgConds = {'g','g_hi8','g_lo8'};
+% groupname = 'SpatialFreq';
+
+data = nan(length(sessions),length(imgConds),length(training),length(phases),length(subjects));
+
+for s = 1:length(sessions)
+  for p = 1:length(phases)
+    for i = 1:length(imgConds)
+      
+      %collapseData = [];
+      
+      for t = 1:length(training)
+        for n = 1:length(naming)
+          data(s,i,t,p,:) = results.(sessions{s}).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasure);
+        end
+      end
+      
+    end
+  end
+end
+
+% % stats
+% [h, p, ci, stats] = ttest(squeeze(data.(dataMeasure).(naming{1})(:,1,1,1,1)),squeeze(data.(dataMeasure).(naming{1})(:,2,1,1,1)));
+
+% make some plots
+for p = 1:length(phases)
+  for t = 1:length(training)
+    for n = 1:length(naming)
+      figure
+      
+      data_mean = nanmean(data,5);
+      data_sem = nanstd(data,0,5) ./ sqrt(length(subjects));
+      
+      bw_legend = imgConds;
+      
+      if strcmp(training{t},'TT')
+        trainStr = 'trained';
+      elseif strcmp(training{t},'UU')
+        trainStr = 'untrained';
+      else
+        trainStr = training{t};
+      end
+      
+      bw_title = sprintf('%s: %s, %s',groupname,trainStr,naming{n});
+      %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
+      %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
+      bw_groupnames = sesStr;
+      %bw_xlabel = 'Test day';
+      bw_xlabel = [];
+      bw_ylabel = dataLabel;
+      if exist('linspecer','file')
+        bw_colormap = 'linspecer';
+      else
+        bw_colormap = 'gray';
+      end
+      bw_data = data_mean;
+      bw_errors =data_sem;
+      h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
+      set(h.legend,'Location','NorthEast');
+      axis([0.5 (length(imgConds)+1.5) ylimits(1) ylimits(2)]);
+      publishfig(gcf,0);
+      
+      if saveFigs
+        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s_%s',phases{p},dataMeasure,training{t},naming{n},groupname)));
+      end
+    end
+  end
+end
+
+%% NEW: d' - break pre/post tests into different graphs - training x img cond - not complete
+
+% pretest only will collapse across training
+
+dataMeasure = 'dp';
+dataLabel = 'd''';
+ylimits = [0 4];
+
+% dataMeasure = 'hr';
+% dataLabel = 'Hit Rate';
+% ylimits = [0 1];
+
+% dataMeasure = 'c';
+% dataLabel = 'Response bias (criterion; c)';
+% ylimits = [-0.6 0.6];
+% % positive/conservative bias indicates a tendency to say 'new', whereas
+% % negative/liberal bias indicates a tendency to say 'old'
+
+% dataMeasure = 'Br';
+% dataLabel = 'Response bias index (Br)';
+% ylimits = [0 1];
+
+% dataMeasure = 'Pr';
+% dataLabel = 'Discrimination index (Pr)';
+% ylimits = [0 1];
+
+sessions = {'pretest', 'posttest', 'posttest_delay'};
+sesStr = {'Pretest','Posttest','Delay'};
+if collapsePhases
+  phases = {'match'};
+else
+  phases = {'match_1'};
+end
+% training = {'trained','untrained'};
+
+% naming = {'basic','subord'};
+naming = {'subord'};
+
+% training = {'TT','UU'};
+% imgConds = {'normal','color','g','g_hi8','g_lo8'};
+% groupname = 'All';
+
+training = {'TT'};
+% training = {'UU'};
+imgConds = {'normal','color','g'};
+groupname = 'Color';
+
+% training = {'TT'};
+% % training = {'UU'};
+% % training = {'TT','UU','TU','UT'};
+% imgConds = {'g','g_hi8','g_lo8'};
+% groupname = 'SpatialFreq';
+
+data = nan(length(sessions),length(imgConds),length(training),length(phases),length(subjects));
+
+for s = 1:length(sessions)
+  for p = 1:length(phases)
+    for i = 1:length(imgConds)
+      
+      %collapseData = [];
+      
+      for t = 1:length(training)
+        for n = 1:length(naming)
+          data(s,i,t,p,:) = results.(sessions{s}).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasure);
+        end
+      end
+      
+    end
+  end
+end
+
+% % stats
+% [h, p, ci, stats] = ttest(squeeze(data.(dataMeasure).(naming{1})(:,1,1,1,1)),squeeze(data.(dataMeasure).(naming{1})(:,2,1,1,1)));
+
+% make some plots
+for p = 1:length(phases)
+  for t = 1:length(training)
+    for n = 1:length(naming)
+      figure
+      
+      data_mean = nanmean(data,5);
+      data_sem = nanstd(data,0,5) ./ sqrt(length(subjects));
+      
+      bw_legend = imgConds;
+      
+      if strcmp(training{t},'TT')
+        trainStr = 'trained';
+      elseif strcmp(training{t},'UU')
+        trainStr = 'untrained';
+      else
+        trainStr = training{t};
+      end
+      
+      bw_title = sprintf('%s: %s, %s',groupname,trainStr,naming{n});
+      %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
+      %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
+      bw_groupnames = sesStr;
+      %bw_xlabel = 'Test day';
+      bw_xlabel = [];
+      bw_ylabel = dataLabel;
+      if exist('linspecer','file')
+        bw_colormap = 'linspecer';
+      else
+        bw_colormap = 'gray';
+      end
+      bw_data = data_mean;
+      bw_errors =data_sem;
+      h = barweb(bw_data,bw_errors,[],bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,[],bw_legend,[],'plot');
+      set(h.legend,'Location','NorthEast');
+      axis([0.5 (length(imgConds)+1.5) ylimits(1) ylimits(2)]);
+      publishfig(gcf,0);
+      
+      if saveFigs
+        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s_%s',phases{p},dataMeasure,training{t},naming{n},groupname)));
+      end
     end
   end
 end
@@ -957,18 +1196,18 @@ end
 %   figure
 %   
 %   bRT_mean = nanmean(rt.basic(:,:,p),1);
-%   bRT_sem = nanstd(rt.basic(:,:,p),1) ./ sqrt(sum(~isnan(rt.basic(:,:,p))));
+%   bRT_sem = nanstd(rt.basic(:,:,p),0,1) ./ sqrt(sum(~isnan(rt.basic(:,:,p))));
 %   %plot(1:nTrainSes,bRT_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 %   errorbar(bRT_mean,bRT_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 %   hold on
 %   
 %   sRT_mean = nanmean(rt.subord(:,:,p),1);
-%   sRT_sem = nanstd(rt.subord(:,:,p),1) ./ sqrt(sum(~isnan(rt.subord(:,:,p))));
+%   sRT_sem = nanstd(rt.subord(:,:,p),0,1) ./ sqrt(sum(~isnan(rt.subord(:,:,p))));
 %   %plot(1:nTrainSes,sRT_mean,'ks-','LineWidth',2);
 %   errorbar(sRT_mean,sRT_sem,'ks-','LineWidth',2);
 %   
 %   % oRT_mean = nanmean(rt.overall(:,:,p),1);
-%   % oRT_sem = nanstd(rt.overall(:,:,p),1) ./ sqrt(sum(~isnan(rt.overall(:,:,p))));
+%   % oRT_sem = nanstd(rt.overall(:,:,p),0,1) ./ sqrt(sum(~isnan(rt.overall(:,:,p))));
 %   % % plot(1:nTrainSes,oRT_mean,'ro-','LineWidth',2);
 %   % errorbar(oRT_mean,oRT_sem,'ro-','LineWidth',2);
 %   hold off
@@ -1011,18 +1250,18 @@ end
 %   figure
 %   
 %   bAcc_mean = nanmean(acc.basic(:,:,p),1);
-%   bAcc_sem = nanstd(acc.basic(:,:,p),1) ./ sqrt(sum(~isnan(acc.basic(:,:,p))));
+%   bAcc_sem = nanstd(acc.basic(:,:,p),0,1) ./ sqrt(sum(~isnan(acc.basic(:,:,p))));
 %   %plot(1:nTrainSes,bAcc_mean,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 %   errorbar(bAcc_mean,bAcc_sem,'d-','LineWidth',2,'Color',[0.5 0.5 0.5]);
 %   hold on
 %   
 %   sAcc_mean = nanmean(acc.subord(:,:,p),1);
-%   sAcc_sem = nanstd(acc.subord(:,:,p),1) ./ sqrt(sum(~isnan(acc.subord(:,:,p))));
+%   sAcc_sem = nanstd(acc.subord(:,:,p),0,1) ./ sqrt(sum(~isnan(acc.subord(:,:,p))));
 %   %plot(1:nTrainSes,sAcc_mean,'ks-','LineWidth',2);
 %   errorbar(sAcc_mean,sAcc_sem,'ks-','LineWidth',2);
 %   
 %   % oAcc_mean = nanmean(acc.overall(:,:,p),1);
-%   % oAcc_sem = nanstd(acc.overall(:,:,p),1) ./ sqrt(sum(~isnan(acc.overall(:,:,p))));
+%   % oAcc_sem = nanstd(acc.overall(:,:,p),0,1) ./ sqrt(sum(~isnan(acc.overall(:,:,p))));
 %   % % plot(1:nTrainSes,oAcc_mean,'ro-','LineWidth',2);
 %   % errorbar(oAcc_mean,oAcc_sem,'ro-','LineWidth',2);
 %   hold off
