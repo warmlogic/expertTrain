@@ -145,9 +145,9 @@ if size(barvalues,1) ~= size(errors,1) || size(barvalues,2) ~= size(errors,2)
 	error('barvalues and errors matrix must be of same dimension');
 else
 	if size(barvalues,2) == 1
-        % commented out so we can plot multiple groups with one bar each
-		%barvalues = barvalues';
-		%errors = errors';
+    % % MVM: commented out so we can plot multiple groups with one bar each
+    % barvalues = barvalues';
+    % errors = errors';
 	end
 	if size(barvalues,1) == 1
 		barvalues = [barvalues; zeros(1,length(barvalues))];
