@@ -940,6 +940,10 @@ ylimits = [0 4];
 % dataLabel = 'Hit Rate';
 % ylimits = [0 1];
 
+% dataMeasure = 'rt_hit';
+% dataLabel = 'Response Time: Hits';
+% ylimits = [0 5000];
+
 % dataMeasure = 'c';
 % dataLabel = 'Response bias (criterion; c)';
 % ylimits = [-0.6 0.6];
@@ -1054,6 +1058,10 @@ end
 dataMeasure = 'dp';
 dataLabel = 'd''';
 ylimits = [0 4];
+
+% dataMeasure = 'rt_hit';
+% dataLabel = 'Response Time: Hits';
+% ylimits = [0 5000];
 
 % dataMeasure = 'hr';
 % dataLabel = 'Hit Rate';
