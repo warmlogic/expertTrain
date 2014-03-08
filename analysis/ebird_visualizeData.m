@@ -381,7 +381,7 @@ end
 training = {'TT','UU'};
 naming = {'basic','subord'};
 imgConds = {'normal','color','g','g_hi8','g_lo8'};
-imgStr = {'Cong','Incong','Gray','Hi8','Lo8'};
+imgCondsStr = {'Cong','Incong','Gray','Hi8','Lo8'};
 
 data.(dataMeasure) = struct;
 for n = 1:length(naming)
@@ -436,7 +436,7 @@ for i = 1:length(imgConds)
       axis([0.5 (length(sessions)+0.5) ylimits(1) ylimits(2)]);
       publishfig(gcf,0);
       if saveFigs
-        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s',phases{p},dataMeasure,naming{n},imgStr{i})));
+        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('prepost_trainUn_%s_%s_%s_%s',phases{p},dataMeasure,naming{n},imgCondsStr{i})));
       end
     end
   end
@@ -1017,14 +1017,14 @@ for p = 1:length(phases)
       bw_legend = imgConds;
       
       if strcmp(training{t},'TT')
-        trainStr = 'trained';
+        trainingStr = 'trained';
       elseif strcmp(training{t},'UU')
-        trainStr = 'untrained';
+        trainingStr = 'untrained';
       else
-        trainStr = training{t};
+        trainingStr = training{t};
       end
       
-      bw_title = sprintf('%s: %s, %s',groupname,trainStr,naming{n});
+      bw_title = sprintf('%s: %s, %s',groupname,trainingStr,naming{n});
       %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
       %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
       bw_groupnames = sesStr;
@@ -1097,14 +1097,14 @@ naming = {'subord'};
 % trainStr = {'Trained','Untrained','TU','UT'};
 
 training = {'TT','UU'};
-trainStr = {'Trained', 'Untrained'};
+trainingStr = {'Trained', 'Untrained'};
 
 % imgConds = {'normal','color','g'};
 % imgStr = {'Congruent','Incongruent','Gray'};
 % groupname = 'Color';
 
 imgConds = {'g','g_hi8','g_lo8'};
-imgStr = {'Gray','Hi8','Lo8'};
+imgCondsStr = {'Gray','Hi8','Lo8'};
 groupname = 'SpatialFreq';
 
 data = nan(length(training),length(imgConds),length(sessions),length(phases),length(subjects));
@@ -1142,7 +1142,7 @@ for p = 1:length(phases)
         data_sem = nanstd(data(:,:,s,p,:),0,5) ./ sqrt(length(subjects));
       end
       
-      bw_legend = imgStr;
+      bw_legend = imgCondsStr;
       
       bw_title = sprintf('%s: %s, %s',groupname,sesStr{s},naming{n});
       %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
@@ -1151,7 +1151,7 @@ for p = 1:length(phases)
         bw_groupnames = [];
         axis_x = 1.5;
       else
-        bw_groupnames = trainStr;
+        bw_groupnames = trainingStr;
         %axis_x = length(training) + 1.5;
         axis_x = length(training) + 0.5;
       end
@@ -1181,14 +1181,13 @@ for p = 1:length(phases)
   end
 end
 
-%% NEWEST: d' bootci - break pre/post tests into different graphs - training x img cond
+%% NEWEST: d' bootci - break pre/post tests into different graphs - training x naming x img cond
 
 % pretest only will collapse across training
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-% ylimits = [0 4];
-ylimits = [-1 4];
+ylimits = [-0.9 3.1];
 
 % dataMeasure = 'rt_hit';
 % dataLabel = 'Response Time: Hits';
@@ -1212,41 +1211,44 @@ ylimits = [-1 4];
 % dataLabel = 'Discrimination index (Pr)';
 % ylimits = [0 1];
 
-sessions = {'pretest', 'posttest', 'posttest_delay'};
-sesStr = {'Pretest', 'Posttest','Delay'};
+% sessions = {'pretest', 'posttest', 'posttest_delay'};
+% sesStr = {'Pretest', 'Posttest', 'Delay'};
+
+% sessions = {'pretest'};
+% sesStr = {'Pretest'};
+% training = {'TT','UU','TU','UT'};
+% trainingStr = {'Trained','Untrained','TU','UT'};
+
+sessions = {'posttest', 'posttest_delay'};
+sesStr = {'Posttest', 'Delay'};
+% training = {'TT'};
+% trainingStr = {'Trained'};
+training = {'TT','UU'};
+trainingStr = {'Trained', 'Untrained'};
 
 if collapsePhases
   phases = {'match'};
 else
   phases = {'match_1'};
 end
-% training = {'trained','untrained'};
 
-% naming = {'basic','subord'};
-naming = {'subord'};
-namingStr = {'Subordinate'};
+naming = {'basic','subord'};
+namingStr = {'Basic','Subordinate'};
+% naming = {'subord'};
+% namingStr = {'Subordinate'};
 
-% training = {'TT','UU','TU','UT'};
-% trainStr = {'Trained','Untrained','TU','UT'};
+% imgConds = {'normal','color','g'};
+% % imgStr = {'Congruent','Incongruent','Gray'};
+% imgCondsStr = {'Cong','Inc','Gray'};
+% groupname = 'Color';
+% imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
+% imgDiffsStr = {'Cong - Inc', 'Cong - Gray', 'Inc - Gray'};
 
-% training = {'TT','UU'};
-% trainStr = {'Trained', 'Untrained'};
-
-training = {'TT'};
-trainStr = {'Trained'};
-
-imgConds = {'normal','color','g'};
-% imgStr = {'Congruent','Incongruent','Gray'};
-imgStr = {'Cong','Inc','Gray'};
-groupname = 'Color';
-imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
-imgDiffs_str = {'Cong - Inc', 'Cong - Gray', 'Inc - Gray'};
-
-% imgConds = {'g','g_hi8','g_lo8'};
-% imgStr = {'Gray','Hi8','Lo8'};
-% groupname = 'SpatialFreq';
-% imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
-% imgDiffs_str = {'Gray - Hi8', 'Gray - Lo8', 'Hi8 - Lo8'};
+imgConds = {'g','g_hi8','g_lo8'};
+imgCondsStr = {'Gray','Hi8','Lo8'};
+groupname = 'SpatialFreq';
+imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
+imgDiffsStr = {'Gray - Hi8', 'Gray - Lo8', 'Hi8 - Lo8'};
 
 data = nan(length(training),length(naming),length(imgConds),length(sessions),length(phases),length(subjects));
 
@@ -1276,90 +1278,58 @@ for s = 1:length(sessions)
   end
 end
 
-% % posttest trained color conditions
-% data_ci_all = [0.3199875 0.8624409; 0.3687077 0.9319167; -0.3066402  0.3142171]';
+% bar options
+bw_width = 0.75;
+%bw_gridstatus = [];
+bw_gridstatus = 'y';
+bw_error_sides = 2;
+%bw_legend_type = 'plot';
+bw_legend_type = 'axis';
 
 % make some plots
 for p = 1:length(phases)
   for s = 1:length(sessions)
     
-    for n = 1:length(naming)
-      if strcmp(sessions{s},'pretest')
+    if strcmp(sessions{s},'pretest')
+      
+      % collapse across training and basic/subordinate
+      
+      nboot = 10000;
+      bootfun = @(x) mean(x);
+      boottype = 'bca';
+      data_ci_all = [];
+      for i = 1:length(imgDiffs)
+        fprintf('Calculating bootstrap confidence intervals for %s %s (collapsed)...',sessions{s},imgDiffsStr{i});
+        data_ci = bootci(nboot,{bootfun,squeeze(nanmean(nanmean(data_diffs(:,:,i,s,p,:),1),2))'},'type',boottype);
         
-%         if strcmp(groupname,'Color')
-%         data_ci_all = [];
-%         
-%         elseif strcmp(groupname,'SpatialFreq')
-%           
-%           
-%         end
-        
-        nboot = 10000;
-        %bootfun = @(x) std(x,0);
-        bootfun = @(x) mean(x,0);
-        boottype = 'bca';
-        data_ci_all = [];
-        for i = 1:length(imgDiffs)
-          data_ci = bootci(nboot,{bootfun,squeeze(nanmean(nanmean(data_diffs(:,:,i,s,p,:),1),2))'},'type',boottype);
-          
-          data_ci_all = cat(2,data_ci_all,data_ci);
-        end
-        
-        % collapse across training conditions
-        data_mean = squeeze(nanmean(nanmean(nanmean(data(:,:,:,s,p,:),1),2),6))';
-        data_sem = squeeze(nanstd(nanmean(nanmean(data(:,:,:,s,p,:),1),2),0,6))' ./ sqrt(length(subjects));
-        
-        data_diffs_mean = squeeze(nanmean(nanmean(nanmean(data_diffs(:,:,:,s,p,:),1),2),6))';
-        
-        data_mean = cat(1,data_mean, data_diffs_mean);
-        
-        data_err_low = data_sem;
-        data_err_up = data_sem;
-        
-        % set the upper and lower error bars
-        %data_err_low = cat(1,data_err_low, data_ci_all(1,:));
-        %data_err_up = cat(1,data_err_up, data_ci_all(2,:));
-        data_err_low = cat(1,data_err_low, data_diffs_mean - data_ci_all(1,:));
-        data_err_up = cat(1,data_err_up, data_ci_all(2,:) - data_diffs_mean);
-        
-      else
-        nboot = 10000;
-        %bootfun = @(x) std(x,0);
-        bootfun = @(x) mean(x);
-        boottype = 'bca';
-        data_ci_all = [];
-        for i = 1:length(imgDiffs)
-          data_ci = bootci(nboot,{bootfun,squeeze(data_diffs(:,n,i,s,p,:))'},'type',boottype);
-          
-          data_ci_all = cat(2,data_ci_all,data_ci);
-        end
-        
-        data_mean = squeeze(nanmean(data(:,n,:,s,p,:),6))';
-        data_sem = squeeze(nanstd(data(:,n,:,s,p,:),0,6))' ./ sqrt(length(subjects));
-        
-        data_diffs_mean = squeeze(nanmean(data_diffs(:,n,:,s,p,:),6))';
-        
-        %data_mean = cat(1,data_mean, data_diffs_mean);
-        data_mean = cat(2,data_mean, data_diffs_mean);
-        
-        data_err_low = data_sem;
-        data_err_up = data_sem;
-        
-        % set the upper and lower error bars
-        %data_err_low = cat(1,data_err_low, data_diffs_mean - data_ci_all(1,:));
-        %data_err_up = cat(1,data_err_up, data_ci_all(2,:) - data_diffs_mean);
-        data_err_low = cat(2,data_err_low, data_diffs_mean - data_ci_all(1,:));
-        data_err_up = cat(2,data_err_up, data_ci_all(2,:) - data_diffs_mean);
+        data_ci_all = cat(2,data_ci_all,data_ci);
+        fprintf('Done.\n');
       end
+      
+      % collapse across training conditions
+      data_mean = squeeze(nanmean(nanmean(nanmean(data(:,:,:,s,p,:),1),2),6))';
+      data_sem = squeeze(nanstd(nanmean(nanmean(data(:,:,:,s,p,:),1),2),0,6))' ./ sqrt(length(subjects));
+      
+      data_diffs_mean = squeeze(nanmean(nanmean(nanmean(data_diffs(:,:,:,s,p,:),1),2),6))';
+      
+      %data_mean = cat(1,data_mean, data_diffs_mean);
+      data_mean = cat(2,data_mean, data_diffs_mean);
+      
+      data_err_low = data_sem;
+      data_err_up = data_sem;
+      
+      % set the upper and lower error bars
+      %data_err_low = cat(1,data_err_low, data_diffs_mean - data_ci_all(1,:));
+      %data_err_up = cat(1,data_err_up, data_ci_all(2,:) - data_diffs_mean);
+      data_err_low = cat(2,data_err_low, data_diffs_mean - data_ci_all(1,:));
+      data_err_up = cat(2,data_err_up, data_ci_all(2,:) - data_diffs_mean);
       
       figure
       
       %bw_legend = imgStr;
-      bw_legend = cat(2,imgStr,imgDiffs_str);
+      bw_legend = cat(2,imgCondsStr,imgDiffsStr);
       
-      bw_title = sprintf('%s: %s, %s, %s',groupname,sesStr{s},trainStr{1},namingStr{n});
-      %bw_title = sprintf('%s%s: %s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'),strrep(imgConds{i},'_','\_'));
-      %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
+      bw_title = sprintf('%s: %s',groupname,sesStr{s});
       if strcmp(sessions{s},'pretest')
         bw_groupnames = [];
         axis_x = 1.5;
@@ -1381,19 +1351,14 @@ for p = 1:length(phases)
       bw_errors_up = data_err_up;
       bw_errors_low = data_err_low;
       
-%       bw_data = data_mean';
-%       bw_errors_up = data_err_up';
-%       bw_errors_low = data_err_low';
-%       
-%       bw_data = bw_data(:)';
-%       bw_errors_up = bw_errors_up(:)';
-%       bw_errors_low = bw_errors_low(:)';
+      %       bw_data = data_mean';
+      %       bw_errors_up = data_err_up';
+      %       bw_errors_low = data_err_low';
+      %
+      %       bw_data = bw_data(:)';
+      %       bw_errors_up = bw_errors_up(:)';
+      %       bw_errors_low = bw_errors_low(:)';
       
-      bw_width = 0.75;
-      bw_gridstatus = [];
-      bw_error_sides = 2;
-      %bw_legend_type = 'plot';
-      bw_legend_type = 'axis';
       h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type);
       if strcmp(bw_legend_type,'plot')
         set(h.legend,'Location','NorthEast');
@@ -1401,17 +1366,108 @@ for p = 1:length(phases)
       axis([0.5 axis_x ylimits(1) ylimits(2)]);
       %axis([0.5 axis_x min(bw_data - bw_errors_low)-0.5 max(bw_data + bw_errors_up)+0.5]);
       
-      if length(sessions) == 1 && strcmp(sessions{s},'pretest')
-        xlabel('Collapsed');
-      end
+      %if strcmp(sessions{s},'pretest')
+      %  xlabel('Collapsed');
+      %end
+      set(gca,'YTick',0:1:round(ylimits(2)));
       publishfig(gcf,0);
       
       if saveFigs
-        print(gcf,figFormat,figRes,fullfile(figsDir,sprintf('mean_err_trainUn_%s_%s_%s_%s_%s',phases{p},dataMeasure,sessions{s},namingStr{n},groupname)));
+        fileName = sprintf('mean_sem_ci_%s_%s_%s_%s',phases{p},dataMeasure,sessions{s},groupname);
+        print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
       end
-    end
-  end
-end
+      
+    else
+      for t = 1:length(training)
+        for n = 1:length(naming)
+          nboot = 10000;
+          bootfun = @(x) mean(x);
+          boottype = 'bca';
+          data_ci_all = [];
+          for i = 1:length(imgDiffs)
+            fprintf('Calculating bootstrap confidence intervals for %s %s %s %s...',sesStr{s},namingStr{n},trainingStr{t},imgDiffsStr{i});
+            data_ci = bootci(nboot,{bootfun,squeeze(data_diffs(t,n,i,s,p,:))'},'type',boottype);
+            
+            data_ci_all = cat(2,data_ci_all,data_ci);
+            fprintf('Done.\n');
+          end
+          
+          data_mean = squeeze(nanmean(data(t,n,:,s,p,:),6))';
+          data_sem = squeeze(nanstd(data(t,n,:,s,p,:),0,6))' ./ sqrt(length(subjects));
+          
+          data_diffs_mean = squeeze(nanmean(data_diffs(t,n,:,s,p,:),6))';
+          
+          %data_mean = cat(1,data_mean, data_diffs_mean);
+          data_mean = cat(2,data_mean, data_diffs_mean);
+          
+          data_err_low = data_sem;
+          data_err_up = data_sem;
+          
+          % set the upper and lower error bars
+          %data_err_low = cat(1,data_err_low, data_diffs_mean - data_ci_all(1,:));
+          %data_err_up = cat(1,data_err_up, data_ci_all(2,:) - data_diffs_mean);
+          data_err_low = cat(2,data_err_low, data_diffs_mean - data_ci_all(1,:));
+          data_err_up = cat(2,data_err_up, data_ci_all(2,:) - data_diffs_mean);
+          
+          figure
+          
+          %bw_legend = imgStr;
+          bw_legend = cat(2,imgCondsStr,imgDiffsStr);
+          
+          bw_title = sprintf('%s: %s, %s, %s',groupname,sesStr{s},trainingStr{t},namingStr{n});
+          %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
+          if strcmp(sessions{s},'pretest')
+            bw_groupnames = [];
+            axis_x = 1.5;
+          else
+            %bw_groupnames = trainStr;
+            bw_groupnames = [];
+            %axis_x = length(training) + 1.5;
+            %axis_x = length(training) + 0.5;
+            axis_x = 1.5;
+          end
+          %bw_xlabel = 'Test day';
+          bw_xlabel = [];
+          bw_ylabel = dataLabel;
+          if exist('linspecer','file')
+            bw_colormap = 'linspecer';
+          else
+            bw_colormap = 'gray';
+          end
+          bw_data = data_mean;
+          bw_errors_up = data_err_up;
+          bw_errors_low = data_err_low;
+          
+          %       bw_data = data_mean';
+          %       bw_errors_up = data_err_up';
+          %       bw_errors_low = data_err_low';
+          %
+          %       bw_data = bw_data(:)';
+          %       bw_errors_up = bw_errors_up(:)';
+          %       bw_errors_low = bw_errors_low(:)';
+          
+          h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type);
+          if strcmp(bw_legend_type,'plot')
+            set(h.legend,'Location','NorthEast');
+          end
+          axis([0.5 axis_x ylimits(1) ylimits(2)]);
+          %axis([0.5 axis_x min(bw_data - bw_errors_low)-0.5 max(bw_data + bw_errors_up)+0.5]);
+          
+          %if strcmp(sessions{s},'pretest')
+          %  xlabel('Collapsed');
+          %end
+          set(gca,'YTick',0:1:round(ylimits(2)));
+          publishfig(gcf,0);
+          
+          if saveFigs
+            fileName = sprintf('mean_sem_ci_%s_%s_%s_%s_%s_%s',phases{p},dataMeasure,sessions{s},trainingStr{t},namingStr{n},groupname);
+            print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
+          end
+        end % name
+      end % train
+    end % if pretest or other
+  end % session
+end % phase
 
 
 %% old stuff
