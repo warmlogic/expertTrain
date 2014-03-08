@@ -224,9 +224,10 @@ if strcmp(legend_type, 'axis')
   for i = 1:numbars
     xdata = get(handles.errors(i),'xdata');
     for j = 1:length(xdata)
-      %text(xdata(j),  -0.03*ymax*1.1, bw_legend(i), 'Rotation', 60, 'fontsize', 12, 'HorizontalAlignment', 'right');
-      %text(xdata(j),  -0.07*ymax*1.1, bw_legend(i), 'Rotation', 15, 'fontsize', 12, 'HorizontalAlignment', 'center');
-      text(xdata(j),  ymin*1.5, bw_legend(i), 'Rotation', 15, 'fontsize', 12, 'HorizontalAlignment', 'center');
+      %text(xdata(j),  -0.03*ymax*1.1, bw_legend(i), 'Rotation', 60, 'FontSize', 12, 'HorizontalAlignment', 'right');
+      %text(xdata(j),  -0.07*ymax*1.1, bw_legend(i), 'Rotation', 15, 'FontSize', 12, 'HorizontalAlignment', 'center');
+      text(xdata(j),  ymin*1.5, bw_legend(i), 'Rotation', 15, 'FontSize', 12, 'HorizontalAlignment', 'center');
+      %text(xdata(j),  -0.65, bw_legend(i), 'Rotation', 15, 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center');
     end
   end
   set(gca,'xaxislocation','top');
