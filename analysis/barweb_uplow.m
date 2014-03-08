@@ -154,6 +154,7 @@ end
 
 change_axis = 0;
 ymax = 0;
+ymin = 0;
 
 if size(barvalues,1) ~= size(errors_upper,1) || size(barvalues,2) ~= size(errors_upper,2)
 	error('barvalues and errors_upper matrix must be of same dimension');
@@ -204,7 +205,8 @@ for i = 1:numbars
   x =get(get(handles.bars(i),'children'), 'xdata');
   x = mean(x([1 3],:));
   if ~isempty(errors_lower)
-    handles.errors(i) = errorbar(x, barvalues(:,i), errors_upper(:,i), errors_lower(:,i), 'k', 'linestyle', 'none', 'linewidth', 2);
+    handles.errors(i) = errorbar(x, barvalues(:,i), errors_lower(:,i), errors_upper(:,i), 'k', 'linestyle', 'none', 'linewidth', 2);
+    ymin = min([ymin; barvalues(:,i)-errors_lower(:,i)]);
   else
     handles.errors(i) = errorbar(x, barvalues(:,i), errors_upper(:,i), 'k', 'linestyle', 'none', 'linewidth', 2);
   end
@@ -215,14 +217,16 @@ if error_sides == 1
   set(gca,'children', flipud(get(gca,'children')));
 end
 
-ylim([0 ymax*1.1]);
+ylim([ymin*1.1 ymax*1.1]);
 xlim([0.5 numgroups-change_axis+0.5]);
 
 if strcmp(legend_type, 'axis')
   for i = 1:numbars
     xdata = get(handles.errors(i),'xdata');
     for j = 1:length(xdata)
-      text(xdata(j),  -0.03*ymax*1.1, bw_legend(i), 'Rotation', 60, 'fontsize', 12, 'HorizontalAlignment', 'right');
+      %text(xdata(j),  -0.03*ymax*1.1, bw_legend(i), 'Rotation', 60, 'fontsize', 12, 'HorizontalAlignment', 'right');
+      %text(xdata(j),  -0.07*ymax*1.1, bw_legend(i), 'Rotation', 15, 'fontsize', 12, 'HorizontalAlignment', 'center');
+      text(xdata(j),  ymin*1.5, bw_legend(i), 'Rotation', 15, 'fontsize', 12, 'HorizontalAlignment', 'center');
     end
   end
   set(gca,'xaxislocation','top');
