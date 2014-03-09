@@ -79,16 +79,20 @@ elseif nargin == 0
 end
 
 % figure out how many quantiles to use to split the data
-if length(quantiles) > 1
+if length(quantiles) == 1 && quantiles == 1
+  nQuantiles = 0;
+elseif length(quantiles) == 1 && quantiles ~= 1
+  % this can happen when splitting the data in two (using a proportion less
+  % than 1); or with a scalar splitting the data by N quantiles
+  if quantiles < 1
+    nQuantiles = 1;
+  elseif quantiles > 1
+    nQuantiles = quantiles;
+  end
+elseif length(quantiles) > 1
   nQuantiles = length(quantiles);
-else
-  nQuantiles = quantiles;
 end
-if nQuantiles > 1
-  nDivisions = nQuantiles + 1;
-else
-  nDivisions = 1;
-end
+nDivisions = nQuantiles + 1;
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
