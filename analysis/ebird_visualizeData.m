@@ -72,6 +72,17 @@ end
 
 collapsePhases = false;
 
+%% split into quantile divisions?
+
+% nDivisions = 1;
+nDivisions = 4;
+
+if nDivisions > 1
+  quantStr = sprintf('_%dquantileDiv',nDivisions);
+else
+  quantStr = '';
+end
+
 %% run the data processing script
 
 % onlyCompleteSub = false;
@@ -87,9 +98,9 @@ saveResults = true;
 %% or just load the behavioral data
 
 if collapsePhases
-  load(fullfile(dataroot,'EBIRD_behav_results_collapsed.mat'));
+  load(fullfile(dataroot,sprintf('%s_behav_results%s_collapsed.mat',expName,quantStr)));
 else
-  load(fullfile(dataroot,'EBIRD_behav_results.mat'));
+  load(fullfile(dataroot,sprintf('%s_behav_results%s.mat',expName,quantStr)));
 end
 
 %% rerun to print data again
