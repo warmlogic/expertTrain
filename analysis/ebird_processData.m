@@ -14,12 +14,12 @@ if nargin == 9
   %if length(quantiles) > 1
   %error('Defining cumulative probability values in the variable ''quantiles'' is not yet supported.');
   if length(quantiles) == 1 && quantiles == 1
-    warning('Only 1 quantile desired, not splitting data into quantiles based on ''%s''.',quantileMeasure);
+    warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data based on ''%s''.',quantileMeasure);
     quantileMeasure = [];
   end
 elseif nargin == 8
   if ~isempty(quantileMeasure)
-    error('Need to supply both quantileMeasure and nQuantile');
+    error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
   elseif isempty(quantileMeasure)
     warning('No quantile measure supplied, not splitting data into quantiles based on ''%s''.',quantileMeasure);
     quantiles = 1;
