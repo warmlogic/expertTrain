@@ -11,7 +11,7 @@ function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub
 %   [results] = ebird_processData([],[],[],true,false,false,true,'rt',3);
 
 if nargin == 9
-  %if length(nQuantile) > 1
+  %if length(quantiles) > 1
   %error('Defining cumulative probability values in the variable ''quantiles'' is not yet supported.');
   if length(quantiles) == 1 && quantiles == 1
     warning('Only 1 quantile desired, not splitting data into quantiles based on ''%s''.',quantileMeasure);
@@ -97,31 +97,31 @@ if ~exist('subjects','var') || isempty(subjects)
     %'EBIRD003'; % Pilot. (due to missing ses7 name) - NB: LAST PILOT TO BE REPLACED
     %'EBIRD004'; % DNF. Dropout. Last session: 8.
     'EBIRD005';
-%     %'EBIRD006'; % DNF. Dropout. Last session: 2.
-%     'EBIRD007';
-%     'EBIRD008';
-%     'EBIRD009';
-%     'EBIRD010';
-%     'EBIRD011';
-%     'EBIRD012';
-%     %'EBIRD013'; % DNF. Dropout. Last session: 5. Lost session 6 in HD crash.
-%     %'EBIRD014'; % DNF. Rejected. Last session: 1.
-%     %'EBIRD015'; % DNF. Lost in HD crash.
-%     %'EBIRD016'; % DNF. Lost in HD crash.
-%     %'EBIRD017'; % DNF. Lost in HD crash.
-%     'EBIRD018';
-%     'EBIRD019';
-%     'EBIRD020';
-%     'EBIRD021';
-%     %'EBIRD022'; % DNF. Dropout. Last session: 8.
-%     %'EBIRD023'; % DNF. Dropout. Last session: 1.
-%     'EBIRD024';
-%     'EBIRD025';
-%     'EBIRD027';
-%     'EBIRD029';
-%     'EBIRD032';
-%     'EBIRD034';
-%     'EBIRD042';
+    %'EBIRD006'; % DNF. Dropout. Last session: 2.
+    'EBIRD007';
+    'EBIRD008';
+    'EBIRD009';
+    'EBIRD010';
+    'EBIRD011';
+    'EBIRD012';
+    %'EBIRD013'; % DNF. Dropout. Last session: 5. Lost session 6 in HD crash.
+    %'EBIRD014'; % DNF. Rejected. Last session: 1.
+    %'EBIRD015'; % DNF. Lost in HD crash.
+    %'EBIRD016'; % DNF. Lost in HD crash.
+    %'EBIRD017'; % DNF. Lost in HD crash.
+    'EBIRD018';
+    'EBIRD019';
+    'EBIRD020';
+    'EBIRD021';
+    %'EBIRD022'; % DNF. Dropout. Last session: 8.
+    %'EBIRD023'; % DNF. Dropout. Last session: 1.
+    'EBIRD024';
+    'EBIRD025';
+    'EBIRD027';
+    'EBIRD029';
+    'EBIRD032';
+    'EBIRD034';
+    'EBIRD042';
     };
 end
 
@@ -328,7 +328,7 @@ if isempty(results)
             
             for mf = 1:length(mainFields)
               for df = 1:length(dataFields{mf})
-                results.(sesName).(fn).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),1);
+                results.(sesName).(fn).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
               end
             end
             if nBlocks > 1
@@ -856,7 +856,7 @@ if isempty(results)
   fprintf('Done processing data for experiment %s.\n\n',expName);
   if saveResults
     if nDivisions > 1
-      quantStr = sprintf('_%squantDiv',nDivisions);
+      quantStr = sprintf('_%dquantileDiv',nDivisions);
     else
       quantStr = '';
     end
@@ -977,7 +977,7 @@ for sesNum = 1:length(expParam.sesTypes)
         if nDivisions > 1
           if q == 1
             fprintf(fid,'Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q));
-          elseif q == nQuantiles
+          elseif q == nDivisions
             fprintf(fid,'Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quants(q-1));
           else
             fprintf(fid,'Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q-1),quantileMeasure,quants(q));
