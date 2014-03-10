@@ -98,8 +98,8 @@ collapsePhases = false;
 
 %% split into quantile divisions?
 
-nDivisions = 1;
-% nDivisions = 4;
+% nDivisions = 1;
+nDivisions = 4;
 
 if nDivisions > 1
   quantStr = sprintf('_%dquantileDiv',nDivisions);
@@ -1248,6 +1248,8 @@ elseif strcmp(bw_legend_type,'axis')
   ylimits = [-0.9 3.5];
 end
 
+plot_nSubj = true;
+
 % dataMeasure = 'rt_hit';
 % dataLabel = 'Response Time: Hits';
 % ylimits = [0 5000];
@@ -1280,12 +1282,11 @@ trainingStr = {'Trained','Untrained','TU','UT'};
 
 % sessions = {'posttest', 'posttest_delay'};
 % sesStr = {'Posttest', 'Delay'};
+% training = {'TT','UU'};
+% trainingStr = {'Trained', 'Untrained'};
+
 % sessions = {'posttest'};
 % sesStr = {'Posttest'};
-% training = {'TT'};
-% trainingStr = {'Trained'};
-training = {'TT','UU'};
-trainingStr = {'Trained', 'Untrained'};
 
 if collapsePhases
   phases = {'match'};
@@ -1356,6 +1357,7 @@ for p = 1:length(phases)
       data_diffs_ci_all = [];
       data_err_low_all = [];
       data_err_up_all = [];
+      nSubj_all = [];
       
       for d = 1:nDivisions
         if nDivisions > 1
@@ -1380,14 +1382,21 @@ for p = 1:length(phases)
           data_err_up = data_sem;
         elseif strcmp(mean_err_type,'95ci')
           data_means_ci = [];
+          if plot_nSubj
+            nSubj_means = [];
+          end
           for i = 1:length(imgConds)
             fprintf('Calculating bootstrap confidence intervals for %s%s (collapsed training/naming): %s...',sessions{s},divStr,imgConds{i});
             %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
             
             % exclude subjecst with NaNs
-            % TODO: check on this
             thisImgData = theseData(i,~isnan(theseData(i,:)));
             data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+            
+            if plot_nSubj
+              % save the number of subjects that went into this ci
+              nSubj_means = cat(2,nSubj_means,length(thisImgData));
+            end
             
             data_means_ci = cat(2,data_means_ci,data_ci);
             fprintf('Done.\n');
@@ -1397,14 +1406,21 @@ for p = 1:length(phases)
         end
         
         data_diffs_ci = [];
+        if plot_nSubj
+          nSubj_diffs = [];
+        end
         for i = 1:length(imgDiffs)
           fprintf('Calculating bootstrap confidence intervals for %s%s (collapsed training/naming): %s...',sessions{s},divStr,imgDiffsStr{i});
           %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
           
           % exclude subjecst with NaNs
-          % TODO: check on this
           thisImgData = theseData_diffs(i,~isnan(theseData_diffs(i,:)));
           data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+          
+          if plot_nSubj
+            % save the number of subjects that went into this ci
+            nSubj_diffs = cat(2,nSubj_diffs,length(thisImgData));
+          end
           
           data_diffs_ci = cat(2,data_diffs_ci,data_ci);
           fprintf('Done.\n');
@@ -1433,6 +1449,11 @@ for p = 1:length(phases)
         data_mean = cat(2,data_mean, data_diffs_mean);
         % put all the divisions together
         data_mean_all = cat(1,data_mean_all,data_mean);
+        
+        if plot_nSubj
+          nSubj = cat(2,nSubj_means,nSubj_diffs);
+          nSubj_all = cat(1,nSubj_all,nSubj);
+        end
       end % divisions/quantiles
       
       figure
@@ -1470,7 +1491,7 @@ for p = 1:length(phases)
       %       bw_errors_up = bw_errors_up(:)';
       %       bw_errors_low = bw_errors_low(:)';
       
-      h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type);
+      h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type,nSubj_all);
       if strcmp(bw_legend_type,'plot')
         set(h.legend,'Location','NorthEast');
       end
@@ -1492,7 +1513,7 @@ for p = 1:length(phases)
       end
       
     else
-      %for t = 1:length(training)
+      for t = 1:length(training)
         for n = 1:length(naming)
           % initialize to store all data (across divisions/quantiles)
           data_mean_all = [];
@@ -1500,6 +1521,7 @@ for p = 1:length(phases)
           data_diffs_ci_all = [];
           data_err_low_all = [];
           data_err_up_all = [];
+          nSubj_all = [];
           
           for d = 1:nDivisions
             if nDivisions > 1
@@ -1529,6 +1551,9 @@ for p = 1:length(phases)
               data_err_up = data_sem;
             elseif strcmp(mean_err_type,'95ci')
               data_means_ci = [];
+              if plot_nSubj
+                nSubj_means = [];
+              end
               for i = 1:length(imgConds)
                 if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
                   fprintf('Calculating bootstrap confidence intervals for %s %s%s: %s...',sesStr{s},namingStr{n},divStr,imgConds{i});
@@ -1538,9 +1563,13 @@ for p = 1:length(phases)
                 %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
                 
                 % exclude subjecst with NaNs
-                % TODO: check on this
                 thisImgData = theseData(i,~isnan(theseData(i,:)));
                 data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+                
+                if plot_nSubj
+                  % save the number of subjects that went into this ci
+                  nSubj_means = cat(2,nSubj_means,length(thisImgData));
+                end
                 
                 data_means_ci = cat(2,data_means_ci,data_ci);
                 fprintf('Done.\n');
@@ -1550,6 +1579,9 @@ for p = 1:length(phases)
             end
             
             data_diffs_ci = [];
+            if plot_nSubj
+              nSubj_diffs = [];
+            end
             for i = 1:length(imgDiffs)
               if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
                 fprintf('Calculating bootstrap confidence intervals for %s %s%s: %s...',sesStr{s},namingStr{n},divStr,imgDiffsStr{i});
@@ -1560,9 +1592,13 @@ for p = 1:length(phases)
               %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
               
               % exclude subjecst with NaNs
-              % TODO: check on this
               thisImgData = theseData_diffs(i,~isnan(theseData_diffs(i,:)));
               data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+              
+              if plot_nSubj
+                % save the number of subjects that went into this ci
+                nSubj_diffs = cat(2,nSubj_diffs,length(thisImgData));
+              end
               
               data_diffs_ci = cat(2,data_diffs_ci,data_ci);
               fprintf('Done.\n');
@@ -1591,6 +1627,11 @@ for p = 1:length(phases)
             data_mean = cat(2,data_mean, data_diffs_mean);
             % put all the divisions together
             data_mean_all = cat(1,data_mean_all,data_mean);
+            
+            if plot_nSubj
+              nSubj = cat(2,nSubj_means,nSubj_diffs);
+              nSubj_all = cat(1,nSubj_all,nSubj);
+            end
           end % divisions/quantiles
           
           figure
@@ -1632,7 +1673,7 @@ for p = 1:length(phases)
           %       bw_errors_up = bw_errors_up(:)';
           %       bw_errors_low = bw_errors_low(:)';
           
-          h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type);
+          h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type,nSubj_all);
           if strcmp(bw_legend_type,'plot')
             set(h.legend,'Location','NorthEast');
           end
@@ -1657,7 +1698,7 @@ for p = 1:length(phases)
             print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
           end
         end % name
-      %end % train
+      end % train
     end % if pretest or other
   end % session
 end % phase
