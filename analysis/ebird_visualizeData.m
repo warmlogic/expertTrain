@@ -98,8 +98,8 @@ collapsePhases = false;
 
 %% split into quantile divisions?
 
-% nDivisions = 1;
-nDivisions = 4;
+nDivisions = 1;
+% nDivisions = 4;
 
 if nDivisions > 1
   quantStr = sprintf('_%dquantileDiv',nDivisions);
@@ -1273,13 +1273,15 @@ end
 % sessions = {'pretest', 'posttest', 'posttest_delay'};
 % sesStr = {'Pretest', 'Posttest', 'Delay'};
 
-% sessions = {'pretest'};
-% sesStr = {'Pretest'};
-% training = {'TT','UU','TU','UT'};
-% trainingStr = {'Trained','Untrained','TU','UT'};
+sessions = {'pretest'};
+sesStr = {'Pretest'};
+training = {'TT','UU','TU','UT'};
+trainingStr = {'Trained','Untrained','TU','UT'};
 
-sessions = {'posttest', 'posttest_delay'};
-sesStr = {'Posttest', 'Delay'};
+% sessions = {'posttest', 'posttest_delay'};
+% sesStr = {'Posttest', 'Delay'};
+% sessions = {'posttest'};
+% sesStr = {'Posttest'};
 % training = {'TT'};
 % trainingStr = {'Trained'};
 training = {'TT','UU'};
@@ -1295,6 +1297,8 @@ naming = {'basic','subord'};
 namingStr = {'Basic','Subordinate'};
 % naming = {'subord'};
 % namingStr = {'Subordinate'};
+% naming = {'basic'};
+% namingStr = {'Basic'};
 
 imgConds = {'normal','color','g'};
 % imgStr = {'Congruent','Incongruent','Gray'};
@@ -1488,7 +1492,7 @@ for p = 1:length(phases)
       end
       
     else
-      for t = 1:length(training)
+      %for t = 1:length(training)
         for n = 1:length(naming)
           % initialize to store all data (across divisions/quantiles)
           data_mean_all = [];
@@ -1506,8 +1510,14 @@ for p = 1:length(phases)
               quantStr = '';
             end
             
-            theseData = squeeze(data(t,n,:,s,p,:,d));
-            theseData_diffs = squeeze(data_diffs(t,n,:,s,p,:,d));
+            if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+              % collapse across trained/untrained for posttest basic only
+              theseData = squeeze(nanmean(data(:,n,:,s,p,:,d),1));
+              theseData_diffs = squeeze(nanmean(data_diffs(:,n,:,s,p,:,d),1));
+            else
+              theseData = squeeze(data(t,n,:,s,p,:,d));
+              theseData_diffs = squeeze(data_diffs(t,n,:,s,p,:,d));
+            end
             
             data_mean = nanmean(theseData,2)';
             data_diffs_mean = nanmean(theseData_diffs,2)';
@@ -1520,7 +1530,11 @@ for p = 1:length(phases)
             elseif strcmp(mean_err_type,'95ci')
               data_means_ci = [];
               for i = 1:length(imgConds)
-                fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgConds{i});
+                if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+                  fprintf('Calculating bootstrap confidence intervals for %s %s%s: %s...',sesStr{s},namingStr{n},divStr,imgConds{i});
+                else
+                  fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgConds{i});
+                end
                 %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
                 
                 % exclude subjecst with NaNs
@@ -1537,7 +1551,11 @@ for p = 1:length(phases)
             
             data_diffs_ci = [];
             for i = 1:length(imgDiffs)
-              fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgDiffsStr{i});
+              if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+                fprintf('Calculating bootstrap confidence intervals for %s %s%s: %s...',sesStr{s},namingStr{n},divStr,imgDiffsStr{i});
+              else
+                fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgDiffsStr{i});
+              end
               
               %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
               
@@ -1580,7 +1598,11 @@ for p = 1:length(phases)
           %bw_legend = imgStr;
           bw_legend = cat(2,imgCondsStr,imgDiffsStr);
           
-          bw_title = sprintf('%s: %s, %s, %s',groupname,sesStr{s},trainingStr{t},namingStr{n});
+          if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+            bw_title = sprintf('%s: %s, %s',groupname,sesStr{s},namingStr{n});
+          else
+            bw_title = sprintf('%s: %s, %s, %s',groupname,sesStr{s},trainingStr{t},namingStr{n});
+          end
           
           axis_x = nDivisions + 0.5;
           
@@ -1627,11 +1649,15 @@ for p = 1:length(phases)
           end
           
           if saveFigs
-            fileName = sprintf('%s_%s_%s_%s_%s_%s_mean%s_diff%s%s',groupname,dataMeasure,sesStr{s},phases{p},trainingStr{t},namingStr{n},mean_err_type,diff_err_type,quantStr);
+            if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+              fileName = sprintf('%s_%s_%s_%s_%s_mean%s_diff%s%s',groupname,dataMeasure,sesStr{s},phases{p},namingStr{n},mean_err_type,diff_err_type,quantStr);
+            else
+              fileName = sprintf('%s_%s_%s_%s_%s_%s_mean%s_diff%s%s',groupname,dataMeasure,sesStr{s},phases{p},trainingStr{t},namingStr{n},mean_err_type,diff_err_type,quantStr);
+            end
             print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
           end
         end % name
-      end % train
+      %end % train
     end % if pretest or other
   end % session
 end % phase
