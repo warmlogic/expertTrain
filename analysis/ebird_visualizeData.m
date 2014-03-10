@@ -1233,6 +1233,11 @@ bw_legend_type = 'plot';
 mean_err_type = '95ci';
 diff_err_type = '95ci';
 
+% set up for bootci
+nboot = 10000;
+bootfun = @(x) mean(x);
+boottype = 'bca';
+
 % NB: pretest will collapse across training and basic/subordinate
 
 dataMeasure = 'dp';
@@ -1339,14 +1344,15 @@ end
 % make some plots
 for p = 1:length(phases)
   for s = 1:length(sessions)
-    % initialize to store all data (across divisions/quantiles)
-    data_mean_all = [];
-    data_means_ci_all = [];
-    data_diffs_ci_all = [];
-    data_err_low_all = [];
-    data_err_up_all = [];
     
     if strcmp(sessions{s},'pretest')
+      % initialize to store all data (across divisions/quantiles)
+      data_mean_all = [];
+      data_means_ci_all = [];
+      data_diffs_ci_all = [];
+      data_err_low_all = [];
+      data_err_up_all = [];
+      
       for d = 1:nDivisions
         if nDivisions > 1
           divStr = sprintf(', division %d of %d',d,nDivisions);
@@ -1363,11 +1369,6 @@ for p = 1:length(phases)
         data_mean = nanmean(theseData,2)';
         data_diffs_mean = nanmean(theseData_diffs,2)';
         
-        % set up for bootci
-        nboot = 10000;
-        bootfun = @(x) mean(x);
-        boottype = 'bca';
-        
         if strcmp(mean_err_type,'sem')
           data_sem = nanstd(theseData,0,2)' ./ sqrt(length(subjects));
           
@@ -1377,8 +1378,12 @@ for p = 1:length(phases)
           data_means_ci = [];
           for i = 1:length(imgConds)
             fprintf('Calculating bootstrap confidence intervals for %s%s (collapsed training/naming): %s...',sessions{s},divStr,imgConds{i});
-            % TODO: check on this indexing
-            data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+            %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+            
+            % exclude subjecst with NaNs
+            % TODO: check on this
+            thisImgData = theseData(i,~isnan(theseData(i,:)));
+            data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
             
             data_means_ci = cat(2,data_means_ci,data_ci);
             fprintf('Done.\n');
@@ -1390,7 +1395,12 @@ for p = 1:length(phases)
         data_diffs_ci = [];
         for i = 1:length(imgDiffs)
           fprintf('Calculating bootstrap confidence intervals for %s%s (collapsed training/naming): %s...',sessions{s},divStr,imgDiffsStr{i});
-          data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+          %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+          
+          % exclude subjecst with NaNs
+          % TODO: check on this
+          thisImgData = theseData_diffs(i,~isnan(theseData_diffs(i,:)));
+          data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
           
           data_diffs_ci = cat(2,data_diffs_ci,data_ci);
           fprintf('Done.\n');
@@ -1480,6 +1490,13 @@ for p = 1:length(phases)
     else
       for t = 1:length(training)
         for n = 1:length(naming)
+          % initialize to store all data (across divisions/quantiles)
+          data_mean_all = [];
+          data_means_ci_all = [];
+          data_diffs_ci_all = [];
+          data_err_low_all = [];
+          data_err_up_all = [];
+          
           for d = 1:nDivisions
             if nDivisions > 1
               divStr = sprintf(', division %d of %d',d,nDivisions);
@@ -1495,11 +1512,6 @@ for p = 1:length(phases)
             data_mean = nanmean(theseData,2)';
             data_diffs_mean = nanmean(theseData_diffs,2)';
             
-            % set up for bootci
-            nboot = 10000;
-            bootfun = @(x) mean(x);
-            boottype = 'bca';
-            
             if strcmp(mean_err_type,'sem')
               data_sem = nanstd(theseData,0,2)' ./ sqrt(length(subjects));
               
@@ -1508,8 +1520,13 @@ for p = 1:length(phases)
             elseif strcmp(mean_err_type,'95ci')
               data_means_ci = [];
               for i = 1:length(imgConds)
-                fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sessions{s},namingStr{n},trainingStr{t},divStr,imgConds{i});
-                data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+                fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgConds{i});
+                %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+                
+                % exclude subjecst with NaNs
+                % TODO: check on this
+                thisImgData = theseData(i,~isnan(theseData(i,:)));
+                data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
                 
                 data_means_ci = cat(2,data_means_ci,data_ci);
                 fprintf('Done.\n');
@@ -1521,7 +1538,13 @@ for p = 1:length(phases)
             data_diffs_ci = [];
             for i = 1:length(imgDiffs)
               fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgDiffsStr{i});
-              data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+              
+              %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+              
+              % exclude subjecst with NaNs
+              % TODO: check on this
+              thisImgData = theseData_diffs(i,~isnan(theseData_diffs(i,:)));
+              data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
               
               data_diffs_ci = cat(2,data_diffs_ci,data_ci);
               fprintf('Done.\n');
