@@ -1,5 +1,5 @@
-function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles)
-% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles)
+function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
+% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
@@ -10,13 +10,19 @@ function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub
 %   [results] = ebird_processData([],[],[],true,false,false,true,'rt',[.25 .50 .75]);
 %   [results] = ebird_processData([],[],[],true,false,false,true,'rt',3);
 
-if nargin == 9
+
+if nargin == 10
+  if isempty(filenameSuffix)
+    filenameSuffix = '';
+  end
+elseif nargin == 9
   %if length(quantiles) > 1
   %error('Defining cumulative probability values in the variable ''quantiles'' is not yet supported.');
   if length(quantiles) == 1 && quantiles == 1
     warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data based on ''%s''.',quantileMeasure);
     quantileMeasure = [];
   end
+  filenameSuffix = '';
 elseif nargin == 8
   if ~isempty(quantileMeasure)
     error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
@@ -24,24 +30,29 @@ elseif nargin == 8
     warning('No quantile measure supplied, not splitting data into quantiles based on ''%s''.',quantileMeasure);
     quantiles = 1;
   end
+  filenameSuffix = '';
 elseif nargin == 7
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 6
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 5
   printResults = [];
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 4
   collapsePhases = [];
   printResults = [];
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 3
   onlyCompleteSub = [];
   collapsePhases = [];
@@ -49,6 +60,7 @@ elseif nargin == 3
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 2
   subjects = [];
   onlyCompleteSub = [];
@@ -57,6 +69,7 @@ elseif nargin == 2
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 1
   dataroot = [];
   subjects = [];
@@ -66,6 +79,7 @@ elseif nargin == 1
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 elseif nargin == 0
   results = [];
   dataroot = [];
@@ -76,6 +90,7 @@ elseif nargin == 0
   saveResults = [];
   quantileMeasure = [];
   quantiles = 1;
+  filenameSuffix = '';
 end
 
 % figure out how many quantiles to use to split the data
@@ -192,6 +207,14 @@ dataFields = {...
   {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
   {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
   {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+  };
+
+% only trial counts
+mainFields = {'basic','subord'};
+dataFields = {...
+  {'nTrial','nTarg','nLure','nHit','nFA'} ...
+  {'nTrial','nTarg','nLure','nHit','nFA'} ...
+  {'nTrial','nTarg','nLure','nHit','nFA'} ...
   };
 
 % mainFields = {'basic','subord'};
@@ -872,9 +895,9 @@ if isempty(results)
     end
     
     if collapsePhases
-      matFileName = sprintf('%s_behav_results%s_collapsed.mat',expName,quantStr);
+      matFileName = sprintf('%s_behav_results%s%s_collapsed.mat',expName,quantStr,filenameSuffix);
     else
-      matFileName = sprintf('%s_behav_results%s.mat',expName,quantStr);
+      matFileName = sprintf('%s_behav_results%s%s.mat',expName,quantStr,filenameSuffix);
     end
     matFileName = fullfile(dataroot,matFileName);
     
@@ -911,9 +934,9 @@ end
 
 if saveResults
   if collapsePhases
-    textFileName = sprintf('%s_behav_results%s_collapsed.txt',expName,quantStr);
+    textFileName = sprintf('%s_behav_results%s%s_collapsed.txt',expName,quantStr,filenameSuffix);
   else
-    textFileName = sprintf('%s_behav_results%s.txt',expName,quantStr);
+    textFileName = sprintf('%s_behav_results%s%s.txt',expName,quantStr,filenameSuffix);
   end
   textFileName = fullfile(dataroot,textFileName);
   
@@ -981,18 +1004,22 @@ for sesNum = 1:length(expParam.sesTypes)
       
       fprintf(fid,'phase\t%s\n',fn);
       
-      if ~isempty(quantileMeasure)
-        quants = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
-      end
+      % % doesn't make sense to get actual quantiles for this subject
+      % if ~isempty(quantileMeasure)
+      %   quants = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
+      % end
       
       for q = 1:nDivisions
         if ~isempty(quantileMeasure) && nDivisions > 1
           if q == 1
-            fprintf(fid,'Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q));
+            %fprintf(fid,'Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q));
+            fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           elseif q == nDivisions
-            fprintf(fid,'Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quants(q-1));
+            %fprintf(fid,'Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quants(q-1));
+            fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           else
-            fprintf(fid,'Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q-1),quantileMeasure,quants(q));
+            %fprintf(fid,'Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q-1),quantileMeasure,quants(q));
+            fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           end
         end
       
