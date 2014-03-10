@@ -1,7 +1,7 @@
-function handles = barweb_uplow(barvalues, errors_upper, errors_lower, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend, error_sides, legend_type)
+function handles = barweb_uplow(barvalues, errors_upper, errors_lower, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend, error_sides, legend_type, nSubj)
 
 %
-% Usage: handles = barweb_uplow(barvalues, errors_upper, errors_lower, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend, error_sides, legend_type)
+% Usage: handles = barweb_uplow(barvalues, errors_upper, errors_lower, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend, error_sides, legend_type, nSubj)
 %
 % Ex: handles = barweb_uplow(my_barvalues, my_errors_upper, my_errors_lower, [], [], [], [], [], bone, [], bw_legend, 1, 'axis')
 %
@@ -85,6 +85,7 @@ elseif nargin == 2
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 3
 	width = 1;
 	groupnames = 1:size(barvalues,1);
@@ -96,6 +97,7 @@ elseif nargin == 3
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 4
 	groupnames = 1:size(barvalues,1);
 	bw_title = [];
@@ -106,6 +108,7 @@ elseif nargin == 4
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 5
 	bw_title = [];
 	bw_xlabel = [];
@@ -115,6 +118,7 @@ elseif nargin == 5
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 6
 	bw_xlabel = [];
 	bw_ylabel = [];
@@ -123,6 +127,7 @@ elseif nargin == 6
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 7
 	bw_ylabel = [];
 	bw_colormap = jet;
@@ -130,26 +135,34 @@ elseif nargin == 7
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 8
 	bw_colormap = jet;
 	gridstatus = 'none';
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 9
 	gridstatus = 'none';
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 10
 	bw_legend = [];
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 11
 	error_sides = 2;
 	legend_type = 'plot';
+  nSubj = [];
 elseif nargin == 12
 	legend_type = 'plot';
+  nSubj = [];
+elseif nargin == 13
+  nSubj = [];
 end
 
 change_axis = 0;
@@ -176,6 +189,9 @@ if size(barvalues,1) == 1
   errors_upper = [errors_upper; zeros(1,size(barvalues,2))];
   if ~isempty(errors_lower)
     errors_lower = [errors_lower; zeros(1,size(barvalues,2))];
+  end
+  if ~isempty(nSubj)
+    nSubj = [nSubj; zeros(1,length(barvalues))];
   end
   change_axis = 1;
 end
@@ -231,6 +247,15 @@ if strcmp(legend_type, 'axis')
     end
   end
   set(gca,'xaxislocation','top');
+end
+
+if ~isempty(nSubj)
+  for i = 1:numbars
+    xdata = get(handles.errors(i),'xdata');
+    for j = 1:length(xdata)
+      text(xdata(j), 0.09+(barvalues(j,i) + errors_upper(j,i)), num2str(nSubj(j,i)), 'FontSize', 12, 'HorizontalAlignment', 'center');
+    end
+  end
 end
 
 if ~isempty(bw_title)
