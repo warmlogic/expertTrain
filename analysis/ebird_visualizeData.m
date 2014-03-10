@@ -8,18 +8,42 @@
 
 expName = 'EBIRD';
 
-serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
-serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
-localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
+% serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,'Behavioral','Sessions');
+% serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,'Behavioral','Sessions');
+% localDir = fullfile(getenv('HOME'),'data',expName,'Behavioral','Sessions');
+% if exist('serverDir','var') && exist(serverDir,'dir')
+%   dataroot = serverDir;
+% elseif exist('serverLocalDir','var') && exist(serverLocalDir,'dir')
+%   dataroot = serverLocalDir;
+% elseif exist('localDir','var') && exist(localDir,'dir')
+%   dataroot = localDir;
+% else
+%   error('No data directory found.');
+% end
+
+subDir = '';
+behDir = fullfile(expName,'Behavioral','Sessions',subDir);
+eegDir = fullfile(expName,'EEG','Sessions','ftpp',subDir);
+% Possible locations of the data files (dataroot)
+serverDir = fullfile(filesep,'Volumes','curranlab','Data');
+serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data');
+dreamDir = fullfile(filesep,'data','projects','curranlab');
+localDir = fullfile(getenv('HOME'),'data');
+
+% pick the right dataroot
 if exist('serverDir','var') && exist(serverDir,'dir')
   dataroot = serverDir;
 elseif exist('serverLocalDir','var') && exist(serverLocalDir,'dir')
   dataroot = serverLocalDir;
+elseif exist('dreamDir','var') && exist(dreamDir,'dir')
+  dataroot = dreamDir;
 elseif exist('localDir','var') && exist(localDir,'dir')
   dataroot = localDir;
 else
-  error('No data directory found.');
+  error('Data directory not found.');
 end
+
+behDir = fullfile(dataroot,behDir);
 
 subjects = {
   %'EBIRD049'; % Pilot. (due to short ses1 match, missing ses2 name)
@@ -56,7 +80,7 @@ subjects = {
 
 saveFigs = true;
 if saveFigs
-  figsDir = fullfile(dataroot,'figs');
+  figsDir = fullfile(behDir,'figs');
   if ~exist(figsDir,'dir')
     mkdir(figsDir);
   end
@@ -98,9 +122,9 @@ saveResults = true;
 %% or just load the behavioral data
 
 if collapsePhases
-  resultsFile = fullfile(dataroot,sprintf('%s_behav_results%s_collapsed.mat',expName,quantStr));
+  resultsFile = fullfile(behDir,sprintf('%s_behav_results%s_collapsed.mat',expName,quantStr));
 else
-  resultsFile = fullfile(dataroot,sprintf('%s_behav_results%s.mat',expName,quantStr));
+  resultsFile = fullfile(behDir,sprintf('%s_behav_results%s.mat',expName,quantStr));
 end
 fprintf('Loading %s...',resultsFile);
 load(resultsFile);
@@ -1214,7 +1238,7 @@ diff_err_type = '95ci';
 dataMeasure = 'dp';
 dataLabel = 'd''';
 if strcmp(bw_legend_type,'plot')
-  ylimits = [-0.2 3.5];
+  ylimits = [-0.5 3.5];
 elseif strcmp(bw_legend_type,'axis')
   ylimits = [-0.9 3.5];
 end
@@ -1244,17 +1268,17 @@ end
 % sessions = {'pretest', 'posttest', 'posttest_delay'};
 % sesStr = {'Pretest', 'Posttest', 'Delay'};
 
-sessions = {'pretest'};
-sesStr = {'Pretest'};
-training = {'TT','UU','TU','UT'};
-trainingStr = {'Trained','Untrained','TU','UT'};
+% sessions = {'pretest'};
+% sesStr = {'Pretest'};
+% training = {'TT','UU','TU','UT'};
+% trainingStr = {'Trained','Untrained','TU','UT'};
 
-% sessions = {'posttest', 'posttest_delay'};
-% sesStr = {'Posttest', 'Delay'};
-% % training = {'TT'};
-% % trainingStr = {'Trained'};
-% training = {'TT','UU'};
-% trainingStr = {'Trained', 'Untrained'};
+sessions = {'posttest', 'posttest_delay'};
+sesStr = {'Posttest', 'Delay'};
+% training = {'TT'};
+% trainingStr = {'Trained'};
+training = {'TT','UU'};
+trainingStr = {'Trained', 'Untrained'};
 
 if collapsePhases
   phases = {'match'};
@@ -1274,11 +1298,11 @@ groupname = 'Color';
 imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
 imgDiffsStr = {'Cong - Incong', 'Cong - Gray', 'Incong - Gray'};
 
-imgConds = {'g','g_hi8','g_lo8'};
-imgCondsStr = {'Gray','HiSF','LoSF'};
-groupname = 'SpatialFreq';
-imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
-imgDiffsStr = {'Gray - HiSF', 'Gray - LoSF', 'HiSF - LoSF'};
+% imgConds = {'g','g_hi8','g_lo8'};
+% imgCondsStr = {'Gray','HiSF','LoSF'};
+% groupname = 'SpatialFreq';
+% imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
+% imgDiffsStr = {'Gray - HiSF', 'Gray - LoSF', 'HiSF - LoSF'};
 
 data = nan(length(training),length(naming),length(imgConds),length(sessions),length(phases),length(subjects),nDivisions);
 
@@ -1315,7 +1339,6 @@ end
 % make some plots
 for p = 1:length(phases)
   for s = 1:length(sessions)
-    
     % initialize to store all data (across divisions/quantiles)
     data_mean_all = [];
     data_means_ci_all = [];
@@ -1589,7 +1612,6 @@ for p = 1:length(phases)
     end % if pretest or other
   end % session
 end % phase
-
 
 %% old stuff
 
