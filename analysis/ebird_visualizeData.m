@@ -74,8 +74,8 @@ collapsePhases = false;
 
 %% split into quantile divisions?
 
-% nDivisions = 1;
-nDivisions = 4;
+nDivisions = 1;
+% nDivisions = 4;
 
 if nDivisions > 1
   quantStr = sprintf('_%dquantileDiv',nDivisions);
@@ -98,10 +98,13 @@ saveResults = true;
 %% or just load the behavioral data
 
 if collapsePhases
-  load(fullfile(dataroot,sprintf('%s_behav_results%s_collapsed.mat',expName,quantStr)));
+  resultsFile = fullfile(dataroot,sprintf('%s_behav_results%s_collapsed.mat',expName,quantStr));
 else
-  load(fullfile(dataroot,sprintf('%s_behav_results%s.mat',expName,quantStr)));
+  resultsFile = fullfile(dataroot,sprintf('%s_behav_results%s.mat',expName,quantStr));
 end
+fprintf('Loading %s...',resultsFile);
+load(resultsFile);
+fprintf('Done.\n');
 
 %% rerun to print data again
 
@@ -1198,7 +1201,7 @@ end
 
 dataMeasure = 'dp';
 dataLabel = 'd''';
-ylimits = [-0.9 3.1];
+ylimits = [-0.9 3.5];
 
 % dataMeasure = 'rt_hit';
 % dataLabel = 'Response Time: Hits';
@@ -1225,17 +1228,17 @@ ylimits = [-0.9 3.1];
 % sessions = {'pretest', 'posttest', 'posttest_delay'};
 % sesStr = {'Pretest', 'Posttest', 'Delay'};
 
-% sessions = {'pretest'};
-% sesStr = {'Pretest'};
-% training = {'TT','UU','TU','UT'};
-% trainingStr = {'Trained','Untrained','TU','UT'};
+sessions = {'pretest'};
+sesStr = {'Pretest'};
+training = {'TT','UU','TU','UT'};
+trainingStr = {'Trained','Untrained','TU','UT'};
 
-sessions = {'posttest', 'posttest_delay'};
-sesStr = {'Posttest', 'Delay'};
-% training = {'TT'};
-% trainingStr = {'Trained'};
-training = {'TT','UU'};
-trainingStr = {'Trained', 'Untrained'};
+% sessions = {'posttest', 'posttest_delay'};
+% sesStr = {'Posttest', 'Delay'};
+% % training = {'TT'};
+% % trainingStr = {'Trained'};
+% training = {'TT','UU'};
+% trainingStr = {'Trained', 'Untrained'};
 
 if collapsePhases
   phases = {'match'};
@@ -1248,18 +1251,18 @@ namingStr = {'Basic','Subordinate'};
 % naming = {'subord'};
 % namingStr = {'Subordinate'};
 
-% imgConds = {'normal','color','g'};
-% % imgStr = {'Congruent','Incongruent','Gray'};
-% imgCondsStr = {'Cong','Inc','Gray'};
-% groupname = 'Color';
-% imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
-% imgDiffsStr = {'Cong - Inc', 'Cong - Gray', 'Inc - Gray'};
+imgConds = {'normal','color','g'};
+% imgStr = {'Congruent','Incongruent','Gray'};
+imgCondsStr = {'Cong','Incong','Gray'};
+groupname = 'Color';
+imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
+imgDiffsStr = {'Cong - Incong', 'Cong - Gray', 'Incong - Gray'};
 
-imgConds = {'g','g_hi8','g_lo8'};
-imgCondsStr = {'Gray','Hi8','Lo8'};
-groupname = 'SpatialFreq';
-imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
-imgDiffsStr = {'Gray - Hi8', 'Gray - Lo8', 'Hi8 - Lo8'};
+% imgConds = {'g','g_hi8','g_lo8'};
+% imgCondsStr = {'Gray','HiSF','LoSF'};
+% groupname = 'SpatialFreq';
+% imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
+% imgDiffsStr = {'Gray - HiSF', 'Gray - LoSF', 'HiSF - LoSF'};
 
 data = nan(length(training),length(naming),length(imgConds),length(sessions),length(phases),length(subjects));
 
@@ -1297,43 +1300,69 @@ bw_error_sides = 2;
 %bw_legend_type = 'plot';
 bw_legend_type = 'axis';
 
+%mean_err_type = 'sem';
+mean_err_type = '95ci';
+diff_err_type = '95ci';
+
 % make some plots
 for p = 1:length(phases)
   for s = 1:length(sessions)
     
     if strcmp(sessions{s},'pretest')
-      
       % collapse across training and basic/subordinate
+      theseData = squeeze(nanmean(nanmean(data(:,:,:,s,p,:),1),2));
+      theseData_diffs = squeeze(nanmean(nanmean(data_diffs(:,:,:,s,p,:),1),2));
       
+      data_mean = nanmean(theseData,2)';
+      data_diffs_mean = nanmean(theseData_diffs,2)';
+      
+      % set up for bootci
       nboot = 10000;
       bootfun = @(x) mean(x);
       boottype = 'bca';
-      data_ci_all = [];
-      for i = 1:length(imgDiffs)
-        fprintf('Calculating bootstrap confidence intervals for %s %s (collapsed)...',sessions{s},imgDiffsStr{i});
-        data_ci = bootci(nboot,{bootfun,squeeze(nanmean(nanmean(data_diffs(:,:,i,s,p,:),1),2))'},'type',boottype);
+      
+      if strcmp(mean_err_type,'sem')
+        data_sem = nanstd(theseData,0,2)' ./ sqrt(length(subjects));
         
-        data_ci_all = cat(2,data_ci_all,data_ci);
+        data_err_low = data_sem;
+        data_err_up = data_sem;
+      elseif strcmp(mean_err_type,'95ci')
+        data_means_ci = [];
+        for i = 1:length(imgConds)
+          fprintf('Calculating bootstrap confidence intervals for %s (collapsed training/naming): %s...',sessions{s},imgConds{i});
+          % TODO: check on this indexing
+          data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+          
+          data_means_ci = cat(2,data_means_ci,data_ci);
+          fprintf('Done.\n');
+        end
+      end
+      
+      data_diffs_ci = [];
+      for i = 1:length(imgDiffs)
+        fprintf('Calculating bootstrap confidence intervals for %s (collapsed training/naming): %s...',sessions{s},imgDiffsStr{i});
+        data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+        
+        data_diffs_ci = cat(2,data_diffs_ci,data_ci);
         fprintf('Done.\n');
       end
       
-      % collapse across training conditions
-      data_mean = squeeze(nanmean(nanmean(nanmean(data(:,:,:,s,p,:),1),2),6))';
-      data_sem = squeeze(nanstd(nanmean(nanmean(data(:,:,:,s,p,:),1),2),0,6))' ./ sqrt(length(subjects));
+        % set the upper and lower error bars
+      if strcmp(mean_err_type,'sem')
+        % data_err_low = cat(1,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+        % data_err_up = cat(1,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+        data_err_low = cat(2,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+        data_err_up = cat(2,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+      elseif strcmp(mean_err_type,'95ci')
+        %data_err_low = cat(1,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+        %data_err_up = cat(1,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+        data_err_low = cat(2,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+        data_err_up = cat(2,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+      end
       
-      data_diffs_mean = squeeze(nanmean(nanmean(nanmean(data_diffs(:,:,:,s,p,:),1),2),6))';
-      
+      % put all the means together
       %data_mean = cat(1,data_mean, data_diffs_mean);
       data_mean = cat(2,data_mean, data_diffs_mean);
-      
-      data_err_low = data_sem;
-      data_err_up = data_sem;
-      
-      % set the upper and lower error bars
-      %data_err_low = cat(1,data_err_low, data_diffs_mean - data_ci_all(1,:));
-      %data_err_up = cat(1,data_err_up, data_ci_all(2,:) - data_diffs_mean);
-      data_err_low = cat(2,data_err_low, data_diffs_mean - data_ci_all(1,:));
-      data_err_up = cat(2,data_err_up, data_ci_all(2,:) - data_diffs_mean);
       
       figure
       
@@ -1341,15 +1370,9 @@ for p = 1:length(phases)
       bw_legend = cat(2,imgCondsStr,imgDiffsStr);
       
       bw_title = sprintf('%s: %s',groupname,sesStr{s});
-      if strcmp(sessions{s},'pretest')
-        bw_groupnames = [];
-        axis_x = 1.5;
-      else
-        %bw_groupnames = trainStr;
-        bw_groupnames = [];
-        %axis_x = length(training) + 1.5;
-        axis_x = length(training) + 0.5;
-      end
+      bw_groupnames = [];
+      axis_x = 1.5;
+      
       %bw_xlabel = 'Test day';
       bw_xlabel = [];
       bw_ylabel = dataLabel;
@@ -1375,7 +1398,6 @@ for p = 1:length(phases)
         set(h.legend,'Location','NorthEast');
       end
       axis([0.5 axis_x ylimits(1) ylimits(2)]);
-      %axis([0.5 axis_x min(bw_data - bw_errors_low)-0.5 max(bw_data + bw_errors_up)+0.5]);
       
       %if strcmp(sessions{s},'pretest')
       %  xlabel('Collapsed');
@@ -1384,41 +1406,65 @@ for p = 1:length(phases)
       publishfig(gcf,0);
       
       if saveFigs
-        fileName = sprintf('mean_sem_ci_%s_%s_%s_%s',phases{p},dataMeasure,sessions{s},groupname);
+        fileName = sprintf('%s_%s_%s_%s_mean%s_diff%s',groupname,dataMeasure,sesStr{s},phases{p},mean_err_type,diff_err_type);
         print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
       end
       
     else
       for t = 1:length(training)
         for n = 1:length(naming)
+          theseData = squeeze(data(t,n,:,s,p,:));
+          theseData_diffs = squeeze(data_diffs(t,n,:,s,p,:));
+          
+          data_mean = nanmean(theseData,2)';
+          data_diffs_mean = nanmean(theseData_diffs,2)';
+          
+          % set up for bootci
           nboot = 10000;
           bootfun = @(x) mean(x);
           boottype = 'bca';
-          data_ci_all = [];
-          for i = 1:length(imgDiffs)
-            fprintf('Calculating bootstrap confidence intervals for %s %s %s %s...',sesStr{s},namingStr{n},trainingStr{t},imgDiffsStr{i});
-            data_ci = bootci(nboot,{bootfun,squeeze(data_diffs(t,n,i,s,p,:))'},'type',boottype);
+          
+          if strcmp(mean_err_type,'sem')
+            data_sem = nanstd(theseData,0,2)' ./ sqrt(length(subjects));
             
-            data_ci_all = cat(2,data_ci_all,data_ci);
+            data_err_low = data_sem;
+            data_err_up = data_sem;
+          elseif strcmp(mean_err_type,'95ci')
+            data_means_ci = [];
+            for i = 1:length(imgConds)
+              fprintf('Calculating bootstrap confidence intervals for %s %s %s: %s...',sessions{s},namingStr{n},trainingStr{t},imgConds{i});
+              data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+              
+              data_means_ci = cat(2,data_means_ci,data_ci);
+              fprintf('Done.\n');
+            end
+          end
+          
+          data_diffs_ci = [];
+          for i = 1:length(imgDiffs)
+            fprintf('Calculating bootstrap confidence intervals for %s %s %s: %s...',sesStr{s},namingStr{n},trainingStr{t},imgDiffsStr{i});
+            data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+            
+            data_diffs_ci = cat(2,data_diffs_ci,data_ci);
             fprintf('Done.\n');
           end
           
-          data_mean = squeeze(nanmean(data(t,n,:,s,p,:),6))';
-          data_sem = squeeze(nanstd(data(t,n,:,s,p,:),0,6))' ./ sqrt(length(subjects));
+          % set the upper and lower error bars
+          if strcmp(mean_err_type,'sem')
+            % data_err_low = cat(1,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+            % data_err_up = cat(1,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+            data_err_low = cat(2,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+            data_err_up = cat(2,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+          elseif strcmp(mean_err_type,'95ci')
+            %data_err_low = cat(1,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+            %data_err_up = cat(1,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+            data_err_low = cat(2,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+            data_err_up = cat(2,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+          end
           
-          data_diffs_mean = squeeze(nanmean(data_diffs(t,n,:,s,p,:),6))';
-          
+          % put all the means together
           %data_mean = cat(1,data_mean, data_diffs_mean);
           data_mean = cat(2,data_mean, data_diffs_mean);
-          
-          data_err_low = data_sem;
-          data_err_up = data_sem;
-          
-          % set the upper and lower error bars
-          %data_err_low = cat(1,data_err_low, data_diffs_mean - data_ci_all(1,:));
-          %data_err_up = cat(1,data_err_up, data_ci_all(2,:) - data_diffs_mean);
-          data_err_low = cat(2,data_err_low, data_diffs_mean - data_ci_all(1,:));
-          data_err_up = cat(2,data_err_up, data_ci_all(2,:) - data_diffs_mean);
           
           figure
           
@@ -1427,16 +1473,8 @@ for p = 1:length(phases)
           
           bw_title = sprintf('%s: %s, %s, %s',groupname,sesStr{s},trainingStr{t},namingStr{n});
           %bw_groupnames = {'Pretest', 'Posttest', 'Delay'};
-          if strcmp(sessions{s},'pretest')
-            bw_groupnames = [];
-            axis_x = 1.5;
-          else
-            %bw_groupnames = trainStr;
-            bw_groupnames = [];
-            %axis_x = length(training) + 1.5;
-            %axis_x = length(training) + 0.5;
-            axis_x = 1.5;
-          end
+          bw_groupnames = [];
+          axis_x = 1.5;
           %bw_xlabel = 'Test day';
           bw_xlabel = [];
           bw_ylabel = dataLabel;
@@ -1462,7 +1500,6 @@ for p = 1:length(phases)
             set(h.legend,'Location','NorthEast');
           end
           axis([0.5 axis_x ylimits(1) ylimits(2)]);
-          %axis([0.5 axis_x min(bw_data - bw_errors_low)-0.5 max(bw_data + bw_errors_up)+0.5]);
           
           %if strcmp(sessions{s},'pretest')
           %  xlabel('Collapsed');
@@ -1471,7 +1508,7 @@ for p = 1:length(phases)
           publishfig(gcf,0);
           
           if saveFigs
-            fileName = sprintf('mean_sem_ci_%s_%s_%s_%s_%s_%s',phases{p},dataMeasure,sessions{s},trainingStr{t},namingStr{n},groupname);
+            fileName = sprintf('%s_%s_%s_%s_%s_%s_mean%s_diff%s',groupname,dataMeasure,sesStr{s},phases{p},trainingStr{t},namingStr{n},mean_err_type,diff_err_type);
             print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
           end
         end % name
