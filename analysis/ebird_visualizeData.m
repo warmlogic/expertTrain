@@ -99,7 +99,9 @@ collapsePhases = false;
 %% split into quantile divisions?
 
 % nDivisions = 1;
-nDivisions = 4;
+nDivisions = 2;
+% nDivisions = 3;
+% nDivisions = 4;
 
 if nDivisions > 1
   quantStr = sprintf('_%dquantileDiv',nDivisions);
@@ -1275,15 +1277,15 @@ plot_nSubj = true;
 % sessions = {'pretest', 'posttest', 'posttest_delay'};
 % sesStr = {'Pretest', 'Posttest', 'Delay'};
 
-sessions = {'pretest'};
-sesStr = {'Pretest'};
-training = {'TT','UU','TU','UT'};
-trainingStr = {'Trained','Untrained','TU','UT'};
+% sessions = {'pretest'};
+% sesStr = {'Pretest'};
+% training = {'TT','UU','TU','UT'};
+% trainingStr = {'Trained','Untrained','TU','UT'};
 
-% sessions = {'posttest', 'posttest_delay'};
-% sesStr = {'Posttest', 'Delay'};
-% training = {'TT','UU'};
-% trainingStr = {'Trained', 'Untrained'};
+sessions = {'posttest', 'posttest_delay'};
+sesStr = {'Posttest', 'Delay'};
+training = {'TT','UU'};
+trainingStr = {'Trained', 'Untrained'};
 
 % sessions = {'posttest'};
 % sesStr = {'Posttest'};
