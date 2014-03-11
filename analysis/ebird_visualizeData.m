@@ -98,8 +98,8 @@ collapsePhases = false;
 
 %% split into quantile divisions?
 
-% nDivisions = 1;
-nDivisions = 2;
+nDivisions = 1;
+% nDivisions = 2;
 % nDivisions = 3;
 % nDivisions = 4;
 
@@ -1704,6 +1704,106 @@ for p = 1:length(phases)
     end % if pretest or other
   end % session
 end % phase
+
+
+%% min trial counts
+
+dataMeasures = {'nTarg', 'nLure'};
+
+sessions = {'pretest', 'posttest', 'posttest_delay'};
+% sesStr = {'Pretest', 'Posttest', 'Delay'};
+
+% sessions = {'pretest'};
+% sesStr = {'Pretest'};
+% training = {'TT','UU','TU','UT'};
+% trainingStr = {'Trained','Untrained','TU','UT'};
+
+% sessions = {'posttest', 'posttest_delay'};
+% sesStr = {'Posttest', 'Delay'};
+training = {'TT','UU'};
+% trainingStr = {'Trained', 'Untrained'};
+
+% sessions = {'posttest'};
+% sesStr = {'Posttest'};
+
+if collapsePhases
+  phases = {'match'};
+else
+  phases = {'match_1'};
+end
+
+naming = {'basic','subord'};
+% namingStr = {'Basic','Subordinate'};
+% naming = {'subord'};
+% namingStr = {'Subordinate'};
+% naming = {'basic'};
+% namingStr = {'Basic'};
+
+imgConds = {'normal','color','g'};
+% imgStr = {'Congruent','Incongruent','Gray'};
+% imgCondsStr = {'Cong','Incong','Gray'};
+groupname = 'Color';
+% imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
+% imgDiffsStr = {'Cong - Incong', 'Cong - Gray', 'Incong - Gray'};
+
+% imgConds = {'g','g_hi8','g_lo8'};
+% % imgCondsStr = {'Gray','HiSF','LoSF'};
+% groupname = 'SpatialFreq';
+% % imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
+% % imgDiffsStr = {'Gray - HiSF', 'Gray - LoSF', 'HiSF - LoSF'};
+
+minTrials = nan(length(subjects),length(dataMeasures),length(sessions),length(naming));
+
+for sub = 1:length(subjects)
+  for s = 1:length(sessions)
+    for n = 1:length(naming)
+      for dm = 1:length(dataMeasures)
+        thisMin = Inf;
+        
+        for p = 1:length(phases)
+          for i = 1:length(imgConds)
+            for t = 1:length(training)
+              %for d = 1:nDivisions
+              
+              % get the minimum for this division
+              dMin = min(results.(sessions{s}).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasures{dm})(sub,:));
+              
+              if dMin < thisMin
+                minTrials(sub,dm,s,n) = dMin;
+              end
+              
+              %end
+            end
+          end
+        end
+        
+      end
+    end
+  end
+end
+
+fprintf('=============================================================================================================\n');
+for n = 1:length(naming)
+  for s = 1:length(sessions)
+    fprintf('%s: %s %s (across training, img cond, %d quantile divisions)\n',groupname,sessions{s},naming{n},nDivisions);
+    for sub = 1:length(subjects)
+      if sub == 1
+        fprintf('\t%s\n',sprintf(repmat('\t%s',1,length(dataMeasures)),dataMeasures{:}));
+      end
+      fprintf('%s',subjects{sub});
+      for dm = 1:length(dataMeasures)
+        fprintf('\t%d',minTrials(sub,dm,s,n));
+      end
+      fprintf('\n');
+    end
+    fprintf('nZeros:\t');
+    for dm = 1:length(dataMeasures)
+      fprintf('\t(%d)',sum(minTrials(:,dm,s,n) == 0));
+    end
+    fprintf('\n\n');
+  end
+end
+
 
 %% old stuff
 
