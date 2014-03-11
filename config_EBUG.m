@@ -181,6 +181,14 @@ if expParam.sessionNum == 1
     cfg.stim.yokeTogether = [1 1];
   end
   
+  % yoke exemplars across species within these family groups so training
+  % status is the same for all families with the same number; NB this
+  % applies when there is some dependency between different families
+  cfg.stim.yokeTrainedExemplars = false;
+  if cfg.stim.yokeTrainedExemplars
+    cfg.stim.yokeExemplars_train = [1 2];
+  end
+  
   % Number of trained and untrained exemplars per species per family
   cfg.stim.nTrained = 6;
   cfg.stim.nUntrained = 6;
