@@ -201,6 +201,10 @@ if ~isfield(cfg.stim,'yokeTrainedExemplars')
   cfg.stim.yokeTrainedExemplars = false;
 end
 
+if ~cfg.stim.yokeTrainedExemplars
+  cfg.stim.yokeExemplars_train = 1:length(cfg.stim.familyNames);
+end
+
 for f = 1:length(cfg.stim.familyNames)
   % initialize to store trained/untrained exemplar numbers (only used it
   % cfg.stim.yokeTrainedExemplars == true)
@@ -281,7 +285,7 @@ for s = 1:expParam.nSessions
                 [expParam.session.(sesName).(phaseName)(recogCount).allStims{b},stimStruct(f).fStims] = et_divvyStims(...
                   stimStruct(f).fStims,expParam.session.(sesName).(phaseName)(recogCount).allStims{b},...
                   cfg.stim.(sesName).(phaseName)(recogCount).nStudyTarg + cfg.stim.(sesName).(phaseName)(recogCount).nTestLure,...
-                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false},[],cfg.stim.exemplarNums_recog(recogBlockInd,:));
+                  cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice'},{false},[],cfg.stim.speciesNums_recog(recogBlockInd,:));
               end
             end
           end
