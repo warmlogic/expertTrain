@@ -174,7 +174,8 @@ if expParam.sessionNum == 1
   cfg.stim.nUntrained = 6;
   
   % yoke exemplars across species within these family groups so training
-  % status is the same for all finches and for all warblers
+  % status is the same for all finches and for all warblers; NB this
+  % applies when there is some dependency between different families
   cfg.stim.yokeTrainedExemplars = true;
   if cfg.stim.yokeTrainedExemplars
     cfg.stim.yokeExemplars_train = [1 1 1 1 1 2 2 2 2 2];
