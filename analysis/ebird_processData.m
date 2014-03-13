@@ -10,6 +10,7 @@ function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub
 %   [results] = ebird_processData([],[],[],true,false,false,true,'rt',[.25 .50 .75]);
 %   [results] = ebird_processData([],[],[],true,false,false,true,'rt',3);
 
+plotQhist = false;
 
 if nargin == 10
   if isempty(filenameSuffix)
@@ -453,6 +454,12 @@ if isempty(results)
                 if ~isempty(quantileMeasure)
                   quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
                   results.(sesName).(fn).quantiles(sub,:) = quantz;
+                  if plotQhist && ismember(sesName,{'pretest','posttest','posttest_delay'})
+                    hist([events.(sesName).(fn).data.(quantileMeasure)],100);
+                    title(sprintf('%s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-')));
+                    keyboard
+                    close all
+                  end
                 end
             
                 for q = 1:nDivisions
