@@ -1,5 +1,5 @@
 function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
-% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
+% function [results,quantileDivs] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
@@ -298,6 +298,10 @@ if isempty(results)
           fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
         end
         
+        if ~isempty(quantileMeasure)
+          results.(sesName).(fn).quantiles = nan(length(subjects),nQuantiles);
+        end
+        
         switch phaseName
           case {'match', 'prac_match'}
             for t = 1:length(trainedConds)
@@ -447,18 +451,19 @@ if isempty(results)
                 fprintf('%s, session_%d %s, %s\n',expParam.subject,sesNum,sesName,fn);
                 
                 if ~isempty(quantileMeasure)
-                  quants = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
+                  quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
+                  results.(sesName).(fn).quantiles(sub,:) = quantz;
                 end
-                
+            
                 for q = 1:nDivisions
                   if ~isempty(quantileMeasure) && printResults && nDivisions > 1
                     fprintf('==================================================\n');
                     if q == 1
-                      fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q));
+                      fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q));
                     elseif q == nDivisions
-                      fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quants(q-1));
+                      fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1));
                     else
-                      fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q-1),quantileMeasure,quants(q));
+                      fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1),quantileMeasure,quantz(q));
                     end
                     fprintf('==================================================\n');
                   end
@@ -466,11 +471,11 @@ if isempty(results)
                   if ~isempty(quantileMeasure)
                     % get the events for this quantile
                     if q == 1
-                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] <= quants(q));
+                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] <= quantz(q));
                     elseif q == nDivisions
-                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quants(q-1));
+                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quantz(q-1));
                     else
-                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quants(q-1) & [events.(sesName).(fn).data.(quantileMeasure)] <= quants(q));
+                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(quantileMeasure)] <= quantz(q));
                     end
                   else
                     theseEvents = events.(sesName).(fn).data;
@@ -1006,19 +1011,19 @@ for sesNum = 1:length(expParam.sesTypes)
       
       % % doesn't make sense to get actual quantiles for this subject
       % if ~isempty(quantileMeasure)
-      %   quants = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
+      %   quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
       % end
       
       for q = 1:nDivisions
         if ~isempty(quantileMeasure) && nDivisions > 1
           if q == 1
-            %fprintf(fid,'Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q));
+            %fprintf(fid,'Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q));
             fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           elseif q == nDivisions
-            %fprintf(fid,'Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quants(q-1));
+            %fprintf(fid,'Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1));
             fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           else
-            %fprintf(fid,'Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quants(q-1),quantileMeasure,quants(q));
+            %fprintf(fid,'Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1),quantileMeasure,quantz(q));
             fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           end
         end
