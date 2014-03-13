@@ -952,14 +952,21 @@ if saveResults
   end
   textFileName = fullfile(dataroot,textFileName);
   
-  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,textFileName,collapsePhases,templateSubIndex,quantileMeasure,quantiles,nDivisions);
+  printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,textFileName,collapsePhases,templateSubIndex,quantileMeasure,nDivisions);
 end
 
 end % function
 
 %% print to text file
 
-function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,textFileName,collapsePhases,templateSubIndex,quantileMeasure,quantiles,nDivisions)
+function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainToPrint,dataToPrint,textFileName,collapsePhases,templateSubIndex,quantileMeasure,nDivisions)
+
+if nargin < 12
+  error('Must include both variables: ''quantileMeasure'' and ''nDivisions''.');
+elseif nargin < 11
+  quantileMeasure = [];
+  nDivisions = 1;
+end
 
 fprintf('Saving results to text file: %s...',textFileName);
 
@@ -1016,21 +1023,13 @@ for sesNum = 1:length(expParam.sesTypes)
       
       fprintf(fid,'phase\t%s\n',fn);
       
-      % % doesn't make sense to get actual quantiles for this subject
-      % if ~isempty(quantileMeasure)
-      %   quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
-      % end
-      
       for q = 1:nDivisions
         if ~isempty(quantileMeasure) && nDivisions > 1
           if q == 1
-            %fprintf(fid,'Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q));
             fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           elseif q == nDivisions
-            %fprintf(fid,'Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1));
             fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           else
-            %fprintf(fid,'Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1),quantileMeasure,quantz(q));
             fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
           end
         end
