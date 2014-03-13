@@ -1706,6 +1706,524 @@ for p = 1:length(phases)
   end % session
 end % phase
 
+%% NEWEST with sig: d' bootci - break pre/post tests into different graphs - training x naming x img cond
+
+% bar options
+bw_width = 0.75;
+%bw_gridstatus = [];
+bw_gridstatus = 'y';
+bw_error_sides = 2;
+bw_legend_type = 'plot';
+% bw_legend_type = 'axis';
+
+%mean_err_type = 'sem';
+mean_err_type = '95ci';
+diff_err_type = '95ci';
+
+% set up for bootci
+nboot = 10000;
+bootfun = @(x) mean(x);
+boottype = 'bca';
+
+% NB: pretest will collapse across training and basic/subordinate
+
+dataMeasure = 'dp';
+dataLabel = 'd''';
+if strcmp(bw_legend_type,'plot')
+  ylimits = [0 3.5];
+elseif strcmp(bw_legend_type,'axis')
+  ylimits = [-0.9 3.5];
+end
+
+% plot_nSubj = true;
+plot_nSubj = false;
+
+plot_diffs = false;
+
+% dataMeasure = 'rt_hit';
+% dataLabel = 'Response Time: Hits';
+% ylimits = [0 5000];
+
+% dataMeasure = 'hr';
+% dataLabel = 'Hit Rate';
+% ylimits = [0 1];
+
+% dataMeasure = 'c';
+% dataLabel = 'Response bias (criterion; c)';
+% ylimits = [-0.6 0.6];
+% % positive/conservative bias indicates a tendency to say 'new', whereas
+% % negative/liberal bias indicates a tendency to say 'old'
+
+% dataMeasure = 'Br';
+% dataLabel = 'Response bias index (Br)';
+% ylimits = [0 1];
+
+% dataMeasure = 'Pr';
+% dataLabel = 'Discrimination index (Pr)';
+% ylimits = [0 1];
+
+% sessions = {'pretest', 'posttest', 'posttest_delay'};
+% sesStr = {'Pretest', 'Posttest', 'Delay'};
+
+sessions = {'pretest'};
+sesStr = {'Pretest'};
+training = {'TT','UU','TU','UT'};
+trainingStr = {'Trained','Untrained','TU','UT'};
+
+% sessions = {'posttest', 'posttest_delay'};
+% sesStr = {'Posttest', 'Delay'};
+% training = {'TT','UU'};
+% trainingStr = {'Trained', 'Untrained'};
+
+% sessions = {'posttest'};
+% sesStr = {'Posttest'};
+
+if collapsePhases
+  phases = {'match'};
+else
+  phases = {'match_1'};
+end
+
+naming = {'basic','subord'};
+namingStr = {'Basic','Subordinate'};
+% naming = {'subord'};
+% namingStr = {'Subordinate'};
+% naming = {'basic'};
+% namingStr = {'Basic'};
+
+imgConds = {'normal','color','g'};
+% imgStr = {'Congruent','Incongruent','Gray'};
+imgCondsStr = {'Cong','Incong','Gray'};
+groupname = 'Color';
+imgDiffs = {{'normal', 'color'},{'normal', 'g'},{'color', 'g'}};
+imgDiffsStr = {'Cong - Incong', 'Cong - Gray', 'Incong - Gray'};
+
+% imgConds = {'g','g_hi8','g_lo8'};
+% imgCondsStr = {'Gray','HiSF','LoSF'};
+% groupname = 'SpatialFreq';
+% imgDiffs = {{'g', 'g_hi8'},{'g', 'g_lo8'},{'g_hi8', 'g_lo8'}};
+% imgDiffsStr = {'Gray - HiSF', 'Gray - LoSF', 'HiSF - LoSF'};
+
+data = nan(length(training),length(naming),length(imgConds),length(sessions),length(phases),length(subjects),nDivisions);
+
+for s = 1:length(sessions)
+  for p = 1:length(phases)
+    for i = 1:length(imgConds)
+      for t = 1:length(training)
+        for n = 1:length(naming)
+          for d = 1:nDivisions
+            data(t,n,i,s,p,:,d) = results.(sessions{s}).(phases{p}).(training{t}).(imgConds{i}).(naming{n}).(dataMeasure)(:,d);
+          end
+        end
+      end
+    end
+  end
+end
+
+if plot_diffs
+  data_diffs = nan(length(training),length(naming),length(imgDiffs),length(sessions),length(phases),length(subjects),nDivisions);
+  
+  for s = 1:length(sessions)
+    for p = 1:length(phases)
+      for i = 1:length(imgDiffs)
+        for t = 1:length(training)
+          for n = 1:length(naming)
+            for d = 1:nDivisions
+              data_diffs(t,n,i,s,p,:,d) = results.(sessions{s}).(phases{p}).(training{t}).(imgDiffs{i}{1}).(naming{n}).(dataMeasure)(:,d) - results.(sessions{s}).(phases{p}).(training{t}).(imgDiffs{i}{2}).(naming{n}).(dataMeasure)(:,d);
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+% make some plots
+for p = 1:length(phases)
+  for s = 1:length(sessions)
+    
+    if strcmp(sessions{s},'pretest')
+      % initialize to store all data (across divisions/quantiles)
+      data_mean_all = [];
+      data_means_ci_all = [];
+      if plot_diffs
+        data_diffs_ci_all = [];
+      end
+      data_err_low_all = [];
+      data_err_up_all = [];
+      nSubj_all = [];
+      
+      for d = 1:nDivisions
+        if nDivisions > 1
+          divStr = sprintf(', division %d of %d',d,nDivisions);
+          quantStr = sprintf('_%dquantileDiv',nDivisions);
+        else
+          divStr = '';
+          quantStr = '';
+        end
+        
+        % collapse across training and basic/subordinate
+        theseData = squeeze(nanmean(nanmean(data(:,:,:,s,p,:,d),1),2));
+        if plot_diffs
+          theseData_diffs = squeeze(nanmean(nanmean(data_diffs(:,:,:,s,p,:,d),1),2));
+        end
+        
+        data_mean = nanmean(theseData,2)';
+        if plot_diffs
+          data_diffs_mean = nanmean(theseData_diffs,2)';
+        end
+        
+        if strcmp(mean_err_type,'sem')
+          data_sem = nanstd(theseData,0,2)' ./ sqrt(length(subjects));
+          
+          data_err_low = data_sem;
+          data_err_up = data_sem;
+        elseif strcmp(mean_err_type,'95ci')
+          data_means_ci = [];
+          if plot_nSubj
+            nSubj_means = [];
+          end
+          for i = 1:length(imgConds)
+            fprintf('Calculating bootstrap confidence intervals for %s%s (collapsed training/naming): %s...',sessions{s},divStr,imgConds{i});
+            %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+            
+            % exclude subjecst with NaNs
+            thisImgData = theseData(i,~isnan(theseData(i,:)));
+            data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+            
+            if plot_nSubj
+              % save the number of subjects that went into this ci
+              nSubj_means = cat(2,nSubj_means,length(thisImgData));
+            end
+            
+            data_means_ci = cat(2,data_means_ci,data_ci);
+            fprintf('Done.\n');
+          end
+          % put all the divisions together
+          data_means_ci_all = cat(1,data_means_ci_all,data_means_ci);
+        end
+        
+        if plot_diffs
+          data_diffs_ci = [];
+          if plot_nSubj
+            nSubj_diffs = [];
+          end
+          for i = 1:length(imgDiffs)
+            fprintf('Calculating bootstrap confidence intervals for %s%s (collapsed training/naming): %s...',sessions{s},divStr,imgDiffsStr{i});
+            %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+            
+            % exclude subjecst with NaNs
+            thisImgData = theseData_diffs(i,~isnan(theseData_diffs(i,:)));
+            data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+            
+            if plot_nSubj
+              % save the number of subjects that went into this ci
+              nSubj_diffs = cat(2,nSubj_diffs,length(thisImgData));
+            end
+            
+            data_diffs_ci = cat(2,data_diffs_ci,data_ci);
+            fprintf('Done.\n');
+          end
+          % put all the divisions together
+          data_diffs_ci_all = cat(1,data_diffs_ci_all,data_diffs_ci);
+        end
+        
+        % set the upper and lower error bars
+        if strcmp(mean_err_type,'sem')
+          if plot_diffs
+            % data_err_low = cat(1,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+            % data_err_up = cat(1,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+            data_err_low = cat(2,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+            data_err_up = cat(2,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+          %else
+          %  data_err_low = cat(2,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+          %  data_err_up = cat(2,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+          end
+        elseif strcmp(mean_err_type,'95ci')
+          if plot_diffs
+            %data_err_low = cat(1,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+            %data_err_up = cat(1,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+            data_err_low = cat(2,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+            data_err_up = cat(2,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+          else
+            data_err_low = data_mean - data_means_ci(1,:);
+            data_err_up = data_means_ci(2,:) - data_mean;
+          end
+        end
+        % put all the divisions together
+        data_err_low_all = cat(1,data_err_low_all,data_err_low);
+        data_err_up_all = cat(1,data_err_up_all,data_err_up);
+        
+        % put the means together
+        if plot_diffs
+          %data_mean = cat(1,data_mean, data_diffs_mean);
+          data_mean = cat(2,data_mean, data_diffs_mean);
+        end
+        % put all the divisions together
+        data_mean_all = cat(1,data_mean_all,data_mean);
+        
+        if plot_nSubj
+          nSubj = cat(2,nSubj_means,nSubj_diffs);
+          nSubj_all = cat(1,nSubj_all,nSubj);
+        end
+      end % divisions/quantiles
+      
+      figure
+      
+      %bw_legend = imgStr;
+      if plot_diffs
+        bw_legend = cat(2,imgCondsStr,imgDiffsStr);
+      else
+        bw_legend = imgCondsStr;
+      end
+      
+      bw_title = sprintf('%s: %s',groupname,sesStr{s});
+      
+      axis_x = nDivisions + 0.5;
+      
+      if nDivisions > 1
+        %bw_groupnames = 1:nDivisions;
+        bw_groupnames = {'Fast','Slow'};
+        bw_xlabel = 'Response Time Speed';
+      else
+        bw_groupnames = [];
+        bw_xlabel = [];
+      end
+      
+      bw_ylabel = dataLabel;
+      if exist('linspecer','file')
+        bw_colormap = 'linspecer';
+      else
+        bw_colormap = 'gray';
+      end
+      bw_data = data_mean_all;
+      bw_errors_up = data_err_up_all;
+      bw_errors_low = data_err_low_all;
+      
+      %       bw_data = data_mean';
+      %       bw_errors_up = data_err_up';
+      %       bw_errors_low = data_err_low';
+      %
+      %       bw_data = bw_data(:)';
+      %       bw_errors_up = bw_errors_up(:)';
+      %       bw_errors_low = bw_errors_low(:)';
+      
+      h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type,nSubj_all);
+      if strcmp(bw_legend_type,'plot')
+        set(h.legend,'Location','NorthEast');
+      end
+      axis([0.5 axis_x ylimits(1) ylimits(2)]);
+      
+      %if strcmp(sessions{s},'pretest')
+      %  xlabel('Collapsed');
+      %end
+      set(gca,'YTick',0:1:round(ylimits(2)));
+      if strcmp(bw_legend_type,'plot') && length(bw_legend) > 4
+        publishfig(gcf,0,16);
+      else
+        publishfig(gcf,0);
+      end
+      
+      if saveFigs
+        if plot_diffs
+          fileName = sprintf('%s_%s_%s_%s_mean%s_diff%s%s',groupname,dataMeasure,sesStr{s},phases{p},mean_err_type,diff_err_type,quantStr);
+        else
+          fileName = sprintf('%s_%s_%s_%s_mean%s%s',groupname,dataMeasure,sesStr{s},phases{p},mean_err_type,quantStr);
+        end
+        %print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
+      end
+      
+    else
+      for t = 1:length(training)
+        for n = 1:length(naming)
+          % initialize to store all data (across divisions/quantiles)
+          data_mean_all = [];
+          data_means_ci_all = [];
+          data_diffs_ci_all = [];
+          data_err_low_all = [];
+          data_err_up_all = [];
+          nSubj_all = [];
+          
+          for d = 1:nDivisions
+            if nDivisions > 1
+              divStr = sprintf(', division %d of %d',d,nDivisions);
+              quantStr = sprintf('_%dquantileDiv',nDivisions);
+            else
+              divStr = '';
+              quantStr = '';
+            end
+            
+            if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+              % collapse across trained/untrained for posttest basic only
+              theseData = squeeze(nanmean(data(:,n,:,s,p,:,d),1));
+              theseData_diffs = squeeze(nanmean(data_diffs(:,n,:,s,p,:,d),1));
+            else
+              theseData = squeeze(data(t,n,:,s,p,:,d));
+              theseData_diffs = squeeze(data_diffs(t,n,:,s,p,:,d));
+            end
+            
+            data_mean = nanmean(theseData,2)';
+            data_diffs_mean = nanmean(theseData_diffs,2)';
+            
+            if strcmp(mean_err_type,'sem')
+              data_sem = nanstd(theseData,0,2)' ./ sqrt(length(subjects));
+              
+              data_err_low = data_sem;
+              data_err_up = data_sem;
+            elseif strcmp(mean_err_type,'95ci')
+              data_means_ci = [];
+              if plot_nSubj
+                nSubj_means = [];
+              end
+              for i = 1:length(imgConds)
+                if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+                  fprintf('Calculating bootstrap confidence intervals for %s %s%s: %s...',sesStr{s},namingStr{n},divStr,imgConds{i});
+                else
+                  fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgConds{i});
+                end
+                %data_ci = bootci(nboot,{bootfun,theseData(i,:)},'type',boottype);
+                
+                % exclude subjecst with NaNs
+                thisImgData = theseData(i,~isnan(theseData(i,:)));
+                data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+                
+                if plot_nSubj
+                  % save the number of subjects that went into this ci
+                  nSubj_means = cat(2,nSubj_means,length(thisImgData));
+                end
+                
+                data_means_ci = cat(2,data_means_ci,data_ci);
+                fprintf('Done.\n');
+              end
+              % put all the divisions together
+              data_means_ci_all = cat(1,data_means_ci_all,data_means_ci);
+            end
+            
+            data_diffs_ci = [];
+            if plot_nSubj
+              nSubj_diffs = [];
+            end
+            for i = 1:length(imgDiffs)
+              if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+                fprintf('Calculating bootstrap confidence intervals for %s %s%s: %s...',sesStr{s},namingStr{n},divStr,imgDiffsStr{i});
+              else
+                fprintf('Calculating bootstrap confidence intervals for %s %s %s%s: %s...',sesStr{s},namingStr{n},trainingStr{t},divStr,imgDiffsStr{i});
+              end
+              
+              %data_ci = bootci(nboot,{bootfun,theseData_diffs(i,:)},'type',boottype);
+              
+              % exclude subjecst with NaNs
+              thisImgData = theseData_diffs(i,~isnan(theseData_diffs(i,:)));
+              data_ci = bootci(nboot,{bootfun,thisImgData},'type',boottype);
+              
+              if plot_nSubj
+                % save the number of subjects that went into this ci
+                nSubj_diffs = cat(2,nSubj_diffs,length(thisImgData));
+              end
+              
+              data_diffs_ci = cat(2,data_diffs_ci,data_ci);
+              fprintf('Done.\n');
+            end
+            % put all the divisions together
+            data_diffs_ci_all = cat(1,data_diffs_ci_all,data_diffs_ci);
+            
+            % set the upper and lower error bars
+            if strcmp(mean_err_type,'sem')
+              % data_err_low = cat(1,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+              % data_err_up = cat(1,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+              data_err_low = cat(2,data_err_low, data_diffs_mean - data_diffs_ci(1,:));
+              data_err_up = cat(2,data_err_up, data_diffs_ci(2,:) - data_diffs_mean);
+            elseif strcmp(mean_err_type,'95ci')
+              %data_err_low = cat(1,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+              %data_err_up = cat(1,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+              data_err_low = cat(2,data_mean - data_means_ci(1,:), data_diffs_mean - data_diffs_ci(1,:));
+              data_err_up = cat(2,data_means_ci(2,:) - data_mean, data_diffs_ci(2,:) - data_diffs_mean);
+            end
+            % put all the divisions together
+            data_err_low_all = cat(1,data_err_low_all,data_err_low);
+            data_err_up_all = cat(1,data_err_up_all,data_err_up);
+            
+            % put the means together
+            %data_mean = cat(1,data_mean, data_diffs_mean);
+            data_mean = cat(2,data_mean, data_diffs_mean);
+            % put all the divisions together
+            data_mean_all = cat(1,data_mean_all,data_mean);
+            
+            if plot_nSubj
+              nSubj = cat(2,nSubj_means,nSubj_diffs);
+              nSubj_all = cat(1,nSubj_all,nSubj);
+            end
+          end % divisions/quantiles
+          
+          figure
+          
+          %bw_legend = imgStr;
+          bw_legend = cat(2,imgCondsStr,imgDiffsStr);
+          
+          if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+            bw_title = sprintf('%s: %s, %s',groupname,sesStr{s},namingStr{n});
+          else
+            bw_title = sprintf('%s: %s, %s, %s',groupname,sesStr{s},trainingStr{t},namingStr{n});
+          end
+          
+          axis_x = nDivisions + 0.5;
+          
+          if nDivisions > 1
+            bw_groupnames = 1:nDivisions;
+            bw_xlabel = 'Quartile (by RT)';
+          else
+            bw_groupnames = [];
+            bw_xlabel = [];
+          end
+          
+          bw_ylabel = dataLabel;
+          if exist('linspecer','file')
+            bw_colormap = 'linspecer';
+          else
+            bw_colormap = 'gray';
+          end
+          bw_data = data_mean_all;
+          bw_errors_up = data_err_up_all;
+          bw_errors_low = data_err_low_all;
+          
+          %       bw_data = data_mean';
+          %       bw_errors_up = data_err_up';
+          %       bw_errors_low = data_err_low';
+          %
+          %       bw_data = bw_data(:)';
+          %       bw_errors_up = bw_errors_up(:)';
+          %       bw_errors_low = bw_errors_low(:)';
+          
+          h = barweb_uplow(bw_data,bw_errors_up,bw_errors_low,bw_width,bw_groupnames,bw_title,bw_xlabel,bw_ylabel,bw_colormap,bw_gridstatus,bw_legend,bw_error_sides,bw_legend_type,nSubj_all);
+          if strcmp(bw_legend_type,'plot')
+            set(h.legend,'Location','NorthEast');
+          end
+          axis([0.5 axis_x ylimits(1) ylimits(2)]);
+          
+          %if strcmp(sessions{s},'pretest')
+          %  xlabel('Collapsed');
+          %end
+          set(gca,'YTick',0:1:round(ylimits(2)));
+          if strcmp(bw_legend_type,'plot') && length(bw_legend) > 4
+            publishfig(gcf,0,16);
+          else
+            publishfig(gcf,0);
+          end
+          
+          if saveFigs
+            if length(sessions) == 1 && strcmp(sessions,'posttest') && length(naming) == 1 && strcmp(naming,'basic')
+              fileName = sprintf('%s_%s_%s_%s_%s_mean%s_diff%s%s',groupname,dataMeasure,sesStr{s},phases{p},namingStr{n},mean_err_type,diff_err_type,quantStr);
+            else
+              fileName = sprintf('%s_%s_%s_%s_%s_%s_mean%s_diff%s%s',groupname,dataMeasure,sesStr{s},phases{p},trainingStr{t},namingStr{n},mean_err_type,diff_err_type,quantStr);
+            end
+            print(gcf,figFormat,figRes,fullfile(figsDir,fileName));
+          end
+        end % name
+      end % train
+    end % if pretest or other
+  end % session
+end % phase
+
 
 %% min trial counts
 
