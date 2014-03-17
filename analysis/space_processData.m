@@ -46,7 +46,13 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE027';
     'SPACE029';
     'SPACE037';
-    'SPACE039';
+    'SPACE039'; % original EEG analyses stopped here
+    'SPACE023';
+    'SPACE024';
+    'SPACE025';
+    'SPACE026';
+    'SPACE028';
+    'SPACE030';
     };
 end
 
