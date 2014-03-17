@@ -1,5 +1,5 @@
 function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
-% function [results,quantileDivs] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
+% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
@@ -16,82 +16,47 @@ if nargin == 10
   if isempty(filenameSuffix)
     filenameSuffix = '';
   end
-elseif nargin == 9
-  %if length(quantiles) > 1
-  %error('Defining cumulative probability values in the variable ''quantiles'' is not yet supported.');
+end
+
+if nargin < 10
+  filenameSuffix = '';
   if length(quantiles) == 1 && quantiles == 1
     warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data based on ''%s''.',quantileMeasure);
     quantileMeasure = [];
   end
-  filenameSuffix = '';
-elseif nargin == 8
-  if ~isempty(quantileMeasure)
-    error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
-  elseif isempty(quantileMeasure)
-    warning('No quantile measure supplied, not splitting data into quantiles based on ''%s''.',quantileMeasure);
-    quantiles = 1;
+  if nargin < 9
+    if ~isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif isempty(quantileMeasure)
+      warning('No quantile measure supplied, not splitting data into quantiles based on ''%s''.',quantileMeasure);
+      quantiles = 1;
+    end
+    if nargin < 8
+      quantileMeasure = [];
+      quantiles = 1;
+      if nargin < 7
+        saveResults = [];
+        if nargin < 6
+          printResults = [];
+          if nargin < 5
+            collapsePhases = [];
+            if nargin < 4
+              onlyCompleteSub = [];
+              if nargin < 3
+                subjects = [];
+                if nargin < 2
+                  dataroot = [];
+                  if nargin < 1
+                    results = [];
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
   end
-  filenameSuffix = '';
-elseif nargin == 7
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 6
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 5
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 4
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 3
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 2
-  subjects = [];
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 1
-  dataroot = [];
-  subjects = [];
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 0
-  results = [];
-  dataroot = [];
-  subjects = [];
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
 end
 
 % figure out how many quantiles to use to split the data
@@ -109,6 +74,22 @@ elseif length(quantiles) > 1
   nQuantiles = length(quantiles);
 end
 nDivisions = nQuantiles + 1;
+
+if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
+  onlyCompleteSub = false;
+end
+
+if ~exist('collapsePhases','var') || isempty(collapsePhases)
+  collapsePhases = false;
+end
+
+if ~exist('printResults','var') || isempty(printResults)
+  printResults = true;
+end
+
+if ~exist('saveResults','var') || isempty(saveResults)
+  saveResults = true;
+end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
@@ -178,22 +159,6 @@ if ~exist('dataroot','var') || isempty(dataroot)
     error('No data directory found.');
   end
   %saveDir = dataroot;
-end
-
-if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
-  onlyCompleteSub = false;
-end
-
-if ~exist('collapsePhases','var') || isempty(collapsePhases)
-  collapsePhases = false;
-end
-
-if ~exist('printResults','var') || isempty(printResults)
-  printResults = true;
-end
-
-if ~exist('saveResults','var') || isempty(saveResults)
-  saveResults = true;
 end
 
 %% some constants
