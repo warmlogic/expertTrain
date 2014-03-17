@@ -1,21 +1,98 @@
-function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField)
-% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField)
+function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField,quantileMeasure,quantiles,filenameSuffix)
+% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
 % e.g.,
 % [results] = space_processData([],[],[],true,true,true,true,false,true,true,true);
 
-if ~exist('prependDestField','var') || isempty(prependDestField)
-  prependDestField = true;
+if nargin == 14
+  if isempty(filenameSuffix)
+    filenameSuffix = '';
+  end
 end
 
-if ~exist('partialCredit','var') || isempty(partialCredit)
-  partialCredit = true;
+if nargin < 14
+  filenameSuffix = '';
+  if nargin < 13
+    quantiles = 1;
+    if nargin < 12
+      quantileMeasure = '';
+      if nargin < 11
+        prependDestField = true;
+        if nargin < 10
+          partialCredit = true;
+          if nargin < 9
+            saveResults = true;
+            if nargin < 8
+              printResults = false;
+              if nargin < 7
+                onlyCompleteSub = true;
+                if nargin < 6
+                  separateCategories = true;
+                  if nargin < 5
+                    collapseCategories = true;
+                    if nargin < 4
+                      collapsePhases = true;
+                      if nargin < 3
+                        subjects = [];
+                        if nargin < 2
+                          dataroot = [];
+                          if nargin < 1
+                            results = [];
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
 end
 
-if ~exist('results','var') || isempty(results)
-  results = [];
+% figure out how many quantiles to use to split the data
+if length(quantiles) == 1 && quantiles == 1
+  nQuantiles = 0;
+elseif length(quantiles) == 1 && quantiles ~= 1
+  % this can happen when splitting the data in two (using a proportion less
+  % than 1); or with a scalar splitting the data by N quantiles
+  if quantiles < 1
+    nQuantiles = 1;
+  elseif quantiles > 1
+    nQuantiles = quantiles;
+  end
+elseif length(quantiles) > 1
+  nQuantiles = length(quantiles);
+end
+nDivisions = nQuantiles + 1;
+
+if ~exist('collapsePhases','var') || isempty(collapsePhases)
+  collapsePhases = false;
+end
+
+if ~exist('collapseCategories','var') || isempty(collapseCategories)
+  collapseCategories = true;
+end
+
+if ~exist('separateCategories','var') || isempty(separateCategories)
+  separateCategories = true;
+end
+
+if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
+  onlyCompleteSub = true;
+end
+
+if ~exist('printResults','var') || isempty(printResults)
+  printResults = true;
+end
+
+if ~exist('saveResults','var') || isempty(saveResults)
+  saveResults = true;
 end
 
 % EEG
@@ -209,30 +286,6 @@ if ~exist('dataroot','var') || isempty(dataroot)
   %saveDir = dataroot;
 end
 
-if ~exist('collapsePhases','var') || isempty(collapsePhases)
-  collapsePhases = false;
-end
-
-if ~exist('collapseCategories','var') || isempty(collapseCategories)
-  collapseCategories = true;
-end
-
-if ~exist('separateCategories','var') || isempty(separateCategories)
-  separateCategories = true;
-end
-
-if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
-  onlyCompleteSub = true;
-end
-
-if ~exist('printResults','var') || isempty(printResults)
-  printResults = true;
-end
-
-if ~exist('saveResults','var') || isempty(saveResults)
-  saveResults = true;
-end
-
 %% messing around
 
 % r1data = events.oneDay.cued_recall_1.data;
@@ -269,28 +322,28 @@ end
 % fprintf('onePres recall acc (%d/%d) = %.3f\n',sum([onePres.recall_spellCorr] == 1),length(onePres),mean([onePres.recall_spellCorr] == 1));
 % %fprintf('newStims recall acc %.3f\n',mean([newStims.recall_spellCorr] == 1));
 
+%% some constants
+
+%nBlocks = 3;
+
+% lagConds = [8, 0, -1];
+
+results = struct;
+
+mainFields = {'recog','recall'};
+dataFields = {...
+  {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+  {'nTrial','nTarg','nHit','nMiss','hr','mr','rt','rt_hit','rt_miss'} ...
+  };
+
+% % remove these fields when there's no noise distribution (i.e., recall
+% % events)
+% rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
+
+% categories = [1, 2];
+% categoryStr = {'faces', 'houses'};
+
 if isempty(results)
-  
-  %% some constants
-  
-  %nBlocks = 3;
-  
-  % lagConds = [8, 0, -1];
-  
-  results = struct;
-  
-  mainFields = {'recog','recall'};
-  dataFields = {...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
-    {'nTrial','nTarg','nHit','nMiss','hr','mr','rt','rt_hit','rt_miss'} ...
-    };
-  
-  % % remove these fields when there's no noise distribution (i.e., recall
-  % % events)
-  % rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
-  
-  % categories = [1, 2];
-  % categoryStr = {'faces', 'houses'};
   
   %% initialize to store the data
   
