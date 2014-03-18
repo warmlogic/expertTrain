@@ -23,10 +23,34 @@ if nargin == 14
   end
 end
 
+
 if nargin < 14
   filenameSuffix = '';
+  
+  if nargin == 13
+    if length(quantiles) > 1 && isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif length(quantiles) == 1 && quantiles ~= 1 && isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif length(quantiles) == 1 && quantiles == 1
+      warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data into quantiles.');
+      quantileMeasure = {};
+    end
+  end
+  
   if nargin < 13
-    quantiles = 1;
+    
+    if nargin == 12
+      if ~isempty(quantileMeasure)
+        error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+      elseif isempty(quantileMeasure)
+        warning('No quantile measure supplied, not splitting data into quantiles.');
+        quantiles = 1;
+      end
+    else
+      quantiles = 1;
+    end
+    
     if nargin < 12
       quantileMeasure = {};
       if nargin < 11
@@ -571,6 +595,7 @@ if isempty(results)
               % collect data if this phase is complete
               if events.(sesName).(fn).isComplete
                 fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
+                
                 if ~isempty(quantileMeasure) && nDivisions > 1
                   if ismember(phaseName,quantileMeasure)
                     thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
@@ -592,7 +617,7 @@ if isempty(results)
                 end
                 
                 for q = 1:nDivisions
-                  if ~isempty(quantileMeasure) && ~isempty(thisQuantMeasure)
+                  if ~isempty(thisQuantMeasure)
                     % get the events for this quantile
                     if q == 1
                       thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
@@ -602,7 +627,7 @@ if isempty(results)
                       thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
                     end
                     
-                    if printResults && nDivisions > 1
+                    if printResults
                       fprintf('==================================================\n');
                       if q == 1
                         fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q));
@@ -1052,7 +1077,7 @@ for sesNum = 1:length(expParam.sesTypes)
         
         for q = 1:nDivisions
           if ~isempty(quantileMeasure) && nDivisions > 1
-            if ismember(quantileMeasure,phaseName)
+            if ismember(phaseName,quantileMeasure)
               thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
               if ~isempty(thisQuantMeasure)
                 if q == 1
@@ -1120,7 +1145,7 @@ for sesNum = 1:length(expParam.sesTypes)
                         subDataToPrint = dataToPrint{mf};
                       end
                       
-                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,subDataToPrint);
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,q,subDataToPrint);
                     end
                     fprintf(fid,sprintf('%s\n',dataStr));
                   end
@@ -1162,7 +1187,7 @@ for sesNum = 1:length(expParam.sesTypes)
                         else
                           subDataToPrint = dataToPrint{mf};
                         end
-                        [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,subDataToPrint);
+                        [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,q,subDataToPrint);
                       end
                     end
                     fprintf(fid,sprintf('%s\n',dataStr));
@@ -1281,13 +1306,13 @@ end
 
 %% create the data string
 
-function [dataStr] = setDataStr(dataStr,structFields,results,sub,dataToPrint) %#ok<INUSL>
+function [dataStr] = setDataStr(dataStr,structFields,results,sub,thisQ,dataToPrint) %#ok<INUSL>
 
 theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,length(structFields)),structFields{:})));
 
 for i = 1:length(dataToPrint)
-  if ~isnan(theseResults.(dataToPrint{i})(sub))
-    dataStr = sprintf('%s\t%.4f',dataStr,theseResults.(dataToPrint{i})(sub));
+  if ~isnan(theseResults.(dataToPrint{i})(sub,thisQ))
+    dataStr = sprintf('%s\t%.4f',dataStr,theseResults.(dataToPrint{i})(sub,thisQ));
   else
     dataStr = sprintf('%s\t',dataStr);
   end
