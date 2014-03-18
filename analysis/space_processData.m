@@ -1,21 +1,133 @@
-function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField)
-% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField)
+function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField,quantileMeasure,quantiles,filenameSuffix)
+% function [results] = space_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
 % e.g.,
 % [results] = space_processData([],[],[],true,true,true,true,false,true,true,true);
+%
+% Quantile example (quantileMeasure is a cell array of phase names with
+% a paired measure name).
+%
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall','recog_rt'},[.25 .50 .75]);
+%
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall','recog_rt'},3);
+%
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall','recog_rt'},0.5);
 
-if ~exist('prependDestField','var') || isempty(prependDestField)
-  prependDestField = true;
+plotQhist = false;
+
+if nargin == 14
+  if isempty(filenameSuffix)
+    filenameSuffix = '';
+  end
 end
 
-if ~exist('partialCredit','var') || isempty(partialCredit)
-  partialCredit = true;
+
+if nargin < 14
+  filenameSuffix = '';
+  
+  if nargin == 13
+    if length(quantiles) > 1 && isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif length(quantiles) == 1 && quantiles ~= 1 && isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif length(quantiles) == 1 && quantiles == 1
+      warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data into quantiles.');
+      quantileMeasure = {};
+    end
+  end
+  
+  if nargin < 13
+    
+    if nargin == 12
+      if ~isempty(quantileMeasure)
+        error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+      elseif isempty(quantileMeasure)
+        warning('No quantile measure supplied, not splitting data into quantiles.');
+        quantiles = 1;
+      end
+    else
+      quantiles = 1;
+    end
+    
+    if nargin < 12
+      quantileMeasure = {};
+      if nargin < 11
+        prependDestField = true;
+        if nargin < 10
+          partialCredit = true;
+          if nargin < 9
+            saveResults = true;
+            if nargin < 8
+              printResults = false;
+              if nargin < 7
+                onlyCompleteSub = true;
+                if nargin < 6
+                  separateCategories = true;
+                  if nargin < 5
+                    collapseCategories = true;
+                    if nargin < 4
+                      collapsePhases = true;
+                      if nargin < 3
+                        subjects = [];
+                        if nargin < 2
+                          dataroot = [];
+                          if nargin < 1
+                            results = [];
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
 end
 
-if ~exist('results','var') || isempty(results)
-  results = [];
+% figure out how many quantiles to use to split the data
+if length(quantiles) == 1 && quantiles == 1
+  nQuantiles = 0;
+elseif length(quantiles) == 1 && quantiles ~= 1
+  % this can happen when splitting the data in two (using a proportion less
+  % than 1); or with a scalar splitting the data by N quantiles
+  if quantiles < 1
+    nQuantiles = 1;
+  elseif quantiles > 1
+    nQuantiles = quantiles;
+  end
+elseif length(quantiles) > 1
+  nQuantiles = length(quantiles);
+end
+nDivisions = nQuantiles + 1;
+
+if ~exist('collapsePhases','var') || isempty(collapsePhases)
+  collapsePhases = false;
+end
+
+if ~exist('collapseCategories','var') || isempty(collapseCategories)
+  collapseCategories = true;
+end
+
+if ~exist('separateCategories','var') || isempty(separateCategories)
+  separateCategories = true;
+end
+
+if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
+  onlyCompleteSub = true;
+end
+
+if ~exist('printResults','var') || isempty(printResults)
+  printResults = true;
+end
+
+if ~exist('saveResults','var') || isempty(saveResults)
+  saveResults = true;
 end
 
 % EEG
@@ -209,30 +321,6 @@ if ~exist('dataroot','var') || isempty(dataroot)
   %saveDir = dataroot;
 end
 
-if ~exist('collapsePhases','var') || isempty(collapsePhases)
-  collapsePhases = false;
-end
-
-if ~exist('collapseCategories','var') || isempty(collapseCategories)
-  collapseCategories = true;
-end
-
-if ~exist('separateCategories','var') || isempty(separateCategories)
-  separateCategories = true;
-end
-
-if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
-  onlyCompleteSub = true;
-end
-
-if ~exist('printResults','var') || isempty(printResults)
-  printResults = true;
-end
-
-if ~exist('saveResults','var') || isempty(saveResults)
-  saveResults = true;
-end
-
 %% messing around
 
 % r1data = events.oneDay.cued_recall_1.data;
@@ -269,30 +357,29 @@ end
 % fprintf('onePres recall acc (%d/%d) = %.3f\n',sum([onePres.recall_spellCorr] == 1),length(onePres),mean([onePres.recall_spellCorr] == 1));
 % %fprintf('newStims recall acc %.3f\n',mean([newStims.recall_spellCorr] == 1));
 
+%% some constants
+
+%nBlocks = 3;
+
+% lagConds = [8, 0, -1];
+
+mainFields = {'recog','recall'};
+dataFields = {...
+  {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
+  {'nTrial','nTarg','nHit','nMiss','hr','mr','rt','rt_hit','rt_miss'} ...
+  };
+
+% % remove these fields when there's no noise distribution (i.e., recall
+% % events)
+% rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
+
+% categories = [1, 2];
+% categoryStr = {'faces', 'houses'};
+
 if isempty(results)
-  
-  %% some constants
-  
-  %nBlocks = 3;
-  
-  % lagConds = [8, 0, -1];
+  % initialize to store the data
   
   results = struct;
-  
-  mainFields = {'recog','recall'};
-  dataFields = {...
-    {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
-    {'nTrial','nTarg','nHit','nMiss','hr','mr','rt','rt_hit','rt_miss'} ...
-    };
-  
-  % % remove these fields when there's no noise distribution (i.e., recall
-  % % events)
-  % rmfieldNoNoise = {'nLure','nCR','nFA','crr','far','dp','rt_cr','rt_fa','c','Pr','Br'};
-  
-  % categories = [1, 2];
-  % categoryStr = {'faces', 'houses'};
-  
-  %% initialize to store the data
   
   % use a specific subject's files as a template for loading data
   if length(subjects) > 5
@@ -355,6 +442,10 @@ if isempty(results)
         
         if isfield(events.(sesName),fn)
           
+          if ~isempty(quantileMeasure)
+            results.(sesName).(fn).quantiles = nan(length(subjects),nQuantiles);
+          end
+          
           switch phaseName
             case {'cued_recall'}
               targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
@@ -384,7 +475,7 @@ if isempty(results)
                     for df = 1:length(dataFields{mf})
                       dField = dataFields{mf}{df};
                       
-                      results.(sesName).(fn).(lagStr).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),1);
+                      results.(sesName).(fn).(lagStr).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
                     end
                   end
                 end
@@ -398,7 +489,7 @@ if isempty(results)
                       for df = 1:length(dataFields{mf})
                         dField = dataFields{mf}{df};
                         
-                        results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),1);
+                        results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
                       end
                     end
                   end
@@ -422,7 +513,7 @@ if isempty(results)
               %             for b = 1:nBlocks
               %               for mf = 1:length(mainFields)
               %                 for df = 1:length(dataFields)
-              %                   results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+              %                   results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),nDivisions);
               %                 end
               %               end
               %             end
@@ -503,190 +594,122 @@ if isempty(results)
               
               % collect data if this phase is complete
               if events.(sesName).(fn).isComplete
+                fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
                 
-                switch phaseName
-                  case {'cued_recall'}
-                    thisPhaseEv = events.(sesName).(fn).data;
-                    % this phase events; how many lag conditions occurred
-                    % for targets (during study)?
-                    lagConds = unique([thisPhaseEv([thisPhaseEv.targ]).lag],'sorted');
-                    
-                    % exclude missed responses ({'NO_RESPONSE', 'none'})
-                    thisPhaseEv = thisPhaseEv(~ismember({thisPhaseEv.recog_resp},{'NO_RESPONSE', 'none'}));
-                    
-                    if sum(lagConds > 0) > 1
-                      error('%s does not yet support multiple lag conditions!',mfilename);
+                if ~isempty(quantileMeasure) && nDivisions > 1
+                  if ismember(phaseName,quantileMeasure)
+                    thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
+                    if ~isempty(thisQuantMeasure)
+                      quantz = quantile([events.(sesName).(fn).data.(thisQuantMeasure)],quantiles);
+                      results.(sesName).(fn).quantiles(sub,:) = quantz;
+                      if plotQhist
+                        hist([events.(sesName).(fn).data.(thisQuantMeasure)],100); %#ok<UNRCH>
+                        title(sprintf('%s %s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-'),strrep(thisQuantMeasure,'_','-')));
+                        keyboard
+                        close all
+                      end
+                    end
+                  else
+                    thisQuantMeasure = '';
+                  end
+                else
+                  thisQuantMeasure = '';
+                end
+                
+                for q = 1:nDivisions
+                  if ~isempty(thisQuantMeasure)
+                    % get the events for this quantile
+                    if q == 1
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
+                    elseif q == nDivisions
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1));
+                    else
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
                     end
                     
-                    for lc = 1:length(lagConds)
-                      fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
-                      
-                      % targ events are either massed or spaced, depending
-                      % on the lag condition
-                      targEvents = thisPhaseEv([thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & ismember([thisPhaseEv.lag],lagConds(lc)));
-                      % lure events don't have lag conditions
-                      lureEvents = thisPhaseEv(~[thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM'));
-                      
-                      % choose the training condition
-                      if length(lagConds(lc)) == 1
-                        if lagConds(lc) > 0
-                          if printResults
-                            fprintf('*** Spaced (lag %d) ***\n',lagConds(lc));
-                          end
-                          %lagStr = sprintf('lag%d',lagConds(lc));
-                          lagStr = 'spaced';
-                        elseif lagConds(lc) == 0
-                          if printResults
-                            fprintf('*** Massed ***\n');
-                          end
-                          lagStr = 'massed';
-                        elseif lagConds(lc) == -1
-                          lagStr = 'once';
-                          if printResults
-                            fprintf('*** Once ***\n');
-                          end
-                        end
-                      elseif length(lagConds(lc)) > 1
-                        if printResults
-                          fprintf('Multi?\n');
-                        end
-                        lagStr = 'all';
+                    if printResults
+                      fprintf('==================================================\n');
+                      if q == 1
+                        fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q));
+                      elseif q == nDivisions
+                        fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q-1));
+                      else
+                        fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q-1),thisQuantMeasure,quantz(q));
                       end
-                      
-                      % filter the events that we want
-                      %recog_spaced_resp = targEvents(ismember({targEvents.type},'RECOGTEST_RECOGRESP') & ismember([targEvents.lag],lagConds(lc)));
+                      fprintf('==================================================\n');
+                    end
+                  else
+                    thisPhaseEv = events.(sesName).(fn).data;
+                  end
+                  
+                  switch phaseName
+                    case {'cued_recall'}
+                      % how many lag conditions occurred for targets
+                      % (during study)?
+                      lagConds = unique([thisPhaseEv([thisPhaseEv.targ]).lag],'sorted');
                       
                       % exclude missed responses ({'NO_RESPONSE', 'none'})
-                      %recog_spaced_resp = recog_spaced_resp(~ismember({recog_spaced_resp.recog_resp},{'NO_RESPONSE', 'none'}));
-                      % % set missing responses to incorrect
-                      % noRespInd = find(ismember({matchResp.resp},{'NO_RESPONSE', 'none'}));
-                      % if ~isempty(noRespInd)
-                      %   for nr = 1:length(noRespInd)
-                      %     matchResp(noRespInd(nr)).acc = 0;
-                      %   end
-                      % end
+                      thisPhaseEv = thisPhaseEv(~ismember({thisPhaseEv.recog_resp},{'NO_RESPONSE', 'none'}));
                       
-                      if collapseCategories
-                        % overall, collapsing across categories
-                        for mf = 1:length(mainFields)
-                          mField = mainFields{mf};
-                          
-                          %                           % filter the events that we want
-                          %                           theseEvents = targEvents(...
-                          %                             strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
-                          %                             ismember([targEvents.lag],lagConds(lc)));
-                          
-                          % if single presentation items are not tested,
-                          % there will be no targets with lag=-1, only
-                          % lures have this lag field value.
-                          %if isempty(theseEvents)
-                          %  keyboard
-                          %end
-                          
-                          if strcmp(mField,'recog')
-                            accField = sprintf('%s_acc',mField);
-                          elseif strcmp(mField,'recall')
-                            accField = sprintf('%s_spellCorr',mField);
-                            lureEvents = [];
-                          end
-                          
-                          results.(sesName).(fn).(lagStr) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr),...
-                            partialCredit,mField,accField,dataFields{mf},prependDestField);
-                          
-                          if printResults
-                            theseResults = results.(sesName).(fn).(lagStr).(mField);
-                            fprintf('\t%s\n',mField);
-                            
-                            if prependDestField
-                              hrField = sprintf('%s_hr',mField);
-                            else
-                              hrField = 'hr';
-                            end
-                            if prependDestField
-                              nHitField = sprintf('%s_nHit',mField);
-                            else
-                              nHitField = 'nHit';
-                            end
-                            if prependDestField
-                              nTargField = sprintf('%s_nTarg',mField);
-                            else
-                              nTargField = 'nTarg';
-                            end
-                            
-                            fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',theseResults.(hrField)(sub),theseResults.(nHitField)(sub),(theseResults.(nTargField)(sub)));
-                            if ~isempty(lureEvents)
-                              if prependDestField
-                                farField = sprintf('%s_far',mField);
-                              else
-                                farField = 'far';
-                              end
-                              if prependDestField
-                                nFAField = sprintf('%s_nFA',mField);
-                              else
-                                nFAField = 'nFA';
-                              end
-                              if prependDestField
-                                nLureField = sprintf('%s_nLure',mField);
-                              else
-                                nLureField = 'nLure';
-                              end
-                              if prependDestField
-                                dpField = sprintf('%s_dp',mField);
-                              else
-                                dpField = 'dp';
-                              end
-                              fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',theseResults.(farField)(sub),theseResults.(nFAField)(sub),(theseResults.(nLureField)(sub)));
-                              fprintf('\t\td'':\t\t%.2f\n',theseResults.(dpField)(sub));
-                            end
-                            
-                            if prependDestField
-                              rtField = sprintf('%s_rt',mField);
-                            else
-                              rtField = 'rt';
-                            end
-                            fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',theseResults.(sprintf('%s_hit',rtField))(sub),theseResults.(sprintf('%s_miss',rtField))(sub));
-                            if ~isempty(lureEvents)
-                              fprintf(', cr: %.2f, fa: %.2f\n',theseResults.(sprintf('%s_cr',rtField))(sub),theseResults.(sprintf('%s_fa',rtField))(sub));
-                            else
-                              fprintf('\n');
-                            end
-                          end
-                        end
+                      if sum(lagConds > 0) > 1
+                        error('%s does not yet support multiple lag conditions!',mfilename);
                       end
                       
-                      % accuracy for the different image categories
-                      i_catStrs = unique({targEvents.i_catStr},'sorted');
-                      % if there's only 1 image category, the results were
-                      % printed above
-                      if length(i_catStrs) > 1 && separateCategories
-                        if printResults
-                          fprintf('\n');
+                      for lc = 1:length(lagConds)
+                        % targ events are either massed or spaced, depending
+                        % on the lag condition
+                        targEvents = thisPhaseEv([thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & ismember([thisPhaseEv.lag],lagConds(lc)));
+                        % lure events don't have lag conditions
+                        lureEvents = thisPhaseEv(~[thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM'));
+                        
+                        % choose the training condition
+                        if length(lagConds(lc)) == 1
+                          if lagConds(lc) > 0
+                            if printResults
+                              fprintf('*** Spaced (lag %d) ***\n',lagConds(lc));
+                            end
+                            %lagStr = sprintf('lag%d',lagConds(lc));
+                            lagStr = 'spaced';
+                          elseif lagConds(lc) == 0
+                            if printResults
+                              fprintf('*** Massed ***\n');
+                            end
+                            lagStr = 'massed';
+                          elseif lagConds(lc) == -1
+                            lagStr = 'once';
+                            if printResults
+                              fprintf('*** Once ***\n');
+                            end
+                          end
+                        elseif length(lagConds(lc)) > 1
+                          if printResults
+                            fprintf('Multi?\n');
+                          end
+                          lagStr = 'all';
                         end
-                        for im = 1:length(i_catStrs)
+                        
+                        % filter the events that we want
+                        %recog_spaced_resp = targEvents(ismember({targEvents.type},'RECOGTEST_RECOGRESP') & ismember([targEvents.lag],lagConds(lc)));
+                        
+                        % exclude missed responses ({'NO_RESPONSE', 'none'})
+                        %recog_spaced_resp = recog_spaced_resp(~ismember({recog_spaced_resp.recog_resp},{'NO_RESPONSE', 'none'}));
+                        % % set missing responses to incorrect
+                        % noRespInd = find(ismember({matchResp.resp},{'NO_RESPONSE', 'none'}));
+                        % if ~isempty(noRespInd)
+                        %   for nr = 1:length(noRespInd)
+                        %     matchResp(noRespInd(nr)).acc = 0;
+                        %   end
+                        % end
+                        
+                        if collapseCategories
+                          % overall, collapsing across categories
                           for mf = 1:length(mainFields)
                             mField = mainFields{mf};
                             
-                            % targ events are either massed or spaced, depending
-                            % on the lag condition
-                            targEvents = thisPhaseEv([thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & ismember([thisPhaseEv.lag],lagConds(lc)) & strcmpi({thisPhaseEv.i_catStr},i_catStrs{im}));
-                            % lure events don't have lag conditions
-                            lureEvents = thisPhaseEv(~[thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & strcmpi({thisPhaseEv.i_catStr},i_catStrs{im}));
-                            
-                            %                             % filter the events that we want
-                            %                             theseEvents = targEvents(...
-                            %                               strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
-                            %                               ismember([targEvents.lag],lagConds(lc)) &...
-                            %                               strcmpi({targEvents.i_catStr},i_catStrs{im}));
-                            %theseEvents = targEvents(...
-                            %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
-                            %  ismember([targEvents.lag],lagConds(lc)) &...
-                            %  strcmpi({targEvents.i_catStr},i_catStrs{im}) &...
-                            %  [targEvents.targ]);
-                            
-                            %                             if strcmp(mField,'recog')
-                            %                               % exclude missed responses ({'NO_RESPONSE', 'none'})
-                            %                               theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
-                            %                             end
+                            %                           % filter the events that we want
+                            %                           theseEvents = targEvents(...
+                            %                             strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
+                            %                             ismember([targEvents.lag],lagConds(lc)));
                             
                             % if single presentation items are not tested,
                             % there will be no targets with lag=-1, only
@@ -702,13 +725,12 @@ if isempty(results)
                               lureEvents = [];
                             end
                             
-                            results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(targEvents,lureEvents,sub,results.(sesName).(fn).(lagStr).(i_catStrs{im}),...
+                            results.(sesName).(fn).(lagStr) = accAndRT(targEvents,lureEvents,sub,q,results.(sesName).(fn).(lagStr),...
                               partialCredit,mField,accField,dataFields{mf},prependDestField);
                             
                             if printResults
-                              theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
-                              
-                              fprintf('\t%s %s\n',i_catStrs{im},mField);
+                              theseResults = results.(sesName).(fn).(lagStr).(mField);
+                              fprintf('\t%s\n',mField);
                               
                               if prependDestField
                                 hrField = sprintf('%s_hr',mField);
@@ -764,15 +786,129 @@ if isempty(results)
                                 fprintf('\n');
                               end
                             end
+                          end
+                        end
+                        
+                        % accuracy for the different image categories
+                        i_catStrs = unique({targEvents.i_catStr},'sorted');
+                        % if there's only 1 image category, the results were
+                        % printed above
+                        if length(i_catStrs) > 1 && separateCategories
+                          if printResults
+                            fprintf('\n');
+                          end
+                          for im = 1:length(i_catStrs)
+                            for mf = 1:length(mainFields)
+                              mField = mainFields{mf};
+                              
+                              % targ events are either massed or spaced, depending
+                              % on the lag condition
+                              targEvents = thisPhaseEv([thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & ismember([thisPhaseEv.lag],lagConds(lc)) & strcmpi({thisPhaseEv.i_catStr},i_catStrs{im}));
+                              % lure events don't have lag conditions
+                              lureEvents = thisPhaseEv(~[thisPhaseEv.targ] & ismember({thisPhaseEv.type},'RECOGTEST_STIM') & strcmpi({thisPhaseEv.i_catStr},i_catStrs{im}));
+                              
+                              %                             % filter the events that we want
+                              %                             theseEvents = targEvents(...
+                              %                               strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
+                              %                               ismember([targEvents.lag],lagConds(lc)) &...
+                              %                               strcmpi({targEvents.i_catStr},i_catStrs{im}));
+                              %theseEvents = targEvents(...
+                              %  strcmpi({targEvents.type},sprintf('RECOGTEST_%sRESP',mField)) &...
+                              %  ismember([targEvents.lag],lagConds(lc)) &...
+                              %  strcmpi({targEvents.i_catStr},i_catStrs{im}) &...
+                              %  [targEvents.targ]);
+                              
+                              %                             if strcmp(mField,'recog')
+                              %                               % exclude missed responses ({'NO_RESPONSE', 'none'})
+                              %                               theseEvents = theseEvents(~ismember({theseEvents.recog_resp},{'NO_RESPONSE', 'none'}));
+                              %                             end
+                              
+                              % if single presentation items are not tested,
+                              % there will be no targets with lag=-1, only
+                              % lures have this lag field value.
+                              %if isempty(theseEvents)
+                              %  keyboard
+                              %end
+                              
+                              if strcmp(mField,'recog')
+                                accField = sprintf('%s_acc',mField);
+                              elseif strcmp(mField,'recall')
+                                accField = sprintf('%s_spellCorr',mField);
+                                lureEvents = [];
+                              end
+                              
+                              results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(targEvents,lureEvents,sub,q,results.(sesName).(fn).(lagStr).(i_catStrs{im}),...
+                                partialCredit,mField,accField,dataFields{mf},prependDestField);
+                              
+                              if printResults
+                                theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
+                                
+                                fprintf('\t%s %s\n',i_catStrs{im},mField);
+                                
+                                if prependDestField
+                                  hrField = sprintf('%s_hr',mField);
+                                else
+                                  hrField = 'hr';
+                                end
+                                if prependDestField
+                                  nHitField = sprintf('%s_nHit',mField);
+                                else
+                                  nHitField = 'nHit';
+                                end
+                                if prependDestField
+                                  nTargField = sprintf('%s_nTarg',mField);
+                                else
+                                  nTargField = 'nTarg';
+                                end
+                                
+                                fprintf('\t\tHitRate:\t%.4f (%d/%d)\n',theseResults.(hrField)(sub),theseResults.(nHitField)(sub),(theseResults.(nTargField)(sub)));
+                                if ~isempty(lureEvents)
+                                  if prependDestField
+                                    farField = sprintf('%s_far',mField);
+                                  else
+                                    farField = 'far';
+                                  end
+                                  if prependDestField
+                                    nFAField = sprintf('%s_nFA',mField);
+                                  else
+                                    nFAField = 'nFA';
+                                  end
+                                  if prependDestField
+                                    nLureField = sprintf('%s_nLure',mField);
+                                  else
+                                    nLureField = 'nLure';
+                                  end
+                                  if prependDestField
+                                    dpField = sprintf('%s_dp',mField);
+                                  else
+                                    dpField = 'dp';
+                                  end
+                                  fprintf('\t\tFA-Rate:\t%.4f (%d/%d)\n',theseResults.(farField)(sub),theseResults.(nFAField)(sub),(theseResults.(nLureField)(sub)));
+                                  fprintf('\t\td'':\t\t%.2f\n',theseResults.(dpField)(sub));
+                                end
+                                
+                                if prependDestField
+                                  rtField = sprintf('%s_rt',mField);
+                                else
+                                  rtField = 'rt';
+                                end
+                                fprintf('\t\tRespTime:\thit: %.2f, miss: %.2f',theseResults.(sprintf('%s_hit',rtField))(sub),theseResults.(sprintf('%s_miss',rtField))(sub));
+                                if ~isempty(lureEvents)
+                                  fprintf(', cr: %.2f, fa: %.2f\n',theseResults.(sprintf('%s_cr',rtField))(sub),theseResults.(sprintf('%s_fa',rtField))(sub));
+                                else
+                                  fprintf('\n');
+                                end
+                              end
+                              
+                            end % mf
                             
-                          end % mf
-                          
-                        end % im
-                      end
+                          end % im
+                        end
+                        
+                      end % lc
                       
-                    end % lc
-                    
-                end % switch phaseName
+                  end % switch phaseName
+                end % quantiles
                 
               else
                 fprintf('%s: %s, session_%d %s: phase %s is incomplete.\n',mfilename,expParam.subject,sesNum,sesName,fn);
@@ -793,35 +929,82 @@ if isempty(results)
   fprintf('Done processing data for experiment %s.\n\n',expName);
   
   if saveResults
-    if collapsePhases
-      matFileName = sprintf('%s_behav_results_collapsed.mat',expName);
+    if nDivisions > 1
+      quantStr = sprintf('_%dquantileDiv',nDivisions);
     else
-      matFileName = sprintf('%s_behav_results.mat',expName);
+      quantStr = '';
     end
+    
+    if collapsePhases
+      collapseStr = '_collapsed';
+    else
+      collapseStr = '';
+    end
+    matFileName = sprintf('%s_behav_results%s%s%s.mat',expName,quantStr,collapseStr,filenameSuffix);
     matFileName = fullfile(dataroot,matFileName);
     
     fprintf('Saving results struct to %s...',matFileName);
     save(matFileName,'results');
     fprintf('Done.\n');
   end
+else
+  completeStatus = true(1,length(subjects));
+  
+  if onlyCompleteSub
+    fprintf('Loading events to check whether each subject has completed all sessions...\n');
+    for sub = 1:length(subjects)
+      subDir = fullfile(dataroot,subjects{sub});
+      
+      fprintf('Loading events for %s...',subjects{sub});
+      eventsFile = fullfile(subDir,'events','events.mat');
+      if exist(eventsFile,'file')
+        load(eventsFile,'events');
+      else
+        error('events file does not exist: %s',eventsFile);
+      end
+      
+      % if we only want complete subjects and this one is not done, set to
+      % false
+      if ~events.isComplete
+        fprintf('Incomplete!\n');
+        completeStatus(sub) = false;
+      else
+        fprintf('Complete!\n');
+      end
+    end
+  end
 end
 
 if saveResults
-  if collapsePhases
-    textFileName = sprintf('%s_behav_results_collapsed.txt',expName);
+  if nDivisions > 1
+    quantStr = sprintf('_%dquantileDiv',nDivisions);
   else
-    textFileName = sprintf('%s_behav_results.txt',expName);
+    quantStr = '';
   end
+  
+  if collapsePhases
+    collapseStr = '_collapsed';
+  else
+    collapseStr = '';
+  end
+  textFileName = sprintf('%s_behav_results%s%s%s.txt',expName,quantStr,collapseStr,filenameSuffix);
   textFileName = fullfile(dataroot,textFileName);
   
-  printResultsToFile(dataroot,subjects,results,mainFields,dataFields,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject);
+  printResultsToFile(dataroot,subjects,results,mainFields,dataFields,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,quantileMeasure,nDivisions);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject)
+function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,quantileMeasure,nDivisions)
+
+if nargin < 13
+  error('Must include both variables: ''quantileMeasure'' and ''nDivisions''.');
+elseif nargin < 12
+  quantileMeasure = {};
+  nDivisions = 1;
+end
 
 fprintf('Saving results to text file: %s...',textFileName);
 
@@ -892,173 +1075,190 @@ for sesNum = 1:length(expParam.sesTypes)
         
         fprintf(fid,'phase\t%s\n',fn);
         
-        switch phaseName
-          case {'cued_recall'}
-            targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
-            lagConds = unique([targEvents.lag],'sorted');
-            
-            % lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
-            
-            for lc = 1:length(lagConds)
-              
-              % choose the training condition
-              if length(lagConds(lc)) == 1
-                if lagConds(lc) > 0
-                  %lagStr = sprintf('lag%d',lagConds(lc));
-                  lagStr = 'spaced';
-                elseif lagConds(lc) == 0
-                  lagStr = 'massed';
-                elseif lagConds(lc) == -1
-                  lagStr = 'once';
+        for q = 1:nDivisions
+          if ~isempty(quantileMeasure) && nDivisions > 1
+            if ismember(phaseName,quantileMeasure)
+              thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
+              if ~isempty(thisQuantMeasure)
+                if q == 1
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                elseif q == nDivisions
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                else
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
                 end
-              elseif length(lagConds(lc)) > 1
-                lagStr = 'all';
               end
+            end
+          end
+          
+          switch phaseName
+            case {'cued_recall'}
+              targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
+              lagConds = unique([targEvents.lag],'sorted');
               
-              if collapseCategories
-                % overall
-                nTabs = nan(1,length(dataToPrint));
-                nTabInd = 0;
-                for d = 1:length(dataToPrint)
-                  nTabInd = nTabInd + 1;
-                  nTabs(nTabInd) = length(dataToPrint{d});
-                end
-                headerCell = {{lagStr},mainToPrint};
-                [headerStr] = setHeaderStr(headerCell,nTabs);
-                fprintf(fid,sprintf('\t%s\n',headerStr));
+              % lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
+              
+              for lc = 1:length(lagConds)
                 
-                for sub = 1:length(subjects)
-                  % print the header string only before the first sub
-                  if sub == 1
-                    for mf = 1:length(mainToPrint)
-                      [headerStr] = setHeaderStr(dataToPrint(mf),1);
-                      headerStr = sprintf('\t%s',headerStr);
-                      fprintf(fid,sprintf('%s',headerStr));
-                    end
-                    fprintf(fid,'\n');
+                % choose the training condition
+                if length(lagConds(lc)) == 1
+                  if lagConds(lc) > 0
+                    %lagStr = sprintf('lag%d',lagConds(lc));
+                    lagStr = 'spaced';
+                  elseif lagConds(lc) == 0
+                    lagStr = 'massed';
+                  elseif lagConds(lc) == -1
+                    lagStr = 'once';
                   end
-                  
-                  dataStr = subjects{sub};
-                  for mf = 1:length(mainToPrint)
-                    if prependDestField
-                      subDataToPrint = strcat(sprintf('%s_',mainToPrint{mf}),dataToPrint{mf});
-                    else
-                      subDataToPrint = dataToPrint{mf};
-                    end
-                    
-                    [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,subDataToPrint);
-                  end
-                  fprintf(fid,sprintf('%s\n',dataStr));
+                elseif length(lagConds(lc)) > 1
+                  lagStr = 'all';
                 end
-              end
-              
-              % separate categories
-              i_catStrs = unique({targEvents.i_catStr},'sorted');
-              if length(i_catStrs) > 1 && separateCategories
-                nTabs = nan(1,length(dataToPrint) * length(i_catStrs));
-                nTabInd = 0;
-                for ic = 1:length(i_catStrs)
+                
+                if collapseCategories
+                  % overall
+                  nTabs = nan(1,length(dataToPrint));
+                  nTabInd = 0;
                   for d = 1:length(dataToPrint)
                     nTabInd = nTabInd + 1;
                     nTabs(nTabInd) = length(dataToPrint{d});
                   end
-                end
-                headerCell = {{lagStr},i_catStrs,mainToPrint};
-                [headerStr] = setHeaderStr(headerCell,nTabs);
-                fprintf(fid,sprintf('\t%s\n',headerStr));
-                
-                for sub = 1:length(subjects)
-                  % print the header string only before the first sub
-                  if sub == 1
-                    for ic = 1:length(i_catStrs)
+                  headerCell = {{lagStr},mainToPrint};
+                  [headerStr] = setHeaderStr(headerCell,nTabs);
+                  fprintf(fid,sprintf('\t%s\n',headerStr));
+                  
+                  for sub = 1:length(subjects)
+                    % print the header string only before the first sub
+                    if sub == 1
                       for mf = 1:length(mainToPrint)
                         [headerStr] = setHeaderStr(dataToPrint(mf),1);
                         headerStr = sprintf('\t%s',headerStr);
                         fprintf(fid,sprintf('%s',headerStr));
                       end
+                      fprintf(fid,'\n');
                     end
-                    fprintf(fid,'\n');
-                  end
-                  
-                  dataStr = subjects{sub};
-                  for im = 1:length(i_catStrs)
+                    
+                    dataStr = subjects{sub};
                     for mf = 1:length(mainToPrint)
                       if prependDestField
                         subDataToPrint = strcat(sprintf('%s_',mainToPrint{mf}),dataToPrint{mf});
                       else
                         subDataToPrint = dataToPrint{mf};
                       end
-                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,subDataToPrint);
+                      
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,mainToPrint{mf}},results,sub,q,subDataToPrint);
+                    end
+                    fprintf(fid,sprintf('%s\n',dataStr));
+                  end
+                end
+                
+                % separate categories
+                i_catStrs = unique({targEvents.i_catStr},'sorted');
+                if length(i_catStrs) > 1 && separateCategories
+                  nTabs = nan(1,length(dataToPrint) * length(i_catStrs));
+                  nTabInd = 0;
+                  for ic = 1:length(i_catStrs)
+                    for d = 1:length(dataToPrint)
+                      nTabInd = nTabInd + 1;
+                      nTabs(nTabInd) = length(dataToPrint{d});
                     end
                   end
-                  fprintf(fid,sprintf('%s\n',dataStr));
+                  headerCell = {{lagStr},i_catStrs,mainToPrint};
+                  [headerStr] = setHeaderStr(headerCell,nTabs);
+                  fprintf(fid,sprintf('\t%s\n',headerStr));
+                  
+                  for sub = 1:length(subjects)
+                    % print the header string only before the first sub
+                    if sub == 1
+                      for ic = 1:length(i_catStrs)
+                        for mf = 1:length(mainToPrint)
+                          [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                          headerStr = sprintf('\t%s',headerStr);
+                          fprintf(fid,sprintf('%s',headerStr));
+                        end
+                      end
+                      fprintf(fid,'\n');
+                    end
+                    
+                    dataStr = subjects{sub};
+                    for im = 1:length(i_catStrs)
+                      for mf = 1:length(mainToPrint)
+                        if prependDestField
+                          subDataToPrint = strcat(sprintf('%s_',mainToPrint{mf}),dataToPrint{mf});
+                        else
+                          subDataToPrint = dataToPrint{mf};
+                        end
+                        [dataStr] = setDataStr(dataStr,{sesName,fn,lagStr,i_catStrs{im},mainToPrint{mf}},results,sub,q,subDataToPrint);
+                      end
+                    end
+                    fprintf(fid,sprintf('%s\n',dataStr));
+                  end
                 end
-              end
+                
+                if lc ~= length(lagConds)
+                  fprintf(fid,'\n');
+                end
+                
+              end % lc
               
-              if lc ~= length(lagConds)
-                fprintf(fid,'\n');
-              end
+              %             end
               
-            end % lc
-            
-            %             end
-            
-            %           case {'name', 'nametrain', 'prac_name'}
-            %             if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-            %               nBlocks = 1;
-            %             else
-            %               nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-            %             end
-            %
-            %             if nBlocks > 1
-            %               blockStr = cell(1,nBlocks);
-            %               for b = 1:nBlocks
-            %                 blockStr{b} = sprintf('b%d',b);
-            %               end
-            %               headerCell = {blockStr,mainToPrint};
-            %               [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
-            %               fprintf(fid,sprintf('\t%s\n',headerStr));
-            %               [headerStr] = setHeaderStr({dataToPrint},1);
-            %               headerStr = sprintf('\t%s',headerStr);
-            %               headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            %               fprintf(fid,sprintf('%s\n',headerStr));
-            %
-            %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %               for sub = 1:length(subjects)
-            %                 dataStr = subjects{sub};
-            %                 for b = 1:nBlocks
-            %                   for mf = 1:length(mainToPrint)
-            %                     [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
-            %                   end
-            %                 end
-            %                 fprintf(fid,sprintf('%s\n',dataStr));
-            %               end
-            %             else
-            %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %               headerCell = {mainToPrint};
-            %               [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
-            %               fprintf(fid,sprintf('\t%s\n',headerStr));
-            %               [headerStr] = setHeaderStr({dataToPrint},1);
-            %               headerStr = sprintf('\t%s',headerStr);
-            %               headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-            %               fprintf(fid,sprintf('%s\n',headerStr));
-            %
-            %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %               for sub = 1:length(subjects)
-            %                 dataStr = subjects{sub};
-            %                 for mf = 1:length(mainToPrint)
-            %                   [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
-            %                 end
-            %                 fprintf(fid,sprintf('%s\n',dataStr));
-            %               end
-            %
-            %             end
-        end % switch phaseName
-        fprintf(fid,'\n');
+              %           case {'name', 'nametrain', 'prac_name'}
+              %             if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+              %               nBlocks = 1;
+              %             else
+              %               nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+              %             end
+              %
+              %             if nBlocks > 1
+              %               blockStr = cell(1,nBlocks);
+              %               for b = 1:nBlocks
+              %                 blockStr{b} = sprintf('b%d',b);
+              %               end
+              %               headerCell = {blockStr,mainToPrint};
+              %               [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+              %               fprintf(fid,sprintf('\t%s\n',headerStr));
+              %               [headerStr] = setHeaderStr({dataToPrint},1);
+              %               headerStr = sprintf('\t%s',headerStr);
+              %               headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+              %               fprintf(fid,sprintf('%s\n',headerStr));
+              %
+              %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              %               for sub = 1:length(subjects)
+              %                 dataStr = subjects{sub};
+              %                 for b = 1:nBlocks
+              %                   for mf = 1:length(mainToPrint)
+              %                     [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,dataToPrint);
+              %                   end
+              %                 end
+              %                 fprintf(fid,sprintf('%s\n',dataStr));
+              %               end
+              %             else
+              %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              %               headerCell = {mainToPrint};
+              %               [headerStr] = setHeaderStr(headerCell,length(dataToPrint));
+              %               fprintf(fid,sprintf('\t%s\n',headerStr));
+              %               [headerStr] = setHeaderStr({dataToPrint},1);
+              %               headerStr = sprintf('\t%s',headerStr);
+              %               headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+              %               fprintf(fid,sprintf('%s\n',headerStr));
+              %
+              %               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              %               for sub = 1:length(subjects)
+              %                 dataStr = subjects{sub};
+              %                 for mf = 1:length(mainToPrint)
+              %                   [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,dataToPrint);
+              %                 end
+              %                 fprintf(fid,sprintf('%s\n',dataStr));
+              %               end
+              %
+              %             end
+          end % switch phaseName
+          fprintf(fid,'\n');
+        end % q
       else
         fprintf('printResultsToFile: %s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
-      end
-    end
+      end % isfield
+    end % isExp
   end % phases
 end % sessions
 
@@ -1106,13 +1306,13 @@ end
 
 %% create the data string
 
-function [dataStr] = setDataStr(dataStr,structFields,results,sub,dataToPrint) %#ok<INUSL>
+function [dataStr] = setDataStr(dataStr,structFields,results,sub,thisQ,dataToPrint) %#ok<INUSL>
 
 theseResults = eval(sprintf('results%s',sprintf(repmat('.%s',1,length(structFields)),structFields{:})));
 
 for i = 1:length(dataToPrint)
-  if ~isnan(theseResults.(dataToPrint{i})(sub))
-    dataStr = sprintf('%s\t%.4f',dataStr,theseResults.(dataToPrint{i})(sub));
+  if ~isnan(theseResults.(dataToPrint{i})(sub,thisQ))
+    dataStr = sprintf('%s\t%.4f',dataStr,theseResults.(dataToPrint{i})(sub,thisQ));
   else
     dataStr = sprintf('%s\t',dataStr);
   end
@@ -1122,7 +1322,7 @@ end
 
 %% Calculate accuracy and reaction time
 
-function inputStruct = accAndRT(targEv,lureEv,sub,inputStruct,partialCredit,destField,accField,dataFields,prependDestField)
+function inputStruct = accAndRT(targEv,lureEv,sub,thisQ,inputStruct,partialCredit,destField,accField,dataFields,prependDestField)
 
 if ~exist('prependDestField','var') || isempty(prependDestField)
   prependDestField = false;
@@ -1143,7 +1343,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = length(allEv);
+  inputStruct.(destField).(thisField)(sub,thisQ) = length(allEv);
 end
 
 thisStr = 'nTarg';
@@ -1153,7 +1353,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = length(targEv);
+  inputStruct.(destField).(thisField)(sub,thisQ) = length(targEv);
 end
 
 if ~isempty(lureEv)
@@ -1164,7 +1364,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = length(lureEv);
+    inputStruct.(destField).(thisField)(sub,thisQ) = length(lureEv);
   end
 end
 
@@ -1194,7 +1394,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = length(hitEv);
+  inputStruct.(destField).(thisField)(sub,thisQ) = length(hitEv);
 end
 
 thisStr = 'nMiss';
@@ -1204,7 +1404,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = length(missEv);
+  inputStruct.(destField).(thisField)(sub,thisQ) = length(missEv);
 end
 
 if ~isempty(lureEv)
@@ -1215,7 +1415,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = length(crEv);
+    inputStruct.(destField).(thisField)(sub,thisQ) = length(crEv);
   end
   
   thisStr = 'nFA';
@@ -1225,7 +1425,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = length(faEv);
+    inputStruct.(destField).(thisField)(sub,thisQ) = length(faEv);
   end
 end
 
@@ -1294,7 +1494,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = hr;
+  inputStruct.(destField).(thisField)(sub,thisQ) = hr;
 end
 
 thisStr = 'mr';
@@ -1304,7 +1504,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = mr;
+  inputStruct.(destField).(thisField)(sub,thisQ) = mr;
 end
 
 if ~isempty(lureEv)
@@ -1315,7 +1515,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = far;
+    inputStruct.(destField).(thisField)(sub,thisQ) = far;
   end
   
   thisStr = 'crr';
@@ -1325,7 +1525,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = crr;
+    inputStruct.(destField).(thisField)(sub,thisQ) = crr;
   end
   
   thisStr = 'dp';
@@ -1338,7 +1538,7 @@ if ~isempty(lureEv)
     zhr = norminv(hr,0,1);
     zfar = norminv(far,0,1);
     
-    inputStruct.(destField).(thisField)(sub) = zhr - zfar;
+    inputStruct.(destField).(thisField)(sub,thisQ) = zhr - zfar;
   end
   
   % response bias: c (criterion) (Macmillan & Creelman, 2005, p. 29)
@@ -1354,7 +1554,7 @@ if ~isempty(lureEv)
     end
     c = -0.5 * (norminv(hr,0,1) + norminv(far,0,1));
     
-    inputStruct.(destField).(thisField)(sub) = c;
+    inputStruct.(destField).(thisField)(sub,thisQ) = c;
   end
   
   % discrimination index (Pr)
@@ -1376,7 +1576,7 @@ if ~isempty(lureEv)
     end
     Pr = hr - far;
     
-    inputStruct.(destField).(thisField)(sub) = Pr;
+    inputStruct.(destField).(thisField)(sub,thisQ) = Pr;
   end
   
   % response bias index (Br)
@@ -1399,7 +1599,7 @@ if ~isempty(lureEv)
     Pr = hr - far;
     Br = far / (1 - Pr);
     
-    inputStruct.(destField).(thisField)(sub) = Br;
+    inputStruct.(destField).(thisField)(sub,thisQ) = Br;
   end
 end
 
@@ -1417,7 +1617,7 @@ end
 %     thisField = thisStr;
 %   end
 %   s = zhr/-zfar;
-%   inputStruct.(destField).(thisField)(sub) = (2 / (1 + (s^2)))^(1/2) * (zhr - (s*zfar));
+%   inputStruct.(destField).(thisField)(sub,thisQ) = (2 / (1 + (s^2)))^(1/2) * (zhr - (s*zfar));
 % end
 
 % Response Times
@@ -1430,7 +1630,7 @@ end
 
 thisStr = 'rt';
 if any(strcmp(thisStr,dataFields))
-  inputStruct.(destField).(rtField)(sub) = mean([allEv.(rtField)]);
+  inputStruct.(destField).(rtField)(sub,thisQ) = mean([allEv.(rtField)]);
 end
 
 thisStr = 'rt_hit';
@@ -1440,7 +1640,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = mean([hitEv.(rtField)]);
+  inputStruct.(destField).(thisField)(sub,thisQ) = mean([hitEv.(rtField)]);
 end
 
 thisStr = 'rt_miss';
@@ -1450,7 +1650,7 @@ if any(strcmp(thisStr,dataFields))
   else
     thisField = thisStr;
   end
-  inputStruct.(destField).(thisField)(sub) = mean([missEv.(rtField)]);
+  inputStruct.(destField).(thisField)(sub,thisQ) = mean([missEv.(rtField)]);
 end
 
 if ~isempty(lureEv)
@@ -1461,7 +1661,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = mean([crEv.(rtField)]);
+    inputStruct.(destField).(thisField)(sub,thisQ) = mean([crEv.(rtField)]);
   end
   
   thisStr = 'rt_fa';
@@ -1471,7 +1671,7 @@ if ~isempty(lureEv)
     else
       thisField = thisStr;
     end
-    inputStruct.(destField).(thisField)(sub) = mean([faEv.(rtField)]);
+    inputStruct.(destField).(thisField)(sub,thisQ) = mean([faEv.(rtField)]);
   end
 end
 

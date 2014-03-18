@@ -1,5 +1,5 @@
 function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
-% function [results,quantileDivs] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
+% function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub,collapsePhases,printResults,saveResults,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
@@ -7,8 +7,8 @@ function [results] = ebird_processData(results,dataroot,subjects,onlyCompleteSub
 %   [results] = ebird_processData([],[],[],true,false,false,true);
 %
 % % e.g., split into quartiles based on response time
-%   [results] = ebird_processData([],[],[],true,false,false,true,'rt',[.25 .50 .75]);
-%   [results] = ebird_processData([],[],[],true,false,false,true,'rt',3);
+%   [results] = ebird_processData([],[],[],true,false,false,true,{'match','rt','name','rt'},[.25 .50 .75]);
+%   [results] = ebird_processData([],[],[],true,false,false,true,{'match','rt','name','rt'},3);
 
 plotQhist = false;
 
@@ -16,82 +16,61 @@ if nargin == 10
   if isempty(filenameSuffix)
     filenameSuffix = '';
   end
-elseif nargin == 9
-  %if length(quantiles) > 1
-  %error('Defining cumulative probability values in the variable ''quantiles'' is not yet supported.');
-  if length(quantiles) == 1 && quantiles == 1
-    warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data based on ''%s''.',quantileMeasure);
-    quantileMeasure = [];
+end
+
+if nargin < 10
+  filenameSuffix = '';
+  
+  if nargin == 9
+    if length(quantiles) > 1 && isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif length(quantiles) == 1 && quantiles ~= 1 && isempty(quantileMeasure)
+      error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+    elseif length(quantiles) == 1 && quantiles == 1
+      warning('Variable ''quantiles'' set to 1. This includes all the data, so not actually splitting data into quantiles.');
+      quantileMeasure = {};
+    end
   end
-  filenameSuffix = '';
-elseif nargin == 8
-  if ~isempty(quantileMeasure)
-    error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
-  elseif isempty(quantileMeasure)
-    warning('No quantile measure supplied, not splitting data into quantiles based on ''%s''.',quantileMeasure);
-    quantiles = 1;
+  
+  if nargin < 9
+    
+    if nargin == 8
+      if ~isempty(quantileMeasure)
+        error('Need to supply both variables ''quantileMeasure'' and ''quantiles''.');
+      elseif isempty(quantileMeasure)
+        warning('No quantile measure supplied, not splitting data into quantiles.');
+        quantiles = 1;
+      end
+    else
+      quantiles = 1;
+    end
+    
+    if nargin < 8
+      quantileMeasure = {};
+      quantiles = 1;
+      if nargin < 7
+        saveResults = [];
+        if nargin < 6
+          printResults = [];
+          if nargin < 5
+            collapsePhases = [];
+            if nargin < 4
+              onlyCompleteSub = [];
+              if nargin < 3
+                subjects = [];
+                if nargin < 2
+                  dataroot = [];
+                  if nargin < 1
+                    results = [];
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
   end
-  filenameSuffix = '';
-elseif nargin == 7
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 6
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 5
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 4
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 3
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 2
-  subjects = [];
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 1
-  dataroot = [];
-  subjects = [];
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
-elseif nargin == 0
-  results = [];
-  dataroot = [];
-  subjects = [];
-  onlyCompleteSub = [];
-  collapsePhases = [];
-  printResults = [];
-  saveResults = [];
-  quantileMeasure = [];
-  quantiles = 1;
-  filenameSuffix = '';
 end
 
 % figure out how many quantiles to use to split the data
@@ -109,6 +88,22 @@ elseif length(quantiles) > 1
   nQuantiles = length(quantiles);
 end
 nDivisions = nQuantiles + 1;
+
+if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
+  onlyCompleteSub = false;
+end
+
+if ~exist('collapsePhases','var') || isempty(collapsePhases)
+  collapsePhases = false;
+end
+
+if ~exist('printResults','var') || isempty(printResults)
+  printResults = true;
+end
+
+if ~exist('saveResults','var') || isempty(saveResults)
+  saveResults = true;
+end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
@@ -178,22 +173,6 @@ if ~exist('dataroot','var') || isempty(dataroot)
     error('No data directory found.');
   end
   %saveDir = dataroot;
-end
-
-if ~exist('onlyCompleteSub','var') || isempty(onlyCompleteSub)
-  onlyCompleteSub = false;
-end
-
-if ~exist('collapsePhases','var') || isempty(collapsePhases)
-  collapsePhases = false;
-end
-
-if ~exist('printResults','var') || isempty(printResults)
-  printResults = true;
-end
-
-if ~exist('saveResults','var') || isempty(saveResults)
-  saveResults = true;
 end
 
 %% some constants
@@ -299,80 +278,83 @@ if isempty(results)
           fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
         end
         
-        if ~isempty(quantileMeasure)
-          results.(sesName).(fn).quantiles = nan(length(subjects),nQuantiles);
-        end
-        
-        switch phaseName
-          case {'match', 'prac_match'}
-            for t = 1:length(trainedConds)
-              % choose the training condition
-              if trainedConds{t}(1) == true && trainedConds{t}(2) == true
-                trainStr = 'TT';
-                %trainStr = 'trainTrain';
-              elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
-                trainStr = 'UU';
-                %trainStr = 'untrainedUntrained';
-              elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
-                trainStr = 'TU';
-                %trainStr = 'trainedUntrained';
-              elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
-                trainStr = 'UT';
-                %trainStr = 'untrainedTrained';
-              else
-                keyboard
-              end
+        if isfield(events.(sesName),fn)
+          
+          if ~isempty(quantileMeasure)
+            results.(sesName).(fn).quantiles = nan(length(subjects),nQuantiles);
+          end
+          
+          switch phaseName
+            case {'match', 'prac_match'}
+              for t = 1:length(trainedConds)
+                % choose the training condition
+                if trainedConds{t}(1) == true && trainedConds{t}(2) == true
+                  trainStr = 'TT';
+                  %trainStr = 'trainTrain';
+                elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
+                  trainStr = 'UU';
+                  %trainStr = 'untrainedUntrained';
+                elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
+                  trainStr = 'TU';
+                  %trainStr = 'trainedUntrained';
+                elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
+                  trainStr = 'UT';
+                  %trainStr = 'untrainedTrained';
+                else
+                  keyboard
+                end
+                
+                %               if length(trainedConds{t}) == 1
+                %                 if trainedConds{t} == 1
+                %                   trainStr = 'trained';
+                %                 elseif trainedConds{t} == 0
+                %                   trainStr = 'untrained';
+                %                 end
+                %               elseif length(trainedConds{t}) > 1
+                %                 trainStr = 'all';
+                %               end
+                
+                for mf = 1:length(mainFields)
+                  for df = 1:length(dataFields{mf})
+                    results.(sesName).(fn).(trainStr).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
+                  end
+                end
+                
+                imgConds = unique({events.(sesName).(fn).data.imgCond},'sorted');
+                if length(imgConds) > 1
+                  for im = 1:length(imgConds)
+                    for mf = 1:length(mainFields)
+                      for df = 1:length(dataFields{mf})
+                        results.(sesName).(fn).(trainStr).(imgConds{im}).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
+                      end
+                    end
+                  end
+                end
+              end % for t
+            case {'name', 'nametrain', 'prac_name'}
               
-              %               if length(trainedConds{t}) == 1
-              %                 if trainedConds{t} == 1
-              %                   trainStr = 'trained';
-              %                 elseif trainedConds{t} == 0
-              %                   trainStr = 'untrained';
-              %                 end
-              %               elseif length(trainedConds{t}) > 1
-              %                 trainStr = 'all';
-              %               end
+              if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+                nBlocks = 1;
+              else
+                nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+              end
               
               for mf = 1:length(mainFields)
                 for df = 1:length(dataFields{mf})
-                  results.(sesName).(fn).(trainStr).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
+                  results.(sesName).(fn).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
                 end
               end
-              
-              imgConds = unique({events.(sesName).(fn).data.imgCond},'sorted');
-              if length(imgConds) > 1
-                for im = 1:length(imgConds)
+              if nBlocks > 1
+                for b = 1:nBlocks
                   for mf = 1:length(mainFields)
                     for df = 1:length(dataFields{mf})
-                      results.(sesName).(fn).(trainStr).(imgConds{im}).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
+                      results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
                     end
                   end
                 end
               end
-            end % for t
-          case {'name', 'nametrain', 'prac_name'}
-            
-            if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-              nBlocks = 1;
-            else
-              nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-            end
-            
-            for mf = 1:length(mainFields)
-              for df = 1:length(dataFields{mf})
-                results.(sesName).(fn).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
-              end
-            end
-            if nBlocks > 1
-              for b = 1:nBlocks
-                for mf = 1:length(mainFields)
-                  for df = 1:length(dataFields{mf})
-                    results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{mf}{df}) = nan(length(subjects),nDivisions);
-                  end
-                end
-              end
-            end
-        end % switch
+          end % switch
+        end
       end
     end
   end
@@ -451,41 +433,62 @@ if isempty(results)
               if events.(sesName).(fn).isComplete
                 fprintf('%s, session_%d %s, %s\n',expParam.subject,sesNum,sesName,fn);
                 
-                if ~isempty(quantileMeasure)
-                  quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
-                  results.(sesName).(fn).quantiles(sub,:) = quantz;
-                  if plotQhist && ismember(sesName,{'pretest','posttest','posttest_delay'})
-                    hist([events.(sesName).(fn).data.(quantileMeasure)],100);
-                    title(sprintf('%s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-')));
-                    keyboard
-                    close all
-                  end
-                end
-            
-                for q = 1:nDivisions
-                  if ~isempty(quantileMeasure) && printResults && nDivisions > 1
-                    fprintf('==================================================\n');
-                    if q == 1
-                      fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q));
-                    elseif q == nDivisions
-                      fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1));
-                    else
-                      fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1),quantileMeasure,quantz(q));
-                    end
-                    fprintf('==================================================\n');
-                  end
-                  
-                  if ~isempty(quantileMeasure)
-                    % get the events for this quantile
-                    if q == 1
-                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] <= quantz(q));
-                    elseif q == nDivisions
-                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quantz(q-1));
-                    else
-                      theseEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(quantileMeasure)] <= quantz(q));
+                if ~isempty(quantileMeasure) && nDivisions > 1
+                  if ismember(phaseName,quantileMeasure)
+                    thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
+                    if ~isempty(thisQuantMeasure)
+                      quantz = quantile([events.(sesName).(fn).data.(thisQuantMeasure)],quantiles);
+                      results.(sesName).(fn).quantiles(sub,:) = quantz;
+                      if plotQhist
+                        hist([events.(sesName).(fn).data.(thisQuantMeasure)],100); %#ok<UNRCH>
+                        title(sprintf('%s %s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-'),strrep(thisQuantMeasure,'_','-')));
+                        keyboard
+                        close all
+                      end
                     end
                   else
-                    theseEvents = events.(sesName).(fn).data;
+                    thisQuantMeasure = '';
+                  end
+                else
+                  thisQuantMeasure = '';
+                end
+                
+%                 if ~isempty(quantileMeasure) && nDivisions > 1
+%                   quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
+%                   results.(sesName).(fn).quantiles(sub,:) = quantz;
+%                   if plotQhist && ismember(sesName,{'pretest','posttest','posttest_delay'})
+%                     hist([events.(sesName).(fn).data.(quantileMeasure)],100);
+%                     title(sprintf('%s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-')));
+%                     keyboard
+%                     close all
+%                   end
+%                 end
+            
+                for q = 1:nDivisions
+                  
+                  if ~isempty(thisQuantMeasure)
+                    % get the events for this quantile
+                    if q == 1
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
+                    elseif q == nDivisions
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1));
+                    else
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
+                    end
+                    
+                    if printResults
+                      fprintf('==================================================\n');
+                      if q == 1
+                        fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q));
+                      elseif q == nDivisions
+                        fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q-1));
+                      else
+                        fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q-1),thisQuantMeasure,quantz(q));
+                      end
+                      fprintf('==================================================\n');
+                    end
+                  else
+                    thisPhaseEv = events.(sesName).(fn).data;
                   end
                   
                   switch phaseName
@@ -541,7 +544,7 @@ if isempty(results)
                         %                       end
                         
                         % filter the events that we want
-                        matchResp = theseEvents(ismember({theseEvents.type},'MATCH_RESP'));
+                        matchResp = thisPhaseEv(ismember({thisPhaseEv.type},'MATCH_RESP'));
                         trainedInd = false(size(matchResp));
                         for ti = 1:length(matchResp)
                           if matchResp(ti).trained(1) == trainedConds{t}(1) && matchResp(ti).trained(2) == trainedConds{t}(2)
@@ -778,7 +781,7 @@ if isempty(results)
                       end
                       
                       % filter the events that we want
-                      nameResp = theseEvents(ismember({theseEvents.type},'NAME_RESP'));
+                      nameResp = thisPhaseEv(ismember({thisPhaseEv.type},'NAME_RESP'));
                       
                       % exclude missed responses (-1)
                       nameResp = nameResp([nameResp.resp] ~= -1);
@@ -907,10 +910,11 @@ if isempty(results)
     end
     
     if collapsePhases
-      matFileName = sprintf('%s_behav_results%s%s_collapsed.mat',expName,quantStr,filenameSuffix);
+      collapseStr = '_collapsed';
     else
-      matFileName = sprintf('%s_behav_results%s%s.mat',expName,quantStr,filenameSuffix);
+      collapseStr = '';
     end
+    matFileName = sprintf('%s_behav_results%s%s%s.mat',expName,quantStr,collapseStr,filenameSuffix);
     matFileName = fullfile(dataroot,matFileName);
     
     fprintf('Saving results struct to %s...',matFileName);
@@ -933,7 +937,8 @@ else
         error('events file does not exist: %s',eventsFile);
       end
       
-      % if we only want complete subjects and this one is not done, set to F
+      % if we only want complete subjects and this one is not done, set to
+      % false
       if ~events.isComplete
         fprintf('Incomplete!\n');
         completeStatus(sub) = false;
@@ -945,11 +950,18 @@ else
 end
 
 if saveResults
-  if collapsePhases
-    textFileName = sprintf('%s_behav_results%s%s_collapsed.txt',expName,quantStr,filenameSuffix);
+  if nDivisions > 1
+    quantStr = sprintf('_%dquantileDiv',nDivisions);
   else
-    textFileName = sprintf('%s_behav_results%s%s.txt',expName,quantStr,filenameSuffix);
+    quantStr = '';
   end
+  
+  if collapsePhases
+    collapseStr = '_collapsed';
+  else
+    collapseStr = '';
+  end
+  textFileName = sprintf('%s_behav_results%s%s%s.txt',expName,quantStr,collapseStr,filenameSuffix);
   textFileName = fullfile(dataroot,textFileName);
   
   printResultsToFile(dataroot,subjects,completeStatus,trainedConds,results,mainFields,dataFields,textFileName,collapsePhases,templateSubIndex,quantileMeasure,nDivisions);
@@ -964,7 +976,7 @@ function printResultsToFile(dataroot,subjects,completeStatus,trainedConds,result
 if nargin < 12
   error('Must include both variables: ''quantileMeasure'' and ''nDivisions''.');
 elseif nargin < 11
-  quantileMeasure = [];
+  quantileMeasure = {};
   nDivisions = 1;
 end
 
@@ -1021,233 +1033,249 @@ for sesNum = 1:length(expParam.sesTypes)
         fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
       end
       
-      fprintf(fid,'phase\t%s\n',fn);
-      
-      for q = 1:nDivisions
-        if ~isempty(quantileMeasure) && nDivisions > 1
-          if q == 1
-            fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
-          elseif q == nDivisions
-            fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
-          else
-            fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
-          end
-        end
-      
-      switch phaseName
-        case {'match', 'prac_match'}
-          for t = 1:length(trainedConds)
-            
-            % choose the training condition
-            if trainedConds{t}(1) == true && trainedConds{t}(2) == true
-              trainStr = 'TT';
-              %trainStr = 'trainTrain';
-            elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
-              trainStr = 'UU';
-              %trainStr = 'untrainedUntrained';
-            elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
-              trainStr = 'TU';
-              %trainStr = 'trainedUntrained';
-            elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
-              trainStr = 'UT';
-              %trainStr = 'untrainedTrained';
-            else
-              keyboard
-            end
-            
-            %             if length(trainedConds{t}) == 1
-            %               if trainedConds{t} == 1
-            %                 trainStr = 'trained';
-            %               elseif trainedConds{t} == 0
-            %                 trainStr = 'untrained';
-            %               end
-            %             elseif length(trainedConds{t}) > 1
-            %               trainStr = 'all';
-            %             end
-            
-            % the only purpose of getting matchResp events here is to get
-            % the image conditions below; no need to exclude 'none'
-            % responses
-            matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP'));
-            trainedInd = false(size(matchResp));
-            for ti = 1:length(matchResp)
-              if matchResp(ti).trained(1) == trainedConds{t}(1) && matchResp(ti).trained(2) == trainedConds{t}(2)
-                trainedInd(ti) = true;
+      if isfield(events.(sesName),fn)
+        fprintf(fid,'phase\t%s\n',fn);
+        
+        for q = 1:nDivisions
+          if ~isempty(quantileMeasure) && nDivisions > 1
+            if ismember(phaseName,quantileMeasure)
+              thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
+              if ~isempty(thisQuantMeasure)
+                if q == 1
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                elseif q == nDivisions
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                else
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                end
               end
             end
-            matchResp = matchResp(trainedInd);
-            
-            %matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
-            
-            imgConds = unique({matchResp.imgCond},'sorted');
-            if length(imgConds) > 1
-              nTabs = nan(1,length(dataToPrint) * length(imgConds));
-              nTabInd = 0;
-              for im = 1:length(imgConds)
+%             if q == 1
+%               fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
+%             elseif q == nDivisions
+%               fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
+%             else
+%               fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
+%             end
+          end
+          
+          switch phaseName
+            case {'match', 'prac_match'}
+              for t = 1:length(trainedConds)
+                
+                % choose the training condition
+                if trainedConds{t}(1) == true && trainedConds{t}(2) == true
+                  trainStr = 'TT';
+                  %trainStr = 'trainTrain';
+                elseif trainedConds{t}(1) == false && trainedConds{t}(2) == false
+                  trainStr = 'UU';
+                  %trainStr = 'untrainedUntrained';
+                elseif trainedConds{t}(1) == true && trainedConds{t}(2) == false
+                  trainStr = 'TU';
+                  %trainStr = 'trainedUntrained';
+                elseif trainedConds{t}(1) == false && trainedConds{t}(2) == true
+                  trainStr = 'UT';
+                  %trainStr = 'untrainedTrained';
+                else
+                  keyboard
+                end
+                
+                %             if length(trainedConds{t}) == 1
+                %               if trainedConds{t} == 1
+                %                 trainStr = 'trained';
+                %               elseif trainedConds{t} == 0
+                %                 trainStr = 'untrained';
+                %               end
+                %             elseif length(trainedConds{t}) > 1
+                %               trainStr = 'all';
+                %             end
+                
+                % the only purpose of getting matchResp events here is to get
+                % the image conditions below; no need to exclude 'none'
+                % responses
+                matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP'));
+                trainedInd = false(size(matchResp));
+                for ti = 1:length(matchResp)
+                  if matchResp(ti).trained(1) == trainedConds{t}(1) && matchResp(ti).trained(2) == trainedConds{t}(2)
+                    trainedInd(ti) = true;
+                  end
+                end
+                matchResp = matchResp(trainedInd);
+                
+                %matchResp = events.(sesName).(fn).data(ismember({events.(sesName).(fn).data.type},'MATCH_RESP') & ismember([events.(sesName).(fn).data.trained],trainedConds{t}));
+                
+                imgConds = unique({matchResp.imgCond},'sorted');
+                if length(imgConds) > 1
+                  nTabs = nan(1,length(dataToPrint) * length(imgConds));
+                  nTabInd = 0;
+                  for im = 1:length(imgConds)
+                    for d = 1:length(dataToPrint)
+                      nTabInd = nTabInd + 1;
+                      nTabs(nTabInd) = length(dataToPrint{d});
+                    end
+                  end
+                  headerCell = {{trainStr},imgConds,mainToPrint};
+                  [headerStr] = setHeaderStr(headerCell,nTabs);
+                  fprintf(fid,sprintf('\t%s\n',headerStr));
+                  
+                  for sub = 1:length(subjects)
+                    % print the header string only before the first sub
+                    if sub == 1
+                      for im = 1:length(imgConds)
+                        for mf = 1:length(mainToPrint)
+                          [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                          headerStr = sprintf('\t%s',headerStr);
+                          %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                          fprintf(fid,sprintf('%s',headerStr));
+                        end
+                      end
+                      fprintf(fid,'\n');
+                    end
+                    
+                    if completeStatus(sub)
+                      dataStr = subjects{sub};
+                      for im = 1:length(imgConds)
+                        for mf = 1:length(mainToPrint)
+                          [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,imgConds{im},mainToPrint{mf}},results,sub,q,dataToPrint{mf});
+                        end
+                      end
+                      fprintf(fid,sprintf('%s\n',dataStr));
+                    end
+                  end
+                  
+                else
+                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                  keyboard
+                  
+                  nTabs = nan(1,length(dataToPrint));
+                  nTabInd = 0;
+                  for d = 1:length(dataToPrint)
+                    nTabInd = nTabInd + 1;
+                    nTabs(nTabInd) = length(dataToPrint{d});
+                  end
+                  headerCell = {{trainStr},mainToPrint};
+                  [headerStr] = setHeaderStr(headerCell,nTabs);
+                  fprintf(fid,sprintf('\t%s\n',headerStr));
+                  
+                  for sub = 1:length(subjects)
+                    % print the header string only before the first sub
+                    if sub == 1
+                      for mf = 1:length(mainToPrint)
+                        [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                        headerStr = sprintf('\t%s',headerStr);
+                        %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                        fprintf(fid,sprintf('%s',headerStr));
+                      end
+                      fprintf(fid,'\n');
+                    end
+                    
+                    if completeStatus(sub)
+                      dataStr = subjects{sub};
+                      for mf = 1:length(mainToPrint)
+                        [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,q,dataToPrint{mf});
+                      end
+                      fprintf(fid,sprintf('%s\n',dataStr));
+                    end
+                  end
+                end
+                if t ~= length(trainedConds)
+                  fprintf(fid,'\n');
+                end
+              end
+              
+            case {'name', 'nametrain', 'prac_name'}
+              if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+                nBlocks = 1;
+              else
+                nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+              end
+              
+              if nBlocks > 1
+                blockStr = cell(1,nBlocks);
+                for b = 1:nBlocks
+                  blockStr{b} = sprintf('b%d',b);
+                end
+                nTabs = nan(1,length(dataToPrint) * nBlocks);
+                nTabInd = 0;
+                for b = 1:nBlocks
+                  for d = 1:length(dataToPrint)
+                    nTabInd = nTabInd + 1;
+                    nTabs(nTabInd) = length(dataToPrint{d});
+                  end
+                end
+                headerCell = {blockStr,mainToPrint};
+                [headerStr] = setHeaderStr(headerCell,nTabs);
+                fprintf(fid,sprintf('\t%s\n',headerStr));
+                
+                for sub = 1:length(subjects)
+                  % print the header string only before the first sub
+                  if sub == 1
+                    for b = 1:nBlocks
+                      for mf = 1:length(mainToPrint)
+                        [headerStr] = setHeaderStr(dataToPrint(mf),1);
+                        headerStr = sprintf('\t%s',headerStr);
+                        %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
+                        fprintf(fid,sprintf('%s',headerStr));
+                      end
+                    end
+                    fprintf(fid,'\n');
+                  end
+                  
+                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                  if completeStatus(sub)
+                    dataStr = subjects{sub};
+                    for b = 1:nBlocks
+                      for mf = 1:length(mainToPrint)
+                        [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,q,dataToPrint{mf});
+                      end
+                    end
+                    fprintf(fid,sprintf('%s\n',dataStr));
+                  end
+                end
+              else
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                nTabs = nan(1,length(dataToPrint));
+                nTabInd = 0;
                 for d = 1:length(dataToPrint)
                   nTabInd = nTabInd + 1;
                   nTabs(nTabInd) = length(dataToPrint{d});
                 end
-              end
-              headerCell = {{trainStr},imgConds,mainToPrint};
-              [headerStr] = setHeaderStr(headerCell,nTabs);
-              fprintf(fid,sprintf('\t%s\n',headerStr));
-              
-              for sub = 1:length(subjects)
-                % print the header string only before the first sub
-                if sub == 1
-                  for im = 1:length(imgConds)
+                headerCell = {mainToPrint};
+                [headerStr] = setHeaderStr(headerCell,nTabs);
+                fprintf(fid,sprintf('\t%s\n',headerStr));
+                
+                for sub = 1:length(subjects)
+                  % print the header string only before the first sub
+                  if sub == 1
                     for mf = 1:length(mainToPrint)
                       [headerStr] = setHeaderStr(dataToPrint(mf),1);
                       headerStr = sprintf('\t%s',headerStr);
                       %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
                       fprintf(fid,sprintf('%s',headerStr));
                     end
+                    fprintf(fid,'\n');
                   end
-                  fprintf(fid,'\n');
-                end
-                
-                if completeStatus(sub)
-                  dataStr = subjects{sub};
-                  for im = 1:length(imgConds)
+                  
+                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                  if completeStatus(sub)
+                    dataStr = subjects{sub};
                     for mf = 1:length(mainToPrint)
-                      [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,imgConds{im},mainToPrint{mf}},results,sub,q,dataToPrint{mf});
+                      [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,q,dataToPrint{mf});
                     end
+                    fprintf(fid,sprintf('%s\n',dataStr));
                   end
-                  fprintf(fid,sprintf('%s\n',dataStr));
-                end
-              end
-              
-            else
-              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              keyboard
-              
-              nTabs = nan(1,length(dataToPrint));
-              nTabInd = 0;
-              for d = 1:length(dataToPrint)
-                nTabInd = nTabInd + 1;
-                nTabs(nTabInd) = length(dataToPrint{d});
-              end
-              headerCell = {{trainStr},mainToPrint};
-              [headerStr] = setHeaderStr(headerCell,nTabs);
-              fprintf(fid,sprintf('\t%s\n',headerStr));
-              
-              for sub = 1:length(subjects)
-                % print the header string only before the first sub
-                if sub == 1
-                  for mf = 1:length(mainToPrint)
-                    [headerStr] = setHeaderStr(dataToPrint(mf),1);
-                    headerStr = sprintf('\t%s',headerStr);
-                    %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-                    fprintf(fid,sprintf('%s',headerStr));
-                  end
-                  fprintf(fid,'\n');
                 end
                 
-                if completeStatus(sub)
-                  dataStr = subjects{sub};
-                  for mf = 1:length(mainToPrint)
-                    [dataStr] = setDataStr(dataStr,{sesName,fn,trainStr,mainToPrint{mf}},results,sub,q,dataToPrint{mf});
-                  end
-                  fprintf(fid,sprintf('%s\n',dataStr));
-                end
               end
-            end
-            if t ~= length(trainedConds)
-              fprintf(fid,'\n');
-            end
-          end
-          
-        case {'name', 'nametrain', 'prac_name'}
-          if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-            nBlocks = 1;
-          else
-            nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-          end
-          
-          if nBlocks > 1
-            blockStr = cell(1,nBlocks);
-            for b = 1:nBlocks
-              blockStr{b} = sprintf('b%d',b);
-            end
-            nTabs = nan(1,length(dataToPrint) * nBlocks);
-            nTabInd = 0;
-            for b = 1:nBlocks
-              for d = 1:length(dataToPrint)
-                nTabInd = nTabInd + 1;
-                nTabs(nTabInd) = length(dataToPrint{d});
-              end
-            end
-            headerCell = {blockStr,mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,nTabs);
-            fprintf(fid,sprintf('\t%s\n',headerStr));
-            
-            for sub = 1:length(subjects)
-              % print the header string only before the first sub
-              if sub == 1
-                for b = 1:nBlocks
-                  for mf = 1:length(mainToPrint)
-                    [headerStr] = setHeaderStr(dataToPrint(mf),1);
-                    headerStr = sprintf('\t%s',headerStr);
-                    %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-                    fprintf(fid,sprintf('%s',headerStr));
-                  end
-                end
-                fprintf(fid,'\n');
-              end
-              
-              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              if completeStatus(sub)
-                dataStr = subjects{sub};
-                for b = 1:nBlocks
-                  for mf = 1:length(mainToPrint)
-                    [dataStr] = setDataStr(dataStr,{sesName,fn,sprintf('b%d',b),mainToPrint{mf}},results,sub,q,dataToPrint{mf});
-                  end
-                end
-                fprintf(fid,sprintf('%s\n',dataStr));
-              end
-            end
-          else
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            nTabs = nan(1,length(dataToPrint));
-            nTabInd = 0;
-            for d = 1:length(dataToPrint)
-              nTabInd = nTabInd + 1;
-              nTabs(nTabInd) = length(dataToPrint{d});
-            end
-            headerCell = {mainToPrint};
-            [headerStr] = setHeaderStr(headerCell,nTabs);
-            fprintf(fid,sprintf('\t%s\n',headerStr));
-            
-            for sub = 1:length(subjects)
-              % print the header string only before the first sub
-              if sub == 1
-                for mf = 1:length(mainToPrint)
-                  [headerStr] = setHeaderStr(dataToPrint(mf),1);
-                  headerStr = sprintf('\t%s',headerStr);
-                  %headerStr = repmat(headerStr,1,prod(cellfun('prodofsize', headerCell)));
-                  fprintf(fid,sprintf('%s',headerStr));
-                end
-                fprintf(fid,'\n');
-              end
-              
-              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              if completeStatus(sub)
-                dataStr = subjects{sub};
-                for mf = 1:length(mainToPrint)
-                  [dataStr] = setDataStr(dataStr,{sesName,fn,mainToPrint{mf}},results,sub,q,dataToPrint{mf});
-                end
-                fprintf(fid,sprintf('%s\n',dataStr));
-              end
-            end
-            
-          end
-      end % switch phaseName
-      fprintf(fid,'\n');
-      end
-    end
-  end
-end
+          end % switch phaseName
+          fprintf(fid,'\n');
+        end % q
+      else
+        fprintf('printResultsToFile: %s, %s: phase %s does not exist.\n',expParam.subject,sesName,fn);
+      end % isfield
+    end % isExp
+  end % pha
+end % ses
 
 % close out the results file
 fclose(fid);
