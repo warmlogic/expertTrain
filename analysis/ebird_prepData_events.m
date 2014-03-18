@@ -186,7 +186,7 @@ for sub = 1:length(subjects)
   
   fprintf('Saving %s...',eventsOutfile_sub);
   % save each subject's events
-  save(eventsOutfile_sub,'events');
+  save(eventsOutfile_sub,'events','-v7');
   %saveEvents(events,eventsOutfile_sub);
   fprintf('Done.\n');
   

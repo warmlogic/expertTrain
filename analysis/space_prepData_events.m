@@ -425,7 +425,7 @@ for sub = 1:length(subjects)
   
   fprintf('Saving %s...',eventsOutfile_sub);
   % save each subject's events
-  save(eventsOutfile_sub,'events');
+  save(eventsOutfile_sub,'events','-v7');
   fprintf('Done.\n');
   
   fprintf('Done processing %s.\n',subjects{sub});
