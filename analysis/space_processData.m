@@ -5,6 +5,15 @@ function [results] = space_processData(results,dataroot,subjects,collapsePhases,
 %
 % e.g.,
 % [results] = space_processData([],[],[],true,true,true,true,false,true,true,true);
+%
+% Quantile example (quantileMeasure is a cell array of phase names with
+% a paired measure name).
+%
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall','recog_rt'},[.25 .50 .75]);
+%
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall','recog_rt'},3);
+%
+% [results] = space_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall','recog_rt'},0.5);
 
 plotQhist = false;
 
@@ -19,7 +28,7 @@ if nargin < 14
   if nargin < 13
     quantiles = 1;
     if nargin < 12
-      quantileMeasure = '';
+      quantileMeasure = {};
       if nargin < 11
         prependDestField = true;
         if nargin < 10
@@ -562,38 +571,47 @@ if isempty(results)
               % collect data if this phase is complete
               if events.(sesName).(fn).isComplete
                 fprintf('%s, %s, %s\n',expParam.subject,sesName,fn);
-                if ~isempty(quantileMeasure)
-                  quantz = quantile([events.(sesName).(fn).data.(quantileMeasure)],quantiles);
-                  results.(sesName).(fn).quantiles(sub,:) = quantz;
-                  if plotQhist && ismember(sesName,{'pretest','posttest','posttest_delay'})
-                    hist([events.(sesName).(fn).data.(quantileMeasure)],100);
-                    title(sprintf('%s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-')));
-                    keyboard
-                    close all
+                if ~isempty(quantileMeasure) && nDivisions > 1
+                  if ismember(phaseName,quantileMeasure)
+                    thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
+                    if ~isempty(thisQuantMeasure)
+                      quantz = quantile([events.(sesName).(fn).data.(thisQuantMeasure)],quantiles);
+                      results.(sesName).(fn).quantiles(sub,:) = quantz;
+                      if plotQhist
+                        hist([events.(sesName).(fn).data.(thisQuantMeasure)],100); %#ok<UNRCH>
+                        title(sprintf('%s %s %s %s',subjects{sub},strrep(sesName,'_','-'),strrep(fn,'_','-'),strrep(thisQuantMeasure,'_','-')));
+                        keyboard
+                        close all
+                      end
+                    end
+                  else
+                    thisQuantMeasure = '';
                   end
+                else
+                  thisQuantMeasure = '';
                 end
                 
                 for q = 1:nDivisions
-                  if ~isempty(quantileMeasure) && printResults && nDivisions > 1
-                    fprintf('==================================================\n');
-                    if q == 1
-                      fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q));
-                    elseif q == nDivisions
-                      fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1));
-                    else
-                      fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,quantileMeasure,quantz(q-1),quantileMeasure,quantz(q));
-                    end
-                    fprintf('==================================================\n');
-                  end
-                  
-                  if ~isempty(quantileMeasure)
+                  if ~isempty(quantileMeasure) && ~isempty(thisQuantMeasure)
                     % get the events for this quantile
                     if q == 1
-                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] <= quantz(q));
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
                     elseif q == nDivisions
-                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quantz(q-1));
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1));
                     else
-                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(quantileMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(quantileMeasure)] <= quantz(q));
+                      thisPhaseEv = events.(sesName).(fn).data([events.(sesName).(fn).data.(thisQuantMeasure)] > quantz(q-1) & [events.(sesName).(fn).data.(thisQuantMeasure)] <= quantz(q));
+                    end
+                    
+                    if printResults && nDivisions > 1
+                      fprintf('==================================================\n');
+                      if q == 1
+                        fprintf('Quantile division %d of %d: %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q));
+                      elseif q == nDivisions
+                        fprintf('Quantile division %d of %d: %s > %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q-1));
+                      else
+                        fprintf('Quantile division %d of %d: %s > %.4f & %s <= %.4f\n',q,nDivisions,thisQuantMeasure,quantz(q-1),thisQuantMeasure,quantz(q));
+                      end
+                      fprintf('==================================================\n');
                     end
                   else
                     thisPhaseEv = events.(sesName).(fn).data;
@@ -959,7 +977,7 @@ function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,pr
 if nargin < 13
   error('Must include both variables: ''quantileMeasure'' and ''nDivisions''.');
 elseif nargin < 12
-  quantileMeasure = [];
+  quantileMeasure = {};
   nDivisions = 1;
 end
 
@@ -1034,12 +1052,17 @@ for sesNum = 1:length(expParam.sesTypes)
         
         for q = 1:nDivisions
           if ~isempty(quantileMeasure) && nDivisions > 1
-            if q == 1
-              fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
-            elseif q == nDivisions
-              fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
-            else
-              fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,quantileMeasure);
+            if ismember(quantileMeasure,phaseName)
+              thisQuantMeasure = quantileMeasure{find(ismember(quantileMeasure,phaseName)) + 1};
+              if ~isempty(thisQuantMeasure)
+                if q == 1
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                elseif q == nDivisions
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                else
+                  fprintf(fid,'Quantile division %d of %d: %s\n',q,nDivisions,thisQuantMeasure);
+                end
+              end
             end
           end
           
