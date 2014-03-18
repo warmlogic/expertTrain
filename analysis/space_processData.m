@@ -165,6 +165,8 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE026';
     'SPACE028';
     'SPACE030';
+    'SPACE032';
+    'SPACE034';
     };
 end
 
