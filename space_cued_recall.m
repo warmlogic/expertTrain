@@ -985,14 +985,14 @@ for i = trialNum:length(testStims_img)
           if length(recallResp_all) > 2 && recallsInARowCounter >= 3
             % if they've made the same response more than 3 times in a row
             
-            if phaseCfg.playSound
-              % play a loud angry beep
-              Beeper(440, 0.9, 3);
-            end
+            %if phaseCfg.playSound
+            %  % play a loud angry beep
+            %  Beeper(440, 0.9, 3);
+            %end
             
             % tell them that they're not responding correctly
-            tooManyInARowText1 = sprintf('Are you having trouble understanding what you should be doing?\n\nYou have made the response "%s" many times in a row. It seems that you are not doing the task correctly.',recallResp);
-            tooManyInARowText2 = sprintf('\n\nPlease stop doing the task and talk to the experimenter now.\n\nPlease press "%s" when you know how to do the task properly.',cfg.keys.instructContKey);
+            tooManyInARowText1 = sprintf('It seems that you are not doing the task correctly.\n\nYou have made the response "%s" many times in a row.',recallResp);
+            tooManyInARowText2 = sprintf('\n\nPlease talk to the experimenter now.\n\nPress "%s" when you know how to do the task correctly.',cfg.keys.instructContKey);
             
             Screen('TextSize', w, cfg.text.instructTextSize);
             DrawFormattedText(w,sprintf('%s%s',tooManyInARowText1,tooManyInARowText2),'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
@@ -1000,6 +1000,9 @@ for i = trialNum:length(testStims_img)
               Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
             end
             Screen('Flip', w);
+            
+            fprintf(logFile,'!!! Same response too many times in a row\n');
+            fprintf(phLFile,'!!! Same response too many times in a row\n');
             
             % wait until the key is pressed
             RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
@@ -1017,14 +1020,14 @@ for i = trialNum:length(testStims_img)
           elseif length(recallResp_all) > 4 && sum(strcmpi(recallResp_all,recallResp)) / length(recallResp_all) >= (1/3)
             % if they've made the same response for >= 33% of the responses
             
-            if phaseCfg.playSound
-              % play a loud angry beep
-              Beeper(440, 0.9, 3);
-            end
+            %if phaseCfg.playSound
+            %  % play a loud angry beep
+            %  Beeper(440, 0.9, 3);
+            %end
             
             % tell them that they're not responding correctly
-            tooManySameText1 = sprintf('Are you having trouble understanding what you should be doing?\n\nYou have made the response "%s" many times.\nIf you are simply trying to show that you do not remember a word, please press DELETE until you see "%s" again.',recallResp,cfg.text.recallPrompt);
-            tooManySameText2 = sprintf('\n\nIf instead you do not understand what you should be doing, please stop doing the task and talk to the experimenter now.\n\nPlease press "%s" when you know how to do the task properly.',cfg.keys.instructContKey);
+            tooManySameText1 = sprintf('You have made the response "%s" many times.\nIf you are trying to show that you do not remember a word, you should instead press Delete until you see "%s" again.',recallResp,cfg.text.recallPrompt);
+            tooManySameText2 = sprintf('\n\nOr, if you do not understand how to do the task, please talk to the experimenter now.\n\nPress "%s" when you know how to do the task correctly.',cfg.keys.instructContKey);
             
             Screen('TextSize', w, cfg.text.instructTextSize);
             DrawFormattedText(w,sprintf('%s%s',tooManySameText1,tooManySameText2),'center','center',cfg.text.instructColor, cfg.text.instructCharWidth);
@@ -1032,6 +1035,9 @@ for i = trialNum:length(testStims_img)
               Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
             end
             Screen('Flip', w);
+            
+            fprintf(logFile,'!!! Same response too many times overall\n');
+            fprintf(phLFile,'!!! Same response too many times overall\n');
             
             % wait until the key is pressed
             RestrictKeysForKbCheck(KbName(cfg.keys.instructContKey));
