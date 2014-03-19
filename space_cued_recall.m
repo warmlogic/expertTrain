@@ -1026,7 +1026,7 @@ for i = trialNum:length(testStims_img)
             %end
             
             % tell them that they're not responding correctly
-            tooManySameText1 = sprintf('You have made the response "%s" many times.\nIf you are trying to show that you do not remember a word, you should instead press Delete until you see "%s" again.',recallResp,cfg.text.recallPrompt);
+            tooManySameText1 = sprintf('You have made the response "%s" many times.\nIf you are trying to show that you do not remember a word, you should simply press Return when you see "%s".',recallResp,cfg.text.recallPrompt);
             tooManySameText2 = sprintf('\n\nOr, if you do not understand how to do the task, please talk to the experimenter now.\n\nPress "%s" when you know how to do the task correctly.',cfg.keys.instructContKey);
             
             Screen('TextSize', w, cfg.text.instructTextSize);
