@@ -500,7 +500,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
-        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false). nSpecies = (nSame + nDiff) in practice.
         
         % minimum number of trials needed between exact repeats of a given
@@ -579,7 +579,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
-        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false)
         
         % minimum number of trials needed between exact repeats of a given
@@ -1158,7 +1158,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
-        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false)
         
         % minimum number of trials needed between exact repeats of a given
@@ -1249,7 +1249,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
           cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
           
-          % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+          % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
           % if rmStims_orig=false)
           
           % minimum number of trials needed between exact repeats of a given
@@ -1397,7 +1397,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
-        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false)
         
         % minimum number of trials needed between exact repeats of a given
@@ -1585,7 +1585,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
-        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false)
         
         % minimum number of trials needed between exact repeats of a given

@@ -312,7 +312,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
         
-        % nTrials = (nSame + nDiff) * nSpecies * nFamiles (and multiply by 2
+        % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false)
         
         if expParam.useNS
