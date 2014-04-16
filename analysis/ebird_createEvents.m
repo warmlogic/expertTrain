@@ -151,7 +151,7 @@ switch phaseName
       'type',logData{matchS.type}, 'trial',num2cell(single(logData{matchS.trial})),...
       'familyStr',[], 'familyNum',[], 'speciesStr',[], 'speciesNum',[], 'exemplarNum',[],...
       'imgCond',[],...
-      'isSubord',[], 'trained',[], 'sameSpecies',[],...
+      'isSubord',[], 'trained',[], 'sameTrained',[], 'sameSpecies',[],...
       'resp',[], 'acc',[], 'rt',[]);
     
     for i = 1:length(log)
@@ -178,10 +178,25 @@ switch phaseName
           log(i).trained = logical(logData{matchS.s_trained}(i));
           log(i).sameSpecies = logical(logData{matchS.s_sameSpecies}(i));
           
+          if strcmp(log(i).type, 'MATCH_STIM2')
+            if log(i-1).trained == log(i).trained
+              log(i-1).sameTrained = true;
+              log(i).sameTrained = true;
+            else
+              log(i-1).sameTrained = false;
+              log(i).sameTrained = false;
+            end
+          end
+          
         case {'MATCH_RESP'}
           log(i).isSubord = logical(str2double(logData{matchS.r_isSubord}{i}));
-          log(i).trained = logical(str2double(logData{matchS.r_trained}{i}));
           log(i).sameSpecies = logical(str2double(logData{matchS.r_sameSpecies}{i}));
+          % trained for MATCH_RESP in log gets logged as the training
+          % status of the second stimulus; this is not useful if the
+          % training status is different. however, it doesn't matter
+          % because this gets overwritten below when the training status of
+          % both stimuli are combined into one vector
+          log(i).trained = logical(str2double(logData{matchS.r_trained}{i}));
           
           % unique to MATCH_RESP
           log(i).resp = logData{matchS.r_resp}{i};
@@ -261,6 +276,16 @@ switch phaseName
 %               keyboard
 %             end
             
+            % note whether the two stimuli had the same training status
+            if strcmp(log(i).type,'MATCH_STIM2')
+              if log(i-1).trained == log(i).trained
+                log(i-1).sameTrained = true;
+                log(i).sameTrained = true;
+              else
+                log(i-1).sameTrained = false;
+                log(i).sameTrained = false;
+              end
+            end
           elseif isempty(thisNormalStim)
             keyboard % debug
             %thisNormalStim = normalStim(ismember({normalStim.type},'MATCH_STIM2') & ismember({normalStim.familyStr},thisFamily) & ismember({normalStim.speciesStr},log(i).speciesStr) & [normalStim.exemplarNum] == log(i).exemplarNum);
@@ -296,6 +321,12 @@ switch phaseName
       switch log(i).type
         case {'MATCH_RESP'}
           log(i).trained = [log(i-2).trained log(i-1).trained];
+          % note whether the two stimuli had the same training status
+          if log(i-2).trained == log(i-1).trained
+            log(i).sameTrained = true;
+          else
+            log(i).sameTrained = false;
+          end
           
 %           % debug: see if isSubord field is accurate
 %           if log(i-2).isSubord ~= log(i-1).isSubord
