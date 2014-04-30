@@ -368,6 +368,9 @@ end
 
 % lagConds = [8, 0, -1];
 
+mainFields_expo = {'rating'};
+dataFields_expo = {{'resp', 'rt'}};
+
 mainFields = {'recog','recall'};
 dataFields = {...
   {'nTrial','nTarg','nLure','nHit','nMiss','nCR','nFA','hr','mr','crr','far','dp','rt','rt_hit','rt_miss','rt_cr','rt_fa','c','Pr','Br'} ...
@@ -452,6 +455,35 @@ if isempty(results)
           end
           
           switch phaseName
+            case {'expo'}
+              respEvents = events.oneDay.expo.data(strcmp({events.oneDay.expo.data.type},'EXPO_RESP'));
+              
+              if collapseCategories
+                for mf = 1:length(mainFields_expo)
+                  mField = mainFields_expo{mf};
+                  for df = 1:length(dataFields_expo{mf})
+                    dField = dataFields_expo{mf}{df};
+                    
+                    results.(sesName).(fn).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+                  end
+                end
+              end
+              
+              % image categories
+              i_catStrs = unique({respEvents.i_catStr},'sorted');
+              if length(i_catStrs) > 1 && separateCategories
+                for im = 1:length(i_catStrs)
+                  for mf = 1:length(mainFields_expo)
+                    mField = mainFields_expo{mf};
+                    for df = 1:length(dataFields_expo{mf})
+                      dField = dataFields_expo{mf}{df};
+                      
+                      results.(sesName).(fn).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+                    end
+                  end
+                end
+              end
+              
             case {'cued_recall'}
               targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
               %lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
@@ -648,6 +680,51 @@ if isempty(results)
                   end
                   
                   switch phaseName
+                    case {'expo'}
+                      thisPhaseEv = thisPhaseEv([thisPhaseEv.resp] ~= 0);
+                      respEvents = thisPhaseEv(strcmp({thisPhaseEv.type},'EXPO_RESP'));
+                      
+                      if collapseCategories
+                        % overall, collapsing across categories
+                        for mf = 1:length(mainFields_expo)
+                          mField = mainFields_expo{mf};
+                          
+                          for df = 1:length(dataFields_expo{mf})
+                            dField = sprintf('%s_%s',mField,dataFields_expo{mf}{df});
+                            if strcmp(dataFields_expo{mf}{df},'resp')
+                              results.(sesName).(fn).(mField).(dField)(sub) = mean([respEvents.resp]);
+                            elseif strcmp(dataFields_expo{mf}{df},'rt')
+                              results.(sesName).(fn).(mField).(dField)(sub) = mean([respEvents.rt]);
+                            end
+                          end
+                        end
+                      end
+                      
+                      i_catStrs = unique({respEvents.i_catStr},'sorted');
+                      % if there's only 1 image category, the results were
+                      % printed above
+                      if length(i_catStrs) > 1 && separateCategories
+                        if printResults
+                          fprintf('\n');
+                        end
+                        for im = 1:length(i_catStrs)
+                          respEvents_imgCat = respEvents(strcmp({respEvents.i_catStr},i_catStrs{im}));
+                          for mf = 1:length(mainFields_expo)
+                            mField = mainFields_expo{mf};
+                            
+                            for df = 1:length(dataFields_expo{mf})
+                              dField = sprintf('%s_%s',mField,dataFields_expo{mf}{df});
+                              if strcmp(dataFields_expo{mf}{df},'resp')
+                                results.(sesName).(fn).(i_catStrs{im}).(mField).(dField)(sub) = mean([respEvents_imgCat.resp]);
+                              elseif strcmp(dataFields_expo{mf}{df},'rt')
+                                results.(sesName).(fn).(i_catStrs{im}).(mField).(dField)(sub) = mean([respEvents_imgCat.rt]);
+                              end
+                            end
+                            
+                          end
+                        end
+                      end
+                      
                     case {'cued_recall'}
                       % how many lag conditions occurred for targets
                       % (during study)?
