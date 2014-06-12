@@ -48,24 +48,22 @@ if ~exist('subjects','var') || isempty(subjects)
 %     'EBUG007';
 %     'EBUG008';
 %     'EBUG009';
-%     'EBUG010';
-%     'EBUG011';
-%     'EBUG012';
-    'EBUG013';
-    'EBUG014';
-    'EBUG015';
+    'EBUG010';
+    'EBUG011';
+    'EBUG012';
     'EBUG016';
     'EBUG017';
     'EBUG018';
     'EBUG019';
     'EBUG020';
-    'EBUG021';
     'EBUG022';
-    'EBUG023';
-%     'EBUG092';
-%     'EBUG093';
-%     'EBUG094';
-%     'EBUG095';
+    'EBUG025';
+    'EBUG027';
+    'EBUG029';
+    'EBUG032';
+    'EBUG034';
+    'EBUG043';
+    'EBUG045';
     };
 end
 

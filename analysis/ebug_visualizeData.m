@@ -27,33 +27,31 @@ else
 end
 
 subjects = {
-    'EBUG001';
-    'EBUG002';
-    'EBUG003';
-    'EBUG004';
-    'EBUG005';
-    'EBUG006';
-    'EBUG007';
-    'EBUG008';
-    'EBUG009';
+%     'EBUG001';
+%     'EBUG002';
+%     'EBUG003';
+%     'EBUG004';
+%     'EBUG005';
+%     'EBUG006';
+%     'EBUG007';
+%     'EBUG008';
+%     'EBUG009';
     'EBUG010';
     'EBUG011';
     'EBUG012';
-    'EBUG013';
-    'EBUG014';
-    'EBUG015';
     'EBUG016';
     'EBUG017';
     'EBUG018';
     'EBUG019';
     'EBUG020';
-    'EBUG021';
     'EBUG022';
-    'EBUG023';
-%     'EBUG092';
-%     'EBUG093';
-%     'EBUG094';
-%     'EBUG095';
+    'EBUG025';
+    'EBUG027';
+    'EBUG029';
+    'EBUG032';
+    'EBUG034';
+    'EBUG043';
+    'EBUG045';
   };
 
 saveFigs = true;
@@ -98,7 +96,8 @@ data = struct;
 
 nTrainSes = 6;
 % phases = {'name_1','name_2','name_3','name_4'};
-phases = {'name_1'};
+% phases = {'name_1'};
+phases = {'name'};
 
 data.overall = nan(length(subjects),(nTrainSes * length(phases) - 2));
 data.basic = nan(length(subjects),(nTrainSes * length(phases) - 2));
@@ -187,8 +186,10 @@ ylimits = [0 4];
 % dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0 1];
 
-sessions = {'pretest', 'train1', 'posttest', 'posttest_delay'};
-phases = {'match_1'};
+% sessions = {'pretest', 'train1', 'posttest', 'posttest_delay'};
+sessions = {'pretest', 'posttest', 'posttest_delay'};
+% phases = {'match_1'};
+phases = {'match'};
 training = {'trained','untrained'};
 naming = {'basic','subord'};
 
@@ -222,7 +223,7 @@ for p = 1:length(phases)
     end
     
     bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
-    bw_groupnames = {'Pretest', 'Train 1', 'Posttest', 'One week later'};
+    bw_groupnames = {'Pretest', 'Posttest', 'One week later'};
     bw_legend = {'Trained','Untrained'};
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
@@ -253,7 +254,7 @@ ylimits = [0 4];
 % dataLabel = 'Accuracy (Hit Rate)';
 % ylimits = [0.5 1];
 
-sessions = {'train2', 'train3', 'train4', 'train5', 'train6'};
+sessions = {'train1', 'train2', 'train3', 'train4', 'train5', 'train6'};
 if collapsePhases
     phases = {'match'};
 else
@@ -292,7 +293,7 @@ for p = 1:length(phases)
     end
     
     bw_title = sprintf('%s%s: %s',upper(naming{n}(1)),naming{n}(2:end),strrep(phases{p},'_','\_'));
-    bw_groupnames = {'train2', 'train3', 'train4', 'train5', 'train6'};
+    bw_groupnames = {'train1', 'train2', 'train3', 'train4', 'train5', 'train6'};
     bw_legend = {'Trained','Untrained'};
     %bw_xlabel = 'Test day';
     bw_xlabel = [];
@@ -322,7 +323,8 @@ ylimits = [0 0.8];
 % ylimits = [0.5 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
-phases = {'recog_1'};
+% phases = {'recog_1'};
+phases = {'recog'};
 recogField = {'basic','subord'};
 
 data.(dataMeasure) = struct;

@@ -11,28 +11,36 @@ end
 
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
-      'EBUG001';
-      'EBUG002';
-      'EBUG003';
-      'EBUG004';
-      'EBUG005';
-      'EBUG006';
-      'EBUG007';
-      'EBUG008';
-      'EBUG009';
-      'EBUG010';
-      'EBUG011';
-      'EBUG012';
-%       'EBUG090';
-%       'EBUG091';
-%       'EBUG092';
-%       'EBUG093';
-%       'EBUG094';
-%       'EBUG095';
+%       'EBUG001';
+%       'EBUG002';
+%       'EBUG003';
+%       'EBUG004';
+%       'EBUG005';
+%       'EBUG006';
+%       'EBUG007';
+%       'EBUG008';
+%       'EBUG009';
+    'EBUG010';
+    'EBUG011';
+    'EBUG012';
+    'EBUG016';
+    'EBUG017';
+    'EBUG018';
+    'EBUG019';
+    'EBUG020';
+    'EBUG022';
+    'EBUG025';
+    'EBUG027';
+    'EBUG029';
+    'EBUG032';
+    'EBUG034';
+    'EBUG043';
+    'EBUG045';
     };
 end
 
 % use a specific subject's files as a template for loading data
+% templateSubIndex = 1;
 templateSubIndex = 10;
 if templateSubIndex > length(subjects)
   error('Cannot access subject number %d for templateSubIndex, not enough subjects (there are %d).',templateSubIndex,length(subjects));
