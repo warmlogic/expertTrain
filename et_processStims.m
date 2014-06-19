@@ -195,7 +195,8 @@ end
 % groupings of families); instead, it will produce six groupings.
 %
 % TODO: make cfg.stim.yokeExemplars_train more flexible, allowing
-% non-contiguous groupings
+% non-contiguous groupings. For now, you need to just sort the family names
+% in cfg.stim.familyNames properly.
 
 if ~isfield(cfg.stim,'yokeTrainedExemplars')
   cfg.stim.yokeTrainedExemplars = false;
@@ -213,17 +214,26 @@ for f = 1:length(cfg.stim.familyNames)
     exemplarNums_untrained = [];
   end
   
+  % choose the new stimuli (not presented during trainig) before dividing
+  % up trained and untrained species
+  if isfield(cfg.stim,'newSpecies')
+    expParam.session.(sprintf('f%dNew',f)) = [];
+    [expParam.session.(sprintf('f%dNew',f)),stimStruct(f).fStims] = et_divvyStims(...
+      stimStruct(f).fStims,[],cfg.stim.nNewExemplars,...
+      cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained', 'new'},{false, false, true},[],cfg.stim.newSpecies);
+  end
+  
   % choose the trained stimuli for this family
   expParam.session.(sprintf('f%dTrained',f)) = [];
   [expParam.session.(sprintf('f%dTrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nTrained,...
-    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, true},[],[],exemplarNums_trained);
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained', 'new'},{false, true, false},[],[],exemplarNums_trained);
   
   % choose the untrained stimuli for this family
   expParam.session.(sprintf('f%dUntrained',f)) = [];
   [expParam.session.(sprintf('f%dUntrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nUntrained,...
-    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained'},{false, false},[],[],exemplarNums_untrained);
+    cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained', 'new'},{false, false, false},[],[],exemplarNums_untrained);
   
   if cfg.stim.yokeTrainedExemplars
     if f == 1 || cfg.stim.yokeExemplars_train(f) ~= cfg.stim.yokeExemplars_train(f-1)
