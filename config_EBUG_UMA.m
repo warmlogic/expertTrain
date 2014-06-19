@@ -1062,6 +1062,10 @@ if expParam.sessionNum == 1
         % same or different condition)
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
+        
         % rmStims_orig is true because half of stimuli are in "same" cond and
         % half are in "diff"
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
@@ -1161,6 +1165,10 @@ if expParam.sessionNum == 1
         % same or different condition)
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
+        
         % rmStims_orig is true because half of stimuli are in "same" cond and
         % half are in "diff"
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
