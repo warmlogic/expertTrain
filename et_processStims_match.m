@@ -216,7 +216,7 @@ if isfield(cfg.stim,'newSpecies')
   % stimuli, were in alternating chunks, so this will purposely mix up
   % training and old/new status within a difficulty level
   shuffledSame = [];
-  difficulties = unique([expParam.session.(sesName).(phaseName)(phaseCount).same.difficulty]);
+  difficulties = unique([expParam.session.(sesName).(phaseName)(phaseCount).same.difficulty],'stable');
   for i = 1:length(difficulties)
     thisDiffic_s1 = expParam.session.(sesName).(phaseName)(phaseCount).same([expParam.session.(sesName).(phaseName)(phaseCount).same.difficulty] == difficulties(i) & [expParam.session.(sesName).(phaseName)(phaseCount).same.matchStimNum] == 1);
     thisDiffic_s1 = thisDiffic_s1(randperm(length(thisDiffic_s1)));
@@ -238,7 +238,7 @@ if isfield(cfg.stim,'newSpecies')
   expParam.session.(sesName).(phaseName)(phaseCount).same = shuffledSame;
   
   shuffledDiff = [];
-  difficulties = unique([expParam.session.(sesName).(phaseName)(phaseCount).diff.difficulty]);
+  difficulties = unique([expParam.session.(sesName).(phaseName)(phaseCount).diff.difficulty],'stable');
   for i = 1:length(difficulties)
     thisDiffic_s1 = expParam.session.(sesName).(phaseName)(phaseCount).diff([expParam.session.(sesName).(phaseName)(phaseCount).diff.difficulty] == difficulties(i) & [expParam.session.(sesName).(phaseName)(phaseCount).diff.matchStimNum] == 1);
     thisDiffic_s1 = thisDiffic_s1(randperm(length(thisDiffic_s1)));
