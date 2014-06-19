@@ -35,14 +35,14 @@ function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origS
 %  shuffleFirst: True or false. Randomly shuffle stimuli before selecting
 %                nSame and nSiff from each species. False = select first
 %                nSame/nDiff for each species. Optional (default = true).
-%  origStims:    Original stimulus structure with the chosen stimuli
-%                removed if rmStims_orig = true.
 %  maxChosen:    Integer. Upper limit for choosing stimuli. Used in case
 %                fewer than nStims x nSpecies are needed.
 %
 % Output:
 %  chosenStimsSame: stimuli for the "same" condition.
 %  chosenStimsDiff: stimuli for the "diff" condition.
+%  origStims:       Original stimulus structure with the chosen stimuli
+%                   removed if rmStims_orig = true.
 %
 
 if ~exist('rmStims_orig','var') || isempty(rmStims_orig)
@@ -135,7 +135,9 @@ not_good = true;
 while not_good
   % permute until each species has a pair that is not the same number
   speciesPair = randperm(length(theseSpecies));
-  if ~any(speciesPair == theseSpecies)
+  %if ~any(speciesPair == theseSpecies)
+  if all(theseSpecies(speciesPair) ~= theseSpecies)
+    otherSpecies = theseSpecies(speciesPair);
     not_good = false;
   end
 end
@@ -143,7 +145,8 @@ for s = 1:length(theseSpecies)
   % get the stim2 for this species
   sInd_stim2 = find([stim2_diff.speciesNum] == theseSpecies(s));
   % get the corresponding (diff) stim1 indices, from the permuted pairs
-  sInd_stim1 = [stim1_diff.speciesNum] == speciesPair(theseSpecies(s));
+  %sInd_stim1 = [stim1_diff.speciesNum] == speciesPair(theseSpecies(s));
+  sInd_stim1 = [stim1_diff.speciesNum] == otherSpecies(s);
   % pull out these possible stim1s
   stim1_spec = stim1_diff(sInd_stim1);
   for e = 1:length(sInd_stim2)
