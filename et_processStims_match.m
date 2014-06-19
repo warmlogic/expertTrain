@@ -276,12 +276,10 @@ if isfield(cfg.stim,'newSpecies')
   sameDiffOrder = cat(2,ones(1,length(expParam.session.(sesName).(phaseName)(phaseCount).same) / 2),2*ones(1,length(expParam.session.(sesName).(phaseName)(phaseCount).same) / 2));
   sameDiffOrder = sameDiffOrder(randperm(length(sameDiffOrder)));
   expParam.session.(sesName).(phaseName)(phaseCount).allStims = [];
-  %stimCount = 0;
   sameCount = 0;
   diffCount = 0;
   % 1=same, 2=diff, pull stimuli from each pool in the randomized order
   for i = 1:length(sameDiffOrder)
-    %stimCount = stimCount + 1;
     if sameDiffOrder(i) == 1
       sameCount = sameCount + 2;
       expParam.session.(sesName).(phaseName)(phaseCount).allStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).allStims,expParam.session.(sesName).(phaseName)(phaseCount).same(sameCount-1));
