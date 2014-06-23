@@ -194,13 +194,17 @@ if expParam.sessionNum == 1
   
   % number of species to mark as "new"; left out of training
   if expParam.counterbalance == 1 %expParam.counterbalance 1 skips species 5,10
-    cfg.stim.newSpecies = [5, 10];
+    %cfg.stim.newSpecies = [5, 10];
+    cfg.stim.newSpecies = [1, 3, 5, 7, 9];
   elseif expParam.counterbalance == 2 %expParam.counterbalance 2 skips species 1,3
-    cfg.stim.newSpecies = [1, 3];
+    %cfg.stim.newSpecies = [1, 3];
+    cfg.stim.newSpecies = [2, 4, 6, 8, 10];
   elseif expParam.counterbalance == 3
-    cfg.stim.newSpecies = [4, 2];
+    %cfg.stim.newSpecies = [4, 2];
+    cfg.stim.newSpecies = [1, 2, 5, 9, 10];
   elseif expParam.counterbalance == 4
-    cfg.stim.newSpecies = [6, 9];
+    %cfg.stim.newSpecies = [6, 9];
+    cfg.stim.newSpecies = [3, 4, 6, 7, 8];
   end
   cfg.stim.nNewExemplars = 12;
   
@@ -612,21 +616,25 @@ if expParam.sessionNum == 1
         % % every stimulus is in both the same and the different condition.
         % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
         % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
-        % % rmStims_orig is false because all stimuli are used in both "same"
-        % % and "diff" conditions
-        % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
+        % rmStims_orig is false because all stimuli are used in both "same"
+        % and "diff" conditions
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
         
         % number per species per family (half because each stimulus is only in
         % same or different condition)
-        cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
-        cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
-        cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 4;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 4;
         
-        % rmStims_orig is true because half of stimuli are in "same" cond and
-        % half are in "diff"
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+        % % rmStims_orig is true because half of stimuli are in "same" cond and
+        % % half are in "diff"
+        % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
         
         % rmStims_pair is true because pairs are removed after they're added
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
