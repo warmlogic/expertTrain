@@ -1,5 +1,5 @@
-function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst,maxChosen)
-%function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst,maxChosen)
+function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst,maxChosen,reuseStimsSameDiff)
+%function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origStims,sameStims,diffStims,nSame,nDiff,rmStims_orig,rmStims_pair,shuffleFirst,maxChosen,reuseStimsSameDiff)
 %
 % Description:
 %  Divide stimuli for the subordinate matching task.
@@ -61,6 +61,10 @@ if ~exist('maxChosen','var') || isempty(maxChosen)
   maxChosen = [];
 end
 
+if ~exist('reuseStimsSameDiff','var') || isempty(reuseStimsSameDiff)
+  reuseStimsSameDiff = false;
+end
+
 if nSame == length(sameStims)
   warning('Setting rmStims_orig to false because nSame == length(sameStims). Otherwise you will run out of stimuli to divvy out.\n');
   rmStims_orig = false;
@@ -74,11 +78,19 @@ theseSameStims = [];
 [theseSameStims,origStims] = et_divvyStims(...
   origStims,theseSameStims,nSame,rmStims_orig,shuffleFirst,...
   {'same', 'matchStimNum', 'matchPairNum'},{true, 2, []},maxChosen);
-% different: other half are stim2 in "different" condition
+
 theseDiffStims = [];
-[theseDiffStims,origStims] = et_divvyStims(...
-  origStims,theseDiffStims,nDiff,rmStims_orig,shuffleFirst,...
-  {'same', 'matchStimNum', 'matchPairNum'},{false, 2, []},maxChosen);
+if reuseStimsSameDiff
+  % different: reuse the stims for stim2 in "different" condition
+  [theseDiffStims] = et_divvyStims(...
+    theseSameStims,theseDiffStims,nDiff,rmStims_orig,shuffleFirst,...
+    {'same', 'matchStimNum', 'matchPairNum'},{false, 2, []},maxChosen);
+else
+  % different: other half are stim2 in "different" condition
+  [theseDiffStims,origStims] = et_divvyStims(...
+    origStims,theseDiffStims,nDiff,rmStims_orig,shuffleFirst,...
+    {'same', 'matchStimNum', 'matchPairNum'},{false, 2, []},maxChosen);
+end
 
 % store the stimuli for slicing before modifying
 stim2_same = theseSameStims;

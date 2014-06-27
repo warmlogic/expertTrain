@@ -17,6 +17,18 @@ if ~isfield(phaseCfg,'familyNames')
   end
 end
 
+if ~isfield(cfg.stim,'orderPairsByDifficulty')
+  cfg.stim.orderPairsByDifficulty = false;
+end
+
+if ~isfield(cfg.stim,'writePairsToFile')
+  if isfield(cfg.stim,'newSpecies')
+    cfg.stim.writePairsToFile = true;
+  else
+    cfg.stim.writePairsToFile = false;
+  end
+end
+
 % initialize to hold all the same and different stimuli
 expParam.session.(sesName).(phaseName)(phaseCount).same = [];
 expParam.session.(sesName).(phaseName)(phaseCount).diff = [];
@@ -44,32 +56,49 @@ else
   for f = 1:length(cfg.stim.familyNames)
     if ismember(cfg.stim.familyNames{f},phaseCfg.familyNames)
       if isfield(cfg.stim,'newSpecies')
-        [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff] = et_divvyStims_match(...
+        [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+          expParam.session.(sprintf('f%dNew',f))] = et_divvyStims_match(...
           expParam.session.(sprintf('f%dNew',f)),...
           expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
           phaseCfg.nSameNew,phaseCfg.nDiffNew,...
-          phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst);
+          phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst,[],phaseCfg.reuseStimsSameDiff);
           %phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst,length(cfg.stim.newSpecies) * (phaseCfg.nSameNew+phaseCfg.nDiffNew));
+          
+          % trained
+          [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+            expParam.session.(sprintf('f%dTrained',f))] = et_divvyStims_match(...
+            expParam.session.(sprintf('f%dTrained',f)),...
+            expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+            phaseCfg.nSame,phaseCfg.nDiff,...
+            phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst,[],phaseCfg.reuseStimsSameDiff);
+          
+          % untrained
+          [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+            expParam.session.(sprintf('f%dUntrained',f))] = et_divvyStims_match(...
+            expParam.session.(sprintf('f%dUntrained',f)),...
+            expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+            phaseCfg.nSame,phaseCfg.nDiff,...
+            phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst,[],phaseCfg.reuseStimsSameDiff);
+      else
+        % trained
+        [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff] = et_divvyStims_match(...
+          expParam.session.(sprintf('f%dTrained',f)),...
+          expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+          phaseCfg.nSame,phaseCfg.nDiff,...
+          phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst);
+        
+        % untrained
+        [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff] = et_divvyStims_match(...
+          expParam.session.(sprintf('f%dUntrained',f)),...
+          expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
+          phaseCfg.nSame,phaseCfg.nDiff,...
+          phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst);
       end
-      
-      % trained
-      [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff] = et_divvyStims_match(...
-        expParam.session.(sprintf('f%dTrained',f)),...
-        expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
-        phaseCfg.nSame,phaseCfg.nDiff,...
-        phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst);
-      
-      % untrained
-      [expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff] = et_divvyStims_match(...
-        expParam.session.(sprintf('f%dUntrained',f)),...
-        expParam.session.(sesName).(phaseName)(phaseCount).same,expParam.session.(sesName).(phaseName)(phaseCount).diff,...
-        phaseCfg.nSame,phaseCfg.nDiff,...
-        phaseCfg.rmStims_orig,phaseCfg.rmStims_pair,phaseCfg.shuffleFirst);
     end
   end
 end
 
-if isfield(cfg.stim,'newSpecies')
+if isfield(cfg.stim,'newSpecies') && cfg.stim.orderPairsByDifficulty
   % set up for reading difficulty rating files
   cols = struct;
   cols.fam = 1;
@@ -81,7 +110,12 @@ if isfield(cfg.stim,'newSpecies')
   % new with new
   
   % Within Spec Pairs
-  sameSpecRate = load(fullfile(cfg.files.stimDir,'WithinSpecRate.txt'));
+  WithinSpecRateFile = fullfile(cfg.files.stimDir,'WithinSpecRate.txt');
+  if exist(WithinSpecRateFile,'file')
+    sameSpecRate = load(WithinSpecRateFile);
+  else
+    error('Within species difficulty rating file does not exist: %s',WithinSpecRateFile);
+  end
   if expParam.difficulty == 1 %Difficulty condition 1 goes from easiest to hardest
     [~, ord] = sort(sameSpecRate(:,4),'ascend');
   elseif expParam.difficulty == 2 %goes from hardest to easiest
@@ -145,7 +179,12 @@ if isfield(cfg.stim,'newSpecies')
   expParam.session.(sesName).(phaseName)(phaseCount).same = expParam.session.(sesName).(phaseName)(phaseCount).same(i);
   
   % Between Spec Pairs
-  diffSpecRate = load(fullfile(cfg.files.stimDir,'BetweenSpecRate.txt'));
+  BetweenSpecRateFile = fullfile(cfg.files.stimDir,'BetweenSpecRate.txt');
+  if exist(BetweenSpecRateFile,'file')
+    diffSpecRate = load(BetweenSpecRateFile);
+  else
+    error('Between species difficulty rating file does not exist: %s',BetweenSpecRateFile);
+  end
   if expParam.difficulty == 1 %Difficulty condition 1 goes from easiest to hardest
     [~, ord] = sort(diffSpecRate(:,4),'ascend');
   elseif expParam.difficulty == 2 %goes from hardest to easiest
@@ -290,27 +329,6 @@ if isfield(cfg.stim,'newSpecies')
       expParam.session.(sesName).(phaseName)(phaseCount).allStims = cat(1,expParam.session.(sesName).(phaseName)(phaseCount).allStims,expParam.session.(sesName).(phaseName)(phaseCount).diff(diffCount));
     end
   end
-  
-  % write the stimuli to file
-  fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('participant%d_%s_%s%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseName,phaseCount)),'w+t');
-  for i = 2:2:length(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
-    familyStr = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).familyStr;
-    speciesStr1 = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).speciesStr;
-    exempNum1 = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).exemplarNum;
-    speciesStr2 = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i).speciesStr;
-    exempNum2 = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i).exemplarNum;
-    
-    file1 = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).fileName;
-    file2 = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i).fileName;
-    
-    trained = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).trained;
-    same = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).same;
-    new = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).new;
-    difficulty = expParam.session.(sesName).(phaseName)(phaseCount).allStims(i-1).difficulty;
-    
-    fprintf(fid,'%s\t%s\t%d\t%s\t%d\t%s\t%s\t%d\t%d\t%d\t%.2f\n',familyStr,speciesStr1,exempNum1,speciesStr2,exempNum2,file1,file2,trained,same,new,difficulty);
-  end
-  fclose(fid);
   
 else
   % shuffle same and diff together for the experiment
