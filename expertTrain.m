@@ -289,9 +289,9 @@ else
   if exist(fullfile(pwd,sprintf('config_%s.m',expParam.expName)),'file')
     [cfg,expParam] = eval(sprintf('config_%s(cfg,expParam);',expParam.expName));
     
-    if strcmp(expParam.expName,'EBUG_UMA')
-      return
-    end
+    %if strcmp(expParam.expName,'EBUG_UMA')
+    %  return
+    %end
   else
     error('Configuration file for %s experiment does not exist: %s',fullfile(pwd,sprintf('config_%s.m',expParam.expName)));
   end
