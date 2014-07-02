@@ -72,8 +72,16 @@ matchTextPrompt = true;
 
 % one session
 expParam.nSessions = 1;
-expParam.sesTypes = {'pretest'};
-expParam.session.pretest.phases = {'match', 'match'};
+% expParam.sesTypes = {'pretest'};
+% expParam.session.pretest.phases = {'match', 'match'};
+expParam.sesTypes = {'pretest_eye'};
+expParam.doNotRunSes = true;
+% expParam.sesTypes = {'pretest_eye','pretest_eeg'};
+% expParam.doNotRunSes = [true false];
+expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
+% expParam.session.pretest_eeg.phases = {'match', 'compare'};
+
+
 
 % % multiple sessions
 % expParam.nSessions = 3;
@@ -507,7 +515,7 @@ if expParam.sessionNum == 1
   %% pretest configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  sesName = 'pretest';
+  sesName = 'pretest_eye';
   
   if ismember(sesName,expParam.sesTypes)
     
@@ -620,32 +628,74 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        % % every stimulus is in both the same and the different condition.
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
-        % % rmStims_orig is false because all stimuli are used in both "same"
-        % % and "diff" conditions
-        % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
         
-        % number per species per family (half because each stimulus is only in
-        % same or different condition)
-        cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
-        cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).remakeStimPairs = true;
         
-        cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 4;
-        cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 4;
-        
-        % rmStims_orig is true because half of stimuli are in "same" cond and
-        % half are in "diff"
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
-        
-        % this is how to force all stimuli to be both stim1 and stim2 in
-        % "same" and "diff" conds
-        cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
-        
-        % rmStims_pair is true because pairs are removed after they're added
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
+        if phaseCount == 1 || phaseCount == 3
+          % 360 trials per phase (for eyetracking matching and moving
+          % window phases)
+          
+          % % every stimulus is in both the same and the different condition.
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+          % % rmStims_orig is false because all stimuli are used in both "same"
+          % % and "diff" conditions
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
+          
+          % number per species per family (half because each stimulus is only in
+          % same or different condition)
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+          
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
+          
+          % rmStims_orig is true because half of stimuli are in "same" cond and
+          % half are in "diff"
+%           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+          
+          % this is how to force all stimuli to be both stim1 and stim2 in
+          % "same" and "diff" conds
+          %cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
+          
+          % rmStims_pair is true because pairs are removed after they're added
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
+          
+        elseif phaseCount == 2
+          % 2 blocks, 180 trials per block (for eyetracking foveal and
+          % peripheral masking blocks)
+          
+          cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks = 2;
+          % hack splits stimuli in half after making pairs
+          
+          % % every stimulus is in both the same and the different condition.
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+          % % rmStims_orig is false because all stimuli are used in both "same"
+          % % and "diff" conditions
+          % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
+          
+          % number per species per family (half because each stimulus is only in
+          % same or different condition)
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+          
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 4;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 4;
+          
+          % rmStims_orig is true because half of stimuli are in "same" cond and
+          % half are in "diff"
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+          
+          % this is how to force all stimuli to be both stim1 and stim2 in
+          % "same" and "diff" conds
+          cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
+          
+          % rmStims_pair is true because pairs are removed after they're added
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
+        end
         
         % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
         % if rmStims_orig=false)
@@ -1260,93 +1310,184 @@ if expParam.sessionNum == 1
   for s = 1:expParam.nSessions
     sesName = expParam.sesTypes{s};
     
+    matchCount = 0;
+    
     for p = 1:length(expParam.session.(sesName).phases)
       phaseName = expParam.session.(sesName).phases{p};
       
-      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+      switch phaseName
         
-        if phaseCfg.writePairsToFile
-          allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
-          stim2 = allStims([allStims.matchStimNum] == 2);
-          % initialize for storing stimulus 1s
-          stim1 = struct([]);
-          fn = fieldnames(stim2);
-          for i = 1:length(fn)
-            stim1(1).(fn{i}) = [];
-          end
-          for i = 1:length(stim2)
-            % find stim2's corresponding pair, contingent upon whether this is a same
-            % or diff stimulus
-            if isfield(cfg.stim,'newSpecies')
-              if stim2(i).same
-                % same (same species)
-                stim1(i) = allStims(...
-                  ([allStims.familyNum] == stim2(i).familyNum) &...
-                  ([allStims.speciesNum] == stim2(i).speciesNum) &...
-                  ([allStims.trained] == stim2(i).trained) &...
-                  ([allStims.new] == stim2(i).new) &...
-                  ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
-                  ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+        case{'match'}
+          % Subordinate Matching task (same/different)
+          matchCount = matchCount + 1;
+          phaseCount = matchCount;
+          
+          phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+          
+          if phaseCfg.writePairsToFile
+            if isfield(phaseCfg,'nBlocks') && ~isempty(phaseCfg.nBlocks) && phaseCfg.nBlocks > 1
+              for b = 1:phaseCfg.nBlocks
+                allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims{b};
+                stim2 = allStims([allStims.matchStimNum] == 2);
+                % initialize for storing stimulus 1s
+                stim1 = struct([]);
+                fn = fieldnames(stim2);
+                for i = 1:length(fn)
+                  stim1(1).(fn{i}) = [];
+                end
+                for i = 1:length(stim2)
+                  % find stim2's corresponding pair, contingent upon whether this is a same
+                  % or diff stimulus
+                  if isfield(cfg.stim,'newSpecies')
+                    if stim2(i).same
+                      % same (same species)
+                      stim1(i) = allStims(...
+                        ([allStims.familyNum] == stim2(i).familyNum) &...
+                        ([allStims.speciesNum] == stim2(i).speciesNum) &...
+                        ([allStims.trained] == stim2(i).trained) &...
+                        ([allStims.new] == stim2(i).new) &...
+                        ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                        ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                      
+                    else
+                      % diff (different species)
+                      stim1(i) = allStims(...
+                        ([allStims.familyNum] == stim2(i).familyNum) &...
+                        ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
+                        ([allStims.trained] == stim2(i).trained) &...
+                        ([allStims.new] == stim2(i).new) &...
+                        ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                        ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                    end
+                  else
+                    if stim2(i).same
+                      % same (same species)
+                      stim1(i) = allStims(...
+                        ([allStims.familyNum] == stim2(i).familyNum) &...
+                        ([allStims.speciesNum] == stim2(i).speciesNum) &...
+                        ([allStims.trained] == stim2(i).trained) &...
+                        ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                        ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                      
+                    else
+                      % diff (different species)
+                      stim1(i) = allStims(...
+                        ([allStims.familyNum] == stim2(i).familyNum) &...
+                        ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
+                        ([allStims.trained] == stim2(i).trained) &...
+                        ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                        ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                    end
+                  end
+                end
                 
-              else
-                % diff (different species)
-                stim1(i) = allStims(...
-                  ([allStims.familyNum] == stim2(i).familyNum) &...
-                  ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
-                  ([allStims.trained] == stim2(i).trained) &...
-                  ([allStims.new] == stim2(i).new) &...
-                  ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
-                  ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                % write the stimuli to file
+                fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('participant%d_%s_%s%d_b%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseName,phaseCount,b)),'w+t');
+                for i = 1:length(stim1)
+                  file1 = stim1(i).fileName;
+                  familyStr1 = stim1(i).familyStr;
+                  speciesStr1 = stim1(i).speciesStr;
+                  exempNum1 = stim1(i).exemplarNum;
+                  
+                  file2 = stim2(i).fileName;
+                  familyStr2 = stim2(i).familyStr;
+                  speciesStr2 = stim2(i).speciesStr;
+                  exempNum2 = stim2(i).exemplarNum;
+                  
+                  trained = stim1(i).trained;
+                  same = stim1(i).same;
+                  new = stim1(i).new;
+                  if isfield(stim1(i),'difficulty')
+                    difficulty = stim1(i).difficulty;
+                    fprintf(fid,'%s\t%s\t%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%d\t%.2f\n',familyStr1,speciesStr1,exempNum1,familyStr2,speciesStr2,exempNum2,file1,file2,trained,same,new,difficulty);
+                  else
+                    fprintf(fid,'%s\t%s\t%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n',familyStr1,speciesStr1,exempNum1,familyStr2,speciesStr2,exempNum2,file1,file2,trained,same,new);
+                  end
+                end
+                fclose(fid);
               end
             else
-              if stim2(i).same
-                % same (same species)
-                stim1(i) = allStims(...
-                  ([allStims.familyNum] == stim2(i).familyNum) &...
-                  ([allStims.speciesNum] == stim2(i).speciesNum) &...
-                  ([allStims.trained] == stim2(i).trained) &...
-                  ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
-                  ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
-                
-              else
-                % diff (different species)
-                stim1(i) = allStims(...
-                  ([allStims.familyNum] == stim2(i).familyNum) &...
-                  ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
-                  ([allStims.trained] == stim2(i).trained) &...
-                  ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
-                  ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+              allStims = expParam.session.(sesName).(phaseName)(phaseCount).allStims;
+              stim2 = allStims([allStims.matchStimNum] == 2);
+              % initialize for storing stimulus 1s
+              stim1 = struct([]);
+              fn = fieldnames(stim2);
+              for i = 1:length(fn)
+                stim1(1).(fn{i}) = [];
               end
+              for i = 1:length(stim2)
+                % find stim2's corresponding pair, contingent upon whether this is a same
+                % or diff stimulus
+                if isfield(cfg.stim,'newSpecies')
+                  if stim2(i).same
+                    % same (same species)
+                    stim1(i) = allStims(...
+                      ([allStims.familyNum] == stim2(i).familyNum) &...
+                      ([allStims.speciesNum] == stim2(i).speciesNum) &...
+                      ([allStims.trained] == stim2(i).trained) &...
+                      ([allStims.new] == stim2(i).new) &...
+                      ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                      ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                    
+                  else
+                    % diff (different species)
+                    stim1(i) = allStims(...
+                      ([allStims.familyNum] == stim2(i).familyNum) &...
+                      ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
+                      ([allStims.trained] == stim2(i).trained) &...
+                      ([allStims.new] == stim2(i).new) &...
+                      ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                      ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                  end
+                else
+                  if stim2(i).same
+                    % same (same species)
+                    stim1(i) = allStims(...
+                      ([allStims.familyNum] == stim2(i).familyNum) &...
+                      ([allStims.speciesNum] == stim2(i).speciesNum) &...
+                      ([allStims.trained] == stim2(i).trained) &...
+                      ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                      ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                    
+                  else
+                    % diff (different species)
+                    stim1(i) = allStims(...
+                      ([allStims.familyNum] == stim2(i).familyNum) &...
+                      ([allStims.speciesNum] ~= stim2(i).speciesNum) &...
+                      ([allStims.trained] == stim2(i).trained) &...
+                      ([allStims.matchPairNum] == stim2(i).matchPairNum) &...
+                      ([allStims.matchStimNum] ~= stim2(i).matchStimNum));
+                  end
+                end
+              end
+              
+              % write the stimuli to file
+              fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('participant%d_%s_%s%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseName,phaseCount)),'w+t');
+              for i = 1:length(stim1)
+                file1 = stim1(i).fileName;
+                familyStr1 = stim1(i).familyStr;
+                speciesStr1 = stim1(i).speciesStr;
+                exempNum1 = stim1(i).exemplarNum;
+                
+                file2 = stim2(i).fileName;
+                familyStr2 = stim2(i).familyStr;
+                speciesStr2 = stim2(i).speciesStr;
+                exempNum2 = stim2(i).exemplarNum;
+                
+                trained = stim1(i).trained;
+                same = stim1(i).same;
+                new = stim1(i).new;
+                if isfield(stim1(i),'difficulty')
+                  difficulty = stim1(i).difficulty;
+                  fprintf(fid,'%s\t%s\t%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%d\t%.2f\n',familyStr1,speciesStr1,exempNum1,familyStr2,speciesStr2,exempNum2,file1,file2,trained,same,new,difficulty);
+                else
+                  fprintf(fid,'%s\t%s\t%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n',familyStr1,speciesStr1,exempNum1,familyStr2,speciesStr2,exempNum2,file1,file2,trained,same,new);
+                end
+              end
+              fclose(fid);
             end
           end
           
-          % write the stimuli to file
-          fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('participant%d_%s_%s%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseName,phaseCount)),'w+t');
-          for i = 1:length(stim1)
-            file1 = stim1(i).fileName;
-            familyStr1 = stim1(i).familyStr;
-            speciesStr1 = stim1(i).speciesStr;
-            exempNum1 = stim1(i).exemplarNum;
-            
-            file2 = stim2(i).fileName;
-            familyStr2 = stim2(i).familyStr;
-            speciesStr2 = stim2(i).speciesStr;
-            exempNum2 = stim2(i).exemplarNum;
-            
-            trained = stim1(i).trained;
-            same = stim1(i).same;
-            new = stim1(i).new;
-            if cfg.stim.orderPairsByDifficulty
-              difficulty = stim1(i).difficulty;
-              fprintf(fid,'%s\t%s\t%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%d\t%.2f\n',familyStr1,speciesStr1,exempNum1,familyStr2,speciesStr2,exempNum2,file1,file2,trained,same,new,difficulty);
-            else
-              fprintf(fid,'%s\t%s\t%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n',familyStr1,speciesStr1,exempNum1,familyStr2,speciesStr2,exempNum2,file1,file2,trained,same,new);
-            end
-          end
-          fclose(fid);
-        end
-
       end
     end
   end
