@@ -316,8 +316,7 @@ if expParam.sessionNum == 1
         % if rmStims_orig=false)
         
         if expParam.useNS
-          %cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
         end
         
         % durations, in seconds - viewing
