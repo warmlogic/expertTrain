@@ -37,6 +37,8 @@ function [chosenStimsSame,chosenStimsDiff,origStims] = et_divvyStims_match(origS
 %                nSame/nDiff for each species. Optional (default = true).
 %  maxChosen:    Integer. Upper limit for choosing stimuli. Used in case
 %                fewer than nStims x nSpecies are needed.
+%  reuseStimsSameDiff: reuse the exact same stimuli for same and different
+%                      trials (should make sure nSame==nDiff)
 %
 % Output:
 %  chosenStimsSame: stimuli for the "same" condition.
@@ -168,6 +170,33 @@ for s = 1:length(theseSpecies)
       stim1_spec,theseDiffStims,1,rmStims_pair,shuffleFirst,...
       {'same', 'matchStimNum', 'matchPairNum'},{false, 1, pairCount});
     pairCount = pairCount + 1;
+  end
+end
+
+if ~isempty(sameStims) && ~isempty(theseSameStims)
+  % make sure we can concatenate
+  fn_exist = fieldnames(sameStims);
+  fn_toAdd = fieldnames(theseSameStims);
+  if any(~ismember(fn_exist,fn_toAdd))
+    newFields = fn_exist(~ismember(fn_exist,fn_toAdd));
+    for f = 1:length(newFields)
+      for i = 1:length(theseSameStims)
+        theseSameStims(i).(newFields{f}) = [];
+      end
+    end
+  end
+end
+
+if ~isempty(diffStims) && ~isempty(theseDiffStims)
+  fn_exist = fieldnames(diffStims);
+  fn_toAdd = fieldnames(theseDiffStims);
+  if any(~ismember(fn_exist,fn_toAdd))
+    newFields = fn_exist(~ismember(fn_exist,fn_toAdd));
+    for f = 1:length(newFields)
+      for i = 1:length(theseDiffStims)
+        theseDiffStims(i).(newFields{f}) = [];
+      end
+    end
   end
 end
 
