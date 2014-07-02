@@ -17,15 +17,15 @@ if ~isfield(phaseCfg,'familyNames')
   end
 end
 
-if ~isfield(cfg.stim,'orderPairsByDifficulty')
+if ~isfield(cfg.stim,'orderPairsByDifficulty') || (isfield(cfg.stim,'orderPairsByDifficulty') && isempty(cfg.stim.orderPairsByDifficulty))
   cfg.stim.orderPairsByDifficulty = false;
 end
 
-if ~isfield(phaseCfg,'remakeStimPairs')
-  phaseCfg.remakeStimPairs = false;
+if ~isfield(phaseCfg,'reuseStimsSameDiff') || (isfield(phaseCfg,'reuseStimsSameDiff') && isempty(phaseCfg.reuseStimsSameDiff))
+  phaseCfg.reuseStimsSameDiff = false;
 end
 
-if ~isfield(cfg.stim,'writePairsToFile')
+if ~isfield(cfg.stim,'writePairsToFile') || (isfield(cfg.stim,'writePairsToFile') && isempty(cfg.stim.writePairsToFile))
   if strcmp(expParam.expName,'EBUG_UMA')
     cfg.stim.writePairsToFile = true;
   else
