@@ -364,7 +364,7 @@ if runView
   
   for i = trialNum:length(viewStims)
     % do an impedance check after a certain number of blocks or trials
-    if ~expParam.photoCellTest && expParam.useNS && phaseCfg.isExp && i > 1 && i < length(viewStims) && mod((i - 1),phaseCfg.impedanceAfter_nTrials)
+    if ~expParam.photoCellTest && expParam.useNS && phaseCfg.isExp && i > 1 && i < length(viewStims) && mod((i - 1),phaseCfg.impedanceAfter_nTrials) == 0
       % run the impedance break
       thisGetSecs = GetSecs;
       fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_START');
