@@ -23,7 +23,7 @@ if expParam.useNS
   % expParam.NSHost = '128.138.223.251';
   
   % D464
-  expParam.NSHost = '128.138.223.26';
+  expParam.NSHost = '10.0.0.42';
   
   expParam.baselineRecordSecs = 20.0;
 end
@@ -167,7 +167,7 @@ if expParam.sessionNum == 1
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   
   % set the stimulus directory
-  cfg.files.stimDir = fullfile(cfg.files.imgDir,'Army_StimDifficulty');
+  cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
   
   % set the image resources directory
   cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
@@ -514,7 +514,7 @@ if expParam.sessionNum == 1
         
         % only use stimuli from particular families
         if phaseCount == 1
-          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_', 'Wading_'};
+          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
         elseif phaseCount > 1
           cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_g_', 'Perching_g_hi8_', 'Perching_g_lo8_', 'Perching_color_', 'Wading_g_', 'Wading_g_hi8_', 'Wading_g_lo8_', 'Wading_color_'};
         end
@@ -844,7 +844,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_', 'Wading_'};
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
@@ -899,7 +899,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
         
         % hard coded order of which species are presented in each block
         % (counterbalanced). Blocks are denoted by vectors.
@@ -1112,7 +1112,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
           
           % only use stimuli from particular families
-          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
+          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
           
           % maximum number of repeated exemplars from each family in naming
           cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
