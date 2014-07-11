@@ -47,21 +47,23 @@ matchTextPrompt = true;
 % real setup with be something like this
 % ================
 
-% % Set the number of sessions
-% expParam.nSessions = 7;
-% 
-% expParam.sesTypes = {'pretest_eye','pretest_eeg','train1','train2','train3','train4','posttest_eye','posttest_eeg'};
-% expParam.doNotRunSes = [true false false false false false true false];
-% 
-% % set up a field for each session type
-% expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
-% expParam.session.pretest_eeg.phases = {'match', 'compare'};
-% expParam.session.train1.phases = {'nametrain'};
-% expParam.session.train2.phases = {'nametrain'};
-% expParam.session.train3.phases = {'nametrain'};
-% expParam.session.train4.phases = {'nametrain'};
-% expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
-% expParam.session.posttest_eeg.phases = {'match', 'compare'};
+% Set the number of sessions
+ expParam.nSessions = 10;
+ 
+ expParam.sesTypes = {'pretest_eye','pretest_eeg','train1','train2','train3','train4','train5', 'train6','posttest_eye','posttest_eeg'};
+ expParam.doNotRunSes = [true false false false false false false false true false];
+ 
+% set up a field for each session type
+ expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
+ expParam.session.pretest_eeg.phases = {'match'};
+ expParam.session.train1.phases = {'nametrain'};
+ expParam.session.train2.phases = {'nametrain'};
+ expParam.session.train3.phases = {'nametrain'};
+ expParam.session.train4.phases = {'nametrain'};
+ expParam.session.train5.phases = {'nametrain'};
+ expParam.session.train6.phases = {'nametrain'};
+ expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
+ expParam.session.posttest_eeg.phases = {'match'};
 
 % ================
 % temporary setup
@@ -72,15 +74,15 @@ matchTextPrompt = true;
 % expParam.doNotRunSes = true;
 % expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
 
-expParam.nSessions = 4;
-expParam.sesTypes = {'pretest_eye','pretest_eeg','posttest_eye','posttest_eeg'};
-expParam.doNotRunSes = [true false true false];
+% expParam.nSessions = 4;
+% expParam.sesTypes = {'pretest_eye','pretest_eeg','posttest_eye','posttest_eeg'};
+% expParam.doNotRunSes = [true false true false];
 
-expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
-expParam.session.pretest_eeg.phases = {'match'};
+% expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
+% expParam.session.pretest_eeg.phases = {'match'};
 % expParam.session.pretest_eeg.phases = {'match', 'compare'};
-expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
-expParam.session.posttest_eeg.phases = {'match'};
+% expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
+% expParam.session.posttest_eeg.phases = {'match'};
 % expParam.session.posttest_eeg.phases = {'match', 'compare'};
 
 
@@ -223,7 +225,7 @@ if expParam.sessionNum == 1
   cfg.stim.stimListFile = fullfile(cfg.files.subSaveDir,'stimList.txt');
   
   % create the stimulus list if it doesn't exist
-  shuffleSpecies = false; % do not shuffle species because the difficulty ratings rely on this order
+  shuffleSpecies = true; % have the letter/species assignments randomized across participants
   if ~exist(cfg.stim.stimListFile,'file')
     [cfg] = et_saveStimList(cfg,cfg.files.stimDir,cfg.stim,shuffleSpecies);
   else
@@ -314,6 +316,7 @@ if expParam.sessionNum == 1
       cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
     end
   end
+end 
   
   %% Define the response keys
   
@@ -844,7 +847,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'perching_', 'wading_'};
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
@@ -883,6 +886,227 @@ if expParam.sessionNum == 1
       end
     end
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Name training (introduce species in a rolling fashion)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    phaseName = 'nametrain';
+    
+    if ismember(phaseName,expParam.session.(sesName).phases)
+      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+        
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+        
+        % only use stimuli from particular families
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        
+        % hard coded order of which species are presented in each block
+        % (counterbalanced). Blocks are denoted by vectors.
+       
+        if expParam.difficulty == 1
+        cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+          [1],...
+          [1,2],...
+          [1,2,3],...
+          [1,2,3,4],...
+          [1,2,3,4,5]};
+        
+        % hard coded stimulus indices for naming training block presentations
+        % (counterbalanced). Blocks are denoted by cells. The vectors within each
+        % block represent the exemplar number(s) for each species, corresponding
+        % to the species numbers listed in blockSpeciesOrder (defined above). The
+        % contents of each vector corresponds to the exemplar numbers for that
+        % species.
+        
+        % 10 species, 6 trained, 6 untrained
+        cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
+          {[1:6]},...
+          {[1:6], [1:6]},...
+          {[1:6], [1:6], [1:6]},...
+          {[1:6], [1:6], [1:6], [1:6]},...
+          {[1:6], [1:6], [1:6], [1:6], [1:6]}};
+       
+        elseif expParam.difficulty == 2
+        
+        % 8 species, 6 trained, 6 untrained
+        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+        %  [1, 2],...
+        %  [1, 2, 3],...
+        %  [1, 2, 3, 4],...
+        %  [1, 2, 3, 4, 5],...
+        %  [3, 4, 5, 6],...
+        %  [4, 5, 6, 7],...
+        %  [5, 6, 7, 8],...
+        %  [6, 7, 8, 1],...
+        %  [7, 8, 1, 2],...
+        %  [8, 2, 3, 4],...
+        %  [3, 4, 5, 6],...
+        %  [5, 6, 7, 8],...
+        %  [7, 8, 1, 2]};
+      
+      
+        % % 10 species, 4 trained, 4 untrained
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
+        %   {[1, 2], [1, 2]},...
+        %   {[3, 4], [3, 4], [1, 2]},...
+        %   {[2, 3], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+        %   {[1, 4], [2, 3], [3, 4], [1, 2]}};
+       
+        
+        elseif expParam.difficulty == 3
+        
+        % 8 species, 6 trained, 6 untrained
+        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+        %  [1, 2],...
+        %  [1, 2, 3],...
+        %  [1, 2, 3, 4],...
+        %  [1, 2, 3, 4, 5],...
+        %  [3, 4, 5, 6],...
+        %  [4, 5, 6, 7],...
+        %  [5, 6, 7, 8],...
+        %  [6, 7, 8, 1],...
+        %  [7, 8, 1, 2],...
+        %  [8, 2, 3, 4],...
+        %  [3, 4, 5, 6],...
+        %  [5, 6, 7, 8],...
+        %  [7, 8, 1, 2]};
+        
+        
+        % % 8 species, 6 trained, 6 untrained
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
+        %   {[1, 2, 3], [1, 2, 3]},...
+        %   {[4, 5, 6], [4, 5, 6], [1, 2, 3]},...
+        %   {[2, 3, 4], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+        %   {[5, 1, 6], [4, 5, 6], [1, 2, 3], [4, 5, 6]},...
+        %   {[5, 1, 6], [4, 5, 6], [1, 2, 3], [3, 4, 5]},...
+        %   {[4, 5, 6], [6, 1, 2], [1, 2, 3], [4, 5, 6]},...
+        %   {[1, 2, 3], [3, 4, 5], [4, 5, 6], [1, 2, 3]}};
+        
+        end 
+        
+        % maximum number of repeated exemplars from each family in naming
+        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+        
+        if expParam.useNS
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
+        end
+        
+        % durations, in seconds
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+        
+        % do we want to play feedback beeps?
+        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+        
+        % instructions
+        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
+          fullfile(cfg.files.instructDir,sprintf('%s_nametrain_1_exp_intro.txt',expParam.expName)),...
+          {'nBlocks','nFamily','nSpeciesTotal','basicFamStr','contKey'},...
+          {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)),...
+          num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),...
+          num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
+          cfg.keys.instructContKey});
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
+        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
+        
+        expParam.session.(sesName).(phaseName)(phaseCount).date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+      end
+    end
+    
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % Naming
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     phaseName = 'name';
+%     
+%     if ismember(phaseName,expParam.session.(sesName).phases)
+%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+%         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+%         
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+%         
+%         % only use stimuli from particular families
+%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
+%         
+%         % maximum number of repeated exemplars from each family in naming
+%         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+%         
+%         if expParam.useNS
+%           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
+%         end
+%         
+%         % durations, in seconds
+%         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
+%         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+%         
+%         % do we want to play feedback beeps?
+%         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+%         
+%         % instructions
+%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
+%           fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
+%           {'nFamily','basicFamStr','contKey'},...
+%           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,...
+%           cfg.keys.instructContKey});
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
+%         
+%         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+%         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+%         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+%       end
+%     end
+
+  end
+  
+  %% Training Day 2-6 configuration (all these days are the same)
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  sesNames = {'train2','train3','train4','train5','train6'};
+  
+  for s = 1:length(sesNames)
+    sesName = sesNames{s};
+    
+    if ismember(sesName,expParam.sesTypes)
+      
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Name training (introduce species in a rolling fashion)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1025,9 +1249,12 @@ if expParam.sessionNum == 1
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
       end
-    end
-    
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end  
+  end 
+        
+        
+        
+   %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     % Naming
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     phaseName = 'name';
@@ -1080,88 +1307,6 @@ if expParam.sessionNum == 1
 %         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
 %       end
 %     end
-
-  end
-  
-  %% Training Day 2-6 configuration (all these days are the same)
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  sesNames = {'train2','train3','train4','train5','train6'};
-  
-  for s = 1:length(sesNames)
-    sesName = sesNames{s};
-    
-    if ismember(sesName,expParam.sesTypes)
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      % Naming
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      phaseName = 'name';
-      
-      if ismember(phaseName,expParam.session.(sesName).phases)
-        for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-          cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-          if phaseCount == 3
-            cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
-          else
-            cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-          end
-          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-          
-          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-          
-          % only use stimuli from particular families
-          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
-          
-          % maximum number of repeated exemplars from each family in naming
-          cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
-          
-          if expParam.useNS
-            cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
-          end
-          
-          % durations, in seconds
-          cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
-          cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
-          cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
-          cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-          cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
-          
-          % do we want to play feedback beeps?
-          cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-          cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-          cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-          cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-          cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-          
-          % instructions
-          if phaseCount == 1
-            %[cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
-            %  fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_2.txt',expParam.expName)),...
-            %  {'contKey'}, {cfg.keys.instructContKey});
-            [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
-              fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
-              {'nFamily','basicFamStr','contKey'},...
-              {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
-            cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
-            cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
-          elseif phaseCount > 1
-            [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
-              fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
-              {'nFamily','basicFamStr','contKey'},...
-              {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,cfg.keys.instructContKey});
-            cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
-            cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
-          end
-          
-          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
-        end
-      end
-    end
-  end
   
   %% Posttest configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
