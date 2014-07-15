@@ -782,7 +782,7 @@ end
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
         if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 180;
         end
         
         % durations, in seconds
@@ -847,7 +847,7 @@ end
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'perching_', 'wading_'};
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
@@ -904,8 +904,9 @@ end
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
         
-        trainedSpecies = randperm(cfg.stim.nSpecies - length(cfg.stim.newSpecies));
-
+        allSpecies = 1:cfg.stim.nSpecies;
+        trainedSpecies = allSpecies(~ismember(allSpecies,cfg.stim.newSpecies));
+        trainedSpecies = trainedSpecies(randperm(length(trainedSpecies)));
        
         % Increasing difficulty
         if expParam.difficulty == 1
@@ -966,16 +967,37 @@ end
         % Random difficulty
         elseif expParam.difficulty == 3
         
+        % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
+            trainedSpecies_rep = repmat(trainedSpecies,1,10);
+
+        % I think the length of numberOfSpecies should be the number of blocks?
+            numberOfSpecies = randperm(length(trainedSpecies));
+
+           % specIndex = 1;
+            % for i = 1:length(numberOfSpecies)
+            % addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
+            % specIndex = specIndex + numberOfSpecies(i);
+            % end
+            
+            
+    % make sure to set up numberOfSpecies so its length is the number of blocks you want
+        cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
+        for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
+            addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i} = addTheseSpecies;
+        end
+       
+          
         % select trainedSpecies by indexing into trainedSpecies for
         % blockSpeciesOrder
-         cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-          [trainedSpecies(1)],...
-          [trainedSpecies(1:2)],...
-          [trainedSpecies(1:3)],...
-          [trainedSpecies(1:4)],...
-          [trainedSpecies(1:5)]};
+        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+         % [trainedSpecies(1)],...
+         % [trainedSpecies(1:2)],...
+         % [trainedSpecies(1:3)],...
+         % [trainedSpecies(1:4)],...
+         % [trainedSpecies(1:5)]};
         
-        % Number of exemplars to show for each species
+         Number of exemplars to show for each species
          cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
          {[1:6]},... 
          {[1:6],[1:6]},...
@@ -1107,8 +1129,9 @@ end
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
         
-        trainedSpecies = randperm(cfg.stim.nSpecies - length(cfg.stim.newSpecies));
-        
+        allSpecies = 1:cfg.stim.nSpecies;
+        trainedSpecies = allSpecies(~ismember(allSpecies,cfg.stim.newSpecies));
+        trainedSpecies = trainedSpecies(randperm(length(trainedSpecies)));        
         % Increasing difficulty
         if expParam.difficulty == 1
         
@@ -1168,16 +1191,37 @@ end
         % Random difficulty
         elseif expParam.difficulty == 3
         
+                % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
+            trainedSpecies_rep = repmat(trainedSpecies,1,10);
+
+        % I think the length of numberOfSpecies should be the number of blocks?
+            numberOfSpecies = randperm(length(trainedSpecies));
+
+           % specIndex = 1;
+            % for i = 1:length(numberOfSpecies)
+            % addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
+            % specIndex = specIndex + numberOfSpecies(i);
+            % end
+            
+            
+    % make sure to set up numberOfSpecies so its length is the number of blocks you want
+        cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
+        for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
+            addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i} = addTheseSpecies;
+        end
+       
+          
         % select trainedSpecies by indexing into trainedSpecies for
         % blockSpeciesOrder
-         cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-          [trainedSpecies(1)],...
-          [trainedSpecies(1:2)],...
-          [trainedSpecies(1:3)],...
-          [trainedSpecies(1:4)],...
-          [trainedSpecies(1:5)]};
+        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+         % [trainedSpecies(1)],...
+         % [trainedSpecies(1:2)],...
+         % [trainedSpecies(1:3)],...
+         % [trainedSpecies(1:4)],...
+         % [trainedSpecies(1:5)]};
         
-        % Number of exemplars to show for each species
+         Number of exemplars to show for each species
          cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
          {[1:6]},... 
          {[1:6],[1:6]},...
