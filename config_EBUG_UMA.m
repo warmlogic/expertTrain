@@ -48,22 +48,22 @@ matchTextPrompt = true;
 % ================
 
 % Set the number of sessions
- expParam.nSessions = 10;
- 
- expParam.sesTypes = {'pretest_eye','pretest_eeg','train1','train2','train3','train4','train5', 'train6','posttest_eye','posttest_eeg'};
- expParam.doNotRunSes = [true false false false false false false false true false];
- 
+expParam.nSessions = 10;
+
+expParam.sesTypes = {'pretest_eye','pretest_eeg','train1','train2','train3','train4','train5', 'train6','posttest_eye','posttest_eeg'};
+expParam.doNotRunSes = [true false false false false false false false true false];
+
 % set up a field for each session type
- expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
- expParam.session.pretest_eeg.phases = {'match'};
- expParam.session.train1.phases = {'nametrain'};
- expParam.session.train2.phases = {'nametrain'};
- expParam.session.train3.phases = {'nametrain'};
- expParam.session.train4.phases = {'nametrain'};
- expParam.session.train5.phases = {'nametrain'};
- expParam.session.train6.phases = {'nametrain'};
- expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
- expParam.session.posttest_eeg.phases = {'match'};
+expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
+expParam.session.pretest_eeg.phases = {'match'};
+expParam.session.train1.phases = {'nametrain'};
+expParam.session.train2.phases = {'nametrain'};
+expParam.session.train3.phases = {'nametrain'};
+expParam.session.train4.phases = {'nametrain'};
+expParam.session.train5.phases = {'nametrain'};
+expParam.session.train6.phases = {'nametrain'};
+expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
+expParam.session.posttest_eeg.phases = {'match'};
 
 % ================
 % temporary setup
@@ -308,15 +308,14 @@ if expParam.sessionNum == 1
       cfg.stim.practice.nSpecies = 2;
       cfg.stim.practice.famNumBasic = cfg.stim.famNumBasic;
       cfg.stim.practice.famNumSubord = cfg.stim.famNumSubord;
-        
+      
       cfg.stim.practice.yokeSpecies = false;
       if cfg.stim.practice.yokeSpecies
         cfg.stim.practice.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
       end
       cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
     end
-  end
-end 
+  end % runPractice
   
   %% Define the response keys
   
@@ -489,8 +488,6 @@ end
   % text for when they push multiple keys
   cfg.text.multiKeyText = 'Do not press multiple keys!\nRelease all keys except your response,\nthen release your response.';
   
-  
-  
   %% Session/phase configuration
   
   %% pretest eyetracking configuration
@@ -630,7 +627,7 @@ end
           
           % rmStims_orig is true because half of stimuli are in "same" cond and
           % half are in "diff"
-%           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+          %           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
           % this is how to force all stimuli to be both stim1 and stim2 in
           % "same" and "diff" conds
@@ -714,7 +711,7 @@ end
         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
       end
     end
-  end
+  end % ismember
   
   %% pretest EEG configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -823,7 +820,7 @@ end
       end
     end
     
-  end
+  end % ismember
   
   %% Training Day 1 configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -884,7 +881,7 @@ end
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
       end
-    end
+    end % ismember
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Name training (introduce species in a rolling fashion)
@@ -907,105 +904,74 @@ end
         allSpecies = 1:cfg.stim.nSpecies;
         trainedSpecies = allSpecies(~ismember(allSpecies,cfg.stim.newSpecies));
         trainedSpecies = trainedSpecies(randperm(length(trainedSpecies)));
-       
+        
         % Increasing difficulty
         if expParam.difficulty == 1
-        
-        % select trainedSpecies by indexing into trainedSpecies for
-        % blockSpeciesOrder
-         cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-          [trainedSpecies(1)],...
-          [trainedSpecies(1:2)],...
-          [trainedSpecies(1:3)],...
-          [trainedSpecies(1:4)],...
-          [trainedSpecies(1:5)]};
-        
-        % Number of exemplars to show for each species
-         cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-         {[1:6]},... 
-         {[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6],[1:6]}};
-       
-        % hard coded stimulus indices for naming training block presentations
-        % (counterbalanced). Blocks are denoted by cells. The vectors within each
-        % block represent the exemplar number(s) for each species, corresponding
-        % to the species numbers listed in blockSpeciesOrder (defined above). The
-        % contents of each vector corresponds to the exemplar numbers for that
-        % species.
-        
-        % 10 species, 6 trained, 6 untrained
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-        %  {[1:6]},...
-        %  {[1:6], [1:6]},...
-        %  {[1:6], [1:6], [1:6]},...
-        %  {[1:6], [1:6], [1:6], [1:6]},...
-        %  {[1:6], [1:6], [1:6], [1:6], [1:6]}};
-       
-        % Decreasing difficulty
+          
+          % select trainedSpecies by indexing into trainedSpecies for
+          % blockSpeciesOrder
+          cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+            trainedSpecies(1),...
+            trainedSpecies(1:2),...
+            trainedSpecies(1:3),...
+            trainedSpecies(1:4),...
+            trainedSpecies(1:5)};
+          
+          % hard coded stimulus indices for naming training block presentations
+          % (counterbalanced). Blocks are denoted by cells. The vectors within each
+          % block represent the exemplar number(s) for each species, corresponding
+          % to the species numbers listed in blockSpeciesOrder (defined above). The
+          % contents of each vector corresponds to the exemplar numbers for that
+          % species.
+          
+          % Number of exemplars to show for each species
+          cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+          for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices)
+            cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
+          end
+          
+          % Decreasing difficulty
         elseif expParam.difficulty == 2
-        
-        % select trainedSpecies by indexing into trainedSpecies for
-        % blockSpeciesOrder
-         cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-          [trainedSpecies(1:5)],...
-          [trainedSpecies(1:4)],...
-          [trainedSpecies(1:3)],...
-          [trainedSpecies(1:2)],...
-          [trainedSpecies(1)]};
-        
-        % Number of exemplars to show for each species
-         cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-         {[1:6],[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6]},...
-         {[1:6]}};     
-       
-        
-        % Random difficulty
+          
+          % select trainedSpecies by indexing into trainedSpecies for
+          % blockSpeciesOrder
+          cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+            trainedSpecies(1:5),...
+            trainedSpecies(1:4),...
+            trainedSpecies(1:3),...
+            trainedSpecies(1:2),...
+            trainedSpecies(1)};
+          
+          % Number of exemplars to show for each species
+          cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+          for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices)
+            cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
+          end
+          
+          % Random difficulty
         elseif expParam.difficulty == 3
-        
-        % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
-            trainedSpecies_rep = repmat(trainedSpecies,1,10);
-
-        % I think the length of numberOfSpecies should be the number of blocks?
-            numberOfSpecies = randperm(length(trainedSpecies));
-
-           % specIndex = 1;
-            % for i = 1:length(numberOfSpecies)
-            % addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
-            % specIndex = specIndex + numberOfSpecies(i);
-            % end
-            
-            
-    % make sure to set up numberOfSpecies so its length is the number of blocks you want
-        cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
-        for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
+          
+          % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
+          trainedSpecies_rep = repmat(trainedSpecies,1,10);
+          
+          % I think the length of numberOfSpecies should be the number of blocks?
+          numberOfSpecies = randperm(length(trainedSpecies));
+          
+          % make sure to set up numberOfSpecies so its length is the number of blocks you want
+          cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
+          specIndex = 1;
+          for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
             addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
             cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i} = addTheseSpecies;
-        end
-       
+            specIndex = specIndex + numberOfSpecies(i);
+          end
           
-        % select trainedSpecies by indexing into trainedSpecies for
-        % blockSpeciesOrder
-        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-         % [trainedSpecies(1)],...
-         % [trainedSpecies(1:2)],...
-         % [trainedSpecies(1:3)],...
-         % [trainedSpecies(1:4)],...
-         % [trainedSpecies(1:5)]};
-        
-         Number of exemplars to show for each species
-         cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-         {[1:6]},... 
-         {[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6],[1:6]}};
-        
-        end 
+          % Number of exemplars to show for each species
+          cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+          for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices)
+            cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
+          end
+        end
         
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
@@ -1043,63 +1009,63 @@ end
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
       end
-    end
+    end % ismember
     
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     % Naming
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     phaseName = 'name';
-%     
-%     if ismember(phaseName,expParam.session.(sesName).phases)
-%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-%         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-%         
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-%         
-%         % only use stimuli from particular families
-%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
-%         
-%         % maximum number of repeated exemplars from each family in naming
-%         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
-%         
-%         if expParam.useNS
-%           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
-%         end
-%         
-%         % durations, in seconds
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
-%         
-%         % do we want to play feedback beeps?
-%         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-%         
-%         % instructions
-%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
-%           fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
-%           {'nFamily','basicFamStr','contKey'},...
-%           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,...
-%           cfg.keys.instructContKey});
-%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
-%         
-%         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-%         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-%         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
-%       end
-%     end
-
-  end
+    %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     % Naming
+    %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     phaseName = 'name';
+    %
+    %     if ismember(phaseName,expParam.session.(sesName).phases)
+    %       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+    %
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+    %
+    %         % only use stimuli from particular families
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
+    %
+    %         % maximum number of repeated exemplars from each family in naming
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+    %
+    %         if expParam.useNS
+    %           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
+    %         end
+    %
+    %         % durations, in seconds
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+    %
+    %         % do we want to play feedback beeps?
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+    %
+    %         % instructions
+    %         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
+    %           fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
+    %           {'nFamily','basicFamStr','contKey'},...
+    %           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,...
+    %           cfg.keys.instructContKey});
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
+    %
+    %         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+    %         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+    %         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+    %       end
+    %     end
+    
+  end % ismember
   
   %% Training Day 2-6 configuration (all these days are the same)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1111,309 +1077,278 @@ end
     
     if ismember(sesName,expParam.sesTypes)
       
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Name training (introduce species in a rolling fashion)
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'nametrain';
-    
-    if ismember(phaseName,expParam.session.(sesName).phases)
-      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-        
-        % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
-        
-        allSpecies = 1:cfg.stim.nSpecies;
-        trainedSpecies = allSpecies(~ismember(allSpecies,cfg.stim.newSpecies));
-        trainedSpecies = trainedSpecies(randperm(length(trainedSpecies)));        
-        % Increasing difficulty
-        if expParam.difficulty == 1
-        
-        % select trainedSpecies by indexing into trainedSpecies for
-        % blockSpeciesOrder
-         cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-          [trainedSpecies(1)],...
-          [trainedSpecies(1:2)],...
-          [trainedSpecies(1:3)],...
-          [trainedSpecies(1:4)],...
-          [trainedSpecies(1:5)]};
-        
-        % Number of exemplars to show for each species
-         cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-         {[1:6]},... 
-         {[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6],[1:6]}};
-       
-        % hard coded stimulus indices for naming training block presentations
-        % (counterbalanced). Blocks are denoted by cells. The vectors within each
-        % block represent the exemplar number(s) for each species, corresponding
-        % to the species numbers listed in blockSpeciesOrder (defined above). The
-        % contents of each vector corresponds to the exemplar numbers for that
-        % species.
-        
-        % 10 species, 6 trained, 6 untrained
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-        %  {[1:6]},...
-        %  {[1:6], [1:6]},...
-        %  {[1:6], [1:6], [1:6]},...
-        %  {[1:6], [1:6], [1:6], [1:6]},...
-        %  {[1:6], [1:6], [1:6], [1:6], [1:6]}};
-       
-        % Decreasing difficulty
-        elseif expParam.difficulty == 2
-        
-        % select trainedSpecies by indexing into trainedSpecies for
-        % blockSpeciesOrder
-         cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-          [trainedSpecies(1:5)],...
-          [trainedSpecies(1:4)],...
-          [trainedSpecies(1:3)],...
-          [trainedSpecies(1:2)],...
-          [trainedSpecies(1)]};
-        
-        % Number of exemplars to show for each species
-         cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-         {[1:6],[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6]},...
-         {[1:6]}};     
-       
-        
-        % Random difficulty
-        elseif expParam.difficulty == 3
-        
-                % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
-            trainedSpecies_rep = repmat(trainedSpecies,1,10);
-
-        % I think the length of numberOfSpecies should be the number of blocks?
-            numberOfSpecies = randperm(length(trainedSpecies));
-
-           % specIndex = 1;
-            % for i = 1:length(numberOfSpecies)
-            % addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
-            % specIndex = specIndex + numberOfSpecies(i);
-            % end
-            
-            
-    % make sure to set up numberOfSpecies so its length is the number of blocks you want
-        cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
-        for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
-            addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
-            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i} = addTheseSpecies;
-        end
-       
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % Name training (introduce species in a rolling fashion)
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      phaseName = 'nametrain';
+      
+      if ismember(phaseName,expParam.session.(sesName).phases)
+        for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+          cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
           
-        % select trainedSpecies by indexing into trainedSpecies for
-        % blockSpeciesOrder
-        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-         % [trainedSpecies(1)],...
-         % [trainedSpecies(1:2)],...
-         % [trainedSpecies(1:3)],...
-         % [trainedSpecies(1:4)],...
-         % [trainedSpecies(1:5)]};
-        
-         Number of exemplars to show for each species
-         cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-         {[1:6]},... 
-         {[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6]},...
-         {[1:6],[1:6],[1:6],[1:6],[1:6]}};
-        
-        end 
-         
-         
-        % hard coded order of which species are presented in each block
-        % (counterbalanced). Blocks are denoted by vectors.
-        %cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-        %  [1, 2],...
-        %  [1, 2, 3],...
-        %  [1, 2, 3, 4],...
-        %  [1, 2, 3, 4, 5],...
-        %  [3, 4, 5, 6],...
-        %  [4, 5, 6, 7],...
-        %  [5, 6, 7, 8],...
-        %  [6, 7, 8, 9],...
-        %  [7, 8, 9, 10],...
-        %  [8, 9, 10, 1],...
-        %  [9, 10, 2, 3],...
-        %  [10, 4, 5, 6],...
-        %  [7, 8, 9, 10]};
-        
-        % 8 species, 6 trained, 6 untrained
-        % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-        %  [1, 2],...
-        %  [1, 2, 3],...
-        %  [1, 2, 3, 4],...
-        %  [1, 2, 3, 4, 5],...
-        %  [3, 4, 5, 6],...
-        %  [4, 5, 6, 7],...
-        %  [5, 6, 7, 8],...
-        %  [6, 7, 8, 1],...
-        %  [7, 8, 1, 2],...
-        %  [8, 2, 3, 4],...
-        %  [3, 4, 5, 6],...
-        %  [5, 6, 7, 8],...
-        %  [7, 8, 1, 2]};
-        
-        % hard coded stimulus indices for naming training block presentations
-        % (counterbalanced). Blocks are denoted by cells. The vectors within each
-        % block represent the exemplar number(s) for each species, corresponding
-        % to the species numbers listed in blockSpeciesOrder (defined above). The
-        % contents of each vector corresponds to the exemplar numbers for that
-        % species.
-        
-        % 10 species, 6 trained, 6 untrained
-       % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-       %   {[1, 2, 3], [1, 2, 3]},...
-       %   {[4, 5, 6], [4, 5, 6], [1, 2, 3]},...
-       %   {[2, 3, 4], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-       %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [3, 4, 5]},...
-       %   {[5, 1, 6], [2, 3, 4], [3, 5, 6], [3, 5, 6]},...
-       %   {[5, 1, 6], [2, 5, 6], [3, 5, 6], [3, 5, 6]},...
-       %   {[3, 5, 6], [3, 5, 6], [3, 5, 6], [3, 5, 6]}};
-        
-        % % 10 species, 4 trained, 4 untrained
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-        %   {[1, 2], [1, 2]},...
-        %   {[3, 4], [3, 4], [1, 2]},...
-        %   {[2, 3], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
-        %   {[1, 4], [2, 3], [3, 4], [1, 2]}};
-        
-        % % 8 species, 6 trained, 6 untrained
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
-        %   {[1, 2, 3], [1, 2, 3]},...
-        %   {[4, 5, 6], [4, 5, 6], [1, 2, 3]},...
-        %   {[2, 3, 4], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
-        %   {[5, 1, 6], [4, 5, 6], [1, 2, 3], [4, 5, 6]},...
-        %   {[5, 1, 6], [4, 5, 6], [1, 2, 3], [3, 4, 5]},...
-        %   {[4, 5, 6], [6, 1, 2], [1, 2, 3], [4, 5, 6]},...
-        %   {[1, 2, 3], [3, 4, 5], [4, 5, 6], [1, 2, 3]}};
-        
-        % maximum number of repeated exemplars from each family in naming
-        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
-        
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
+          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+          
+          % only use stimuli from particular families
+          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+          
+          allSpecies = 1:cfg.stim.nSpecies;
+          trainedSpecies = allSpecies(~ismember(allSpecies,cfg.stim.newSpecies));
+          trainedSpecies = trainedSpecies(randperm(length(trainedSpecies)));
+          
+          % Increasing difficulty
+          if expParam.difficulty == 1
+            
+            % select trainedSpecies by indexing into trainedSpecies for
+            % blockSpeciesOrder
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+              trainedSpecies(1),...
+              trainedSpecies(1:2),...
+              trainedSpecies(1:3),...
+              trainedSpecies(1:4),...
+              trainedSpecies(1:5)};
+            
+            % hard coded stimulus indices for naming training block presentations
+            % (counterbalanced). Blocks are denoted by cells. The vectors within each
+            % block represent the exemplar number(s) for each species, corresponding
+            % to the species numbers listed in blockSpeciesOrder (defined above). The
+            % contents of each vector corresponds to the exemplar numbers for that
+            % species.
+            
+            % Number of exemplars to show for each species
+            cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+            for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices)
+              cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
+            end
+            
+            % Decreasing difficulty
+          elseif expParam.difficulty == 2
+            
+            % select trainedSpecies by indexing into trainedSpecies for
+            % blockSpeciesOrder
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+              trainedSpecies(1:5),...
+              trainedSpecies(1:4),...
+              trainedSpecies(1:3),...
+              trainedSpecies(1:2),...
+              trainedSpecies(1)};
+            
+            % Number of exemplars to show for each species
+            cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+            for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices)
+              cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
+            end
+            
+            % Random difficulty
+          elseif expParam.difficulty == 3
+            
+            % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
+            trainedSpecies_rep = repmat(trainedSpecies,1,10);
+            
+            % I think the length of numberOfSpecies should be the number of blocks?
+            numberOfSpecies = randperm(length(trainedSpecies));
+            
+            % make sure to set up numberOfSpecies so its length is the number of blocks you want
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
+            specIndex = 1;
+            for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
+              addTheseSpecies = trainedSpecies_rep(specIndex:specIndex+numberOfSpecies(i)-1);
+              cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i} = addTheseSpecies;
+              specIndex = specIndex + numberOfSpecies(i);
+            end
+            
+            % Number of exemplars to show for each species
+            cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+            for i = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices)
+              cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
+            end
+          end
+          
+          
+          % hard coded order of which species are presented in each block
+          % (counterbalanced). Blocks are denoted by vectors.
+          %cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+          %  [1, 2],...
+          %  [1, 2, 3],...
+          %  [1, 2, 3, 4],...
+          %  [1, 2, 3, 4, 5],...
+          %  [3, 4, 5, 6],...
+          %  [4, 5, 6, 7],...
+          %  [5, 6, 7, 8],...
+          %  [6, 7, 8, 9],...
+          %  [7, 8, 9, 10],...
+          %  [8, 9, 10, 1],...
+          %  [9, 10, 2, 3],...
+          %  [10, 4, 5, 6],...
+          %  [7, 8, 9, 10]};
+          
+          % 8 species, 6 trained, 6 untrained
+          % cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+          %  [1, 2],...
+          %  [1, 2, 3],...
+          %  [1, 2, 3, 4],...
+          %  [1, 2, 3, 4, 5],...
+          %  [3, 4, 5, 6],...
+          %  [4, 5, 6, 7],...
+          %  [5, 6, 7, 8],...
+          %  [6, 7, 8, 1],...
+          %  [7, 8, 1, 2],...
+          %  [8, 2, 3, 4],...
+          %  [3, 4, 5, 6],...
+          %  [5, 6, 7, 8],...
+          %  [7, 8, 1, 2]};
+          
+          % hard coded stimulus indices for naming training block presentations
+          % (counterbalanced). Blocks are denoted by cells. The vectors within each
+          % block represent the exemplar number(s) for each species, corresponding
+          % to the species numbers listed in blockSpeciesOrder (defined above). The
+          % contents of each vector corresponds to the exemplar numbers for that
+          % species.
+          
+          % 10 species, 6 trained, 6 untrained
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
+          %   {[1, 2, 3], [1, 2, 3]},...
+          %   {[4, 5, 6], [4, 5, 6], [1, 2, 3]},...
+          %   {[2, 3, 4], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [3, 4, 5]},...
+          %   {[5, 1, 6], [2, 3, 4], [3, 5, 6], [3, 5, 6]},...
+          %   {[5, 1, 6], [2, 5, 6], [3, 5, 6], [3, 5, 6]},...
+          %   {[3, 5, 6], [3, 5, 6], [3, 5, 6], [3, 5, 6]}};
+          
+          % % 10 species, 4 trained, 4 untrained
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
+          %   {[1, 2], [1, 2]},...
+          %   {[3, 4], [3, 4], [1, 2]},...
+          %   {[2, 3], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]},...
+          %   {[1, 4], [2, 3], [3, 4], [1, 2]}};
+          
+          % % 8 species, 6 trained, 6 untrained
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = {...
+          %   {[1, 2, 3], [1, 2, 3]},...
+          %   {[4, 5, 6], [4, 5, 6], [1, 2, 3]},...
+          %   {[2, 3, 4], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [2, 3, 4], [4, 5, 6], [1, 2, 3]},...
+          %   {[5, 1, 6], [4, 5, 6], [1, 2, 3], [4, 5, 6]},...
+          %   {[5, 1, 6], [4, 5, 6], [1, 2, 3], [3, 4, 5]},...
+          %   {[4, 5, 6], [6, 1, 2], [1, 2, 3], [4, 5, 6]},...
+          %   {[1, 2, 3], [3, 4, 5], [4, 5, 6], [1, 2, 3]}};
+          
+          % maximum number of repeated exemplars from each family in naming
+          cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+          
+          if expParam.useNS
+            cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
+          end
+          
+          % durations, in seconds
+          cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
+          cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
+          cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+          
+          % do we want to play feedback beeps?
+          cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+          cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+          cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+          cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+          cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+          
+          % instructions
+          [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
+            fullfile(cfg.files.instructDir,sprintf('%s_nametrain_1_exp_intro.txt',expParam.expName)),...
+            {'nBlocks','nFamily','nSpeciesTotal','basicFamStr','contKey'},...
+            {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)),...
+            num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),...
+            num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
+            cfg.keys.instructContKey});
+          cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
+          cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
+          
+          expParam.session.(sesName).(phaseName)(phaseCount).date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
-        
-        % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
-        
-        % do we want to play feedback beeps?
-        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-        
-        % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_nametrain_1_exp_intro.txt',expParam.expName)),...
-          {'nBlocks','nFamily','nSpeciesTotal','basicFamStr','contKey'},...
-          {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)),...
-          num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),...
-          num2str(cfg.stim.nSpecies),cfg.text.basicFamStr,...
-          cfg.keys.instructContKey});
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
-        
-        expParam.session.(sesName).(phaseName)(phaseCount).date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
-        expParam.session.(sesName).(phaseName)(phaseCount).startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
-        expParam.session.(sesName).(phaseName)(phaseCount).endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
       end
-    end  
-  end 
-        
-        
-        
-   %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     % Naming
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     phaseName = 'name';
-%     
-%     if ismember(phaseName,expParam.session.(sesName).phases)
-%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-%         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-%         
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-%         
-%         % only use stimuli from particular families
-%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
-%         
-%         % maximum number of repeated exemplars from each family in naming
-%         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
-%         
-%         if expParam.useNS
-%           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
-%         end
-%         
-%         % durations, in seconds
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
-%         
-%         % do we want to play feedback beeps?
-%         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-%         
-%         % instructions
-%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
-%           fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
-%           {'nFamily','basicFamStr','contKey'},...
-%           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,...
-%           cfg.keys.instructContKey});
-%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
-%         
-%         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-%         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-%         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
-%       end
-%     end
+    end
+  end % s
+  
+  %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %     % Naming
+  %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %     phaseName = 'name';
+  %
+  %     if ismember(phaseName,expParam.session.(sesName).phases)
+  %       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+  %
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+  %
+  %         % only use stimuli from particular families
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Finch_', 'Warbler_'};
+  %
+  %         % maximum number of repeated exemplars from each family in naming
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+  %
+  %         if expParam.useNS
+  %           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
+  %         end
+  %
+  %         % durations, in seconds
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+  %
+  %         % do we want to play feedback beeps?
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+  %
+  %         % instructions
+  %         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).text] = et_processTextInstruct(...
+  %           fullfile(cfg.files.instructDir,sprintf('%s_name_2_exp_intro.txt',expParam.expName)),...
+  %           {'nFamily','basicFamStr','contKey'},...
+  %           {num2str(length(cfg.stim.(sesName).(phaseName)(phaseCount).familyNames)),cfg.text.basicFamStr,...
+  %           cfg.keys.instructContKey});
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.speciesNumKeyImg;
+  %         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.speciesNumKeyImgScale;
+  %
+  %         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+  %         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+  %         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+  %       end
+  %     end
   
   %% Posttest configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1481,7 +1416,7 @@ end
           
           % rmStims_orig is true because half of stimuli are in "same" cond and
           % half are in "diff"
-%           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+          %           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
           % this is how to force all stimuli to be both stim1 and stim2 in
           % "same" and "diff" conds
@@ -1565,7 +1500,7 @@ end
         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
       end
     end
-  end
+  end % ismember
   
   %% pretest EEG configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1674,7 +1609,7 @@ end
       end
     end
     
-  end
+  end % ismember
   
   %% process the stimuli for the entire experiment
   
@@ -1865,7 +1800,7 @@ end
           
       end
     end
-  end
+  end % s
   
   %% save the parameters
   
@@ -1882,4 +1817,6 @@ end
   % % minimum duration
   % et_calcExpDuration(cfg,expParam,'min');
   
-end
+end % if expParam.sessionNum == 1
+
+end % function
