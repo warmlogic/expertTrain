@@ -629,6 +629,7 @@ try
   recogCount = 0;
   nametrainCount = 0;
   viewnameCount = 0;
+  viewCount = 0;
   compareCount = 0;
   
   prac_matchCount = 0;
@@ -822,6 +823,48 @@ try
           
           if ~phaseIsComplete
             [cfg,expParam] = et_naming(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
+          end
+        end
+        
+      case {'view'}
+        % Viewing task, with category response
+        viewCount = viewCount + 1;
+        phaseCount = viewCount;
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        end
+        
+        % for each view/name block
+        for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
+          % run the viewing task
+          phaseIsComplete = false;
+          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,phaseCount,b));
+          if exist(phaseProgressFile,'file')
+            load(phaseProgressFile);
+            if exist('phaseComplete','var') && phaseComplete
+              phaseIsComplete = true;
+            end
+          end
+          
+          if ~phaseIsComplete
+            [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
           end
         end
         
