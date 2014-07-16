@@ -744,34 +744,38 @@ for i = trialNum:length(nameStims)
     % keyIsDown==1), take the stimulus off screen, and give feedback
     % (species number)
     
-    if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
-      sNumColor = correct_sNumColor;
-      if phaseCfg.playSound
-        respSound = phaseCfg.correctSound;
-        respVol = phaseCfg.correctVol;
+    if phaseCfg.name_feedback > 0
+      
+      if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
+        sNumColor = correct_sNumColor;
+        if phaseCfg.playSound
+          respSound = phaseCfg.correctSound;
+          respVol = phaseCfg.correctVol;
+        end
+      elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
+        sNumColor = incorrect_sNumColor;
+        if phaseCfg.playSound
+          respSound = phaseCfg.incorrectSound;
+          respVol = phaseCfg.incorrectVol;
+        end
       end
-    elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
-      sNumColor = incorrect_sNumColor;
-      if phaseCfg.playSound
-        respSound = phaseCfg.incorrectSound;
-        respVol = phaseCfg.incorrectVol;
+      % draw species number in the appropriate color
+      Screen('TextSize', w, cfg.text.basicTextSize);
+      % TODO: make text rectangles
+      if specNum > 0
+        DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+      else
+        DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
       end
-    end
-    % draw species number in the appropriate color
-    Screen('TextSize', w, cfg.text.basicTextSize);
-    % TODO: make text rectangles
-    if specNum > 0
-      DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
-    else
-      DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
-    end
-    if cfg.stim.photoCell
-      Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
-    end
-    Screen('Flip', w);
-    
-    if phaseCfg.playSound
-      Beeper(respSound,respVol);
+      if cfg.stim.photoCell
+        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+      end
+      Screen('Flip', w);
+      
+      if phaseCfg.playSound
+        Beeper(respSound,respVol);
+      end
+      
     end
     
     respPromptOn = NaN;
@@ -804,35 +808,38 @@ for i = trialNum:length(nameStims)
         %   fprintf('"%s" typed at time %.3f seconds\n', KbName(keyCode), endRT - startRT);
         % end
         
-        % give immediate feedback
-        if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
-          sNumColor = correct_sNumColor;
-          if phaseCfg.playSound
-            respSound = phaseCfg.correctSound;
-            respVol = phaseCfg.correctVol;
+        if phaseCfg.name_feedback > 0
+          % give immediate feedback
+          if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
+            sNumColor = correct_sNumColor;
+            if phaseCfg.playSound
+              respSound = phaseCfg.correctSound;
+              respVol = phaseCfg.correctVol;
+            end
+          elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
+            sNumColor = incorrect_sNumColor;
+            if phaseCfg.playSound
+              respSound = phaseCfg.incorrectSound;
+              respVol = phaseCfg.incorrectVol;
+            end
           end
-        elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
-          sNumColor = incorrect_sNumColor;
-          if phaseCfg.playSound
-            respSound = phaseCfg.incorrectSound;
-            respVol = phaseCfg.incorrectVol;
+          % draw species number in the appropriate color
+          Screen('TextSize', w, cfg.text.basicTextSize);
+          % TODO: make text rectangles
+          if specNum > 0
+            DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+          else
+            DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
           end
-        end
-        % draw species number in the appropriate color
-        Screen('TextSize', w, cfg.text.basicTextSize);
-        % TODO: make text rectangles
-        if specNum > 0
-          DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
-        else
-          DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
-        end
-        if cfg.stim.photoCell
-          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
-        end
-        Screen('Flip', w);
-        
-        if phaseCfg.playSound
-          Beeper(respSound,respVol);
+          if cfg.stim.photoCell
+            Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+          end
+          Screen('Flip', w);
+          
+          if phaseCfg.playSound
+            Beeper(respSound,respVol);
+          end
+          
         end
         
         break
@@ -868,26 +875,29 @@ for i = trialNum:length(nameStims)
     
     % if they didn't respond, show correct response
     if ~keyIsDown
-      sNumColor = incorrect_sNumColor;
-      % TODO: make text rectangles
-      Screen('TextSize', w, cfg.text.basicTextSize);
-      if specNum > 0
-        DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
-      else
-        DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
-      end
-      % "need to respond faster"
-      Screen('TextSize', w, cfg.text.instructTextSize);
-      DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor, cfg.text.instructCharWidth);
-      if cfg.stim.photoCell
-        Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
-      end
-      Screen('Flip', w);
       
-      if phaseCfg.playSound
-        respSound = phaseCfg.incorrectSound;
-        respVol = phaseCfg.incorrectVol;
-        Beeper(respSound,respVol);
+      if phaseCfg.name_feedback > 0
+        sNumColor = incorrect_sNumColor;
+        % TODO: make text rectangles
+        Screen('TextSize', w, cfg.text.basicTextSize);
+        if specNum > 0
+          DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+        else
+          DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
+        end
+        % "need to respond faster"
+        Screen('TextSize', w, cfg.text.instructTextSize);
+        DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor, cfg.text.instructCharWidth);
+        if cfg.stim.photoCell
+          Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
+        end
+        Screen('Flip', w);
+        
+        if phaseCfg.playSound
+          respSound = phaseCfg.incorrectSound;
+          respVol = phaseCfg.incorrectVol;
+          Beeper(respSound,respVol);
+        end
       end
       
       % need a new endRT
@@ -895,8 +905,10 @@ for i = trialNum:length(nameStims)
     end
   end
   
-  % wait to let them view the feedback
-  WaitSecs(phaseCfg.name_feedback);
+  if phaseCfg.name_feedback > 0
+    % wait to let them view the feedback
+    WaitSecs(phaseCfg.name_feedback);
+  end
   
   if (phaseCfg.name_isi > 0 && phaseCfg.fixDuringISI) || (phaseCfg.name_isi == 0 && phaseCfg.fixDuringPreStim)
     % draw fixation
