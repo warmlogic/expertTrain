@@ -449,6 +449,7 @@ for s = 1:expParam.nSessions
   recogCount = 0;
   nametrainCount = 0;
   viewnameCount = 0;
+  viewCount = 0;
   compareCount = 0;
   
   prac_matchCount = 0;
@@ -574,6 +575,7 @@ for s = 1:expParam.nSessions
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
           expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
+            % TODO: block for loop?
             [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
               expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
             [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
@@ -721,6 +723,50 @@ for s = 1:expParam.nSessions
 %           end
         else
           [cfg,expParam] = et_processStims_viewname(cfg,expParam,sesName,phaseName,phaseCount);
+        end
+      case {'view'}
+        viewCount = viewCount + 1;
+        phaseCount = viewCount;
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+        
+        if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
+            [expParam.session.(sesName).(phaseName)(phaseCount).viewStims] = et_shuffleStims(...
+              expParam.session.(sesName).(phaseName)(phaseCount).viewStims,'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).viewMaxConsecFamily);
+          end
+          
+          % set up to receive data from previous phase cfg
+          if phaseCount == 1
+            for r = 1:length(cfg.stim.(sesName).(phaseName))
+              thisCfg = cfg.stim.(sesName).(phaseName)(r);
+              fn2 = fieldnames(cfg.stim.(thisCfg.usePrevPhase{1}).(thisCfg.usePrevPhase{2})(thisCfg.usePrevPhase{3}));
+              fn1 = fieldnames(thisCfg);
+              dummy = struct;
+              for f = 1:length(fn1)
+                dummy.(fn1{f}) = thisCfg.(fn1{f});
+              end
+              for f = 1:length(fn2)
+                dummy.(fn2{f}) = [];
+              end
+              if r == 1
+                fieldsToBeReplaced = dummy;
+              else
+                fieldsToBeReplaced(r) = dummy;
+              end
+            end
+            cfg.stim.(sesName).(phaseName) = fieldsToBeReplaced;
+          end
+          % transfer data from previous phase cfg
+          thatCfg = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          fn = fieldnames(thatCfg);
+          for f = 1:length(fn)
+            if isempty(cfg.stim.(sesName).(phaseName)(phaseCount).(fn{f}))
+              cfg.stim.(sesName).(phaseName)(phaseCount).(fn{f}) = thatCfg.(fn{f});
+            end
+          end
+        else
+          [cfg,expParam] = et_processStims_view(cfg,expParam,sesName,phaseName,phaseCount);
         end
         
       case {'prac_match'}
