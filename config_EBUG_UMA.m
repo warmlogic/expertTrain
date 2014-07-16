@@ -528,6 +528,10 @@ if expParam.sessionNum == 1
         
         % number per species per family (half because each stimulus is only in
         % same or different condition)
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice / 2;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice / 2;
+        
+        % number per species per family...1 for short practice phase
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice / 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice / 2;
         
