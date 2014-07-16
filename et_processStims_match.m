@@ -155,7 +155,7 @@ else
   end
 end
 
-if strcmp(expParam.expName,'EBUG_UMA') && isfield(cfg.stim,'newSpecies')
+if phaseCfg.isExp && strcmp(expParam.expName,'EBUG_UMA') && isfield(cfg.stim,'newSpecies')
   % species number and species strings must match up (a=1, b=2, c=3, etc.)
   
   % set up for reading difficulty rating files
