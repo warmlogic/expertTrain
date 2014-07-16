@@ -514,7 +514,7 @@ if expParam.sessionNum == 1
         
         % only use stimuli from particular families
         if phaseCount == 1
-          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_', 'Wading_'};
         elseif phaseCount > 1
           cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_g_', 'Perching_g_hi8_', 'Perching_g_lo8_', 'Perching_color_', 'Wading_g_', 'Wading_g_hi8_', 'Wading_g_lo8_', 'Wading_color_'};
         end
@@ -530,6 +530,7 @@ if expParam.sessionNum == 1
         % same or different condition)
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice / 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice / 2;
+        
         % rmStims_orig is true because half of stimuli are in "same" cond and
         % half are in "diff"
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
