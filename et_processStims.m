@@ -575,11 +575,14 @@ for s = 1:expParam.nSessions
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
           expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
-            % TODO: block for loop?
-            [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
-            [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).targStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
+            end
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'targ',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).testMaxConsec);
+            end
           end
           
           % set up to receive data from previous phase cfg
@@ -629,8 +632,10 @@ for s = 1:expParam.nSessions
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
           expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
-            [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
+            end
           end
           
           % set up to receive data from previous phase cfg
@@ -680,10 +685,14 @@ for s = 1:expParam.nSessions
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
           expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
-            [expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).viewMaxConsecFamily);
-            [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).viewStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).viewStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).viewMaxConsecFamily);
+            end
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).nameMaxConsecFamily);
+            end
           end
           
           % set up to receive data from previous phase cfg
@@ -881,10 +890,14 @@ for s = 1:expParam.nSessions
         if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
           expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
           if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
-            [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
-            [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
-              expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).targStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).targStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).targStims{b},'familyNum',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).studyMaxConsecFamily);
+            end
+            for b = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).allStims)
+              [expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}] = et_shuffleStims(...
+                expParam.session.(sesName).(phaseName)(phaseCount).allStims{b},'targ',cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3}).testMaxConsec);
+            end
           end
           
           % set up to receive data from previous phase cfg
