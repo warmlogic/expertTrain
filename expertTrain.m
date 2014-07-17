@@ -851,22 +851,24 @@ try
           expParam.session.(sesName).(phaseName)(phaseCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
         end
         
-        % for each view/name block
-        for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
-          % run the viewing task
-          phaseIsComplete = false;
-          phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,phaseCount,b));
-          if exist(phaseProgressFile,'file')
-            load(phaseProgressFile);
-            if exist('phaseComplete','var') && phaseComplete
-              phaseIsComplete = true;
-            end
-          end
-          
-          if ~phaseIsComplete
-            [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
+        % % for each view/name block
+        % for b = 1:length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder)
+        % % run the viewing task
+        phaseIsComplete = false;
+        % phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d_b%d.mat',sesName,phaseName,phaseCount,b));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_view_%d.mat',sesName,phaseName,phaseCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
           end
         end
+        
+        if ~phaseIsComplete
+          % [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount,b);
+          [cfg,expParam] = et_viewing(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
+        end
+        % end
         
       case{'compare'}
         % Comparison task
