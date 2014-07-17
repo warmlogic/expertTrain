@@ -120,7 +120,7 @@ elseif nargin == 1
   % cannot proceed with one argument
   error('You provided 1 argument, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
 elseif nargin == 2
-  % cannot proceed with one argument
+  % cannot proceed with two arguments
   error('You provided 2 arguments, but you need either zero or three! Must provide either no inputs (%s;) or provide experiment name (as a string), subject number (as an integer), and whether to use Net Station (1 or 0). E.g. %s(''%s'', 9, 1);',mfilename,mfilename,expName);
 elseif nargin >= 3
   % the correct number of arguments
