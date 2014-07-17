@@ -93,7 +93,7 @@ end
 
 %% do some error checking
 
-possible_phases = {'match','name','recog','nametrain','viewname','prac_match','prac_name','prac_recog'};
+possible_phases = {'match','name','recog','nametrain','view','viewname','prac_match','prac_name','prac_recog'};
 if length(expParam.sesTypes) ~= expParam.nSessions
   error('There should be %d sessions defined, but expParam.sesTypes contains %d sessions.',expParam.nSessions,length(expParam.sesTypes));
 end
@@ -203,10 +203,12 @@ if expParam.sessionNum == 1
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
+  % for FLOWVIS pilot, two groups (Turb, Lam) are at the species level, in same
+  % family
   cfg.stim.famNumBasic = [];
   cfg.stim.famNumSubord = [1];
   % what to call the basic-level family in viewing and naming tasks
-  %cfg.text.basicFamStr = 'Other';
+  cfg.text.basicFamStr = 'Other';
   
   % whether to remove the trained/untrained stims from the stimulus pool
   % after they are chosen
@@ -230,7 +232,7 @@ if expParam.sessionNum == 1
     cfg.stim.practice.nPractice = 2;
     
     if cfg.stim.useSeparatePracStims
-      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'PracticeBirds');
+      cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Practice');
       cfg.stim.practice.familyNames = {'Perching_'};
       cfg.stim.practice.nSpecies = 2;
       
