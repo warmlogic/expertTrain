@@ -16,7 +16,7 @@ function [cfg,expParam] = config_EBUG_UMA(cfg,expParam)
 % on.
 
 % what host is netstation running on?
-if expParam.useNS
+expParam.useNS
   expParam.NSPort = 55513;
   
   % % D458
@@ -26,7 +26,6 @@ if expParam.useNS
   expParam.NSHost = '10.0.0.41';
   
   expParam.baselineRecordSecs = 20.0;
-end
 
 % sound defaults, these get set for each phase
 playSound = true;
