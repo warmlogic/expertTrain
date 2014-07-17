@@ -1,0 +1,15 @@
+This is the practice Naming experiment.
+
+You will see creatures from nFamily families.
+In this block, there are nSpecies different species in each family, and they are called species theseSpecies. These numbers correspond to the keys listed below.
+
+You will identify species theseSpecies from one family,
+and you will chunk all species of the other family together as "basicFamStr".
+
+Your job is to press the correct species key for each creature. If you don't know the species number, take your best guess. You must respond quickly.
+
+You will use the keys for species theseSpecies in this block.
+
+Please place your fingers on the keys now.
+
+Press "contKey" to begin the naming task.
