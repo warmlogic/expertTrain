@@ -227,7 +227,7 @@ if exist(cfg.files.expParamFile,'file')
   if expParam.sessionNum <= expParam.nSessions
     % make sure we want to start this session
     startUnanswered = 1;
-    if expParam.useNS
+    if useNS
       NSstr = 'with Net Station enabled';
     else
       NSstr = 'WITHOUT Net Station enabled';
