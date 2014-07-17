@@ -23,7 +23,7 @@ expParam.useNS
   % expParam.NSHost = '128.138.223.251';
   
   % D464
-  expParam.NSHost = '10.0.0.41';
+  expParam.NSHost = '10.0.0.42';
   
   expParam.baselineRecordSecs = 20.0;
 
