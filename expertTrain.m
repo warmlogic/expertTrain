@@ -291,6 +291,13 @@ else
     
     if isfield(expParam,'doNotRunSes') && expParam.doNotRunSes(expParam.sessionNum)
       fprintf('Exiting because expParam.doNotRunSes for this sessions is true.\n');
+      % increment the session number for running the next session
+      expParam.sessionNum = expParam.sessionNum + 1;
+      
+      % save the experiment data
+      save(cfg.files.expParamFile,'cfg','expParam');
+      
+      % exit
       return
     end
   else
