@@ -1,0 +1,10 @@
+Viewing task
+
+You will see images of fluid flow.
+There are two different types of flow, although they may look very similar. You will have to look closely to see the differences. These two types correspond to the keys listed below.
+
+Your job is to learn the two types of images by pressing the correct key that corresponds to the type you see below each image.
+
+Please place your fingers on the keys now.
+
+Press "contKey" to begin the viewing task.

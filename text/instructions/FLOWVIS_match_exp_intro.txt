@@ -1,0 +1,8 @@
+This is the Matching experiment.
+
+On each trial you will see two images, one after the other.
+
+Press "sameKey" if the creatures are from the same type.
+Press "diffKey" if the creatures are from different types.
+
+Press "contKey" to begin the matching task.

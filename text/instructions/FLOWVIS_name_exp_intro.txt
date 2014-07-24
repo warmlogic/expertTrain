@@ -1,0 +1,11 @@
+This is the Naming experiment.
+
+You will see two types of fluid flows.
+These two types correspond to the keys listed below.
+
+
+Your job is to press the correct key for each image. If you don't know which type it is, take your best guess. You must respond quickly.
+
+Please place your fingers on the keys now.
+
+Press "contKey" to begin the naming task.

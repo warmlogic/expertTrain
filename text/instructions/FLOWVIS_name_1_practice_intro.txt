@@ -1,0 +1,12 @@
+This is the practice Naming experiment.
+
+You will see images of solids and liquids.
+These images correspond to the keys listed below.
+
+
+Your job is to press the correct key for each image. You must respond quickly.
+
+
+Please place your fingers on the keys now.
+
+Press "contKey" to begin the naming task.
