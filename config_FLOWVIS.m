@@ -2,7 +2,7 @@ function [cfg,expParam] = config_FLOWVIS(cfg,expParam)
 % function [cfg,expParam] = config_FLOWVIS(cfg,expParam)
 %
 % Description:
-%  Configuration function for visual expertise training experiment. This
+%  Configuration function for the FLOWVIS visual expertise training experiment. This
 %  file should be edited for your particular experiment. This function runs
 %  et_processStims to prepare the stimuli for experiment presentation.
 %expParam.nSessions
@@ -15,8 +15,8 @@ function [cfg,expParam] = config_FLOWVIS(cfg,expParam)
 % set up configuration structures to keep track of what day and phase we're
 % on.
 
+% %%FLOWVIS does not use EEG / netstation
 % what host is netstation running on?
-% FLOWVIS does not use EEG / Net Station, so this param should always == 0
 % if expParam.useNS
 %   expParam.NSPort = 55513;
 %   
@@ -58,7 +58,7 @@ end
 % session
 expParam.nSessions = 1;
 
-% Pre-test, training day 1, post-test.
+% practice, Pre-test, training day 1, post-test, all in one day
 expParam.sesTypes = {'pilot'};
 
 % set up a field for each session type
@@ -204,7 +204,7 @@ if expParam.sessionNum == 1
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
-  % for FLOWVIS pilot, two groups (Turb, Lam) are at the species level, in same
+  % NB for FLOWVIS pilot, two groups (Turb, Lam) are at the species level, in same
   % family
   cfg.stim.famNumBasic = [];
   cfg.stim.famNumSubord = [1];
@@ -235,7 +235,7 @@ if expParam.sessionNum == 1
     if cfg.stim.useSeparatePracStims
       cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Practice');
       cfg.stim.practice.familyNames = {'Perching_'};
-      cfg.stim.practice.nSpecies = 2;
+      cfg.stim.practice.nSpecies = 1;
       
       % basic/subordinate families
       cfg.stim.practice.famNumBasic = [];
@@ -471,15 +471,16 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_'};
         
-        % maximum number of repeated exemplars from each family in naming
-        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+        % maximum number of repeated exemplars from each family in naming 
+        % Since FLOWVIS is all one family, no max exemplars from one family
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [1.0 0.7];
         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 3.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
@@ -568,15 +569,15 @@ if expParam.sessionNum == 1
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 0.8;
-        cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 0.8;
+        cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 2.0;
         % random intervals are generated on the fly
         cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim1 = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim2 = [1.0 1.2];
         cfg.stim.(sesName).(phaseName)(phaseCount).match_response = 2.0;
         
-        % do we want to play feedback beeps?
-        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+        % do we want to play feedback beeps? - NO, MATCH IS OUR TESTING 
+        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
@@ -591,7 +592,7 @@ if expParam.sessionNum == 1
             fullfile(cfg.files.instructDir,sprintf('%s_match_1_practice_intro.txt',expParam.expName)),...
             {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
         elseif phaseCount > 1
-          %FOR PILOT ONLY 1 PHASE
+          %PILOT ONLY HAS 1 PHASE
           %[cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
            % fullfile(cfg.files.instructDir,sprintf('%s_match_2_practice_intro.txt',expParam.expName)),...
            % {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
@@ -666,7 +667,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).match_response = 2.0;
         
         % do we want to play feedback beeps for no response?
-        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
@@ -726,7 +727,8 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
         end
         
-        % do we want to play feedback beeps?
+        % do we want to play feedback beeps? Yes for FLOWVIS - this is
+        % error-driven feedback training
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
@@ -774,7 +776,7 @@ if expParam.sessionNum == 1
 %       end
       
       % durations, in seconds
-      cfg.stim.(sesName).(phaseName)(phaseCount).view_isi = 0.8;
+      cfg.stim.(sesName).(phaseName)(phaseCount).view_isi = 2.0;
       cfg.stim.(sesName).(phaseName)(phaseCount).view_preStim = 0.2;
       cfg.stim.(sesName).(phaseName)(phaseCount).view_stim = 4.0;
       
