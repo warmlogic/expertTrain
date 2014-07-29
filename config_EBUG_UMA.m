@@ -16,7 +16,6 @@ function [cfg,expParam] = config_EBUG_UMA(cfg,expParam)
 % on.
 
 % what host is netstation running on?
-expParam.useNS
   expParam.NSPort = 55513;
   
   % % D458
@@ -84,6 +83,22 @@ expParam.session.posttest_eeg.phases = {'match'};
 % expParam.session.posttest_eeg.phases = {'match'};
 % expParam.session.posttest_eeg.phases = {'match', 'compare'};
 
+  % blink break (set to 0 if you don't want breaks)
+  if expParam.useNS
+     timer in secs for when to take a blink break (only when useNS=true)
+    cfg.stim.secUntilBlinkBreak = 45.0;
+  else
+     timer in secs for when to take a blink break (only when useNS=false)
+    cfg.stim.secUntilBlinkBreak = 90.0;
+  end
+  
+  if expParam.useNS
+    cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+  end
+  
+  if expParam.useNS
+     cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
+  end
 
 %% do some error checking
 
@@ -140,14 +155,6 @@ if expParam.sessionNum == 1
   % way that Matlab creates indices.
   expParam.difficulty = mod(str2double(expParam.subject(end-2:end))-1,3)+1;
   
-  % blink break (set to 0 if you don't want breaks)
-  if expParam.useNS
-    % timer in secs for when to take a blink break (only when useNS=true)
-    cfg.stim.secUntilBlinkBreak = 45.0;
-  else
-    % timer in secs for when to take a blink break (only when useNS=false)
-    cfg.stim.secUntilBlinkBreak = 90.0;
-  end
   
   %% Stimulus parameters
   
@@ -685,9 +692,6 @@ if expParam.sessionNum == 1
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-        end
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
@@ -861,11 +865,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).stim2MinRepeatSpacing = 2;
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
-        
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 180;
-        end
-        
+                
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 0.8;
@@ -1424,9 +1424,6 @@ if expParam.sessionNum == 1
           % maximum number of repeated exemplars from each family in naming
           cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
           
-          if expParam.useNS
-            cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
-          end
           
           % durations, in seconds
           cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
@@ -1634,10 +1631,6 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).stim2MinRepeatSpacing = 2;
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
-        
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-        end
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
