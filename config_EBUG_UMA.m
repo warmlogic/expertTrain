@@ -53,7 +53,7 @@ expParam.sesTypes = {'pretest_eye','pretest_eeg','train1','train2','train3','tra
 expParam.doNotRunSes = [true false false false false false false false true false];
 
 % set up a field for each session type
-expParam.session.pretest_eye.phases = {'prac_match', 'match', 'match', 'match'};
+expParam.session.pretest_eye.phases = {'prac_match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
 expParam.session.pretest_eeg.phases = {'match'};
 expParam.session.train1.phases = {'prac_name', 'nametrain'};
 expParam.session.train2.phases = {'nametrain'};
@@ -61,7 +61,7 @@ expParam.session.train3.phases = {'nametrain'};
 expParam.session.train4.phases = {'nametrain'};
 expParam.session.train5.phases = {'nametrain'};
 expParam.session.train6.phases = {'nametrain'};
-expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
+expParam.session.posttest_eye.phases = {'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
 expParam.session.posttest_eeg.phases = {'match'};
 
 % ================
@@ -610,7 +610,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        if phaseCount == 1 || phaseCount == 3
+        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12 
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
@@ -641,7 +641,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
           cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
           
-        elseif phaseCount == 2
+        elseif phaseCount == 2 || phaseCount == 5 || phaseCount == 8 || phaseCount == 11 
           % 2 blocks, 180 trials per block (for eyetracking foveal and
           % peripheral masking blocks)
           
@@ -1560,7 +1560,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        if phaseCount == 1 || phaseCount == 3
+        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12 
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
@@ -1591,7 +1591,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
           cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
           
-        elseif phaseCount == 2
+        elseif phaseCount == 2 || phaseCount == 5 || phaseCount == 8 || phaseCount == 11
           % 2 blocks, 180 trials per block (for eyetracking foveal and
           % peripheral masking blocks)
           
