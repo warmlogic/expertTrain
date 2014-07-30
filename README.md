@@ -38,13 +38,13 @@ Installation
    - https://github.com/warmlogic/expertTrain
    - It is **not** recommended that you add it to your Matlab path
 - Acquire a stimulus image set (e.g., creatures/sheinbugs or birds)
-   - Name stimulus images using this pattern:
-      - `ab1.bmp` (family a, species b, exemplar 1); `sc2.bmp` (family s, species c, exemplar 2)
-      - You should probably stick to naming with single letters for family and species followed by exemplar number (as above).
-         - However, the experiment now supports multiple character family names, which will be used for when stimulus images are manipulated.
-         - Family names can also contain digits (e.g., `fam1`), but species names must not contain digits and exemplar numbers can only consist of digits (because any numbers in the `species+exemplarNumber` string will be read as part of the exemplar number).
+   - Name all stimulus images using this pattern: `FamilySpeciesExemplar.extension`
+      - e.g., `ab1.bmp` (family a, species b, exemplar 1); `sc2.bmp` (family s, species c, exemplar 2)
+      - You can name them with single letters for family and species followed by exemplar number (as above), or:
+         - the experiment supports multiple character family names, which will is useful for particular paradigms (e.g., when stimulus images are manipulated).
+         - Family names can contain digits (e.g., `fam1`), but species names cannot contain digits. Exemplar numbers can only consist of digits (because any numbers in the `species+exemplarNumber` string will be read as part of the exemplar number).
    - All species exemplar images should be stored flat in a single family directory, within `expertTrain/images/STIM_SET_NAME/FAMILY_NAME/`
-      - e.g., `expertTrain/images/Creatures/a/` (for family "a" images)
+      - e.g., `expertTrain/images/Creatures/a/` (for family "a" images, where all images in this folder start with "a")
    - There is a creature set located on curran-lab:
       - <pre><code>/Volumes/curranlab/ExperimentDesign/Experiment Stimuli/Creatures/sorted_in_selected_not_selected.zip</code></pre>
       - NB: If you use this stimulus set and the provided config files (see "Preparing the experiment", below), you must rename the family 1 directory to "a" and the family 2 directory to "s".
