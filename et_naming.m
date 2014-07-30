@@ -337,7 +337,7 @@ Screen('Flip', w);
 
 %% show the instructions
 
-if expParam.useNS && runInBlocks
+if runInBlocks
   % don't show the instructions on the block with impedance break
   if b == 1 || mod((b - 1),phaseCfg.impedanceAfter_nBlocks) ~= 0
     showInstruct = true;
