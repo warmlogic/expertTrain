@@ -167,7 +167,7 @@ if expParam.sessionNum == 1
   
   % family names correspond to the directories in which stimuli reside;
   % includes manipulations
-  cfg.stim.familyNames = {'Turb_Lam'};
+  cfg.stim.familyNames = {'VStreet'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 2;
@@ -179,8 +179,8 @@ if expParam.sessionNum == 1
   end
   
   % Number of trained and untrained exemplars per species per family
-  cfg.stim.nTrained = 6;
-  cfg.stim.nUntrained = 6;
+  cfg.stim.nTrained = 4;
+  cfg.stim.nUntrained = 4;
   
   % yoke exemplars across species within these family groups so training
   % status is the same for all finches and for all warblers; NB this
