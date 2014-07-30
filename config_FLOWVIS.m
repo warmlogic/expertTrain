@@ -4,7 +4,7 @@ function [cfg,expParam] = config_FLOWVIS(cfg,expParam)
 % Description:
 %  Configuration function for the FLOWVIS visual expertise training experiment. This
 %  file should be edited for your particular experiment. This function runs
-%  et_processStims to prepare the stimuli for experiment presentation.
+%  et_processStims to prepare the stimuli for experiment presentation
 %expParam.nSessions
 % see also: et_saveStimList, et_processStims, et_processStims_match,
 % et_processStims_recog, et_processStims_viewname,
