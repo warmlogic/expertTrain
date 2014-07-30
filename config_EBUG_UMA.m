@@ -16,7 +16,7 @@ function [cfg,expParam] = config_EBUG_UMA(cfg,expParam)
 % on.
 
 % what host is netstation running on?
-expParam.useNS
+%expParam.useNS
   expParam.NSPort = 55513;
   
   % % D458
@@ -695,7 +695,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
         %if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+        %  cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
         %end
         
         % durations, in seconds
@@ -1645,7 +1645,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
         %if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
+        %  cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
         %end
         
         % durations, in seconds
