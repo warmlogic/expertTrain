@@ -15,17 +15,13 @@ function [cfg,expParam] = config_EBUG_UMA(cfg,expParam)
 % set up configuration structures to keep track of what day and phase we're
 % on.
 
-% what host is netstation running on?
-%expParam.useNS
-  expParam.NSPort = 55513;
-  
-  % % D458
-  % expParam.NSHost = '128.138.223.251';
-  
-  % D464
-  expParam.NSHost = '10.0.0.42';
-  
-  expParam.baselineRecordSecs = 20.0;
+% IP address of computer running Net Station
+expParam.NSHost = '10.0.0.42';
+
+% Port that NS expects to receive data on
+expParam.NSPort = 55513;
+
+expParam.baselineRecordSecs = 20.0;
 
 % sound defaults, these get set for each phase
 playSound = true;
@@ -40,15 +36,15 @@ cfg.text.printTrialInfo = false;
 % matching task defaults
 matchTextPrompt = true;
 
-  % blink break (set to 0 if you don't want breaks)
-  if expParam.useNS
-    % timer in secs for when to take a blink break (only when useNS=true)
-    cfg.stim.secUntilBlinkBreak = 45.0;
-  else
-    % timer in secs for when to take a blink break (only when useNS=false)
-    cfg.stim.secUntilBlinkBreak = 90.0;
-  end
-  
+% blink break (set to 0 if you don't want breaks)
+if expParam.useNS
+  % timer in secs for when to take a blink break (only when useNS=true)
+  cfg.stim.secUntilBlinkBreak = 45.0;
+else
+  % timer in secs for when to take a blink break (only when useNS=false)
+  cfg.stim.secUntilBlinkBreak = 90.0;
+end
+
 %% Experiment session information
 
 % ================
@@ -149,15 +145,6 @@ if expParam.sessionNum == 1
   % way that Matlab creates indices.
   expParam.difficulty = mod(str2double(expParam.subject(end-2:end))-1,3)+1;
   
-%   % blink break (set to 0 if you don't want breaks)
-%   if expParam.useNS
-%     % timer in secs for when to take a blink break (only when useNS=true)
-%     cfg.stim.secUntilBlinkBreak = 45.0;
-%   else
-%     % timer in secs for when to take a blink break (only when useNS=false)
-%     cfg.stim.secUntilBlinkBreak = 90.0;
-%   end
-%   
   %% Stimulus parameters
   
   % whether to present a white square during the stimulus
@@ -192,18 +179,15 @@ if expParam.sessionNum == 1
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
   
-  % number of species to mark as "new"; left out of training
-  if expParam.counterbalance == 1 %expParam.counterbalance 1 skips species 5,10
-    %cfg.stim.newSpecies = [5, 10];
+  % number of species to mark as "new"; left out of training; different
+  % setups for different counterbalancings
+  if expParam.counterbalance == 1
     cfg.stim.newSpecies = [1, 3, 5, 7, 9];
-  elseif expParam.counterbalance == 2 %expParam.counterbalance 2 skips species 1,3
-    %cfg.stim.newSpecies = [1, 3];
+  elseif expParam.counterbalance == 2
     cfg.stim.newSpecies = [2, 4, 6, 8, 10];
   elseif expParam.counterbalance == 3
-    %cfg.stim.newSpecies = [4, 2];
     cfg.stim.newSpecies = [1, 2, 5, 9, 10];
   elseif expParam.counterbalance == 4
-    %cfg.stim.newSpecies = [6, 9];
     cfg.stim.newSpecies = [3, 4, 6, 7, 8];
   end
   cfg.stim.nNewExemplars = 12;
@@ -383,49 +367,6 @@ if expParam.sessionNum == 1
   % scale image down (< 1) or up (> 1)
   cfg.files.speciesNumKeyImgScale = 0.4;
   
-  %   % recognition keys
-  %   if strcmp(cfg.keys.keyRow,'upper')
-  %     % upper row
-  %     cfg.keys.recogKeyNames = {{'q','w','e','r','u'},{'r','u','i','o','p'}};
-  %   elseif strcmp(cfg.keys.keyRow,'middle')
-  %     % middle row
-  %     if ismac || isunix
-  %       cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';:'}};
-  %     elseif ispc
-  %       cfg.keys.recogKeyNames = {{'a','s','d','f','j'},{'f','j','k','l',';'}};
-  %     end
-  %   end
-  %
-  %   % recognition keys (counterbalanced based on even/odd and 1-5, 6-10)
-  %   if expParam.isEven && expParam.is15 || ~expParam.isEven && ~expParam.is15
-  %     cfg.keys.recogKeySet = 1;
-  %     cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
-  %     cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{1});
-  %     cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{2});
-  %     cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
-  %     cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{4});
-  %     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{5});
-  %   elseif expParam.isEven && ~expParam.is15 || ~expParam.isEven && expParam.is15
-  %     cfg.keys.recogKeySet = 2;
-  %     cfg.keys.recogKeyNames = cfg.keys.recogKeyNames{cfg.keys.recogKeySet};
-  %     cfg.keys.recogDefUn = KbName(cfg.keys.recogKeyNames{5});
-  %     cfg.keys.recogMayUn = KbName(cfg.keys.recogKeyNames{4});
-  %     cfg.keys.recogMayF = KbName(cfg.keys.recogKeyNames{3});
-  %     cfg.keys.recogDefF = KbName(cfg.keys.recogKeyNames{2});
-  %     cfg.keys.recogRecoll = KbName(cfg.keys.recogKeyNames{1});
-  %   end
-  %
-  %   if strcmp(cfg.keys.keyRow,'upper')
-  %     cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_upper_%d.jpg',cfg.keys.recogKeySet));
-  %     %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_upper_%d.jpg',cfg.keys.recogKeySet));
-  %   elseif strcmp(cfg.keys.keyRow,'middle')
-  %     cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_black_middle_%d.jpg',cfg.keys.recogKeySet));
-  %     %cfg.files.recogTestRespKeyImg = fullfile(cfg.files.resDir,sprintf('recogTest_resp_white_middle_%d.jpg',cfg.keys.recogKeySet));
-  %   end
-  %
-  %   % scale image down (< 1) or up (> 1)
-  %   cfg.files.recogTestRespKeyImgScale = 0.4;
-  
   %% Screen, text, and symbol configuration for size and color
   
   % Choose a color value (e.g., 210 for gray) to be used as experiment backdrop
@@ -521,11 +462,6 @@ if expParam.sessionNum == 1
         
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.practice.familyNames;
-%         if phaseCount == 1
-%           cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_', 'Wading_'};
-%         elseif phaseCount > 1
-%           cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_g_', 'Perching_g_hi8_', 'Perching_g_lo8_', 'Perching_color_', 'Wading_g_', 'Wading_g_hi8_', 'Wading_g_lo8_', 'Wading_color_'};
-%         end
         
         % % every stimulus is in both the same and the different condition.
         % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice;
@@ -619,7 +555,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12 
+        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
@@ -638,19 +574,19 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
           
-          % rmStims_orig is true because half of stimuli are in "same" cond and
-          % half are in "diff"
-          %           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+          % % rmStims_orig is true because half of stimuli are in "same"
+          % cond and % half are in "diff"
+          % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
-          % this is how to force all stimuli to be both stim1 and stim2 in
-          % "same" and "diff" conds
-          %cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
+          % % this is how to force all stimuli to be both stim1 and stim2
+          % in % "same" and "diff" conds
+          % cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
           
           % rmStims_pair is true because pairs are removed after they're added
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
           cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
           
-        elseif phaseCount == 2 || phaseCount == 5 || phaseCount == 8 || phaseCount == 11 
+        elseif phaseCount == 2 || phaseCount == 5 || phaseCount == 8 || phaseCount == 11
           % 2 blocks, 180 trials per block (for eyetracking foveal and
           % peripheral masking blocks)
           
@@ -694,10 +630,6 @@ if expParam.sessionNum == 1
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
-        %if expParam.useNS
-        %  cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-        %end
-        
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 0.8;
@@ -732,87 +664,86 @@ if expParam.sessionNum == 1
   sesName = 'pretest_eeg';
   
   if ismember(sesName,expParam.sesTypes)
-      
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     % Matching - practice
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     phaseName = 'prac_match';
-%     
-%     if ismember(phaseName,expParam.session.(sesName).phases)
-%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-%         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-%         
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-%         
-%         % only use stimuli from particular families
-%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.practice.familyNames;
-%         
-%         % every stimulus is in both the same and the different condition.
-%         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice;
-%         % rmStims_orig is false because all stimuli are used in both "same"
-%         % and "diff" conditions
-%         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
-%         
-%         % % number per species per family (half because each stimulus is only in
-%         % % same or different condition)
-%         % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice / 2;
-%         % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice / 2;
-%         % % rmStims_orig is true because half of stimuli are in "same" cond and
-%         % % half are in "diff"
-%         % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
-%         
-%         % rmStims_pair is true because pairs are removed after they're added
-%         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
-%         
-%         % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
-%         % if rmStims_orig=false). nSpecies = (nSame + nDiff) in practice.
-%         
-%         % minimum number of trials needed between exact repeats of a given
-%         % stimulus as stim2
-%         cfg.stim.(sesName).(phaseName)(phaseCount).stim2MinRepeatSpacing = 0;
-%         % whether to have "same" and "diff" text with the response prompt
-%         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
-%         
-%         % durations, in seconds
-%         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 0.8;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 0.8;
-%         % random intervals are generated on the fly
-%         cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim1 = [0.5 0.7];
-%         cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim2 = [1.0 1.2];
-%         cfg.stim.(sesName).(phaseName)(phaseCount).match_response = 2.0;
-%         
-%         % do we want to play feedback beeps?
-%         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-%         
-%         % instructions
-%         %[cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
-%         %  fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_1.txt',expParam.expName)),...
-%         %  {'contKey'}, {cfg.keys.instructContKey});
-%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
-%           fullfile(cfg.files.instructDir,sprintf('%s_match_1_practice_intro.txt',expParam.expName)),...
-%           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
-%         % whether to ask the participant if they have any questions; only
-%         % continues with experimenter's secret key
-%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
-%         
-%         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-%         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-%         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
-%       end
-%     end
-      
-      
+    
+    %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     % Matching - practice
+    %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     phaseName = 'prac_match';
+    %
+    %     if ismember(phaseName,expParam.session.(sesName).phases)
+    %       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+    %
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+    %
+    %         % only use stimuli from particular families
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.practice.familyNames;
+    %
+    %         % every stimulus is in both the same and the different condition.
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice;
+    %         % rmStims_orig is false because all stimuli are used in both "same"
+    %         % and "diff" conditions
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
+    %
+    %         % % number per species per family (half because each stimulus is only in
+    %         % % same or different condition)
+    %         % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice / 2;
+    %         % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.practice.nPractice / 2;
+    %         % % rmStims_orig is true because half of stimuli are in "same" cond and
+    %         % % half are in "diff"
+    %         % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+    %
+    %         % rmStims_pair is true because pairs are removed after they're added
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
+    %
+    %         % nTrials = (nSame + nDiff) * nSpecies * nFamilies (and multiply by 2
+    %         % if rmStims_orig=false). nSpecies = (nSame + nDiff) in practice.
+    %
+    %         % minimum number of trials needed between exact repeats of a given
+    %         % stimulus as stim2
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).stim2MinRepeatSpacing = 0;
+    %         % whether to have "same" and "diff" text with the response prompt
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
+    %
+    %         % durations, in seconds
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 0.8;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 0.8;
+    %         % random intervals are generated on the fly
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim1 = [0.5 0.7];
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim2 = [1.0 1.2];
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).match_response = 2.0;
+    %
+    %         % do we want to play feedback beeps?
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+    %
+    %         % instructions
+    %         %[cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
+    %         %  fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_1.txt',expParam.expName)),...
+    %         %  {'contKey'}, {cfg.keys.instructContKey});
+    %         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
+    %           fullfile(cfg.files.instructDir,sprintf('%s_match_1_practice_intro.txt',expParam.expName)),...
+    %           {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+    %         % whether to ask the participant if they have any questions; only
+    %         % continues with experimenter's secret key
+    %         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
+    %
+    %         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+    %         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+    %         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+    %       end
+    %     end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -871,9 +802,9 @@ if expParam.sessionNum == 1
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 180;
-        end
+        % only used if running Net Station, but need to set unconditionally
+        % because session 1 doesn't use NS
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 180;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
@@ -902,16 +833,16 @@ if expParam.sessionNum == 1
       end
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Comparison task
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'compare';
-    
-    if ismember(phaseName,expParam.session.(sesName).phases)
-      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        
-      end
-    end
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % Comparison task
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     phaseName = 'compare';
+%     
+%     if ismember(phaseName,expParam.session.(sesName).phases)
+%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+%         
+%       end
+%     end
     
   end % ismember
   
@@ -1074,7 +1005,6 @@ if expParam.sessionNum == 1
             trainedSpecies([3]),...
             trainedSpecies([4]),...
             trainedSpecies([5])};
-
           
           % Number of exemplars to show for each species
           cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
@@ -1110,9 +1040,9 @@ if expParam.sessionNum == 1
         % maximum number of repeated exemplars from each family in naming
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
         
-        %if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
-        %end
+        % only used if running Net Station, but need to set unconditionally
+        % because session 1 doesn't use NS
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
@@ -1238,32 +1168,32 @@ if expParam.sessionNum == 1
             
             % select trainedSpecies by indexing into trainedSpecies for
             % blockSpeciesOrder
-          cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-            trainedSpecies([1]),...
-            trainedSpecies([2]),...
-            trainedSpecies([3]),...
-            trainedSpecies([4]),...
-            trainedSpecies([5]),...
-            trainedSpecies([1:2]),...
-            trainedSpecies([3:4]),...
-            trainedSpecies([5,1]),...
-            trainedSpecies([2:3]),...
-            trainedSpecies([4:5]),...
-            trainedSpecies([1:3]),...
-            trainedSpecies([4,5,1]),...
-            trainedSpecies([2,3,4]),...
-            trainedSpecies([5,1,2]),...
-            trainedSpecies([3:5]),...
-            trainedSpecies([1:4]),...
-            trainedSpecies([5,1,2,3]),...
-            trainedSpecies([4,5,1,2]),...
-            trainedSpecies([3,4,5,1]),...
-            trainedSpecies([2:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5])};
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+              trainedSpecies([1]),...
+              trainedSpecies([2]),...
+              trainedSpecies([3]),...
+              trainedSpecies([4]),...
+              trainedSpecies([5]),...
+              trainedSpecies([1:2]),...
+              trainedSpecies([3:4]),...
+              trainedSpecies([5,1]),...
+              trainedSpecies([2:3]),...
+              trainedSpecies([4:5]),...
+              trainedSpecies([1:3]),...
+              trainedSpecies([4,5,1]),...
+              trainedSpecies([2,3,4]),...
+              trainedSpecies([5,1,2]),...
+              trainedSpecies([3:5]),...
+              trainedSpecies([1:4]),...
+              trainedSpecies([5,1,2,3]),...
+              trainedSpecies([4,5,1,2]),...
+              trainedSpecies([3,4,5,1]),...
+              trainedSpecies([2:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5])};
             
             % hard coded stimulus indices for naming training block presentations
             % (counterbalanced). Blocks are denoted by cells. The vectors within each
@@ -1283,32 +1213,32 @@ if expParam.sessionNum == 1
             
             % select trainedSpecies by indexing into trainedSpecies for
             % blockSpeciesOrder
-          cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:5]),...
-            trainedSpecies([1:4]),...
-            trainedSpecies([5,1,2,3]),...
-            trainedSpecies([4,5,1,2]),...
-            trainedSpecies([3,4,5,1]),...
-            trainedSpecies([2:5]),...
-            trainedSpecies([1:3]),...
-            trainedSpecies([4,5,1]),...
-            trainedSpecies([2,3,4]),...
-            trainedSpecies([5,1,2]),...
-            trainedSpecies([3:5]),...
-            trainedSpecies([1:2]),...
-            trainedSpecies([3:4]),...
-            trainedSpecies([5,1]),...
-            trainedSpecies([2:3]),...
-            trainedSpecies([4:5]),...
-            trainedSpecies([1]),...
-            trainedSpecies([2]),...
-            trainedSpecies([3]),...
-            trainedSpecies([4]),...
-            trainedSpecies([5])};
+            cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = {...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:5]),...
+              trainedSpecies([1:4]),...
+              trainedSpecies([5,1,2,3]),...
+              trainedSpecies([4,5,1,2]),...
+              trainedSpecies([3,4,5,1]),...
+              trainedSpecies([2:5]),...
+              trainedSpecies([1:3]),...
+              trainedSpecies([4,5,1]),...
+              trainedSpecies([2,3,4]),...
+              trainedSpecies([5,1,2]),...
+              trainedSpecies([3:5]),...
+              trainedSpecies([1:2]),...
+              trainedSpecies([3:4]),...
+              trainedSpecies([5,1]),...
+              trainedSpecies([2:3]),...
+              trainedSpecies([4:5]),...
+              trainedSpecies([1]),...
+              trainedSpecies([2]),...
+              trainedSpecies([3]),...
+              trainedSpecies([4]),...
+              trainedSpecies([5])};
             
             % Number of exemplars to show for each species
             cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
@@ -1340,7 +1270,6 @@ if expParam.sessionNum == 1
               cfg.stim.(sesName).(phaseName)(phaseCount).nameIndices{i} = repmat({1:6},size(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder{i}));
             end
           end
-          
           
           % hard coded order of which species are presented in each block
           % (counterbalanced). Blocks are denoted by vectors.
@@ -1433,9 +1362,9 @@ if expParam.sessionNum == 1
           % maximum number of repeated exemplars from each family in naming
           cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
           
-          %if expParam.useNS
-            cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
-          %end
+          % only used if running Net Station, but need to set unconditionally
+          % because session 1 doesn't use NS
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
           
           % durations, in seconds
           cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
@@ -1569,7 +1498,7 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12 
+        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
@@ -1644,9 +1573,7 @@ if expParam.sessionNum == 1
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
-        %if expParam.useNS
-        %  cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-        %end
+        %cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
@@ -1741,9 +1668,9 @@ if expParam.sessionNum == 1
         % whether to have "same" and "diff" text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).matchTextPrompt = matchTextPrompt;
         
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
-        end
+        % only used if running Net Station, but need to set unconditionally
+        % because session 1 doesn't use NS
+        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 240;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
@@ -1772,16 +1699,16 @@ if expParam.sessionNum == 1
       end
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Comparison task
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'compare';
-    
-    if ismember(phaseName,expParam.session.(sesName).phases)
-      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        
-      end
-    end
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % Comparison task
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     phaseName = 'compare';
+%     
+%     if ismember(phaseName,expParam.session.(sesName).phases)
+%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+%         
+%       end
+%     end
     
   end % ismember
   
