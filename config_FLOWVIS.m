@@ -167,7 +167,7 @@ if expParam.sessionNum == 1
   
   % family names correspond to the directories in which stimuli reside;
   % includes manipulations
-  cfg.stim.familyNames = {'VStreet'};
+  cfg.stim.familyNames = {'VStreet_'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 2;
@@ -234,7 +234,7 @@ if expParam.sessionNum == 1
     
     if cfg.stim.useSeparatePracStims
       cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Practice');
-      cfg.stim.practice.familyNames = {'Perching_'};
+      cfg.stim.practice.familyNames = {'Phase_'};
       cfg.stim.practice.nSpecies = 1;
       
       % basic/subordinate families
@@ -469,7 +469,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_'};
+        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Phase_'};
         
         % maximum number of repeated exemplars from each family in naming 
         % Since FLOWVIS is all one family, no max exemplars from one family
@@ -533,11 +533,11 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        if phaseCount == 1
-          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_', 'Wading_'};
-        elseif phaseCount > 1
-          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_g_', 'Perching_g_hi8_', 'Perching_g_lo8_', 'Perching_color_', 'Wading_g_', 'Wading_g_hi8_', 'Wading_g_lo8_', 'Wading_color_'};
-        end
+        %if phaseCount == 1
+          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Phase_'};
+       %elseif phaseCount > 1
+       %   cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Perching_g_', 'Perching_g_hi8_', 'Perching_g_lo8_', 'Perching_color_', 'Wading_g_', 'Wading_g_hi8_', 'Wading_g_lo8_', 'Wading_color_'};
+       % end
         
         % % every stimulus is in both the same and the different condition.
         % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.practice.nPractice;
