@@ -149,6 +149,23 @@ incorrect_sNumColor = uint8((rgb('Red') * 255) + 0.5);
 [~,respondFasterY] = RectCenter(cfg.screen.wRect);
 respondFasterY = respondFasterY + (cfg.screen.wRect(RectBottom) * 0.04);
 
+% read the proper response key image, if desired
+if ~isfield(phaseCfg,'respKeyWithPrompt')
+  phaseCfg.respKeyWithPrompt = false;
+end
+if phaseCfg.respKeyWithPrompt
+  if phaseCfg.isExp
+    respKeyImg = imread(cfg.files.speciesNumKeyImg);
+    respKeyImgHeight = size(respKeyImg,1) * cfg.files.speciesNumKeyImgScale;
+    respKeyImgWidth = size(respKeyImg,2) * cfg.files.speciesNumKeyImgScale;
+  else
+    respKeyImg = imread(cfg.files.practice.speciesNumKeyImg);
+    respKeyImgHeight = size(respKeyImg,1) * cfg.files.practice.speciesNumKeyImgScale;
+    respKeyImgWidth = size(respKeyImg,2) * cfg.files.practice.speciesNumKeyImgScale;
+  end
+  respKeyImg = Screen('MakeTexture',w,respKeyImg);
+end
+
 % default is to not print out trial details
 if ~isfield(cfg.text,'printTrialInfo') || isempty(cfg.text.printTrialInfo)
   cfg.text.printTrialInfo = false;
@@ -262,6 +279,13 @@ stimImgWidth = size(stimImg,2) * cfg.stim.stimScale;
 stimImgRect = [0 0 stimImgWidth stimImgHeight];
 stimImgRect = CenterRect(stimImgRect,cfg.screen.wRect);
 
+% set the response key image rectangle
+respKeyImgRect = SetRect(0, 0, respKeyImgWidth, respKeyImgHeight);
+respKeyImgRect = CenterRect(respKeyImgRect, cfg.screen.wRect);
+respKeyImgRect = AlignRect(respKeyImgRect, cfg.screen.wRect, 'bottom', 'bottom');
+% respKeyImgRect = CenterRect([0 0 respKeyImgWidth respKeyImgHeight], stimImgRect);
+% respKeyImgRect = AdjoinRect(respKeyImgRect, stimImgRect, RectBottom);
+
 % text location for error (e.g., "too fast") text
 [~,errorTextY] = RectCenter(cfg.screen.wRect);
 errorTextY = errorTextY + (stimImgHeight / 2);
@@ -272,7 +296,7 @@ sNumY = round(stimImgRect(RectBottom) + (cfg.screen.wRect(RectBottom) * 0.04));
 if runInBlocks
   theseSpecies = unique(phaseCfg.blockSpeciesOrder{b});
 else
-  theseSpecies = unique([nameStims.speciesNum]);
+  theseSpecies = unique([viewStims.speciesNum]);
 end
 nSpecies = length(theseSpecies);
 
@@ -390,9 +414,21 @@ end
 
 %% run the viewing task
 
+if isfield(cfg.keys,'s00')
+  restrictKeysStr = ', cfg.keys.s00';
+else
+  restrictKeysStr = '';
+end
+for i = 1:length(cfg.keys.speciesKeyNames)
+  % sXX, where XX is an integer, buffered with a zero if i <= 9
+  restrictKeysStr = cat(2,restrictKeysStr,sprintf(', cfg.keys.s%.2d',i));
+end
+restrictKeysStr = sprintf('[%s]',restrictKeysStr(3:end));
+
 % only check these keys
-RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
-  cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
+RestrictKeysForKbCheck(eval(restrictKeysStr));
+% RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
+%   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
 
 % start the blink break timer
 if phaseCfg.isExp && cfg.stim.secUntilBlinkBreak > 0
@@ -448,8 +484,9 @@ for i = trialNum:length(viewStims)
         WaitSecs(1.000);
         
         % only check these keys
-        RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
-          cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
+        RestrictKeysForKbCheck(eval(restrictKeysStr));
+        % RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
+        %   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
         
         % reset the blink timer
         if cfg.stim.secUntilBlinkBreak > 0
@@ -468,8 +505,9 @@ for i = trialNum:length(viewStims)
       fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'IMPEDANCE_END');
       
       % only check these keys
-      RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
-        cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
+      RestrictKeysForKbCheck(eval(restrictKeysStr));
+      % RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
+      %   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
       
       % show preparation text
       DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -522,8 +560,9 @@ for i = trialNum:length(viewStims)
     fprintf(logFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
     fprintf(phLFile,'%f\t%s\t%s\t%s\t%d\t%d\t%s\n',thisGetSecs,expParam.subject,sesName,phaseName,phaseCount,phaseCfg.isExp,'BLINK_END');
     % only check these keys
-    RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
-      cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
+    RestrictKeysForKbCheck(eval(restrictKeysStr));
+    % RestrictKeysForKbCheck([cfg.keys.s01, cfg.keys.s02, cfg.keys.s03, cfg.keys.s04, cfg.keys.s05,...
+    %   cfg.keys.s06, cfg.keys.s07, cfg.keys.s08, cfg.keys.s09, cfg.keys.s10, cfg.keys.s00]);
     
     % show preparation text
     DrawFormattedText(w, 'Get ready...', 'center', 'center', cfg.text.fixationColor, cfg.text.instructCharWidth);
@@ -642,6 +681,10 @@ for i = trialNum:length(viewStims)
   else
     DrawFormattedText(w,cfg.text.basicFamStr,'center',sNumY,initial_sNumColor, cfg.text.instructCharWidth);
   end
+  if phaseCfg.respKeyWithPrompt
+    % with the response key image
+    Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
+  end
   
   % photocell rect with stim
   if cfg.stim.photoCell
@@ -723,6 +766,10 @@ for i = trialNum:length(viewStims)
       Screen('TextSize', w, cfg.text.basicTextSize);
       %DrawFormattedText(w,cfg.text.respSymbol,'center','center',initial_sNumColor, cfg.text.instructCharWidth);
       Screen('DrawText', w, cfg.text.respSymbol, respRectX, respRectY, initial_sNumColor);
+      if phaseCfg.respKeyWithPrompt
+        % with the response key image
+        Screen('DrawTexture', w, respKeyImg, [], respKeyImgRect);
+      end
       % don't push multiple keys
       Screen('TextSize', w, cfg.text.instructTextSize);
       DrawFormattedText(w,cfg.text.multiKeyText,'center',errorTextY,cfg.text.errorTextColor, cfg.text.instructCharWidth);
