@@ -559,27 +559,27 @@ if expParam.sessionNum == 1
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
-          % % every stimulus is in both the same and the different condition.
-          % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
-          % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
-          % % rmStims_orig is false because all stimuli are used in both "same"
-          % % and "diff" conditions
-          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
-          
-          % number per species per family (half because each stimulus is only in
-          % same or different condition)
+          % number per species per family; every stimulus is in both the
+          % same and the different condition.
           cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+          % rmStims_orig is false because all stimuli are used in both "same"
+          % and "diff" conditions
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
           
+          % % number per species per family (half because each stimulus is only in
+          % % same or different condition)
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
           % % rmStims_orig is true because half of stimuli are in "same"
           % cond and % half are in "diff"
           % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
           % % this is how to force all stimuli to be both stim1 and stim2
-          % in % "same" and "diff" conds
+          % % in "same" and "diff" conds
           % cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
           
           % rmStims_pair is true because pairs are removed after they're added
@@ -766,28 +766,28 @@ if expParam.sessionNum == 1
         
         % 360 trials per phase
         
-        % % every stimulus is in both the same and the different condition.
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
-        % % rmStims_orig is false because all stimuli are used in both "same"
-        % % and "diff" conditions
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
-        
-        % number per species per family (half because each stimulus is only in
-        % same or different condition)
+        % number per species per family; every stimulus is in both the
+        % same and the different condition.
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+        % rmStims_orig is false because all stimuli are used in both "same"
+        % and "diff" conditions
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
         
-        % rmStims_orig is true because half of stimuli are in "same" cond and
-        % half are in "diff"
-        %           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+        % % number per species per family (half because each stimulus is only in
+        % % same or different condition)
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+        % % rmStims_orig is true because half of stimuli are in "same"
+        % cond and % half are in "diff"
+        % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
         
-        % this is how to force all stimuli to be both stim1 and stim2 in
-        % "same" and "diff" conds
-        %cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
+        % % this is how to force all stimuli to be both stim1 and stim2
+        % % in "same" and "diff" conds
+        % cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
         
         % rmStims_pair is true because pairs are removed after they're added
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
@@ -1015,11 +1015,20 @@ if expParam.sessionNum == 1
           % Random difficulty
         elseif expParam.difficulty == 3
           
-          % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
-          trainedSpecies_rep = repmat(trainedSpecies,1,10);
+          % hard-coded for 25 blocks
+          nBlocks = 25;
+          % the length of numberOfSpecies is the number of blocks
+          numberOfSpecies = repmat(randperm(length(trainedSpecies)),1,ceil(nBlocks / length(trainedSpecies)));
+          % randomize so the number of species doesn't repeat after
+          % length(trainedSpecies) blocks
+          nSpecIndex = randperm(nBlocks);
+          numberOfSpecies = numberOfSpecies(nSpecIndex);
           
-          % I think the length of numberOfSpecies should be the number of blocks?
-          numberOfSpecies = randperm(length(trainedSpecies));
+          % repeat the trained species numbers so we have enough species
+          % numbers to choose from; not randomized because we need to
+          % unique species in each block (i.e., can't have the same species
+          % listed twice for a block)
+          trainedSpecies_rep = repmat(trainedSpecies,1,ceil(sum(numberOfSpecies) / length(trainedSpecies)));
           
           % make sure to set up numberOfSpecies so its length is the number of blocks you want
           cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
@@ -1249,11 +1258,20 @@ if expParam.sessionNum == 1
             % Random difficulty
           elseif expParam.difficulty == 3
             
-            % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
-            trainedSpecies_rep = repmat(trainedSpecies,1,10);
+            % hard-coded for 25 blocks
+            nBlocks = 25;
+            % the length of numberOfSpecies is the number of blocks
+            numberOfSpecies = repmat(randperm(length(trainedSpecies)),1,ceil(nBlocks / length(trainedSpecies)));
+            % randomize so the number of species doesn't repeat after
+            % length(trainedSpecies) blocks
+            nSpecIndex = randperm(nBlocks);
+            numberOfSpecies = numberOfSpecies(nSpecIndex);
             
-            % I think the length of numberOfSpecies should be the number of blocks?
-            numberOfSpecies = randperm(length(trainedSpecies));
+            % repeat the trained species numbers so we have enough species
+            % numbers to choose from; not randomized because we need to
+            % unique species in each block (i.e., can't have the same species
+            % listed twice for a block)
+            trainedSpecies_rep = repmat(trainedSpecies,1,ceil(sum(numberOfSpecies) / length(trainedSpecies)));
             
             % make sure to set up numberOfSpecies so its length is the number of blocks you want
             cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
@@ -1502,28 +1520,28 @@ if expParam.sessionNum == 1
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
-          % % every stimulus is in both the same and the different condition.
-          % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
-          % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
-          % % rmStims_orig is false because all stimuli are used in both "same"
-          % % and "diff" conditions
-          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
-          
-          % number per species per family (half because each stimulus is only in
-          % same or different condition)
+          % number per species per family; every stimulus is in both the
+          % same and the different condition.
           cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+          % rmStims_orig is false because all stimuli are used in both "same"
+          % and "diff" conditions
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
           
-          % rmStims_orig is true because half of stimuli are in "same" cond and
-          % half are in "diff"
-          %           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+          % % number per species per family (half because each stimulus is only in
+          % % same or different condition)
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+          % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+          % % rmStims_orig is true because half of stimuli are in "same"
+          % cond and % half are in "diff"
+          % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
-          % this is how to force all stimuli to be both stim1 and stim2 in
-          % "same" and "diff" conds
-          %cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
+          % % this is how to force all stimuli to be both stim1 and stim2
+          % % in "same" and "diff" conds
+          % cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
           
           % rmStims_pair is true because pairs are removed after they're added
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
@@ -1632,28 +1650,28 @@ if expParam.sessionNum == 1
         
         % 360 trials per phase
         
-        % % every stimulus is in both the same and the different condition.
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
-        % % rmStims_orig is false because all stimuli are used in both "same"
-        % % and "diff" conditions
-        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
-        
-        % number per species per family (half because each stimulus is only in
-        % same or different condition)
+        % number per species per family; every stimulus is in both the
+        % same and the different condition.
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
+        % rmStims_orig is false because all stimuli are used in both "same"
+        % and "diff" conditions
+        cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
         
         cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
         
-        % rmStims_orig is true because half of stimuli are in "same" cond and
-        % half are in "diff"
-        %           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
+        % % number per species per family (half because each stimulus is only in
+        % % same or different condition)
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained / 2;
+        % cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained / 2;
+        % % rmStims_orig is true because half of stimuli are in "same"
+        % cond and % half are in "diff"
+        % cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
         
-        % this is how to force all stimuli to be both stim1 and stim2 in
-        % "same" and "diff" conds
-        %cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
+        % % this is how to force all stimuli to be both stim1 and stim2
+        % % in "same" and "diff" conds
+        % cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
         
         % rmStims_pair is true because pairs are removed after they're added
         cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = true;
