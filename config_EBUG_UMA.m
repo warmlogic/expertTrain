@@ -1015,11 +1015,20 @@ if expParam.sessionNum == 1
           % Random difficulty
         elseif expParam.difficulty == 3
           
-          % just repeating the trained species numbers so we have lots of numbers to choose from; there may be a better way
-          trainedSpecies_rep = repmat(trainedSpecies,1,10);
+          % hard-coded for 25 blocks
+          nBlocks = 25;
+          % the length of numberOfSpecies is the number of blocks
+          numberOfSpecies = repmat(randperm(length(trainedSpecies)),1,ceil(nBlocks / length(trainedSpecies)));
+          % randomize so the number of species doesn't repeat after
+          % length(trainedSpecies) blocks
+          nSpecIndex = randperm(nBlocks);
+          numberOfSpecies = numberOfSpecies(nSpecIndex);
           
-          % I think the length of numberOfSpecies should be the number of blocks?
-          numberOfSpecies = randperm(length(trainedSpecies));
+          % repeat the trained species numbers so we have enough species
+          % numbers to choose from; not randomized because we need to
+          % unique species in each block (i.e., can't have the same species
+          % listed twice for a block)
+          trainedSpecies_rep = repmat(trainedSpecies,1,ceil(sum(numberOfSpecies) / length(trainedSpecies)));
           
           % make sure to set up numberOfSpecies so its length is the number of blocks you want
           cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder = cell(1,length(numberOfSpecies));
