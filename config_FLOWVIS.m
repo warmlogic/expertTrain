@@ -64,11 +64,11 @@ expParam.sesTypes = {'pilot'};
 % set up a field for each session type
 %for test, taking out prac_match
 if expParam.isEven
-  %expParam.session.pilot.phases = {'prac_name','prac_match','match','name','match'};
-  expParam.session.pilot.phases = {'prac_name','match','name','match'};
+  expParam.session.pilot.phases = {'prac_name','prac_match','match','name','match'};
+%   expParam.session.pilot.phases = {'prac_name','match','name','match'};
 else
-  %expParam.session.pilot.phases = {'prac_match','match','view','match'};
-  expParam.session.pilot.phases = {'match','view','match'};
+  expParam.session.pilot.phases = {'prac_match','match','view','match'};
+%   expParam.session.pilot.phases = {'match','view','match'};
 end
 % expParam.session.train1.phases = {'prac_name','nametrain','name','name'};
 % expParam.session.train2.phases = {'name','name','name','name'};
@@ -133,18 +133,18 @@ if expParam.sessionNum == 1
   
   % No EEG/Net Station for FLOWVIS pilot, so this won't run
   % blink break (set to 0 if you don't want breaks)
-%   if expParam.useNS
-%     % timer in secs for when to take a blink break (only when useNS=true)
-%     cfg.stim.secUntilBlinkBreak = 45.0;
-%   else
-%     % timer in secs for when to take a blink break (only when useNS=false)
-%     cfg.stim.secUntilBlinkBreak = 90.0;
-%   end
+  if expParam.useNS
+    % timer in secs for when to take a blink break (only when useNS=true)
+    cfg.stim.secUntilBlinkBreak = 45.0;
+  else
+    % timer in secs for when to take a blink break (only when useNS=false)
+    cfg.stim.secUntilBlinkBreak = 90.0;
+  end
   
   %% Stimulus parameters
   
   % whether to present a white square during the stimulus
-  cfg.stim.photoCell = true;
+  cfg.stim.photoCell = false;
   cfg.stim.photoCellRectSize = 30;
   
   % whether to preload images; if true, could use a lot of memory
@@ -238,7 +238,7 @@ if expParam.sessionNum == 1
     if cfg.stim.useSeparatePracStims
       cfg.files.stimDir_prac = fullfile(cfg.files.imgDir,'Practice');
       cfg.stim.practice.familyNames = {'Phase_'};
-      cfg.stim.practice.nSpecies = 1;
+      cfg.stim.practice.nSpecies = 2;
       
       % basic/subordinate families
       cfg.stim.practice.famNumBasic = [];
@@ -476,7 +476,7 @@ if expParam.sessionNum == 1
         
         % maximum number of repeated exemplars from each family in naming 
         % Since FLOWVIS is all one family, no max exemplars from one family
-        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 999;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 0;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 1.0;
@@ -707,7 +707,7 @@ if expParam.sessionNum == 1
         
         % maximum number of repeated exemplars from each family in naming -
         % for FLOWVIS, set high so max is never hit
-        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 999;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 0;
         
 %         if expParam.useNS
 %           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
