@@ -724,7 +724,7 @@ if expParam.sessionNum == 1
       
       % instructions (view)  with blocking removed for FLOWVIS pilot
       [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).text] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_viewname_1_intro.txt',expParam.expName)), {'contKey'} , {cfg.keys.instructContKey});
+        fullfile(cfg.files.instructDir,sprintf('%s_view_1_intro.txt',expParam.expName)), {'contKey'} , {cfg.keys.instructContKey});
       cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).image = cfg.files.speciesNumKeyImg;
       cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).imageScale = cfg.files.speciesNumKeyImgScale;
       
