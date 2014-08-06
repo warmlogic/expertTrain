@@ -62,10 +62,13 @@ expParam.nSessions = 1;
 expParam.sesTypes = {'pilot'};
 
 % set up a field for each session type
+%for test, taking out prac_match
 if expParam.isEven
-  expParam.session.pilot.phases = {'prac_name','prac_match','match','name','match'};
+  %expParam.session.pilot.phases = {'prac_name','prac_match','match','name','match'};
+  expParam.session.pilot.phases = {'prac_name','match','name','match'};
 else
-  expParam.session.pilot.phases = {'prac_match','match','view','match'};
+  %expParam.session.pilot.phases = {'prac_match','match','view','match'};
+  expParam.session.pilot.phases = {'match','view','match'};
 end
 % expParam.session.train1.phases = {'prac_name','nametrain','name','name'};
 % expParam.session.train2.phases = {'name','name','name','name'};
@@ -473,7 +476,7 @@ if expParam.sessionNum == 1
         
         % maximum number of repeated exemplars from each family in naming 
         % Since FLOWVIS is all one family, no max exemplars from one family
-        % cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 3;
+        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 999;
         
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 1.0;
@@ -592,7 +595,7 @@ if expParam.sessionNum == 1
             fullfile(cfg.files.instructDir,sprintf('%s_match_1_practice_intro.txt',expParam.expName)),...
             {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
         elseif phaseCount > 1
-          %PILOT ONLY HAS 1 PHASE
+          %PILOT ONLY HAS 1 SESSION
           %[cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
            % fullfile(cfg.files.instructDir,sprintf('%s_match_2_practice_intro.txt',expParam.expName)),...
            % {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
@@ -702,8 +705,9 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        % maximum number of repeated exemplars from each family in naming
-        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 0;
+        % maximum number of repeated exemplars from each family in naming -
+        % for FLOWVIS, set high so max is never hit
+        cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 999;
         
 %         if expParam.useNS
 %           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 120;
