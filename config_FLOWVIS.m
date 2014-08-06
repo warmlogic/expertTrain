@@ -262,10 +262,10 @@ if expParam.sessionNum == 1
     % optional, for shoowing a response key image
     if expParam.is15
       % liquid, solid
-      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'recogTest_solidLiquid_resp_black_middle_2.jpg');
+      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_2.jpg');
     else
       % solid, liquid
-      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'recogTest_solidLiquid_resp_black_middle_1.jpg');
+      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
     end
     % scale image down (< 1) or up (> 1)
     cfg.files.practice.speciesNumKeyImgScale = 0.4;
@@ -287,10 +287,10 @@ if expParam.sessionNum == 1
   
   if expParam.is15
     % liquid, solid
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'recogTest_solidLiquid_resp_black_middle_2.jpg');
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_2.jpg');
   else
     % solid, liquid
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'recogTest_solidLiquid_resp_black_middle_1.jpg');
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
   end
   % scale image down (< 1) or up (> 1)
   cfg.files.speciesNumKeyImgScale = 0.4;
