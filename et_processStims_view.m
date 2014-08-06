@@ -3,6 +3,10 @@ function [cfg,expParam] = et_processStims_view(cfg,expParam,sesName,phaseName,ph
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
+if ~isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'viewMaxConsecFamily')
+  cfg.stim.(sesName).(phaseName)(phaseCount).viewMaxConsecFamily = 0;
+end
+
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 
 if ~isfield(phaseCfg,'familyNames')
@@ -38,7 +42,7 @@ end
 % the same family.
 fprintf('Shuffling %s naming (%d) task stimuli.\n',sesName,phaseCount);
 [expParam.session.(sesName).(phaseName)(phaseCount).viewStims] = et_shuffleStims(...
-  expParam.session.(sesName).(phaseName)(phaseCount).viewStims,'familyNum',phaseCfg.nameMaxConsecFamily);
+  expParam.session.(sesName).(phaseName)(phaseCount).viewStims,'familyNum',phaseCfg.viewMaxConsecFamily);
 
 fprintf('Done.\n');
 

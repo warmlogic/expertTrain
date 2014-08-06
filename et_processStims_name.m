@@ -3,6 +3,10 @@ function [cfg,expParam] = et_processStims_name(cfg,expParam,sesName,phaseName,ph
 
 fprintf('Configuring %s %s (%d)...\n',sesName,phaseName,phaseCount);
 
+if ~isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'nameMaxConsecFamily')
+  cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 0;
+end
+
 phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
 
 if ~isfield(phaseCfg,'familyNames')
