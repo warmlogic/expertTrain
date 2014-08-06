@@ -70,6 +70,7 @@ for s = 1:expParam.nSessions
   % multiple times
   matchCount = 0;
   nameCount = 0;
+  viewCount = 0;
   recogCount = 0;
   nametrainCount = 0;
   viewnameCount = 0;
@@ -127,6 +128,18 @@ for s = 1:expParam.nSessions
         end
         
         nTrials = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+        
+      case {'view'}
+        % Viewing task
+        viewCount = viewCount + 1;
+        phaseCount = viewCount;
+        
+        trialDur = ...
+          cfg.stim.(sesName).(phaseName)(phaseCount).view_isi + ...
+          mean(cfg.stim.(sesName).(phaseName)(phaseCount).view_preStim) + ...
+          cfg.stim.(sesName).(phaseName)(phaseCount).view_stim;
+        
+        nTrials = length(expParam.session.(sesName).(phaseName)(phaseCount).viewStims);
         
       case {'recog'}
         % Recognition (old/new) task
