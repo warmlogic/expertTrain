@@ -838,24 +838,14 @@ try
         viewCount = viewCount + 1;
         phaseCount = viewCount;
         
-        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'date')
-          expParam.session.(sesName).(phaseName)(phaseCount).view.date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'startTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
         end
-        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).view,'endTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
-        end
-        
-        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'date')
-          expParam.session.(sesName).(phaseName)(phaseCount).name.date = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
-        end
-        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'startTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).name.startTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
-        end
-        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount).name,'endTime')
-          expParam.session.(sesName).(phaseName)(phaseCount).name.endTime = cell(1,length(cfg.stim.(sesName).(phaseName)(phaseCount).blockSpeciesOrder));
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
         
         % % for each view/name block
