@@ -4,6 +4,7 @@ function [cfg] = et_saveStimList(cfg,stimDir,stimInfoStruct,shuffleSpecies,manua
 if nargin < 5
   manualSpeciesNums = [];
   if nargin < 4
+    warning('Default setting: Shuffling species numbers!');
     shuffleSpecies = true;
     if nargin < 3
       error('Not enough input arguments!');
@@ -12,7 +13,12 @@ if nargin < 5
 end
 
 if isempty(shuffleSpecies)
+  warning('Default setting: Shuffling species numbers!');
   shuffleSpecies = true;
+end
+
+if shuffleSpecies && ~isempty(manualSpeciesNums)
+  error('Cannot shuffle species numbers and define manual species numbers');
 end
 
 if ~isfield(stimInfoStruct,'yokeSpecies') || isempty(stimInfoStruct.yokeSpecies)
