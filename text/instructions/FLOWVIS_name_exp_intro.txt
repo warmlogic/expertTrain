@@ -1,8 +1,9 @@
 This is the Naming experiment.
 
-You will see two types of fluid flows.
-These two types correspond to the keys listed below.
+You will see two types of fluid flows, labeled type 1 and type 2.
 
+There are two different types of flow, although they may look very similar. You will have to look closely to see the differences. 
+These two types correspond to the keys listed below.
 
 Your job is to press the correct key for each image. If you don't know which type it is, take your best guess. You must respond quickly.
 

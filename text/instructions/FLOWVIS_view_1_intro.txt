@@ -1,9 +1,10 @@
 Viewing task
 
-You will see images of fluid flow.
+You will see two types of fluid flows, labeled 1 and 2.
+
 There are two different types of flow, although they may look very similar. You will have to look closely to see the differences. These two types correspond to the keys listed below.
 
-Your job is to learn the two types of images by pressing the correct key that corresponds to the type you see below each image.
+The image is presented with the correct type under it. Your job is to learn the two types of images by pressing the correct key that corresponds to the type you see below each image.
 
 Please place your fingers on the keys now.
 

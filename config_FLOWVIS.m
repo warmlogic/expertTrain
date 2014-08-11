@@ -39,6 +39,7 @@ incorrectVol = 0.6;
 % whether to print trial details to the command window
 cfg.text.printTrialInfo = false;
 
+
 % matching task defaults
 matchTextPrompt = true;
 
@@ -64,7 +65,7 @@ expParam.sesTypes = {'pilot'};
 % set up a field for each session type
 %for test, taking out prac_match
 if expParam.isEven
-  expParam.session.pilot.phases = {'prac_name','prac_match','match','name','match'};
+  expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
 else
   expParam.session.pilot.phases = {'prac_match','match','view','match'};
 end
@@ -259,7 +260,7 @@ if expParam.sessionNum == 1
       cfg.stim.practice.nExemplars = repmat(cfg.stim.practice.nPractice,length(cfg.stim.practice.familyNames),cfg.stim.practice.nSpecies);
     end
     
-    % optional, for shoowing a response key image
+    % optional, for showing a response key image
     if expParam.is15
       % liquid, solid
       cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_2.jpg');
@@ -268,7 +269,7 @@ if expParam.sessionNum == 1
       cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
     end
     % scale image down (< 1) or up (> 1)
-    cfg.files.practice.speciesNumKeyImgScale = 0.4;
+    cfg.files.practice.speciesNumKeyImgScale = 0.5;
   end
   
   %% Define the response keys
@@ -504,7 +505,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim2 = [1.0 1.2];
           cfg.stim.(sesName).(phaseName)(phaseCount).match_response = 2.0;
           
-          % do we want to play feedback beeps? - NO, MATCH IS OUR TESTING
+          % do we want to play feedback beeps? - NO
           cfg.stim.(sesName).(phaseName)(phaseCount).playSound = false;
           cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
           cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
@@ -634,7 +635,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
         % maximum number of repeated exemplars from each family in naming -
-        % for FLOWVIS, set high so max is never hit
+        % for FLOWVIS, set to zero, so no max consec set
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 0;
         
         %         if expParam.useNS
@@ -647,7 +648,7 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
         if expParam.isEven
-          if phaseCount == 2
+          if phaseCount == 4
             % error-driven training
             cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
           else
