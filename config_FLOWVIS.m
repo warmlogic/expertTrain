@@ -287,11 +287,11 @@ if expParam.sessionNum == 1
   end
   
   if expParam.is15
-    % liquid, solid
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_2.jpg');
+    % show keyboard image for f=2, j=1
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_2.jpg');
   else
-    % solid, liquid
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
+    % show keyboard image f=1, j=2
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_1.jpg');
   end
   % scale image down (< 1) or up (> 1)
   cfg.files.speciesNumKeyImgScale = 0.4;
@@ -433,8 +433,9 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).image = cfg.files.practice.speciesNumKeyImg;
         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.name(1).imageScale = cfg.files.practice.speciesNumKeyImgScale;
         % whether to ask the participant if they have any questions; only
-        % continues with experimenter's secret key
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
+        % continues with experimenter's secret key  WE ALREADY ASK THEM IF
+        % THEY HAVE QUESTIONS ON PRACTICE MATCH, DON'T NEED A SECOND TIME
+       % cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -459,7 +460,7 @@ if expParam.sessionNum == 1
         for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
           cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
@@ -545,7 +546,7 @@ if expParam.sessionNum == 1
         for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
           cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
