@@ -649,16 +649,16 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
         if expParam.isEven
-          if phaseCount == 4
-            % error-driven training
-            cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
-          else
             % pretest and posttest
             cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
-          end
         else
-          % pretest and posttest
-          cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
+            if phaseCount == 4
+                % error-driven training
+                cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+            else
+                % pretest and posttest
+                cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
+            end
         end
         
         % do we want to play feedback beeps? Yes for FLOWVIS - this is
