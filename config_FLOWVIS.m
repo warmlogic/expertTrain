@@ -435,7 +435,7 @@ if expParam.sessionNum == 1
         % whether to ask the participant if they have any questions; only
         % continues with experimenter's secret key  WE ALREADY ASK THEM IF
         % THEY HAVE QUESTIONS ON PRACTICE MATCH, DON'T NEED A SECOND TIME
-       % cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
+       cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
         
         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
@@ -654,7 +654,7 @@ if expParam.sessionNum == 1
         else
             if phaseCount == 4
                 % error-driven training
-                cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 1.0;
+                cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
             else
                 % pretest and posttest
                 cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
