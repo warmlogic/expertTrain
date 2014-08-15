@@ -565,7 +565,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
           % rmStims_orig is false because all stimuli are used in both "same"
           % and "diff" conditions
-          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = false;
+          cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = cfg.stim.nNewExemplars / 2;
           cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
