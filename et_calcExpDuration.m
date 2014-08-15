@@ -106,7 +106,17 @@ for s = 1:expParam.nSessions
         end
         
         % divide match trials in half because allStims contains stim1+stim2
-        nTrials = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims) / 2;
+        if isfield(cfg.stim.(sesName).(phaseName)(phaseCount),'nBlocks') && ~isempty(cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks)
+          % currently only EBUG_UMA uses blocks in match, and even then
+          % they are only using the stim setup from expertTrain to run the
+          % experiment in different software
+          nTrials = 0;
+          for b = 1:cfg.stim.(sesName).(phaseName)(phaseCount).nBlocks
+            nTrials = nTrials + length(expParam.session.(sesName).(phaseName)(phaseCount).allStims{b}) / 2;
+          end
+        else
+          nTrials = length(expParam.session.(sesName).(phaseName)(phaseCount).allStims) / 2;
+        end
         
       case {'name'}
         % Naming task
