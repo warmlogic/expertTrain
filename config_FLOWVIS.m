@@ -63,7 +63,7 @@ expParam.nSessions = 1;
 expParam.sesTypes = {'pilot'};
 
 % set up a field for each session type
-%for test, taking out prac_match
+
 if expParam.isEven
   expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
 else
@@ -287,11 +287,11 @@ if expParam.sessionNum == 1
   end
   
   if expParam.is15
-    % show keyboard image for f=2, j=1
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_2.jpg');
-  else
-    % show keyboard image f=1, j=2
+    % show keyboard image for f=1, j=2
     cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_1.jpg');
+  else
+    % show keyboard image f=2, j=1
+    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_2.jpg');
   end
   % scale image down (< 1) or up (> 1)
   cfg.files.speciesNumKeyImgScale = 0.4;
