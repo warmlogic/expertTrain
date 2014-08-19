@@ -30,6 +30,21 @@ speciesNumFieldNum = find(ismember(stim_fieldnames,'speciesNum'));
 % stimuli needed per family for all phases except recognition
 phaseFamilyStimNeeded = cfg.stim.nSpecies * (cfg.stim.nTrained + cfg.stim.nUntrained);
 
+% refillFamiliesIfEmpty is a hack for EBUG_UMA used in setting up its
+% external eye tracking match phases and is intended for use when
+% rmStims_orig=true. It stores the original families in a new field that
+% doesn't get depleted, and if et_processStims_match detects an empty
+% family field, it will fill it back up with the field of the original
+% family. It does not work for practice.
+if ~isfield(cfg.stim,'refillFamiliesIfEmpty')
+  cfg.stim.refillFamiliesIfEmpty = false;
+end
+% forceFamilyRefill is a hack to allow the pre and post-test EEG sessions
+% to get a refilled family set
+if ~isfield(cfg.stim,'forceFamilyRefill')
+  cfg.stim.forceFamilyRefill = false;
+end
+
 % are we doing a recognition phase?
 nRecogBlocks = 0;
 for s = 1:expParam.nSessions
@@ -234,6 +249,15 @@ for f = 1:length(cfg.stim.familyNames)
   [expParam.session.(sprintf('f%dUntrained',f)),stimStruct(f).fStims] = et_divvyStims(...
     stimStruct(f).fStims,[],cfg.stim.nUntrained,...
     cfg.stim.rmStims_init,cfg.stim.shuffleFirst_init,{'practice', 'trained', 'new'},{false, false, false},[],[],exemplarNums_untrained);
+  
+  % refill hacks
+  if cfg.stim.forceFamilyRefill || cfg.stim.refillFamiliesIfEmpty
+    if isfield(cfg.stim,'newSpecies')
+      expParam.session.(sprintf('f%dNew_orig',f)) = expParam.session.(sprintf('f%dNew',f));
+    end
+    expParam.session.(sprintf('f%dTrained_orig',f)) = expParam.session.(sprintf('f%dTrained',f));
+    expParam.session.(sprintf('f%dUntrained_orig',f)) = expParam.session.(sprintf('f%dUntrained',f));
+  end
   
   if cfg.stim.yokeTrainedExemplars
     if f == 1 || cfg.stim.yokeExemplars_train(f) ~= cfg.stim.yokeExemplars_train(f-1)
