@@ -80,14 +80,28 @@ else
           
           for b = 1:phaseCfg.nBlocks
             if (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill) || (cfg.stim.refillFamiliesIfEmpty && phaseCfg.refillFamiliesIfEmpty)
-              if isempty(expParam.session.(sprintf('f%dNew',f))) || (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill)
-                expParam.session.(sprintf('f%dNew',f)) = expParam.session.(sprintf('f%dNew_orig',f));
-              end
-              if isempty(expParam.session.(sprintf('f%dTrained',f))) || (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill)
-                expParam.session.(sprintf('f%dTrained',f)) = expParam.session.(sprintf('f%dTrained_orig',f));
-              end
-              if isempty(expParam.session.(sprintf('f%dUntrained',f))) || (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill)
-                expParam.session.(sprintf('f%dUntrained',f)) = expParam.session.(sprintf('f%dUntrained_orig',f));
+              if (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill) || (cfg.stim.refillFamiliesIfEmpty && phaseCfg.refillFamiliesIfEmpty)
+                if isempty(expParam.session.(sprintf('f%dNew',f)))
+                  fprintf('\t\tRan out of %s stimuli! Refilling...\n',sprintf('f%dNew',f));
+                  expParam.session.(sprintf('f%dNew',f)) = expParam.session.(sprintf('f%dNew_orig',f));
+                elseif cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill
+                  fprintf('\t\tForcing reset of %s stimuli!\n',sprintf('f%dNew',f));
+                  expParam.session.(sprintf('f%dNew',f)) = expParam.session.(sprintf('f%dNew_orig',f));
+                end
+                if isempty(expParam.session.(sprintf('f%dTrained',f)))
+                  fprintf('\t\tRan out of %s stimuli! Refilling...\n',sprintf('f%dTrained',f));
+                  expParam.session.(sprintf('f%dTrained',f)) = expParam.session.(sprintf('f%dTrained_orig',f));
+                elseif cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill
+                  fprintf('\t\tForcing reset of %s stimuli!\n',sprintf('f%dTrained',f));
+                  expParam.session.(sprintf('f%dTrained',f)) = expParam.session.(sprintf('f%dTrained_orig',f));
+                end
+                if isempty(expParam.session.(sprintf('f%dUntrained',f)))
+                  fprintf('\t\tRan out of %s stimuli! Refilling...\n',sprintf('f%dUntrained',f));
+                  expParam.session.(sprintf('f%dUntrained',f)) = expParam.session.(sprintf('f%dUntrained_orig',f));
+                elseif cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill
+                  fprintf('\t\tForcing reset of %s stimuli!\n',sprintf('f%dUntrained',f));
+                  expParam.session.(sprintf('f%dUntrained',f)) = expParam.session.(sprintf('f%dUntrained_orig',f));
+                end
               end
             end
             
@@ -154,13 +168,25 @@ else
       for f = 1:length(cfg.stim.familyNames)
         if ismember(cfg.stim.familyNames{f},phaseCfg.familyNames)
           if (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill) || (cfg.stim.refillFamiliesIfEmpty && phaseCfg.refillFamiliesIfEmpty)
-            if isempty(expParam.session.(sprintf('f%dNew',f))) || (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill)
+            if isempty(expParam.session.(sprintf('f%dNew',f)))
+              fprintf('\t\tRan out of %s stimuli! Refilling...\n',sprintf('f%dNew',f));
+              expParam.session.(sprintf('f%dNew',f)) = expParam.session.(sprintf('f%dNew_orig',f));
+            elseif cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill
+              fprintf('\t\tForcing reset of %s stimuli!\n',sprintf('f%dNew',f));
               expParam.session.(sprintf('f%dNew',f)) = expParam.session.(sprintf('f%dNew_orig',f));
             end
-            if isempty(expParam.session.(sprintf('f%dTrained',f))) || (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill)
+            if isempty(expParam.session.(sprintf('f%dTrained',f)))
+              fprintf('\t\tRan out of %s stimuli! Refilling...\n',sprintf('f%dTrained',f));
+              expParam.session.(sprintf('f%dTrained',f)) = expParam.session.(sprintf('f%dTrained_orig',f));
+            elseif cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill
+              fprintf('\t\tForcing reset of %s stimuli!\n',sprintf('f%dTrained',f));
               expParam.session.(sprintf('f%dTrained',f)) = expParam.session.(sprintf('f%dTrained_orig',f));
             end
-            if isempty(expParam.session.(sprintf('f%dUntrained',f))) || (cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill)
+            if isempty(expParam.session.(sprintf('f%dUntrained',f)))
+              fprintf('\t\tRan out of %s stimuli! Refilling...\n',sprintf('f%dUntrained',f));
+              expParam.session.(sprintf('f%dUntrained',f)) = expParam.session.(sprintf('f%dUntrained_orig',f));
+            elseif cfg.stim.forceFamilyRefill && phaseCfg.forceFamilyRefill
+              fprintf('\t\tForcing reset of %s stimuli!\n',sprintf('f%dUntrained',f));
               expParam.session.(sprintf('f%dUntrained',f)) = expParam.session.(sprintf('f%dUntrained_orig',f));
             end
           end
