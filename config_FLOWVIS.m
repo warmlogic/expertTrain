@@ -65,7 +65,8 @@ expParam.sesTypes = {'pilot'};
 % set up a field for each session type
 
 if expParam.isEven
-  expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
+  %expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
+  expParam.session.pilot.phases = {'name','match'};
 else
   expParam.session.pilot.phases = {'prac_match','match','view','match'};
 end
@@ -621,7 +622,7 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
         
@@ -648,18 +649,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-        if expParam.isEven
-            if phaseCount == 4
-                % error-driven training
-                cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
-            else
-                % pretest and posttest
-                cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
-            end
-        else
-            % pretest and posttest
-            cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 0;
-        end
+        
+        % error-driven training
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
+        
         
         % do we want to play feedback beeps? Yes for FLOWVIS - this is
         % error-driven feedback training
