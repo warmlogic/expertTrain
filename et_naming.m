@@ -190,6 +190,13 @@ if phaseCfg.playSound
   end
 end
 
+if ~isfield(phaseCfg,'correctFeedback')
+  phaseCfg.correctFeedback = '';
+end
+if ~isfield(phaseCfg,'incorrectFeedback')
+  phaseCfg.incorrectFeedback = '';
+end
+
 % are they allowed to respond while the stimulus is on the screen?
 if ~isfield(phaseCfg,'respDuringStim')
   phaseCfg.respDuringStim = true;
@@ -781,11 +788,12 @@ for i = trialNum:length(nameStims)
   if keyIsDown
     % if they hit a key while the stimulus was on the screen (the only way
     % keyIsDown==1), take the stimulus off screen, and give feedback
-    % (species number)
+    % (species number and optional string)
     
     if phaseCfg.name_feedback > 0
       
       if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
+        fb_str = phaseCfg.correctFeedback;
         sNumColor = correct_sNumColor;
         if phaseCfg.playSound
           respSound = phaseCfg.correctSound;
@@ -793,19 +801,31 @@ for i = trialNum:length(nameStims)
         end
       elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
         sNumColor = incorrect_sNumColor;
+        fb_str = phaseCfg.incorrectFeedback;
         if phaseCfg.playSound
           respSound = phaseCfg.incorrectSound;
           respVol = phaseCfg.incorrectVol;
         end
       end
-      % draw species number in the appropriate color
+      % draw species number in the appropriate color, and include string if
+      % it is set
       Screen('TextSize', w, cfg.text.basicTextSize);
       % TODO: make text rectangles
       if specNum > 0
-        DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+        if ~isempty(fb_str)
+          fb_str = sprintf('%s\n%d',fb_str,specNum);
+        else
+          fb_str = num2str(specNum);
+        end
       else
-        DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
+        if ~isempty(fb_str)
+          fb_str = sprintf('%s\n%s',fb_str,cfg.text.basicFamStr);
+        else
+          fb_str = cfg.text.basicFamStr;
+        end
       end
+      DrawFormattedText(w,fb_str,'center','center',sNumColor, cfg.text.instructCharWidth);
+      
       if cfg.stim.photoCell
         Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
       end
@@ -854,6 +874,7 @@ for i = trialNum:length(nameStims)
         if phaseCfg.name_feedback > 0
           % give immediate feedback
           if (keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 1 && all(keyCode(~cfg.keys.(sprintf('s%.2d',specNum))) == 0))
+            fb_str = phaseCfg.correctFeedback;
             sNumColor = correct_sNumColor;
             if phaseCfg.playSound
               respSound = phaseCfg.correctSound;
@@ -861,19 +882,30 @@ for i = trialNum:length(nameStims)
             end
           elseif keyCode(cfg.keys.(sprintf('s%.2d',specNum))) == 0
             sNumColor = incorrect_sNumColor;
+            fb_str = phaseCfg.incorrectFeedback;
             if phaseCfg.playSound
               respSound = phaseCfg.incorrectSound;
               respVol = phaseCfg.incorrectVol;
             end
           end
-          % draw species number in the appropriate color
+          % draw species number in the appropriate color, and include string if
+          % it is set
           Screen('TextSize', w, cfg.text.basicTextSize);
           % TODO: make text rectangles
           if specNum > 0
-            DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+            if ~isempty(fb_str)
+              fb_str = sprintf('%s\n%d',fb_str,specNum);
+            else
+              fb_str = num2str(specNum);
+            end
           else
-            DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
+            if ~isempty(fb_str)
+              fb_str = sprintf('%s\n%s',fb_str,cfg.text.basicFamStr);
+            else
+              fb_str = cfg.text.basicFamStr;
+            end
           end
+          DrawFormattedText(w,fb_str,'center','center',sNumColor, cfg.text.instructCharWidth);
           if cfg.stim.photoCell
             Screen('FillRect', w, cfg.stim.photoCellAntiRectColor, cfg.stim.photoCellRect);
           end
@@ -925,13 +957,23 @@ for i = trialNum:length(nameStims)
       
       if phaseCfg.name_feedback > 0
         sNumColor = incorrect_sNumColor;
+        fb_str = phaseCfg.incorrectFeedback;
         % TODO: make text rectangles
         Screen('TextSize', w, cfg.text.basicTextSize);
         if specNum > 0
-          DrawFormattedText(w,num2str(specNum),'center','center',sNumColor, cfg.text.instructCharWidth);
+          if ~isempty(fb_str)
+            fb_str = sprintf('%s\n%d',fb_str,specNum);
+          else
+            fb_str = num2str(specNum);
+          end
         else
-          DrawFormattedText(w,cfg.text.basicFamStr,'center','center',sNumColor, cfg.text.instructCharWidth);
+          if ~isempty(fb_str)
+            fb_str = sprintf('%s\n%s',fb_str,cfg.text.basicFamStr);
+          else
+            fb_str = cfg.text.basicFamStr;
+          end
         end
+        DrawFormattedText(w,fb_str,'center','center',sNumColor, cfg.text.instructCharWidth);
         % "need to respond faster"
         Screen('TextSize', w, cfg.text.instructTextSize);
         DrawFormattedText(w,cfg.text.respondFaster,'center',respondFasterY,cfg.text.respondFasterColor, cfg.text.instructCharWidth);
