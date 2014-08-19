@@ -405,6 +405,8 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 3.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctFeedback = 'Correct!';
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectFeedback = 'Incorrect!';
         
         % do we want to play feedback beeps?
         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
@@ -639,10 +641,10 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
         cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
-        
-        % error-driven training
+        % feedback for error-driven training
         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
-        
+        cfg.stim.(sesName).(phaseName)(phaseCount).correctFeedback = 'Correct!';
+        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectFeedback = 'Incorrect!';
         
         % do we want to play feedback beeps? Yes for FLOWVIS - this is
         % error-driven feedback training
