@@ -66,7 +66,7 @@ expParam.sesTypes = {'pilot'};
 
 if expParam.isEven
   expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
-  %expParam.session.pilot.phases = {'name','match'};
+  % expParam.session.pilot.phases = {'name','match'};
 else
   expParam.session.pilot.phases = {'prac_match','match','view','match'};
 end
@@ -453,7 +453,7 @@ if expParam.sessionNum == 1
         for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
           cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
@@ -539,7 +539,7 @@ if expParam.sessionNum == 1
         for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
           cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = false;
           
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
@@ -678,7 +678,6 @@ if expParam.sessionNum == 1
     for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
       cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
       cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-      cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
       
       cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
       cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
