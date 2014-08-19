@@ -179,8 +179,7 @@ if expParam.sessionNum == 1
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
   
   % set the stimulus directory
-  %cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
-  cfg.files.stimDir = fullfile(cfg.files.imgDir,'Army_StimDifficulty');
+  cfg.files.stimDir = fullfile(cfg.files.imgDir,'Creatures');
   
   % set the image resources directory
   cfg.files.resDir = fullfile(cfg.files.imgDir,'resources');
