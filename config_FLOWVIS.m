@@ -65,8 +65,8 @@ expParam.sesTypes = {'pilot'};
 % set up a field for each session type
 
 if expParam.isEven
-  %expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
-  expParam.session.pilot.phases = {'name','match'};
+  expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'};
+  %expParam.session.pilot.phases = {'name','match'};
 else
   expParam.session.pilot.phases = {'prac_match','match','view','match'};
 end
@@ -262,13 +262,8 @@ if expParam.sessionNum == 1
     end
     
     % optional, for showing a response key image
-    if expParam.is15
-      % liquid, solid
-      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_2.jpg');
-    else
-      % solid, liquid
-      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
-    end
+    % solid, liquid
+    cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
     % scale image down (< 1) or up (> 1)
     cfg.files.practice.speciesNumKeyImgScale = 0.5;
   end
@@ -287,13 +282,8 @@ if expParam.sessionNum == 1
     cfg.keys.(sprintf('s%.2d',i)) = KbName(cfg.keys.speciesKeyNames{i});
   end
   
-  if expParam.is15
-    % show keyboard image for f=1, j=2
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_1.jpg');
-  else
-    % show keyboard image f=2, j=1
-    cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_2.jpg');
-  end
+  % show keyboard image for f=1, j=2
+  cfg.files.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_FLOWVIS_black_middle_1.jpg');
   % scale image down (< 1) or up (> 1)
   cfg.files.speciesNumKeyImgScale = 0.4;
   
