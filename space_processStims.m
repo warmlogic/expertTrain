@@ -166,11 +166,13 @@ for s = 1:expParam.nSessions
   msCount = 0;
   distCount = 0;
   crCount = 0;
+  croCount = 0;
   
   prac_expoCount = 0;
   prac_msCount = 0;
   prac_distCount = 0;
   prac_crCount = 0;
+  prac_croCount = 0;
   
   % for each phase in this session, run the appropriate config function
   for p = 1:length(expParam.session.(sesName).phases)
@@ -294,6 +296,42 @@ for s = 1:expParam.nSessions
             [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct,'multistudy');
           else
             [cfg,expParam,imgStimStruct_prac,wordStimStruct_prac] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct_prac,wordStimStruct_prac,'prac_multistudy');
+          end
+        end
+        
+      case {'cued_recall_only','prac_cued_recall_only'}
+        if strcmp(phaseName,'cued_recall_only')
+          croCount = croCount + 1;
+          phaseCount = croCount;
+        elseif strcmp(phaseName,'prac_cued_recall_only')
+          prac_croCount = prac_croCount + 1;
+          phaseCount = prac_croCount;
+        end
+        phaseCfg = cfg.stim.(sesName).(phaseName)(phaseCount);
+        
+        if isfield(phaseCfg,'usePrevPhase') && ~isempty(phaseCfg.usePrevPhase)
+          expParam.session.(sesName).(phaseName)(phaseCount) = expParam.session.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          if isfield(phaseCfg,'reshuffleStims') && phaseCfg.reshuffleStims
+            % shuffle the pairs, keeping them together...
+            randind = randperm(length(expParam.session.(sesName).(phaseName)(phaseCount).testStims_img));
+            expParam.session.(sesName).(phaseName)(phaseCount).testStims_img = expParam.session.(sesName).(phaseName)(phaseCount).testStims_img(randind);
+            expParam.session.(sesName).(phaseName)(phaseCount).testStims_word = expParam.session.(sesName).(phaseName)(phaseCount).testStims_word(randind);
+            % and add a new pair number so they're in a different order
+            for i = 1:length(expParam.session.(sesName).(phaseName)(phaseCount).testStims_img)
+              expParam.session.(sesName).(phaseName)(phaseCount).testStims_img(i).pairNum = i;
+              expParam.session.(sesName).(phaseName)(phaseCount).testStims_word(i).pairNum = i;
+            end
+          end
+          if phaseCount == 1
+            cfg.stim.(sesName).(phaseName) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          elseif phaseCount > 1
+            cfg.stim.(sesName).(phaseName)(phaseCount) = cfg.stim.(phaseCfg.usePrevPhase{1}).(phaseCfg.usePrevPhase{2})(phaseCfg.usePrevPhase{3});
+          end
+        else
+          if phaseCfg.isExp
+            [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_test_cro(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct,'multistudy');
+          else
+            [cfg,expParam,imgStimStruct_prac,wordStimStruct_prac] = space_processStims_test_cro(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct_prac,wordStimStruct_prac,'prac_multistudy');
           end
         end
         

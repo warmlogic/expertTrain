@@ -13,7 +13,8 @@ function expertTrain(expName,subNum,useNS,photoCellTest)
 %  - Exposure with ratings (space_exposure)
 %  - Pair associate studying (space_multistudy)
 %  - Math distractor (space_distract_math)
-%  - Cued recall with typing (space_cued_recall)
+%  - Recognition and cued recall with typing (space_cued_recall)
+%  - Cued recall with typing (space_cued_recall_only)
 %
 % Input:
 %  expName:       the name of the experiment (as a string). You must set up
@@ -648,11 +649,13 @@ try
   msCount = 0;
   distCount = 0;
   crCount = 0;
+  croCount = 0;
   
   prac_expoCount = 0;
   prac_msCount = 0;
   prac_distCount = 0;
   prac_crCount = 0;
+  prac_croCount = 0;
   
   % for each phase in this session, run the correct function
   for p = 1:length(expParam.session.(sesName).phases)
@@ -1109,6 +1112,39 @@ try
         
         if ~phaseIsComplete
           [cfg,expParam] = space_cued_recall(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
+        end
+        
+      case {'cued_recall_only','prac_cued_recall_only'}
+        % Spacing cued recall task
+        if strcmp(phaseName,'cued_recall_only')
+          croCount = croCount + 1;
+          phaseCount = croCount;
+        elseif strcmp(phaseName,'prac_cued_recall_only')
+          prac_croCount = prac_croCount + 1;
+          phaseCount = prac_croCount;
+        end
+        
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'date')
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'startTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+        end
+        if ~isfield(expParam.session.(sesName).(phaseName)(phaseCount),'endTime')
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+        end
+        
+        phaseIsComplete = false;
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_cro_%d.mat',sesName,phaseName,phaseCount));
+        if exist(phaseProgressFile,'file')
+          load(phaseProgressFile);
+          if exist('phaseComplete','var') && phaseComplete
+            phaseIsComplete = true;
+          end
+        end
+        
+        if ~phaseIsComplete
+          [cfg,expParam] = space_cued_recall_only(w,cfg,expParam,logFile,sesName,phaseName,phaseCount);
         end
         
       otherwise
