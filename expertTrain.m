@@ -1099,7 +1099,7 @@ try
         end
         
         phaseIsComplete = false;
-        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_cuedRecall_%d.mat',sesName,phaseName,phaseCount));
+        phaseProgressFile = fullfile(cfg.files.sesSaveDir,sprintf('phaseProgress_%s_%s_cr_%d.mat',sesName,phaseName,phaseCount));
         if exist(phaseProgressFile,'file')
           load(phaseProgressFile);
           if exist('phaseComplete','var') && phaseComplete
