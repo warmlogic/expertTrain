@@ -329,9 +329,9 @@ for s = 1:expParam.nSessions
           end
         else
           if phaseCfg.isExp
-            [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_test_cro(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct,'multistudy');
+            [cfg,expParam,imgStimStruct,wordStimStruct] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct,wordStimStruct,'multistudy');
           else
-            [cfg,expParam,imgStimStruct_prac,wordStimStruct_prac] = space_processStims_test_cro(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct_prac,wordStimStruct_prac,'prac_multistudy');
+            [cfg,expParam,imgStimStruct_prac,wordStimStruct_prac] = space_processStims_test(cfg,expParam,sesName,phaseName,phaseCount,imgStimStruct_prac,wordStimStruct_prac,'prac_multistudy');
           end
         end
         
