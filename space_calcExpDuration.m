@@ -1,13 +1,23 @@
 % SPACE timing
 home
 
+% expName = 'SPACE';
+expName = 'SPACE2';
+
+% face/house
 nCategories = 2;
 
+% isExp = false; % prac
 isExp = true;
 
-testOnePres = false;
+if strcmp(expName,'SPACE')
+  testOnePres = false;
+elseif strcmp(expName,'SPACE2')
+  testOnePres = true;
+end
 
 useNS = true;
+% useNS = false;
 
 if ~isExp
   % practice
@@ -17,6 +27,7 @@ if ~isExp
   
   nBlocks = 1;
   
+  % number of stimuli per category (face/house)
   spaced = 2;
   massed = 2;
   onePres = 2;
@@ -39,7 +50,7 @@ elseif isExp
   end
   
   %   nBlocks = 2;
-% 
+%   % number of stimuli per category (face/house)
 %   spaced = 16;
 %   massed = 16;
 %   onePres = 16;
@@ -47,23 +58,45 @@ elseif isExp
 %   lures = 16;
 
 %   nBlocks = 3;
-% 
+%   % number of stimuli per category (face/house)
 %   spaced = 9;
 %   massed = 9;
 %   onePres = 9;
 %   buffers = 2; % start + end together
 %   lures = 9;
   
-%   nBlocks = 4; % behavioral
-  nBlocks = 6; % EEG?
-
-  spaced = 7;
-  massed = 7;
-  onePres = 7;
-  buffers = 4; % start + end together
-  lures = 7;
-  
-  nDist = 50;
+  if strcmp(expName,'SPACE')
+    %   nBlocks = 4; % behavioral
+    nBlocks = 6; % EEG
+    % number of stimuli per category (face/house)
+    spaced = 7;
+    massed = 7;
+    onePres = 7;
+    buffers = 4; % start + end together
+    lures = 7;
+    
+    nDist = 50;
+    
+  elseif strcmp(expName,'SPACE2')
+%     nBlocks = 6; % EEG
+%     % number of stimuli per category (face/house)
+%     spaced = 21;
+%     massed = 7;
+%     onePres = 7;
+%     buffers = 4; % start + end together
+%     lures = 0;
+    
+    nBlocks = 6; % EEG
+    % number of stimuli per category (face/house)
+    spaced = 18;
+    massed = 6;
+    onePres = 6;
+    buffers = 4; % start + end together
+    lures = 0;
+    
+    % math distractor
+    nDist = 45;
+  end
 end
 
 nExpoStimuli = (spaced + massed + onePres + buffers) * nCategories;
@@ -78,10 +111,19 @@ end
 
 % exposure
 
-expo_isi = 0;
-expo_preStim = mean([1.0 1.2]);
-expo_stim = 1.0;
-expo_resp = 0.75;
+if strcmp(expName,'SPACE')
+  expo_isi = 0;
+  expo_preStim = mean([1.0 1.2]);
+  expo_stim = 1.0;
+  expo_resp = 0.75;
+  
+elseif strcmp(expName,'SPACE2')
+  % no expo
+  expo_isi = 0;
+  expo_preStim = 0;
+  expo_stim = 0;
+  expo_resp = 0;
+end
 
 expo_trial = expo_isi + expo_preStim + expo_stim + expo_resp;
 expoTime = expo_trial * nStudyStimuli; 
@@ -114,7 +156,10 @@ distTime = dist_trial * nDist;
 cr_isi = 0;
 cr_preStim = mean([1.0 1.2]);
 cr_stim = 1.0;
-cr_recogResp = 1.0;
+% % SPACE
+% cr_recogResp = 1.0;
+% SPACE2
+cr_recogResp = 0;
 cr_recallResp = 5;
 
 cr_trial = cr_isi + cr_preStim + cr_stim + cr_recogResp + cr_recallResp;
