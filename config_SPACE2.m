@@ -301,7 +301,7 @@ if expParam.sessionNum == 1
 %   cfg.stim.nPairs_study_targ_onePres = 7;
 %   cfg.stim.nPairs_test_lure = 0;
   
-  % 6 lists
+  % 5 lists
   cfg.stim.nPairs_study_targ_spaced = 18;
   cfg.stim.nPairs_study_targ_massed = 6;
 %   cfg.stim.nPairs_study_targ_onePres = 14;
@@ -548,63 +548,63 @@ if expParam.sessionNum == 1
   for ses = 1:length(expParam.sesTypes)
     sesName = expParam.sesTypes{ses};
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Practice: Exposure to image stimuli
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'prac_expo';
-    
-    if ismember(phaseName,expParam.session.(sesName).phases)
-      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 2;
-        
-        % whether to have judgment keys on all the time
-        cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).showRespBtStim = true;
-        
-        % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_isi = 0.0;
-        % random intervals are generated on the fly
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_preStim = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_stim = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_response = 3.0;
-        
-        % do we want to play feedback beeps?
-        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-        
-        % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).text] = et_processTextInstruct(...
-         fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_1.txt',expParam.expName)),...
-         {'contKey'}, {cfg.keys.instructContKey});
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(2).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_expo_1_practice_intro.txt',expParam.expName)),...
-          {'expoVAText','expoSAText','expoSUText','expoVUText',....
-          'expoVAKey','expoSAKey','expoSUKey','expoVUKey','contKey'},...
-          {cfg.text.expoVA,cfg.text.expoSA,cfg.text.expoSU,cfg.text.expoVU,...
-          upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).image = cfg.files.exposureRankRespKeyImg;
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).imageScale = cfg.files.respKeyImgScale;
-        % whether to ask the participant if they have any questions; only
-        % continues with experimenter's secret key
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
-        
-        expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-        expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
-      end
-    end
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % Practice: Exposure to image stimuli
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     phaseName = 'prac_expo';
+%     
+%     if ismember(phaseName,expParam.session.(sesName).phases)
+%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+%         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+%         
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+%         
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 2;
+%         
+%         % whether to have judgment keys on all the time
+%         cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).showRespBtStim = true;
+%         
+%         % durations, in seconds
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_isi = 0.0;
+%         % random intervals are generated on the fly
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_preStim = [1.0 1.2];
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_stim = 1.0;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_response = 3.0;
+%         
+%         % do we want to play feedback beeps?
+%         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+%         
+%         % instructions
+%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).text] = et_processTextInstruct(...
+%          fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_1.txt',expParam.expName)),...
+%          {'contKey'}, {cfg.keys.instructContKey});
+%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(2).text] = et_processTextInstruct(...
+%           fullfile(cfg.files.instructDir,sprintf('%s_expo_1_practice_intro.txt',expParam.expName)),...
+%           {'expoVAText','expoSAText','expoSUText','expoVUText',....
+%           'expoVAKey','expoSAKey','expoSUKey','expoVUKey','contKey'},...
+%           {cfg.text.expoVA,cfg.text.expoSA,cfg.text.expoSU,cfg.text.expoVU,...
+%           upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).image = cfg.files.exposureRankRespKeyImg;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).imageScale = cfg.files.respKeyImgScale;
+%         % whether to ask the participant if they have any questions; only
+%         % continues with experimenter's secret key
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
+%         
+%         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+%         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+%         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+%       end
+%     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Practice: Study presentations 1 and 2
@@ -797,78 +797,78 @@ if expParam.sessionNum == 1
       end
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Exposure to image stimuli
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    phaseName = 'expo';
-    
-    if ismember(phaseName,expParam.session.(sesName).phases)
-      for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        % only do impedance breaks sometimes
-        if expParam.useNS && ismember(phaseCount, preExpoImpedance)
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
-        else
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-        end
-        cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-        
-        % blink break (set to 0 if you don't want breaks)
-        if expParam.useNS
-          % timer in secs for when to take a blink break (only when useNS=true)
-          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 45.0;
-        else
-          % timer in secs for when to take a blink break (only when useNS=false)
-          cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
-        end
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
-        
-        if expParam.useNS
-          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
-        end
-        
-        % whether to have judgment keys on all the time
-        cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).showRespBtStim = true;
-        
-        % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_isi = 0.0;
-        % random intervals are generated on the fly
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_preStim = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_stim = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).expo_response = 3.0;
-        
-        % do we want to play feedback beeps?
-        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-        
-        % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).text] = et_processTextInstruct(...
-         fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_2.txt',expParam.expName)),...
-         {'contKey'}, {cfg.keys.instructContKey});
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(2).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_expo_1_exp_intro.txt',expParam.expName)),...
-          {'expoVAText','expoSAText','expoSUText','expoVUText',....
-          'expoVAKey','expoSAKey','expoSUKey','expoVUKey','contKey'},...
-          {cfg.text.expoVA,cfg.text.expoSA,cfg.text.expoSU,cfg.text.expoVU,...
-          upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).image = cfg.files.exposureRankRespKeyImg;
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).imageScale = cfg.files.respKeyImgScale;
-        
-        expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-        expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
-      end
-    end
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     % Exposure to image stimuli
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     phaseName = 'expo';
+%     
+%     if ismember(phaseName,expParam.session.(sesName).phases)
+%       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+%         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+%         % only do impedance breaks sometimes
+%         if expParam.useNS && ismember(phaseCount, preExpoImpedance)
+%           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
+%         else
+%           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+%         end
+%         cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+%         
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+%         
+%         % blink break (set to 0 if you don't want breaks)
+%         if expParam.useNS
+%           % timer in secs for when to take a blink break (only when useNS=true)
+%           cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 45.0;
+%         else
+%           % timer in secs for when to take a blink break (only when useNS=false)
+%           cfg.stim.(sesName).(phaseName)(phaseCount).secUntilBlinkBreak = 0;
+%         end
+%         
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expoMaxConsecCategory = 3;
+%         
+%         if expParam.useNS
+%           cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nTrials = 0;
+%         end
+%         
+%         % whether to have judgment keys on all the time
+%         cfg.stim.(sesName).(phaseName)(phaseCount).showRespInBreak = true;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).showRespBtStim = true;
+%         
+%         % durations, in seconds
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_isi = 0.0;
+%         % random intervals are generated on the fly
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_preStim = [1.0 1.2];
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_stim = 1.0;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).expo_response = 3.0;
+%         
+%         % do we want to play feedback beeps?
+%         cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+%         
+%         % instructions
+%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).text] = et_processTextInstruct(...
+%          fullfile(cfg.files.instructDir,sprintf('%s_importantMessage_2.txt',expParam.expName)),...
+%          {'contKey'}, {cfg.keys.instructContKey});
+%         [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(2).text] = et_processTextInstruct(...
+%           fullfile(cfg.files.instructDir,sprintf('%s_expo_1_exp_intro.txt',expParam.expName)),...
+%           {'expoVAText','expoSAText','expoSUText','expoVUText',....
+%           'expoVAKey','expoSAKey','expoSUKey','expoVUKey','contKey'},...
+%           {cfg.text.expoVA,cfg.text.expoSA,cfg.text.expoSU,cfg.text.expoVU,...
+%           upper(KbName(cfg.keys.expoVA)),upper(KbName(cfg.keys.expoSA)),upper(KbName(cfg.keys.expoSU)),upper(KbName(cfg.keys.expoVU)),cfg.keys.instructContKey});
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).image = cfg.files.exposureRankRespKeyImg;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).instruct.expo(1).imageScale = cfg.files.respKeyImgScale;
+%         
+%         expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+%         expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+%         expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
+%       end
+%     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Study presentations 1 and 2

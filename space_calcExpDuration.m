@@ -82,6 +82,7 @@ elseif isExp
     nDist = 50;
     
   elseif strcmp(expName,'SPACE2')
+%     %nBlocks = 6; % behavioral
 %     nBlocks = 6; % EEG
 %     % number of stimuli per category (face/house)
 %     spaced = 21;
@@ -90,7 +91,7 @@ elseif isExp
 %     buffers = 4; % start + end together
 %     lures = 0;
     
-    %nBlocks = 4; % behavioral
+    %nBlocks = 5; % behavioral
     nBlocks = 5; % EEG
     % number of stimuli per category (face/house)
     spaced = 18;
