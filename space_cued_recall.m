@@ -1017,7 +1017,7 @@ for i = trialNum:length(testStims_img)
             Screen('Flip', w);
             WaitSecs(2.0);
             
-          elseif length(recallResp_all) > 4 && sum(strcmpi(recallResp_all,recallResp)) / length(recallResp_all) >= (1/3)
+          elseif phaseCfg.isExp && length(recallResp_all) > 4 && sum(strcmpi(recallResp_all,recallResp)) / length(recallResp_all) >= (1/3)
             % if they've made the same response for >= 33% of the responses
             
             %if phaseCfg.playSound
