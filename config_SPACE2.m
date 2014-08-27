@@ -51,10 +51,12 @@ studyTextPrompt = false;
 %% Experiment session information
 
 % Set the number of sessions
-expParam.nSessions = 1;
+% expParam.nSessions = 1;
+expParam.nSessions = 2;
 
-% Pre-test, training day 1, training days 1-6, post-test, post-test delayed.
-expParam.sesTypes = {'oneDay'};
+% session names
+% expParam.sesTypes = {'oneDay'};
+expParam.sesTypes = {'day1','day2'};
 
 % % % set up a field for each session type
 % expParam.session.oneDay.phases = {...
@@ -66,8 +68,24 @@ expParam.sesTypes = {'oneDay'};
 %   'expo','multistudy','distract_math','cued_recall_only',...
 %   'expo','multistudy','distract_math','cued_recall_only'};
 
+% % % set up a field for each session type
+% expParam.session.oneDay.phases = {...
+%   'prac_multistudy','prac_distract_math','prac_cued_recall_only',...
+%   'multistudy','distract_math','cued_recall_only',...
+%   'multistudy','distract_math','cued_recall_only',...
+%   'multistudy','distract_math','cued_recall_only',...
+%   'multistudy','distract_math','cued_recall_only',...
+%   'multistudy','distract_math','cued_recall_only'};
+
 % % set up a field for each session type
-expParam.session.oneDay.phases = {...
+expParam.session.day1.phases = {...
+  'prac_multistudy','prac_distract_math','prac_cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only'};
+expParam.session.day2.phases = {...
   'prac_multistudy','prac_distract_math','prac_cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
@@ -89,9 +107,12 @@ end
 % % debug
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','expo','multistudy','cued_recall_only'};
 % expParam.session.oneDay.phases = {'expo','multistudy','distract_math','cued_recall_only'};
-expParam.session.oneDay.phases = {'multistudy','distract_math','cued_recall_only'};
+% expParam.session.oneDay.phases = {'multistudy','distract_math','cued_recall_only'};
 % expParam.session.oneDay.phases = {'prac_expo','prac_multistudy','prac_distract_math','prac_cued_recall_only'};
 % expParam.session.oneDay.phases = {'prac_multistudy','prac_distract_math','prac_cued_recall_only'};
+
+% expParam.session.day1.phases = {'multistudy','distract_math','cued_recall_only'};
+% expParam.session.day2.phases = {'multistudy','distract_math','cued_recall_only'};
 
 % % debug
 % expParam.nSessions = 1;
@@ -521,9 +542,11 @@ if expParam.sessionNum == 1
   %% pretest configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  sesName = 'oneDay';
+  %sesName = 'oneDay';
   
-  if ismember(sesName,expParam.sesTypes)
+  %if ismember(sesName,expParam.sesTypes)
+  for ses = 1:length(expParam.sesTypes)
+    sesName = expParam.sesTypes{ses};
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Practice: Exposure to image stimuli
@@ -590,61 +613,68 @@ if expParam.sessionNum == 1
     
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-        
-        % whether to have judgment text with the response prompt
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
-        if cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment
-          cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
-          cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
-          cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
-          cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
+        if strcmp(sesName,'day2')
+          % do we want to use the stimuli from a previous phase? Set to an empty
+          % cell if not.
+          cfg.stim.(sesName).(phaseName)(phaseCount).usePrevPhase = {'day1','prac_multistudy',1};
+          cfg.stim.(sesName).(phaseName)(phaseCount).reshuffleStims = false;
+        else
+          cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+          
+          % whether to have judgment text with the response prompt
+          cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;
+          if cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment
+            cfg.stim.(sesName).(phaseName)(phaseCount).studyTextPrompt = studyTextPrompt;
+            cfg.stim.(sesName).(phaseName)(phaseCount).respDuringStim = true;
+            cfg.stim.(sesName).(phaseName)(phaseCount).stimWithPrompt = true;
+            cfg.stim.(sesName).(phaseName)(phaseCount).study_response = 3.0;
+          end
+          
+          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+          cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = false;
+          
+          cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
+          
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'word','image'},{'word','image'}};
+          
+          % stimulus order. 1 = simultaneous. 2 = sequential. 3 = overlap.
+          cfg.stim.(sesName).(phaseName)(phaseCount).studyPresent = studyPresent;
+          % 1: both stimuli on screen for study_stim1+study_stim2;
+          %
+          % 2: stim1 on for study_stim1, then stim2 on for study_stim2;
+          %
+          % 3: stim1 on for study_stim1, then both on for study_stim2.
+          
+          % durations, in seconds
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_isi = 0.0;
+          % random intervals are generated on the fly
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.02;
+          cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
+          
+          % do we want to play feedback beeps?
+          cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+          cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+          cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+          cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+          cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+          
+          % instructions
+          [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.study(1).text] = et_processTextInstruct(...
+            fullfile(cfg.files.instructDir,sprintf('%s_study_1_practice_intro.txt',expParam.expName)),...
+            {'contKey'},{cfg.keys.instructContKey});
+          % whether to ask the participant if they have any questions; only
+          % continues with experimenter's secret key
+          cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
+          
+          expParam.session.(sesName).(phaseName)(phaseCount).date = [];
+          expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
+          expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
         end
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-        cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = false;
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecCategory = 2;
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyMaxConsecLag = 2;
-        
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_order = {{'word','image'},{'word','image'}};
-        
-        % stimulus order. 1 = simultaneous. 2 = sequential. 3 = overlap.
-        cfg.stim.(sesName).(phaseName)(phaseCount).studyPresent = studyPresent; 
-        % 1: both stimuli on screen for study_stim1+study_stim2;
-        %
-        % 2: stim1 on for study_stim1, then stim2 on for study_stim2;
-        %
-        % 3: stim1 on for study_stim1, then both on for study_stim2.
-        
-        % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_isi = 0.0;
-        % random intervals are generated on the fly
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_preStim1 = [1.0 1.2];
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim1 = 1.0;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_bt_stim = 0.02;
-        cfg.stim.(sesName).(phaseName)(phaseCount).study_stim2 = 1.0;
-        
-        % do we want to play feedback beeps?
-        cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-        cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-        cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-        
-        % instructions
-        [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.study(1).text] = et_processTextInstruct(...
-          fullfile(cfg.files.instructDir,sprintf('%s_study_1_practice_intro.txt',expParam.expName)),...
-          {'contKey'},{cfg.keys.instructContKey});
-        % whether to ask the participant if they have any questions; only
-        % continues with experimenter's secret key
-        cfg.stim.(sesName).(phaseName)(phaseCount).instruct.questions = true;
-        
-        expParam.session.(sesName).(phaseName)(phaseCount).date = [];
-        expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
-        expParam.session.(sesName).(phaseName)(phaseCount).endTime = [];
       end
     end
     
