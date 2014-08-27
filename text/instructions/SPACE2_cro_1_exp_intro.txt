@@ -1,0 +1,7 @@
+You will now see the images that you learned earlier.
+
+When you see "recallPromptText" you should type the word that was previously paired with the image. Think about the word-image connection you formed earlier.
+Please try to spell accurately; you can use the DELETE key to fix a typo, however you will not be penalized for spelling mistakes.
+It is OK to guess, but if you really cannot remember the word, DELETE any letters you typed and press ENTER.
+
+Press "contKey" to read about the second response.

@@ -1,0 +1,7 @@
+You will now solve math problems of the form "A+B+C=", where A, B, and C are integers.
+
+When you see a math problem, please type in the answer using the keyboard and then press the ENTER key. You can use the DELETE key if you make a mistake.
+
+Please answer them as quickly and accurately as you can.
+
+Press "contKey" to continue.

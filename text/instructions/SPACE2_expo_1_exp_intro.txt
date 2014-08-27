@@ -1,0 +1,11 @@
+You will now see a series of pictures of people and living rooms.
+
+Your job is to judge how appealing each person and living room is to you. Please be honest, and try to respond quickly. Please try to use the full range of responses.
+
+Your options are "expoVAText", "expoSAText", "expoSUText", and "expoVUText".
+You will indicate your response with the keys "expoVAKey", "expoSAKey", "expoSUKey", and "expoVUKey", respectively.
+Please put your index fingers on expoSAKey and expoSUKey and your middle fingers on expoVAKey and expoVUKey now.
+
+These key assignments will be visible during the experiment as a reminder (see below), but please memorize the keys and avoid looking down at the keyboard or key assignments.
+
+Press "contKey" to continue.
