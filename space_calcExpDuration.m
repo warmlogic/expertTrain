@@ -16,8 +16,8 @@ elseif strcmp(expName,'SPACE2')
   testOnePres = true;
 end
 
-useNS = true;
-% useNS = false;
+% useNS = true;
+useNS = false;
 
 if ~isExp
   % practice
@@ -90,6 +90,7 @@ elseif isExp
 %     buffers = 4; % start + end together
 %     lures = 0;
     
+    %nBlocks = 4; % behavioral
     nBlocks = 5; % EEG
     % number of stimuli per category (face/house)
     spaced = 18;
