@@ -34,12 +34,12 @@ else
     if ismember(cfg.stim.familyNames{f},phaseCfg.familyNames)
       expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,...
         expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dTrained',f)));
-      if strcmp(expParam.expName,'FLOWVIS')
-        if ~expParam.isEven || (expParam.isEven && phaseCount ~= 2)
-          expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,...
-            expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dUntrained',f)));
-        end
-      end
+      %if strcmp(expParam.expName,'FLOWVIS')
+      %  if ~expParam.isEven || (expParam.isEven && phaseCount ~= 2)
+      %    expParam.session.(sesName).(phaseName)(phaseCount).nameStims = cat(1,...
+      %      expParam.session.(sesName).(phaseName)(phaseCount).nameStims,expParam.session.(sprintf('f%dUntrained',f)));
+      %  end
+      %end
     end
   end
 end
