@@ -263,7 +263,11 @@ if expParam.sessionNum == 1
     
     % optional, for showing a response key image
     % solid, liquid
-    cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
+    if expParam.is15
+      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_2.jpg');
+    else
+      cfg.files.practice.speciesNumKeyImg = fullfile(cfg.files.resDir,'speciesNum_solidLiquid_black_middle_1.jpg');
+    end
     % scale image down (< 1) or up (> 1)
     cfg.files.practice.speciesNumKeyImgScale = 0.5;
   end
