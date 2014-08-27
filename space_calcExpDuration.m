@@ -171,11 +171,16 @@ totalTime = expoTime + studyTime + distTime + testTime;
 
 totalExpTime = (totalTime * nBlocks) + eegSetupTime + (nImpedance * impedanceTime);
 
-fprintf('Exposure to %d images:\t%.2f minutes.\n',nExpoStimuli,(expoTime / 60));
-fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
-fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBlocks, nBlocks);
-fprintf('\t# onePres per category: %d (%d in %d blocks)\n',onePres, onePres * nBlocks, nBlocks);
-fprintf('\t# buffers (start+end) per category: %d (%d in %d blocks)\n',buffers, buffers * nBlocks, nBlocks);
+fprintf('==========================================================================\n');
+fprintf('%d image categories:\n\n',nCategories);
+if expoTime > 0
+  fprintf('Exposure to %d images:\t%.2f minutes.\n',nExpoStimuli,(expoTime / 60));
+  fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
+  fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBlocks, nBlocks);
+  fprintf('\t# onePres per category: %d (%d in %d blocks)\n',onePres, onePres * nBlocks, nBlocks);
+  fprintf('\t# buffers (start+end) per category: %d (%d in %d blocks)\n',buffers, buffers * nBlocks, nBlocks);
+  fprintf('\n');
+end
 
 fprintf('Study %d word+image pair presentations:\t%.2f minutes.\n',nStudyStimuli,(studyTime / 60));
 fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
@@ -183,8 +188,10 @@ fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBloc
 fprintf('\t# onePres per category: %d (%d in %d blocks)\n',onePres, onePres * nBlocks, nBlocks);
 fprintf('\t# buffers (start+end) per category: %d (%d in %d blocks)\n',buffers, buffers * nBlocks, nBlocks);
 
+fprintf('\n');
 fprintf('Distractor: %d math problems:\t%.2f minutes.\n',nDist,(distTime / 60));
 
+fprintf('\n');
 fprintf('Cued recall for %d images:\t%.2f minutes.\n',nTestStimuli,(testTime / 60));
 fprintf('\t# spaced per category: %d (%d in %d blocks)\n',spaced, spaced * nBlocks, nBlocks);
 fprintf('\t# massed per category: %d (%d in %d blocks)\n',massed, massed * nBlocks, nBlocks);
@@ -193,7 +200,12 @@ if testOnePres
 end
 fprintf('\t# lures per category: %d (%d in %d blocks)\n',lures, lures * nBlocks, nBlocks);
 
+fprintf('\n===\n');
 
 fprintf('\nTotal time per list: %.2f minutes\n',(totalTime / 60));
 
-fprintf('Total experiment (%d blocks): %.2f minutes\n\n',nBlocks,(totalExpTime / 60));
+fprintf('\n===\n');
+
+fprintf('\nTotal experiment (%d blocks): %.2f minutes\n\n',nBlocks,(totalExpTime / 60));
+
+fprintf('==========================================================================\n');
