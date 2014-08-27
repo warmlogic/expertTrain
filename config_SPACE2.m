@@ -66,9 +66,21 @@ expParam.sesTypes = {'oneDay'};
 %   'expo','multistudy','distract_math','cued_recall_only',...
 %   'expo','multistudy','distract_math','cued_recall_only'};
 
+% % set up a field for each session type
+expParam.session.oneDay.phases = {...
+  'prac_multistudy','prac_distract_math','prac_cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only'};
+
 if expParam.useNS
+  % 5 experiment blocks
+  preBlockImpedance = [2 4];
+  
   % 6 experiment blocks
-  preExpoImpedance = [1 3 5];
+  %preExpoImpedance = [1 3 5];
   
   % 7 experiment blocks
   %preExpoImpedance = [2 4 6];
@@ -833,7 +845,13 @@ if expParam.sessionNum == 1
     if ismember(phaseName,expParam.session.(sesName).phases)
       for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
         cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-        cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        %cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        % only do impedance breaks sometimes
+        if expParam.useNS && ismember(phaseCount, preBlockImpedance)
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = true;
+        else
+          cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+        end
         
         % whether to have judgment text with the response prompt
         cfg.stim.(sesName).(phaseName)(phaseCount).studyJudgment = studyJudgment;

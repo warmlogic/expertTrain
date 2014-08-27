@@ -42,7 +42,11 @@ elseif isExp
   if useNS
     eegSetupTime = 30 * 60;
     impedanceTime = 5 * 60;
-    nImpedance = 3;
+    if strcmp(expName,'SPACE')
+      nImpedance = 3;
+    elseif strcmp(expName,'SPACE2')
+      nImpedance = 2;
+    end
   else
     eegSetupTime = 0;
     nImpedance = 0;
@@ -86,7 +90,7 @@ elseif isExp
 %     buffers = 4; % start + end together
 %     lures = 0;
     
-    nBlocks = 6; % EEG
+    nBlocks = 5; % EEG
     % number of stimuli per category (face/house)
     spaced = 18;
     massed = 6;
