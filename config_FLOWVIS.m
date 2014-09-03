@@ -126,7 +126,7 @@ if expParam.sessionNum == 1
   cfg.stim.preloadImages = false;
   
   % the file extension for your images
-  cfg.files.stimFileExt = '.bmp';
+  cfg.files.stimFileExt = '.jpg';
   
   % scale stimlus down (< 1) or up (> 1)
   cfg.stim.stimScale = 0.75;
