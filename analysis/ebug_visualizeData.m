@@ -37,7 +37,7 @@ subjects = {
 %     'EBUG008';
 %     'EBUG009';
     'EBUG010';
-    'EBUG011';
+%     'EBUG011';
     'EBUG012';
     'EBUG016';
     'EBUG017';
@@ -48,10 +48,18 @@ subjects = {
     'EBUG025';
     'EBUG027';
     'EBUG029';
+    'EBUG030';
     'EBUG032';
-    'EBUG034';
-    'EBUG043';
+%     'EBUG034';
+%     'EBUG043';
     'EBUG045';
+    'EBUG047';
+    'EBUG051';
+    'EBUG052';
+%     'EBUG053';
+    'EBUG054';
+    'EBUG055';
+    'EBUG061';
   };
 
 saveFigs = true;
@@ -314,13 +322,13 @@ end
 
 %% recognition accuracy for pretest, posttest, posttest_delay
 
-dataMeasure = 'dp';
-dataLabel = 'd''';
-ylimits = [0 0.8];
+% dataMeasure = 'dp';
+% dataLabel = 'd''';
+% ylimits = [0 0.8];
 
-% dataMeasure = 'hr';
-% dataLabel = 'Accuracy (Hit Rate)';
-% ylimits = [0.5 1];
+dataMeasure = 'hr';
+dataLabel = 'Accuracy (Hit Rate)';
+ylimits = [0.5 1];
 
 sessions = {'pretest', 'posttest', 'posttest_delay'};
 % phases = {'recog_1'};

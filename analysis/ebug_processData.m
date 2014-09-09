@@ -21,7 +21,7 @@ if ~exist('subjects','var') || isempty(subjects)
 %       'EBUG008';
 %       'EBUG009';
     'EBUG010';
-    'EBUG011';
+%     'EBUG011';
     'EBUG012';
     'EBUG016';
     'EBUG017';
@@ -32,10 +32,18 @@ if ~exist('subjects','var') || isempty(subjects)
     'EBUG025';
     'EBUG027';
     'EBUG029';
+    'EBUG030';
     'EBUG032';
-    'EBUG034';
-    'EBUG043';
+%     'EBUG034';
+%     'EBUG043';
     'EBUG045';
+    'EBUG047';
+    'EBUG051';
+    'EBUG052';
+%     'EBUG053';
+    'EBUG054';
+    'EBUG055';
+    'EBUG061';
     };
 end
 
