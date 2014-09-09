@@ -31,17 +31,7 @@ end
 behDir = fullfile(dataroot,behDir);
 
 subjects = {
-%     'EBUG001';
-%     'EBUG002';
-%     'EBUG003';
-%     'EBUG004';
-%     'EBUG005';
-%     'EBUG006';
-%     'EBUG007';
-%     'EBUG008';
-%     'EBUG009';
     'EBUG010';
-%     'EBUG011';
     'EBUG012';
     'EBUG016';
     'EBUG017';
@@ -54,13 +44,10 @@ subjects = {
     'EBUG029';
     'EBUG030';
     'EBUG032';
-%     'EBUG034';
-%     'EBUG043';
     'EBUG045';
     'EBUG047';
     'EBUG051';
     'EBUG052';
-%     'EBUG053';
     'EBUG054';
     'EBUG055';
     'EBUG061';
