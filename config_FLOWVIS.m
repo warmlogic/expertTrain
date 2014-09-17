@@ -157,8 +157,8 @@ if expParam.sessionNum == 1
   end
   
   % Number of trained and untrained exemplars per species per family
-  cfg.stim.nTrained = 4;
-  cfg.stim.nUntrained = 4;
+  cfg.stim.nTrained = 10;
+  cfg.stim.nUntrained = 8;
   
   % yoke exemplars across species within these family groups so training
   % status is the same for all finches and for all warblers; NB this
