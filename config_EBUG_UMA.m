@@ -600,14 +600,14 @@ if expParam.sessionNum == 1
 %           cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = cfg.stim.nNewExemplars / 2;
 
           % number per species per family
-          cfg.stim.(sesName).(phaseName)(phaseCount).nSame = 1;
-          cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = 1;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSame = 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = 2;
           % rmStims_orig is true because we do not want the same stimuli in
           % "same" cond and "diff" cond
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_orig = true;
           
-          cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = 1;
-          cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = 1;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = 2;
 
           % % this is how to force all stimuli to be both stim1 and stim2
           % % in "same" and "diff" conds
@@ -1591,11 +1591,11 @@ if expParam.sessionNum == 1
           % cfg.stim.(sesName).(phaseName)(phaseCount).reuseStimsSameDiff = true;
           
           % number per species per family
-          cfg.stim.(sesName).(phaseName)(phaseCount).nSame = 1;
-          cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = 1;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSame = 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = 2;
           
-          cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = 1;
-          cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = 1;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nSameNew = 2;
+          cfg.stim.(sesName).(phaseName)(phaseCount).nDiffNew = 2;
           
           % rmStims_orig is true because we do not want the same stimuli in
           % "same" cond and "diff" cond
