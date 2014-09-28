@@ -113,7 +113,7 @@ if expParam.sessionNum == 1
     cfg.stim.secUntilBlinkBreak = 45.0;
   else
     % timer in secs for when to take a blink break (only when useNS=false)
-    cfg.stim.secUntilBlinkBreak = 90.0;
+   cfg.stim.secUntilBlinkBreak = 1800;
   end
   
   %% Stimulus parameters
@@ -129,7 +129,7 @@ if expParam.sessionNum == 1
   cfg.files.stimFileExt = '.jpg';
   
   % scale stimlus down (< 1) or up (> 1)
-  cfg.stim.stimScale = 0.75;
+  cfg.stim.stimScale = 1.00;
   
   % image directory holds the stims and resources
   cfg.files.imgDir = fullfile(cfg.files.expDir,'images');
@@ -158,7 +158,7 @@ if expParam.sessionNum == 1
   
   % Number of trained and untrained exemplars per species per family
   cfg.stim.nTrained = 10;
-  cfg.stim.nUntrained = 8;
+  cfg.stim.nUntrained = 10;
   
   % yoke exemplars across species within these family groups so training
   % status is the same for all finches and for all warblers; NB this
@@ -404,9 +404,9 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).nameMaxConsecFamily = 0;
         
         % durations, in seconds
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 2.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [1.0 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 2.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 3.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).correctFeedback = 'Correct!';
@@ -496,8 +496,8 @@ if expParam.sessionNum == 1
           
           % durations, in seconds
           cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
-          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 2.0;
-          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 2.0;
+          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 1.5;
+          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 1.5;
           % random intervals are generated on the fly
           cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim1 = [0.5 0.7];
           cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim2 = [1.0 1.2];
@@ -586,8 +586,8 @@ if expParam.sessionNum == 1
           
           % durations, in seconds
           cfg.stim.(sesName).(phaseName)(phaseCount).match_isi = 0.0;
-          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 0.8;
-          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 0.8;
+          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim1 = 1.5;
+          cfg.stim.(sesName).(phaseName)(phaseCount).match_stim2 = 1.5;
           % random intervals are generated on the fly
           cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim1 = [0.5 0.7];
           cfg.stim.(sesName).(phaseName)(phaseCount).match_preStim2 = [1.0 1.2];
@@ -643,7 +643,7 @@ if expParam.sessionNum == 1
         % durations, in seconds
         cfg.stim.(sesName).(phaseName)(phaseCount).name_isi = 0.5;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_preStim = [0.5 0.7];
-        cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 1.0;
+        cfg.stim.(sesName).(phaseName)(phaseCount).name_stim = 2.0;
         cfg.stim.(sesName).(phaseName)(phaseCount).name_response = 2.0;
         % feedback for error-driven training
         cfg.stim.(sesName).(phaseName)(phaseCount).name_feedback = 2.0;
@@ -703,7 +703,7 @@ if expParam.sessionNum == 1
       % durations, in seconds
       cfg.stim.(sesName).(phaseName)(phaseCount).view_isi = 2.0;
       cfg.stim.(sesName).(phaseName)(phaseCount).view_preStim = 0.2;
-      cfg.stim.(sesName).(phaseName)(phaseCount).view_stim = 4.0;
+      cfg.stim.(sesName).(phaseName)(phaseCount).view_stim = 2.0;
       
       % do we want to play feedback beeps?
       cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
