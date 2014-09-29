@@ -84,9 +84,11 @@ expParam.session.day1.phases = {...
   'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only'};
 expParam.session.day2.phases = {...
   'prac_multistudy','prac_distract_math','prac_cued_recall_only',...
+  'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
   'multistudy','distract_math','cued_recall_only',...
@@ -301,19 +303,19 @@ if expParam.sessionNum == 1
 %   cfg.stim.nPairs_study_targ_onePres = 7;
 %   cfg.stim.nPairs_test_lure = 0;
   
-  % 5 lists
-  cfg.stim.nPairs_study_targ_spaced = 18;
-  cfg.stim.nPairs_study_targ_massed = 6;
-%   cfg.stim.nPairs_study_targ_onePres = 14;
-  cfg.stim.nPairs_study_targ_onePres = 6;
-  cfg.stim.nPairs_test_lure = 0;
-  
-%   % 6 lists
-%   cfg.stim.nPairs_study_targ_spaced = 15;
-%   cfg.stim.nPairs_study_targ_massed = 5;
+%   % 5 lists
+%   cfg.stim.nPairs_study_targ_spaced = 18;
+%   cfg.stim.nPairs_study_targ_massed = 6;
 % %   cfg.stim.nPairs_study_targ_onePres = 14;
-%   cfg.stim.nPairs_study_targ_onePres = 5;
+%   cfg.stim.nPairs_study_targ_onePres = 6;
 %   cfg.stim.nPairs_test_lure = 0;
+  
+  % 6 lists
+  cfg.stim.nPairs_study_targ_spaced = 15;
+  cfg.stim.nPairs_study_targ_massed = 5;
+%   cfg.stim.nPairs_study_targ_onePres = 14;
+  cfg.stim.nPairs_study_targ_onePres = 5;
+  cfg.stim.nPairs_test_lure = 0;
   
   %cfg.stim.lags = [2 4 8];
   %cfg.stim.lags = [4 8];
