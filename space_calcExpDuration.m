@@ -85,9 +85,9 @@ elseif isExp
 %     %nBlocks = 6; % behavioral
 %     nBlocks = 6; % EEG
 %     % number of stimuli per category (face/house)
-%     spaced = 21;
-%     massed = 7;
-%     onePres = 7;
+%     spaced = 15;
+%     massed = 5;
+%     onePres = 5;
 %     buffers = 4; % start + end together
 %     lures = 0;
     
