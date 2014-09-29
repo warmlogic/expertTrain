@@ -308,6 +308,13 @@ if expParam.sessionNum == 1
   cfg.stim.nPairs_study_targ_onePres = 6;
   cfg.stim.nPairs_test_lure = 0;
   
+%   % 6 lists
+%   cfg.stim.nPairs_study_targ_spaced = 15;
+%   cfg.stim.nPairs_study_targ_massed = 5;
+% %   cfg.stim.nPairs_study_targ_onePres = 14;
+%   cfg.stim.nPairs_study_targ_onePres = 5;
+%   cfg.stim.nPairs_test_lure = 0;
+  
   %cfg.stim.lags = [2 4 8];
   %cfg.stim.lags = [4 8];
   %cfg.stim.lags = 8;
