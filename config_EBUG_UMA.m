@@ -54,11 +54,11 @@ end
 % Set the number of sessions
 expParam.nSessions = 10;
 
-expParam.sesTypes = {'pretest_eye','pretest_eeg','train1','train2','train3','train4','train5', 'train6','posttest_eye','posttest_eeg'};
+expParam.sesTypes = {'pretest','pretest_eeg','train1','train2','train3','train4','train5', 'train6','posttest','posttest_eeg'};
 expParam.doNotRunSes = [true false false false false false false false true false];
 
 % set up a field for each session type
-expParam.session.pretest_eye.phases = {'prac_match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
+expParam.session.pretest.phases = {'prac_match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
 expParam.session.pretest_eeg.phases = {'match'};
 expParam.session.train1.phases = {'prac_name', 'nametrain'};
 expParam.session.train2.phases = {'nametrain'};
@@ -66,7 +66,7 @@ expParam.session.train3.phases = {'nametrain'};
 expParam.session.train4.phases = {'nametrain'};
 expParam.session.train5.phases = {'nametrain'};
 expParam.session.train6.phases = {'nametrain'};
-expParam.session.posttest_eye.phases = {'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
+expParam.session.posttest.phases = {'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
 expParam.session.posttest_eeg.phases = {'match'};
 
 % refillFamiliesIfEmpty is a hack for EBUG_UMA used in setting up its
@@ -89,18 +89,18 @@ cfg.stim.forceFamilyRefill = true;
 % ================
 
 % expParam.nSessions = 1;
-% expParam.sesTypes = {'pretest_eye'};
+% expParam.sesTypes = {'pretest'};
 % expParam.doNotRunSes = true;
-% expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
+% expParam.session.pretest.phases = {'match', 'match', 'match'};
 
 % expParam.nSessions = 4;
-% expParam.sesTypes = {'pretest_eye','pretest_eeg','posttest_eye','posttest_eeg'};
+% expParam.sesTypes = {'pretest','pretest_eeg','posttest','posttest_eeg'};
 % expParam.doNotRunSes = [true false true false];
 
-% expParam.session.pretest_eye.phases = {'match', 'match', 'match'};
+% expParam.session.pretest.phases = {'match', 'match', 'match'};
 % expParam.session.pretest_eeg.phases = {'match'};
 % expParam.session.pretest_eeg.phases = {'match', 'compare'};
-% expParam.session.posttest_eye.phases = {'match', 'match', 'match'};
+% expParam.session.posttest.phases = {'match', 'match', 'match'};
 % expParam.session.posttest_eeg.phases = {'match'};
 % expParam.session.posttest_eeg.phases = {'match', 'compare'};
 
@@ -456,7 +456,7 @@ if expParam.sessionNum == 1
   %% pretest eyetracking configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  sesName = 'pretest_eye';
+  sesName = 'pretest';
   
   if ismember(sesName,expParam.sesTypes)
     
@@ -1518,7 +1518,7 @@ if expParam.sessionNum == 1
   %% Posttest configuration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  sesName = 'posttest_eye';
+  sesName = 'posttest';
   
   if ismember(sesName,expParam.sesTypes)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1892,7 +1892,7 @@ if expParam.sessionNum == 1
                 end
                 
                 % write the stimuli to file
-                fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('participant%d_%s_%s%d_b%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseName,phaseCount,b)),'w+t');
+                fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('%d_%s_%d_b%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseCount,b)),'w+t');
                 for i = 1:length(stim1)
                   file1 = stim1(i).fileName;
                   familyStr1 = stim1(i).familyStr;
@@ -1972,7 +1972,7 @@ if expParam.sessionNum == 1
               end
               
               % write the stimuli to file
-              fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('participant%d_%s_%s%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseName,phaseCount)),'w+t');
+              fid = fopen(fullfile(cfg.files.subSaveDir,sprintf('%d_%s_%d.txt',str2double(expParam.subject(end-2:end)),sesName,phaseCount)),'w+t');
               for i = 1:length(stim1)
                 file1 = stim1(i).fileName;
                 familyStr1 = stim1(i).familyStr;
