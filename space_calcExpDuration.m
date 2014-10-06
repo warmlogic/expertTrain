@@ -16,8 +16,8 @@ elseif strcmp(expName,'SPACE2')
   testOnePres = true;
 end
 
-% useNS = true;
-useNS = false;
+useNS = true;
+% useNS = false;
 
 if ~isExp
   % practice
