@@ -1,0 +1,11 @@
+This is the final Matching experiment.
+
+The fluid flows you will see are different 
+than the ones you saw in the previous tasks, 
+but can still be sorted using the same categories.
+
+Using the same categories as the previous tasks,
+press "sameKey" if the images of fluid flow are the same type and
+press "diffKey" if the images of fluid flow are different types.
+
+Press "contKey" to begin the matching task.
