@@ -66,7 +66,7 @@ expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match'
 
 %% do some error checking
 
-possible_phases = {'match','name','recog','nametrain','view','viewname','prac_match','prac_name','prac_recog'};
+possible_phases = {'match','name','view','prac_match','prac_name'};
 if length(expParam.sesTypes) ~= expParam.nSessions
   error('There should be %d sessions defined, but expParam.sesTypes contains %d sessions.',expParam.nSessions,length(expParam.sesTypes));
 end
@@ -139,11 +139,12 @@ if expParam.sessionNum == 1
   
   % family names correspond to the directories in which stimuli reside;
   % includes manipulations
-  if expParam.isEven
-      cfg.stim.familyNames = {'VStreet_'};
-  else
-      cfg.stim.familyNames = {'NotVStreet_'};
-  end
+  cfg.stim.familyNames = {'VStreet_', 'Plain_'};
+%   if expParam.isEven
+%       cfg.stim.familyNames = {'VStreet_'};
+%   else
+%       cfg.stim.familyNames = {'Plain_'};
+%   end
   
   
   % assumes that each family has the same number of species
@@ -188,10 +189,22 @@ if expParam.sessionNum == 1
   end
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
-  % NB for FLOWVIS pilot, two groups (Turb, Lam) are at the species level, in same
-  % family
+  % NB for FLOWVIS, two groups (Turb, Lam) are at the species level, in  both VStreet and Plain
+  % families
+  
+  
+%   if expParam.isEven
+%     cfg.stim.famNumBasic = [1 2];
+%     cfg.stim.famNumSubord = [];
+%   else
+%     cfg.stim.famNumBasic = [2 1];
+%     cfg.stim.famNumSubord = [];
+%   end
+    
+% used the two lines below when we only had one family  
   cfg.stim.famNumBasic = [];
   cfg.stim.famNumSubord = [1];
+
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';
   
@@ -548,17 +561,15 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
           
           % only use stimuli from particular families
-          
-          if phaseCount == 3
-              if expParam.isEven == true
-                  cfg.stim.familyNames = {'NotVStreet_'};
-              else if expParam.isEven == false
-                      cfg.stim.familyNames = {'VStreet_'};
-                  end
-                  
-              end
-          else cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
-          end
+          cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+%           if phaseCount == 3
+%               if expParam.isEven
+%                   cfg.stim.familyNames = {'Plain_'};
+%               else
+%                   cfg.stim.familyNames = {'VStreet_'};
+%               end
+%           else cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+%           end
           
           % % every stimulus is in both the same and the different condition.
           % cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
@@ -681,56 +692,56 @@ if expParam.sessionNum == 1
     end
   end
   
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Viewing - instructional phase for half of subjects
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  phaseName = 'view';
-  
-  if ismember(phaseName,expParam.session.(sesName).phases)
-    for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
-      cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
-      cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
-      
-      cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
-      cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
-      cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
-      
-      % response key image
-      cfg.stim.(sesName).(phaseName)(phaseCount).respKeyWithPrompt = true;
-      
-      % only use stimuli from particular families
-      cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
-      
-      % maximum number of repeated exemplars from each family in view
-      cfg.stim.(sesName).(phaseName)(phaseCount).viewMaxConsecFamily = 0;
-      
-      %       if expParam.useNS
-      %         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
-      %       end
-      
-      % durations, in seconds
-      cfg.stim.(sesName).(phaseName)(phaseCount).view_isi = 0.5;
-      cfg.stim.(sesName).(phaseName)(phaseCount).view_preStim = 0.2;
-      cfg.stim.(sesName).(phaseName)(phaseCount).view_stim = 2.0;
-      
-      % do we want to play feedback beeps?
-      cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
-      cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
-      cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
-      cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
-      cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
-      
-      % instructions (view)  with blocking removed for FLOWVIS pilot
-      [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).text] = et_processTextInstruct(...
-        fullfile(cfg.files.instructDir,sprintf('%s_view_1_intro.txt',expParam.expName)), {'contKey'} , {cfg.keys.instructContKey});
-      cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).image = cfg.files.speciesNumKeyImg;
-      cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).imageScale = cfg.files.speciesNumKeyImgScale;
-      
-      expParam.session.(sesName).(phaseName)(phaseCount).view.date = [];
-      expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = [];
-      expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = [];
-    end
-  end
+%   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   % Viewing - task not in use for this iteration of experiment
+%   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   phaseName = 'view';
+%   
+%   if ismember(phaseName,expParam.session.(sesName).phases)
+%     for phaseCount = 1:sum(ismember(expParam.session.(sesName).phases,phaseName))
+%       cfg.stim.(sesName).(phaseName)(phaseCount).isExp = true;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).impedanceBeforePhase = false;
+%       
+%       cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringISI = fixDuringISI;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
+%       
+%       % response key image
+%       cfg.stim.(sesName).(phaseName)(phaseCount).respKeyWithPrompt = true;
+%       
+%       % only use stimuli from particular families
+%       cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+%       
+%       % maximum number of repeated exemplars from each family in view
+%       cfg.stim.(sesName).(phaseName)(phaseCount).viewMaxConsecFamily = 0;
+%       
+%       %       if expParam.useNS
+%       %         cfg.stim.(sesName).(phaseName)(phaseCount).impedanceAfter_nBlocks = 7;
+%       %       end
+%       
+%       % durations, in seconds
+%       cfg.stim.(sesName).(phaseName)(phaseCount).view_isi = 0.5;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).view_preStim = 0.2;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).view_stim = 2.0;
+%       
+%       % do we want to play feedback beeps?
+%       cfg.stim.(sesName).(phaseName)(phaseCount).playSound = playSound;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).correctSound = correctSound;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).incorrectSound = incorrectSound;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).correctVol = correctVol;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
+%       
+%       % instructions (view)  with blocking removed for FLOWVIS pilot
+%       [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).text] = et_processTextInstruct(...
+%         fullfile(cfg.files.instructDir,sprintf('%s_view_1_intro.txt',expParam.expName)), {'contKey'} , {cfg.keys.instructContKey});
+%       cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).image = cfg.files.speciesNumKeyImg;
+%       cfg.stim.(sesName).(phaseName)(phaseCount).instruct.view(1).imageScale = cfg.files.speciesNumKeyImgScale;
+%       
+%       expParam.session.(sesName).(phaseName)(phaseCount).view.date = [];
+%       expParam.session.(sesName).(phaseName)(phaseCount).view.startTime = [];
+%       expParam.session.(sesName).(phaseName)(phaseCount).view.endTime = [];
+%     end
+%   end
   
   %% process the stimuli for the entire experiment
   
