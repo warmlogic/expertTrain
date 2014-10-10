@@ -153,6 +153,10 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2018';
     'SPACE2019';
     'SPACE2020';
+    'SPACE2021';
+    'SPACE2022';
+    'SPACE2023';
+    'SPACE2024';
     };
 end
 
