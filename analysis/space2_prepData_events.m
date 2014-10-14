@@ -239,76 +239,94 @@ for sub = 1:length(subjects)
           end
           
           if isfield(events.(sesName),sourcePhase) && isfield(events.(sesName),destPhase)
-            % set apart the correct subset of source events
-            sourceEvents = events.(sesName).(sourcePhase).data(ismember({events.(sesName).(sourcePhase).data.type},sourceStimType));
-            
-            % go through the destination events
-            for ev = 1:length(events.(sesName).(destPhase).data)
-              %keyboard
-              if events.(sesName).(destPhase).data(ev).targ
-                % find the source event
-                if strcmp(events.(sesName).(destPhase).data(ev).type,'STUDY_IMAGE')
-                  sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(ev).stimNum & ...
-                    [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(ev).catNum);
-                elseif strcmp(events.(sesName).(destPhase).data(ev).type,'STUDY_WORD')
-                  % find the image that went with this word
-                  imgInd = [events.(sesName).(destPhase).data.pairNum] == events.(sesName).(destPhase).data(ev).pairNum & ...
-                    [events.(sesName).(destPhase).data.presNum] == events.(sesName).(destPhase).data(ev).presNum & ...
-                    ismember({events.(sesName).(destPhase).data.type},'STUDY_IMAGE');
-                  if sum(imgInd) == 1
-                    sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(imgInd).stimNum & ...
-                      [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(imgInd).catNum & ...
-                      ismember(lower({sourceEvents.recall_origword}),lower(events.(sesName).(destPhase).data(ev).stimStr)));
-                    if isempty(sourceInd)
-                      % old stimuli called 'new' do not get recall_origword
-                      % assigned for some reason
+            if isfield(events.(sesName).(sourcePhase),'data') && isfield(events.(sesName).(destPhase),'data')
+              % set apart the correct subset of source events
+              sourceEvents = events.(sesName).(sourcePhase).data(ismember({events.(sesName).(sourcePhase).data.type},sourceStimType));
+              
+              % go through the destination events
+              for ev = 1:length(events.(sesName).(destPhase).data)
+                %keyboard
+                if events.(sesName).(destPhase).data(ev).targ
+                  % find the source event
+                  if strcmp(events.(sesName).(destPhase).data(ev).type,'STUDY_IMAGE')
+                    sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(ev).stimNum & ...
+                      [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(ev).catNum);
+                  elseif strcmp(events.(sesName).(destPhase).data(ev).type,'STUDY_WORD')
+                    % find the image that went with this word
+                    imgInd = [events.(sesName).(destPhase).data.pairNum] == events.(sesName).(destPhase).data(ev).pairNum & ...
+                      [events.(sesName).(destPhase).data.presNum] == events.(sesName).(destPhase).data(ev).presNum & ...
+                      ismember({events.(sesName).(destPhase).data.type},'STUDY_IMAGE');
+                    if sum(imgInd) == 1
                       sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(imgInd).stimNum & ...
-                        [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(imgInd).catNum);
-                    end
-                  else
-                    fprintf('More than one image match found!\n');
-                    keyboard
-                  end
-                  %sourceInd = find(ismember(lower({sourceEvents.recall_origword}),lower(events.(sesName).(destPhase).data(ev).stimStr)));
-                end
-                
-                % transfer information
-                if ~isempty(sourceInd)
-                  if length(sourceInd) == 1
-%                     events.(sesName).(destPhase).data(ev).cr_recog_acc = sourceEvents(sourceInd).recog_acc;
-                    if ~strcmp(sourceEvents(sourceInd).recall_resp,'NO_RESPONSE') && ~isempty(sourceEvents(sourceInd).recall_resp)
-                      events.(sesName).(destPhase).data(ev).cr_recall_resp = true;
+                        [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(imgInd).catNum & ...
+                        ismember(lower({sourceEvents.recall_origword}),lower(events.(sesName).(destPhase).data(ev).stimStr)));
+                      if isempty(sourceInd)
+                        % old stimuli called 'new' do not get recall_origword
+                        % assigned for some reason
+                        sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(imgInd).stimNum & ...
+                          [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(imgInd).catNum);
+                      end
                     else
-                      events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                      fprintf('More than one image match found!\n');
+                      keyboard
                     end
-                    events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = sourceEvents(sourceInd).recall_spellCorr;
+                    %sourceInd = find(ismember(lower({sourceEvents.recall_origword}),lower(events.(sesName).(destPhase).data(ev).stimStr)));
+                  end
+                  
+                  % transfer information
+                  if ~isempty(sourceInd)
+                    if length(sourceInd) == 1
+                      %                     events.(sesName).(destPhase).data(ev).cr_recog_acc = sourceEvents(sourceInd).recog_acc;
+                      if ~strcmp(sourceEvents(sourceInd).recall_resp,'NO_RESPONSE') && ~isempty(sourceEvents(sourceInd).recall_resp)
+                        events.(sesName).(destPhase).data(ev).cr_recall_resp = true;
+                      else
+                        events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                      end
+                      events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = sourceEvents(sourceInd).recall_spellCorr;
+                    else
+                      fprintf('Found more than one source event!\n');
+                      keyboard
+                    end
                   else
-                    fprintf('Found more than one source event!\n');
-                    keyboard
+                    % IMPORTANT: there will be no source event for single
+                    % presentation destination events (lag==-1) if single
+                    % presentation items are not tested
+                    % (cfg.stim.testOnePres=false). This should be changed if
+                    % we test single presentation items.
+                    
+                    %%%% TODO
+                    
+                    if events.(sesName).(destPhase).data(ev).lag == -1
+                      events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                      events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                      events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+                    else
+                      fprintf('Did not find the source event!\n');
+                      keyboard
+                    end
                   end
                 else
-                  % IMPORTANT: there will be no source event for single
-                  % presentation destination events (lag==-1) if single
-                  % presentation items are not tested
-                  % (cfg.stim.testOnePres=false). This should be changed if
-                  % we test single presentation items.
-                  
-                  %%%% TODO
-                  
-                  if events.(sesName).(destPhase).data(ev).lag == -1
-                    events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
-                    events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
-                    events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
-                  else
-                    fprintf('Did not find the source event!\n');
-                    keyboard
-                  end
+                  events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                  events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                  events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
                 end
-              else
-                events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
-                events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
-                events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
               end
+            elseif ~isfield(events.(sesName).(sourcePhase),'data') && isfield(events.(sesName).(destPhase),'data')
+              fprintf('data field for source phase ''%s'' does not exist (but it does for destionation phase ''%s'')!\n',sourcePhase,destPhase);
+              % did not finish this phase
+              if ~isempty(events.(sesName).(destPhase).data)
+                for ev = 1:length(events.(sesName).(destPhase).data)
+                  events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                  events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+                  events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+                end
+              end
+            elseif isfield(events.(sesName).(sourcePhase),'data') && ~isfield(events.(sesName).(destPhase),'data')
+              fprintf('data field for source phase ''%s'' exist, but it does for destionation phase ''%s''! (this is very odd)\n',sourcePhase,destPhase);
+              keyboard
+            else
+              fprintf('data fields for both source phase ''%s'' and destionation phase ''%s'' does not exist!\n',sourcePhase,destPhase);
+              keyboard
             end
           else
             fprintf('Source phase ''%s'' and/or destionation phase ''%s'' does not exist!\n',sourcePhase,destPhase);
@@ -341,7 +359,9 @@ for sub = 1:length(subjects)
               if str2double(fn{p}(end)) == 1
                 events.(sesName).(u_phases{up}).data = thisPhase;
               else
-                events.(sesName).(u_phases{up}).data = cat(1,events.(sesName).(u_phases{up}).data,thisPhase);
+                if ~isempty(thisPhase)
+                  events.(sesName).(u_phases{up}).data = cat(1,events.(sesName).(u_phases{up}).data,thisPhase);
+                end
               end
             else
               fprintf('\n');
