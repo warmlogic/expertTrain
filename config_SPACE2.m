@@ -103,13 +103,16 @@ expParam.session.day2.phases = {...
 
 if expParam.useNS
   % 5 experiment blocks
-  preBlockImpedance = [2 4];
+  %preBlockImpedance = [2 4];
   
   % 6 experiment blocks
-  %preExpoImpedance = [1 3 5];
+  %preBlockImpedance = [1 3 5];
   
   % 7 experiment blocks
-  %preExpoImpedance = [2 4 6];
+  %preBlockImpedance = [2 4 6];
+  
+  % 9 experiment blocks
+  preBlockImpedance = [1 4 7];
 end
 
 % % debug
