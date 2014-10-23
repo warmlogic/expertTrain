@@ -16,8 +16,8 @@ elseif strcmp(expName,'SPACE2')
   testOnePres = true;
 end
 
-% useNS = true;
-useNS = false;
+useNS = true;
+% useNS = false;
 
 if ~isExp
   % practice
@@ -45,7 +45,7 @@ elseif isExp
     if strcmp(expName,'SPACE')
       nImpedance = 3;
     elseif strcmp(expName,'SPACE2')
-      nImpedance = 2;
+      nImpedance = 3;
     end
   else
     eegSetupTime = 0;
@@ -82,7 +82,6 @@ elseif isExp
     nDist = 50;
     
   elseif strcmp(expName,'SPACE2')
-    %nBlocks = 5; % behavioral
     nBlocks = 9; % EEG
     % number of stimuli per category (face/house)
     spaced = 9;
@@ -91,7 +90,6 @@ elseif isExp
     buffers = 4; % start + end together
     lures = 0;
     
-%     %nBlocks = 6; % behavioral
 %     nBlocks = 7; % EEG
 %     % number of stimuli per category (face/house)
 %     spaced = 12;
@@ -100,7 +98,6 @@ elseif isExp
 %     buffers = 4; % start + end together
 %     lures = 0;
     
-%     %nBlocks = 6; % behavioral
 %     nBlocks = 6; % EEG
 %     % number of stimuli per category (face/house)
 %     spaced = 15;
@@ -109,7 +106,6 @@ elseif isExp
 %     buffers = 4; % start + end together
 %     lures = 0;
     
-%     %nBlocks = 5; % behavioral
 %     nBlocks = 5; % EEG
 %     % number of stimuli per category (face/house)
 %     spaced = 18;
