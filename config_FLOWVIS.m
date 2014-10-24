@@ -62,10 +62,10 @@ expParam.nSessions = 1;
 % practice, Pre-test, training day 1, post-test, all in one day
 expParam.sesTypes = {'pilot'};
 % set up a field for each session type
-%expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match','match'};
+expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match','match'};
 
 %% do some error checking
-expParam.session.pilot.phases = {'name'};
+% expParam.session.pilot.phases = {'name'};
 
 possible_phases = {'match','name','view','prac_match','prac_name'};
 if length(expParam.sesTypes) ~= expParam.nSessions
@@ -158,8 +158,8 @@ if expParam.sessionNum == 1
   end
   
   % Number of trained and untrained exemplars per species per family
-  cfg.stim.nTrained = 6;
-  cfg.stim.nUntrained = 6;
+  cfg.stim.nTrained = 10;
+  cfg.stim.nUntrained = 10;
   
   % yoke exemplars across species within these family groups so training
   % status is the same for all 
@@ -194,17 +194,18 @@ if expParam.sessionNum == 1
   % families
   
   
-%   if expParam.isEven
-%     cfg.stim.famNumBasic = [1 2];
-%     cfg.stim.famNumSubord = [];
-%   else
-%     cfg.stim.famNumBasic = [2 1];
-%     cfg.stim.famNumSubord = [];
-%   end
+   if expParam.isEven
+ cfg.stim.famNumBasic = [];
+  cfg.stim.famNumSubord = [1 2];
+
+   else
+     cfg.stim.famNumBasic = [];
+     cfg.stim.famNumSubord = [2 1];
+   end
     
 % used the two lines below when we only had one family  
-  cfg.stim.famNumBasic = [];
-  cfg.stim.famNumSubord = [1];
+ % cfg.stim.famNumBasic = [];
+ % cfg.stim.famNumSubord = [1];
 
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';
@@ -661,7 +662,12 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).respKeyWithPrompt = true;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+        if expParam.isEven
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'VStreet_'};
+        else
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'Plain_'};
+        end
+       %cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
         % maximum number of repeated exemplars from each family in naming -
         % for FLOWVIS, set to zero, so no max consec set
