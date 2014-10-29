@@ -65,7 +65,7 @@ expParam.sesTypes = {'pilot'};
 expParam.session.pilot.phases = {'prac_match','prac_name','match','name','match','match'};
 
 %% do some error checking
-% expParam.session.pilot.phases = {'name'};
+% expParam.session.pilot.phases = {'match', 'match', 'match'};
 
 possible_phases = {'match','name','view','prac_match','prac_name'};
 if length(expParam.sesTypes) ~= expParam.nSessions
@@ -633,9 +633,17 @@ if expParam.sessionNum == 1
               cfg.stim.(sesName).(phaseName)(phaseCount).incorrectVol = incorrectVol;
               
               % instructions
-              [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
-                  fullfile(cfg.files.instructDir,sprintf('%s_match_exp_intro.txt',expParam.expName)),...
-                  {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+              
+              if phaseCount == 3
+                  [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
+                      fullfile(cfg.files.instructDir,sprintf('%s_match_3_exp_intro.txt',expParam.expName)),...
+                      {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+              elseif phaseCount ~= 3
+                  [cfg.stim.(sesName).(phaseName)(phaseCount).instruct.match(1).text] = et_processTextInstruct(...
+                      fullfile(cfg.files.instructDir,sprintf('%s_match_exp_intro.txt',expParam.expName)),...
+                      {'sameKey','diffKey','contKey'},{KbName(cfg.keys.matchSame),KbName(cfg.keys.matchDiff),cfg.keys.instructContKey});
+              end
+              
               
               expParam.session.(sesName).(phaseName)(phaseCount).date = [];
               expParam.session.(sesName).(phaseName)(phaseCount).startTime = [];
