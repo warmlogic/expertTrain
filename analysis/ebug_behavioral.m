@@ -45,7 +45,7 @@ subjects = {
     'EBUG030';
     'EBUG032';
     'EBUG045';
-    'EBUG047';
+%     'EBUG047';
     'EBUG051';
     'EBUG052';
     'EBUG054';
