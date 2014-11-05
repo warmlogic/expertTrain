@@ -261,17 +261,26 @@ for f = 1:length(cfg.stim.familyNames)
   
   if cfg.stim.yokeTrainedExemplars
     if f == 1 || cfg.stim.yokeExemplars_train(f) ~= cfg.stim.yokeExemplars_train(f-1)
+      % only select the species that aren't in newSpecies; this only
+      % matters for some experiments like EBUG_UMA
+      if isfield(cfg.stim,'newSpecies')
+        speciesNums = setdiff(1:cfg.stim.nSpecies,cfg.stim.newSpecies);
+      else
+        speciesNums = 1:cfg.stim.nSpecies;
+      end
+      
       % set up a matrix of one row per species in the first family denoting
       % the exemplar numbers
-      exemplarNums_trained = nan(cfg.stim.nSpecies,cfg.stim.nTrained);
-      exemplarNums_untrained = nan(cfg.stim.nSpecies,cfg.stim.nUntrained);
+      exemplarNums_trained = nan(length(speciesNums),cfg.stim.nTrained);
+      exemplarNums_untrained = nan(length(speciesNums),cfg.stim.nUntrained);
       
       % if this is the first family, or we need a new grouping, get the
       % species numbers that were chosen so we can apply them to the other
       % families in this grouping
-      for s = 1:cfg.stim.nSpecies
-        theseTrained = expParam.session.(sprintf('f%dTrained',f))([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == s);
-        theseUntrained = expParam.session.(sprintf('f%dUntrained',f))([expParam.session.(sprintf('f%dUntrained',f)).speciesNum] == s);
+      
+      for s = 1:length(speciesNums)
+        theseTrained = expParam.session.(sprintf('f%dTrained',f))([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesNums(s));
+        theseUntrained = expParam.session.(sprintf('f%dUntrained',f))([expParam.session.(sprintf('f%dUntrained',f)).speciesNum] == speciesNums(s));
         
         exemplarNums_trained(s,:) = unique([theseTrained.exemplarNum]);
         exemplarNums_untrained(s,:) = unique([theseUntrained.exemplarNum]);
