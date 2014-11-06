@@ -20,11 +20,11 @@ function space2_prepData_events(subjects)
 
 expName = 'SPACE2';
 
-% behDataFolder = 'Behavioral';
-beh_dir = 'behavioral_pilot';
+% beh_dir = 'behavioral_pilot';
+beh_dir = 'Behavioral';
 
-serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,beh_dir,'Sessions');
-serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,beh_dir,'Sessions');
+% serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,beh_dir,'Sessions');
+% serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,beh_dir,'Sessions');
 localDir = fullfile(getenv('HOME'),'data',expName,beh_dir,'Sessions');
 if exist('serverDir','var') && exist(serverDir,'dir')
   dataroot = serverDir;
@@ -47,37 +47,55 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2006';
     'SPACE2007';
     'SPACE2008';
-    'SPACE2009';
-    'SPACE2010';
-    'SPACE2011';
-    'SPACE2012';
-    'SPACE2013';
-    'SPACE2014';
-    'SPACE2015';
-    'SPACE2016';
-    'SPACE2017';
-    'SPACE2018';
-    'SPACE2019';
-    'SPACE2020';
-    'SPACE2021';
-    'SPACE2022';
-    'SPACE2023';
-    'SPACE2024';
-    'SPACE2025';
-    'SPACE2026';
-    'SPACE2027';
-    'SPACE2028';
-    'SPACE2029';
-    'SPACE2029-2';
-    'SPACE2030';
-    'SPACE2031';
-    'SPACE2032';
-    'SPACE2033';
-    'SPACE2034';
-    'SPACE2035';
-    'SPACE2036';
+%     'SPACE2009';
+%     'SPACE2010';
     };
 end
+
+sessions = {'session_1', 'session_2'};
+
+% % pilot
+% if ~exist('subjects','var') || isempty(subjects)
+%   subjects = {
+%     'SPACE2001';
+%     'SPACE2002';
+%     'SPACE2003';
+%     'SPACE2004';
+%     'SPACE2005';
+%     'SPACE2006';
+%     'SPACE2007';
+%     'SPACE2008';
+%     'SPACE2009';
+%     'SPACE2010';
+%     'SPACE2011';
+%     'SPACE2012';
+%     'SPACE2013';
+%     'SPACE2014';
+%     'SPACE2015';
+%     'SPACE2016';
+%     'SPACE2017';
+%     'SPACE2018';
+%     'SPACE2019';
+%     'SPACE2020';
+%     'SPACE2021';
+%     'SPACE2022';
+%     'SPACE2023';
+%     'SPACE2024';
+%     'SPACE2025';
+%     'SPACE2026';
+%     'SPACE2027';
+%     'SPACE2028';
+%     'SPACE2029';
+%     'SPACE2029-2';
+%     'SPACE2030';
+%     'SPACE2031';
+%     'SPACE2032';
+%     'SPACE2033';
+%     'SPACE2034';
+%     'SPACE2035';
+%     'SPACE2036';
+%     };
+% end
 
 for sub = 1:length(subjects)
   fprintf('Working on %s...\n',subjects{sub});
@@ -89,30 +107,36 @@ for sub = 1:length(subjects)
   end
   
   eventsOutfile_sub = fullfile(eventsOutdir_sub,'events.mat');
-  if ~exist(eventsOutfile_sub,'file')
-    
-    expParamFile = fullfile(dataroot,subjects{sub},'experimentParams.mat');
-    if exist(expParamFile,'file')
-      fprintf('Loading experiment parameter file for %s (%s).\n',subjects{sub},expParamFile);
-      load(expParamFile);
-    else
-      error('Experiment parameter file does not exist: %s',expParamFile);
-    end
-    
-    % hack
-    if strcmp(beh_dir,'behavioral_pilot')
-      expParam.sesTypes = {'day1'};
-    end
-    
-    fprintf('Creating events for %s (%s).\n',subjects{sub},eventsOutfile_sub);
-    
-    % initialize the events struct
+  
+  if exist(eventsOutfile_sub,'file')
+    % load the existing event struct
+    fprintf('Loading existing event struct for %s (%s).\n',subjects{sub},eventsOutfile_sub);
+    load(eventsOutfile_sub);
+  else
+    % initialize the event struct
     events = struct;
+  end
+  
+  expParamFile = fullfile(dataroot,subjects{sub},'experimentParams.mat');
+  if exist(expParamFile,'file')
+    fprintf('Loading experiment parameter file for %s (%s).\n',subjects{sub},expParamFile);
+    load(expParamFile);
+  else
+    error('Experiment parameter file does not exist: %s',expParamFile);
+  end
+  
+%   % hack
+%   if strcmp(beh_dir,'behavioral_pilot')
+%     expParam.sesTypes = {'day1'};
+%   end
+  
+  % go through each session
+  for sesNum = 1:length(expParam.sesTypes)
     
-    % go through each session
-    for sesNum = 1:length(expParam.sesTypes)
-      % set the subject events file
+    if exist(fullfile(saveDir,subjects{sub},sessions{sesNum}),'dir') && ~isfield(events,expParam.sesTypes{sesNum})
       sesName = expParam.sesTypes{sesNum};
+      
+      fprintf('Creating events for %s %s %s (%s).\n',subjects{sub},sessions{sesNum},expParam.sesTypes{sesNum},eventsOutfile_sub);
       
       uniquePhaseNames = unique(expParam.session.(sesName).phases);
       uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
@@ -139,84 +163,84 @@ for sub = 1:length(subjects)
         %end
       end
       
-%       %% put subsequent memory info in exposure events
-%       
-%       sourceDestPhases = {'cued_recall', 'expo'};
-%       sourceStimType = {'RECOGTEST_STIM'};
-%       fn_ses = fieldnames(events.(sesName));
-%       
-%       fprintf('Putting %s info in %s events...\n',sourceDestPhases{1},sourceDestPhases{2});
-%       
-%       for fn = 1:length(fn_ses)
-%         if ~isstrprop(fn_ses{fn}(end),'digit') && ~strcmp(fn_ses{fn}(end-1),'_')
-%           continue
-%         end
-%         
-%         if ~isempty(strfind(fn_ses{fn},sourceDestPhases{1}))
-%           sourcePhase = fn_ses{fn};
-%           
-%           if isempty(strfind(fn_ses{fn},'prac_'))
-%             phaseCount = str2double(strrep(fn_ses{fn},sprintf('%s_',sourceDestPhases{1}),''));
-%             destPhase = sprintf('%s_%d',sourceDestPhases{2},phaseCount);
-%           else
-%             phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1}),''));
-%             destPhase = sprintf('prac_%s_%d',sourceDestPhases{2},phaseCount);
-%           end
-%           
-%           if isfield(events.(sesName),sourcePhase) && isfield(events.(sesName),destPhase)
-%             % set apart the correct subset of source events
-%             sourceEvents = events.(sesName).(sourcePhase).data(ismember({events.(sesName).(sourcePhase).data.type},sourceStimType));
-%             
-%             % go through the destination events
-%             for ev = 1:length(events.(sesName).(destPhase).data)
-%               %keyboard
-%               if events.(sesName).(destPhase).data(ev).targ
-%                 % find the source event
-%                 sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(ev).stimNum & ...
-%                   [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(ev).i_catNum);
-%                 
-%                 % transfer information
-%                 if ~isempty(sourceInd)
-%                   if length(sourceInd) == 1
-%                     events.(sesName).(destPhase).data(ev).cr_recog_acc = sourceEvents(sourceInd).recog_acc;
-%                     if ~strcmp(sourceEvents(sourceInd).recall_resp,'NO_RESPONSE') && ~isempty(sourceEvents(sourceInd).recall_resp)
-%                       events.(sesName).(destPhase).data(ev).cr_recall_resp = true;
-%                     else
-%                       events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
-%                     end
-%                     events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = sourceEvents(sourceInd).recall_spellCorr;
-%                   else
-%                     fprintf('Found more than one source event!\n');
-%                     keyboard
-%                   end
-%                 else
-%                   % IMPORTANT: there will be no source event for single
-%                   % presentation destination events (lag==-1) if single
-%                   % presentation items are not tested
-%                   % (cfg.stim.testOnePres=false). This should be changed if
-%                   % we test single presentation items.
-%                   
-%                   if events.(sesName).(destPhase).data(ev).lag == -1
-%                     events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
-%                     events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
-%                     events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
-%                   else
-%                     fprintf('Did not find the source event!\n');
-%                     keyboard
-%                   end
-%                 end
-%               else
-%                 events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
-%                 events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
-%                 events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
-%               end
-%             end
-%           else
-%             fprintf('Source phase ''%s'' and/or destionation phase ''%s'' does not exist!\n',sourcePhase,destPhase);
-%             keyboard
-%           end
-%         end
-%       end
+      %       %% put subsequent memory info in exposure events
+      %
+      %       sourceDestPhases = {'cued_recall', 'expo'};
+      %       sourceStimType = {'RECOGTEST_STIM'};
+      %       fn_ses = fieldnames(events.(sesName));
+      %
+      %       fprintf('Putting %s info in %s events...\n',sourceDestPhases{1},sourceDestPhases{2});
+      %
+      %       for fn = 1:length(fn_ses)
+      %         if ~isstrprop(fn_ses{fn}(end),'digit') && ~strcmp(fn_ses{fn}(end-1),'_')
+      %           continue
+      %         end
+      %
+      %         if ~isempty(strfind(fn_ses{fn},sourceDestPhases{1}))
+      %           sourcePhase = fn_ses{fn};
+      %
+      %           if isempty(strfind(fn_ses{fn},'prac_'))
+      %             phaseCount = str2double(strrep(fn_ses{fn},sprintf('%s_',sourceDestPhases{1}),''));
+      %             destPhase = sprintf('%s_%d',sourceDestPhases{2},phaseCount);
+      %           else
+      %             phaseCount = str2double(strrep(strrep(fn_ses{fn},'prac_',''),sprintf('%s_',sourceDestPhases{1}),''));
+      %             destPhase = sprintf('prac_%s_%d',sourceDestPhases{2},phaseCount);
+      %           end
+      %
+      %           if isfield(events.(sesName),sourcePhase) && isfield(events.(sesName),destPhase)
+      %             % set apart the correct subset of source events
+      %             sourceEvents = events.(sesName).(sourcePhase).data(ismember({events.(sesName).(sourcePhase).data.type},sourceStimType));
+      %
+      %             % go through the destination events
+      %             for ev = 1:length(events.(sesName).(destPhase).data)
+      %               %keyboard
+      %               if events.(sesName).(destPhase).data(ev).targ
+      %                 % find the source event
+      %                 sourceInd = find([sourceEvents.stimNum] == events.(sesName).(destPhase).data(ev).stimNum & ...
+      %                   [sourceEvents.i_catNum] == events.(sesName).(destPhase).data(ev).i_catNum);
+      %
+      %                 % transfer information
+      %                 if ~isempty(sourceInd)
+      %                   if length(sourceInd) == 1
+      %                     events.(sesName).(destPhase).data(ev).cr_recog_acc = sourceEvents(sourceInd).recog_acc;
+      %                     if ~strcmp(sourceEvents(sourceInd).recall_resp,'NO_RESPONSE') && ~isempty(sourceEvents(sourceInd).recall_resp)
+      %                       events.(sesName).(destPhase).data(ev).cr_recall_resp = true;
+      %                     else
+      %                       events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+      %                     end
+      %                     events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = sourceEvents(sourceInd).recall_spellCorr;
+      %                   else
+      %                     fprintf('Found more than one source event!\n');
+      %                     keyboard
+      %                   end
+      %                 else
+      %                   % IMPORTANT: there will be no source event for single
+      %                   % presentation destination events (lag==-1) if single
+      %                   % presentation items are not tested
+      %                   % (cfg.stim.testOnePres=false). This should be changed if
+      %                   % we test single presentation items.
+      %
+      %                   if events.(sesName).(destPhase).data(ev).lag == -1
+      %                     events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+      %                     events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+      %                     events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+      %                   else
+      %                     fprintf('Did not find the source event!\n');
+      %                     keyboard
+      %                   end
+      %                 end
+      %               else
+      %                 events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+      %                 events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
+      %                 events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
+      %               end
+      %             end
+      %           else
+      %             fprintf('Source phase ''%s'' and/or destionation phase ''%s'' does not exist!\n',sourcePhase,destPhase);
+      %             keyboard
+      %           end
+      %         end
+      %       end
       
       %% put subsequent memory info in study events
       
@@ -378,9 +402,11 @@ for sub = 1:length(subjects)
         events.(sesName).(u_phases{up}).isComplete = true;
       end
       fprintf('Done.\n');
-      
+    else
+      fprintf('Events field for %s %s %s already exists. Not processing.\n',subjects{sub},sessions{sesNum},expParam.sesTypes{sesNum});
     end
-  else
+  end
+  %else
     %     % hack to set each phase as complete
     %     load(eventsOutfile_sub);
     %
@@ -401,9 +427,9 @@ for sub = 1:length(subjects)
     %       end
     %     end
     
-    fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
-    continue
-  end % if exist
+  %  fprintf('%s already exists! Moving on...\n',eventsOutfile_sub);
+  %  continue
+  %end % if exist
   
   fprintf('Saving %s...',eventsOutfile_sub);
   % save each subject's events

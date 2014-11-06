@@ -130,7 +130,6 @@ if ~exist('saveResults','var') || isempty(saveResults)
   saveResults = true;
 end
 
-% behavioral pilot
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'SPACE2001';
@@ -141,37 +140,55 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2006';
     'SPACE2007';
     'SPACE2008';
-    'SPACE2009';
-    'SPACE2010';
-    'SPACE2011';
-    'SPACE2012';
-    'SPACE2013';
-    'SPACE2014';
-    'SPACE2015';
-    'SPACE2016';
-    'SPACE2017';
-    'SPACE2018';
-    'SPACE2019';
-    'SPACE2020';
-    'SPACE2021';
-    'SPACE2022';
-    'SPACE2023';
-    'SPACE2024';
-    'SPACE2025';
-    'SPACE2026';
-    'SPACE2027';
-    'SPACE2028';
-    'SPACE2029';
-    'SPACE2029-2';
-    'SPACE2030';
-    'SPACE2031';
-    'SPACE2032';
-    'SPACE2033';
-    'SPACE2034';
-    'SPACE2035';
-    'SPACE2036';
+%     'SPACE2009';
+%     'SPACE2010';
     };
 end
+
+% % behavioral pilot
+% if ~exist('subjects','var') || isempty(subjects)
+%   subjects = {
+%     'SPACE2001';
+%     'SPACE2002';
+%     'SPACE2003';
+%     'SPACE2004';
+%     'SPACE2005';
+%     'SPACE2006';
+%     'SPACE2007';
+%     'SPACE2008';
+%     'SPACE2009';
+%     'SPACE2010';
+%     'SPACE2011';
+%     'SPACE2012';
+%     'SPACE2013';
+%     'SPACE2014';
+%     'SPACE2015';
+%     'SPACE2016';
+%     'SPACE2017';
+%     'SPACE2018';
+%     'SPACE2019';
+%     'SPACE2020';
+%     'SPACE2021';
+%     'SPACE2022';
+%     'SPACE2023';
+%     'SPACE2024';
+%     'SPACE2025';
+%     'SPACE2026';
+%     'SPACE2027';
+%     'SPACE2028';
+%     'SPACE2029';
+%     'SPACE2029-2';
+%     'SPACE2030';
+%     'SPACE2031';
+%     'SPACE2032';
+%     'SPACE2033';
+%     'SPACE2034';
+%     'SPACE2035';
+%     'SPACE2036';
+%     };
+% end
+
+sessions = {'session_1', 'session_2'};
 
 % use a specific subject's files as a template for loading data
 templateSubject = 'SPACE2001';
@@ -188,13 +205,13 @@ else
   error('Cannot determine experiment name, no subjects provided.');
 end
 
-beh_dir = 'behavioral_pilot';
-% beh_dir = 'Behavioral';
+% beh_dir = 'behavioral_pilot';
+beh_dir = 'Behavioral';
 
 % find where the data is stored
 if ~exist('dataroot','var') || isempty(dataroot)
-  serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,beh_dir,'Sessions');
-  serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,beh_dir,'Sessions');
+%   serverDir = fullfile(filesep,'Volumes','curranlab','Data',expName,beh_dir,'Sessions');
+%   serverLocalDir = fullfile(filesep,'Volumes','RAID','curranlab','Data',expName,beh_dir,'Sessions');
   localDir = fullfile(getenv('HOME'),'data',expName,beh_dir,'Sessions');
   if exist('serverDir','var') && exist(serverDir,'dir')
     dataroot = serverDir;
@@ -258,156 +275,158 @@ if isempty(results)
     error('initialization events file does not exist: %s',eventsFile);
   end
   
-  % hack
-  if strcmp(beh_dir,'behavioral_pilot')
-    expParam.sesTypes = {'day1'};
-  end
+%   % hack
+%   if strcmp(beh_dir,'behavioral_pilot')
+%     expParam.sesTypes = {'day1'};
+%   end
   
   for sesNum = 1:length(expParam.sesTypes)
-    % set the subject events file
-    sesName = expParam.sesTypes{sesNum};
-    
-    uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
-    uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
-    
-    if collapsePhases
-      processThesePhases = uniquePhaseNames;
-    else
-      processThesePhases = expParam.session.(sesName).phases;
-    end
-    
-    for pha = 1:length(processThesePhases)
-      phaseName = processThesePhases{pha};
+    if exist(fullfile(subDir,sessions{sesNum}),'dir') && isfield(events,expParam.sesTypes{sesNum})
+      % set the subject events file
+      sesName = expParam.sesTypes{sesNum};
       
-      % find out where this phase occurs in the list of unique phases
-      uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
-      % increase the phase count for that phase
-      uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
-      % set the phase count
-      phaseCount = uniquePhaseCounts(uniquePhaseInd);
+      uniquePhaseNames = unique(expParam.session.(sesName).phases,'stable');
+      uniquePhaseCounts = zeros(1,length(uniquePhaseNames));
       
-      % accidently set isExp=true for prac_distract_math
-      if ~isempty(strfind(phaseName,'prac_')) && cfg.stim.(sesName).(phaseName)(phaseCount).isExp
-        cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
+      if collapsePhases
+        processThesePhases = uniquePhaseNames;
+      else
+        processThesePhases = expParam.session.(sesName).phases;
       end
       
-      if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+      for pha = 1:length(processThesePhases)
+        phaseName = processThesePhases{pha};
         
-        if collapsePhases
-          fn = phaseName;
-        else
-          % set the phase name with phase count
-          fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
+        % find out where this phase occurs in the list of unique phases
+        uniquePhaseInd = find(ismember(uniquePhaseNames,phaseName));
+        % increase the phase count for that phase
+        uniquePhaseCounts(uniquePhaseInd) = uniquePhaseCounts(uniquePhaseInd) + 1;
+        % set the phase count
+        phaseCount = uniquePhaseCounts(uniquePhaseInd);
+        
+        % accidently set isExp=true for prac_distract_math
+        if ~isempty(strfind(phaseName,'prac_')) && cfg.stim.(sesName).(phaseName)(phaseCount).isExp
+          cfg.stim.(sesName).(phaseName)(phaseCount).isExp = false;
         end
         
-        if isfield(events.(sesName),fn)
+        if cfg.stim.(sesName).(phaseName)(phaseCount).isExp
           
-          if ~isempty(quantileMeasure)
-            results.(sesName).(fn).quantiles = nan(length(subjects),nQuantiles);
+          if collapsePhases
+            fn = phaseName;
+          else
+            % set the phase name with phase count
+            fn = sprintf(sprintf('%s_%d',phaseName,phaseCount));
           end
           
-          switch phaseName
-%             case {'expo'}
-%               respEvents = events.oneDay.expo.data(strcmp({events.oneDay.expo.data.type},'EXPO_RESP'));
-%               
-%               if collapseCategories
-%                 for mf = 1:length(mainFields_expo)
-%                   mField = mainFields_expo{mf};
-%                   for df = 1:length(dataFields_expo{mf})
-%                     dField = dataFields_expo{mf}{df};
-%                     
-%                     results.(sesName).(fn).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
-%                   end
-%                 end
-%               end
-%               
-%               % image categories
-%               i_catStrs = unique({respEvents.i_catStr},'sorted');
-%               if length(i_catStrs) > 1 && separateCategories
-%                 for im = 1:length(i_catStrs)
-%                   for mf = 1:length(mainFields_expo)
-%                     mField = mainFields_expo{mf};
-%                     for df = 1:length(dataFields_expo{mf})
-%                       dField = dataFields_expo{mf}{df};
-%                       
-%                       results.(sesName).(fn).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
-%                     end
-%                   end
-%                 end
-%               end
+          if isfield(events.(sesName),fn)
+            
+            if ~isempty(quantileMeasure)
+              results.(sesName).(fn).quantiles = nan(length(subjects),nQuantiles);
+            end
+            
+            switch phaseName
+              %             case {'expo'}
+              %               respEvents = events.oneDay.expo.data(strcmp({events.oneDay.expo.data.type},'EXPO_RESP'));
+              %
+              %               if collapseCategories
+              %                 for mf = 1:length(mainFields_expo)
+              %                   mField = mainFields_expo{mf};
+              %                   for df = 1:length(dataFields_expo{mf})
+              %                     dField = dataFields_expo{mf}{df};
+              %
+              %                     results.(sesName).(fn).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+              %                   end
+              %                 end
+              %               end
+              %
+              %               % image categories
+              %               i_catStrs = unique({respEvents.i_catStr},'sorted');
+              %               if length(i_catStrs) > 1 && separateCategories
+              %                 for im = 1:length(i_catStrs)
+              %                   for mf = 1:length(mainFields_expo)
+              %                     mField = mainFields_expo{mf};
+              %                     for df = 1:length(dataFields_expo{mf})
+              %                       dField = dataFields_expo{mf}{df};
+              %
+              %                       results.(sesName).(fn).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+              %                     end
+              %                   end
+              %                 end
+              %               end
               
-            case {'cued_recall_only'}
-              targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
-              %lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
-              
-              lagConds = unique([targEvents.lag],'sorted');
-              
-              for lc = 1:length(lagConds)
-                % choose the training condition
-                if length(lagConds(lc)) == 1
-                  if lagConds(lc) > 0
-                    lagStr = sprintf('lag%d',lagConds(lc));
-                    %lagStr = 'spaced';
-                  elseif lagConds(lc) == 0
-                    lagStr = 'massed';
-                  elseif lagConds(lc) == -1
-                    lagStr = 'once';
-                  end
-                elseif length(lagConds(lc)) > 1
-                  lagStr = 'multi?';
-                end
+              case {'cued_recall_only'}
+                targEvents = events.(sesName).(fn).data([events.(sesName).(fn).data.targ]);
+                %lureEvents = events.(sesName).(fn).data(~[events.(sesName).(fn).data.targ]);
                 
+                lagConds = unique([targEvents.lag],'sorted');
                 
-                if collapseCategories
-                  for mf = 1:length(mainFields)
-                    mField = mainFields{mf};
-                    for df = 1:length(dataFields{mf})
-                      dField = dataFields{mf}{df};
-                      
-                      results.(sesName).(fn).(lagStr).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+                for lc = 1:length(lagConds)
+                  % choose the training condition
+                  if length(lagConds(lc)) == 1
+                    if lagConds(lc) > 0
+                      lagStr = sprintf('lag%d',lagConds(lc));
+                      %lagStr = 'spaced';
+                    elseif lagConds(lc) == 0
+                      lagStr = 'massed';
+                    elseif lagConds(lc) == -1
+                      lagStr = 'once';
                     end
+                  elseif length(lagConds(lc)) > 1
+                    lagStr = 'multi?';
                   end
-                end
-                
-                % image categories
-                i_catStrs = unique({targEvents.i_catStr},'sorted');
-                if length(i_catStrs) > 1 && separateCategories
-                  for im = 1:length(i_catStrs)
+                  
+                  
+                  if collapseCategories
                     for mf = 1:length(mainFields)
                       mField = mainFields{mf};
                       for df = 1:length(dataFields{mf})
                         dField = dataFields{mf}{df};
                         
-                        results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+                        results.(sesName).(fn).(lagStr).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
                       end
                     end
                   end
-                end
-                
-              end % for t
-              %         case {'name', 'nametrain', 'prac_name'}
-              %
-              %           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
-              %             nBlocks = 1;
-              %           else
-              %             nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
-              %           end
-              %
-              %           for mf = 1:length(mainFields)
-              %             for df = 1:length(dataFields)
-              %               results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
-              %             end
-              %           end
-              %           if nBlocks > 1
-              %             for b = 1:nBlocks
-              %               for mf = 1:length(mainFields)
-              %                 for df = 1:length(dataFields)
-              %                   results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),nDivisions);
-              %                 end
-              %               end
-              %             end
-              %           end
-          end % switch
+                  
+                  % image categories
+                  i_catStrs = unique({targEvents.i_catStr},'sorted');
+                  if length(i_catStrs) > 1 && separateCategories
+                    for im = 1:length(i_catStrs)
+                      for mf = 1:length(mainFields)
+                        mField = mainFields{mf};
+                        for df = 1:length(dataFields{mf})
+                          dField = dataFields{mf}{df};
+                          
+                          results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField).(sprintf('%s_%s',mField,dField)) = nan(length(subjects),nDivisions);
+                        end
+                      end
+                    end
+                  end
+                  
+                end % for t
+                %         case {'name', 'nametrain', 'prac_name'}
+                %
+                %           if ~iscell(expParam.session.(sesName).(phaseName)(phaseCount).nameStims)
+                %             nBlocks = 1;
+                %           else
+                %             nBlocks = length(expParam.session.(sesName).(phaseName)(phaseCount).nameStims);
+                %           end
+                %
+                %           for mf = 1:length(mainFields)
+                %             for df = 1:length(dataFields)
+                %               results.(sesName).(fn).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),1);
+                %             end
+                %           end
+                %           if nBlocks > 1
+                %             for b = 1:nBlocks
+                %               for mf = 1:length(mainFields)
+                %                 for df = 1:length(dataFields)
+                %                   results.(sesName).(fn).(sprintf('b%d',b)).(mainFields{mf}).(dataFields{df}) = nan(length(subjects),nDivisions);
+                %                 end
+                %               end
+                %             end
+                %           end
+            end % switch
+          end
         end
       end
     end
@@ -442,12 +461,13 @@ if isempty(results)
         error('experiment parameter file does not exist: %s',expParamFile);
       end
       
-      % hack
-      if strcmp(beh_dir,'behavioral_pilot')
-        expParam.sesTypes = {'day1'};
-      end
+%       % hack
+%       if strcmp(beh_dir,'behavioral_pilot')
+%         expParam.sesTypes = {'day1'};
+%       end
       
       for sesNum = 1:length(expParam.sesTypes)
+        if exist(fullfile(subDir,sessions{sesNum}),'dir') && isfield(events,expParam.sesTypes{sesNum})
         % set the subject events file
         sesName = expParam.sesTypes{sesNum};
         
@@ -860,7 +880,7 @@ if isempty(results)
           
         end % for pha
         fprintf('\n');
-        
+        end
       end % for ses
     else
       fprintf('\t%s has not completed all sessions. Not including in results.\n',subjects{sub});
@@ -930,14 +950,14 @@ if saveResults
   textFileName = sprintf('%s_behav_results%s%s%s.txt',expName,quantStr,collapseStr,filenameSuffix);
   textFileName = fullfile(dataroot,textFileName);
   
-  printResultsToFile(dataroot,subjects,results,mainFields,dataFields,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,quantileMeasure,nDivisions);
+  printResultsToFile(dataroot,subjects,sessions,results,mainFields,dataFields,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,quantileMeasure,nDivisions);
 end
 
 end % function
 
 %% print to file
 
-function printResultsToFile(dataroot,subjects,results,mainToPrint,dataToPrint,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,quantileMeasure,nDivisions)
+function printResultsToFile(dataroot,subjects,sessions,results,mainToPrint,dataToPrint,prependDestField,textFileName,collapsePhases,collapseCategories,separateCategories,templateSubject,quantileMeasure,nDivisions)
 
 if nargin < 13
   error('Must include both variables: ''quantileMeasure'' and ''nDivisions''.');
@@ -970,14 +990,16 @@ else
   error('events file does not exist: %s',eventsFile);
 end
 
-% hack
-if ~isempty(strfind(dataroot,'behavioral_pilot'))
-  expParam.sesTypes = {'day1'};
-end
+% % hack
+% if ~isempty(strfind(dataroot,'behavioral_pilot'))
+%   expParam.sesTypes = {'day1'};
+% end
 
 fid = fopen(textFileName,'wt');
 
 for sesNum = 1:length(expParam.sesTypes)
+  if exist(fullfile(subDir,sessions{sesNum}),'dir')
+    
   % set the subject events file
   sesName = expParam.sesTypes{sesNum};
   
@@ -1205,6 +1227,7 @@ for sesNum = 1:length(expParam.sesTypes)
       end % isfield
     end % isExp
   end % phases
+  end
 end % sessions
 
 % close out the results file
