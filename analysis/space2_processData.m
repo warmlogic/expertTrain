@@ -140,8 +140,8 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2006';
     'SPACE2007';
     'SPACE2008';
-%     'SPACE2009';
-%     'SPACE2010';
+    'SPACE2009';
+    'SPACE2010';
     };
 end
 
