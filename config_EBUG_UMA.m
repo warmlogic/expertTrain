@@ -59,7 +59,7 @@ expParam.doNotRunSes = [true false false false false false false false true fals
 
 % set up a field for each session type
 expParam.session.pretest.phases = {'prac_match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
-expParam.session.pretest_eeg.phases = {'match'};
+expParam.session.pretest_eeg.phases = {'match', 'match', 'match', 'match'};
 expParam.session.train1.phases = {'prac_name', 'nametrain'};
 expParam.session.train2.phases = {'nametrain'};
 expParam.session.train3.phases = {'nametrain'};
@@ -67,7 +67,7 @@ expParam.session.train4.phases = {'nametrain'};
 expParam.session.train5.phases = {'nametrain'};
 expParam.session.train6.phases = {'nametrain'};
 expParam.session.posttest.phases = {'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match', 'match'};
-expParam.session.posttest_eeg.phases = {'match'};
+expParam.session.posttest_eeg.phases = {'match', 'match', 'match', 'match'};
 
 % refillFamiliesIfEmpty is a hack for EBUG_UMA used in setting up its
 % external eye tracking match phases and is intended for use when
@@ -189,7 +189,9 @@ if expParam.sessionNum == 1
   
   % family names correspond to the directories in which stimuli reside;
   % includes manipulations
-  cfg.stim.familyNames = {'a', 's'};
+%   cfg.stim.familyNames = {'a', 's'};
+  cfg.stim.familyNames = {'a', 'ag_hi8_', 'ag_lo8_', 'ag_', 's', 'sg_hi8_', 'sg_lo8_', 'sg_'};  
+
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
@@ -208,10 +210,10 @@ if expParam.sessionNum == 1
   cfg.stim.nNewExemplars = 12;
   
   % whether to use the same species order across families
-  cfg.stim.yokeSpecies = false;
+  cfg.stim.yokeSpecies = true;
   if cfg.stim.yokeSpecies
-    %cfg.stim.yokeTogether = [1 1 1 1 1 2 2 2 2 2];
-    cfg.stim.yokeTogether = [1 2];
+    cfg.stim.yokeTogether = [1 1 1 1 2 2 2 2];
+%     cfg.stim.yokeTogether = [1 2];
   end
   
   % Number of trained and untrained exemplars per species per family
@@ -222,7 +224,7 @@ if expParam.sessionNum == 1
   % status is the same for all finches and for all warblers; NB this
   % applies when there is some dependency between different families (e.g.,
   % different image conditions input as families)
-  cfg.stim.yokeTrainedExemplars = false;
+  cfg.stim.yokeTrainedExemplars = true;
   if cfg.stim.yokeTrainedExemplars
     cfg.stim.yokeExemplars_train = [1 1 1 1 1 2 2 2 2 2];
   end
@@ -569,8 +571,23 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
-        % only use stimuli from particular families
+        % placeholder or familyNames
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+        
+        % assigns family names based on the phaseCount
+        if phaseCount == 1 || phaseCount == 4 || phaseCount == 7 || phaseCount == 10
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        end
+        if phaseCount == 3 || phaseCount == 6 || phaseCount == 9 || phaseCount == 12
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_', 'sg_'};
+        end
+        if phaseCount == 2 || phaseCount == 8
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_hi8_', 'sg_hi8_'};
+        end
+        if phaseCount == 5 || phaseCount == 11
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_lo8_', 'sg_lo8_'};
+        end
+        
         
         % hack
         cfg.stim.(sesName).(phaseName)(phaseCount).refillFamiliesIfEmpty = true;
@@ -804,11 +821,26 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        
+        if phaseCount == 1
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        end
+        if phaseCount == 2
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_', 'sg_'};
+        end
+        if phaseCount == 3
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_hi8_', 'sg_hi8_'};
+        end
+        if phaseCount == 4
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_lo8_', 'sg_lo8_'};
+        end
+        
         
         cfg.stim.(sesName).(phaseName)(phaseCount).forceFamilyRefill = true;
         
-        % 360 trials per phase
+        % 240 trials per phase
         
         % number per species per family; every stimulus is in both the
         % same and the different condition.
@@ -1557,8 +1589,22 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringPreStim = fixDuringPreStim;
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
-        % only use stimuli from particular families
+        % placeholder or familyNames
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+        
+        % assigns family names based on the phaseCount
+        if phaseCount == 1 || phaseCount == 4 || phaseCount == 7 || phaseCount == 10
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        end
+        if phaseCount == 3 || phaseCount == 6 || phaseCount == 9 || phaseCount == 12
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_', 'sg_'};
+        end
+        if phaseCount == 2 || phaseCount == 8
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_hi8_', 'sg_hi8_'};
+        end
+        if phaseCount == 5 || phaseCount == 11
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_lo8_', 'sg_lo8_'};
+        end
         
         % hack
         cfg.stim.(sesName).(phaseName)(phaseCount).refillFamiliesIfEmpty = true;
@@ -1719,14 +1765,31 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).fixDuringStim = fixDuringStim;
         
         % only use stimuli from particular families
-        cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
+        
+        
+        if phaseCount == 1
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
+        end
+        if phaseCount == 2
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_', 'sg_'};
+        end
+        if phaseCount == 3
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_hi8_', 'sg_hi8_'};
+        end
+        if phaseCount == 4
+            cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_lo8_', 'sg_lo8_'};
+        end
+        
         
         cfg.stim.(sesName).(phaseName)(phaseCount).forceFamilyRefill = true;
         
-        % 360 trials per phase
+        % 240 trials per phase
         
         % number per species per family; every stimulus is in both the
         % same and the different condition.
+%         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
+%         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
         cfg.stim.(sesName).(phaseName)(phaseCount).nSame = cfg.stim.nTrained;
         cfg.stim.(sesName).(phaseName)(phaseCount).nDiff = cfg.stim.nTrained;
         % rmStims_orig is false because all stimuli are used in both "same"
@@ -1827,7 +1890,7 @@ if expParam.sessionNum == 1
           if strcmp(phaseName,'match')
             matchCount = matchCount + 1;
             phaseCount = matchCount;
-          elseif strcmp(phaseName,'match')
+          elseif strcmp(phaseName,'prac_match')
             prac_matchCount = prac_matchCount + 1;
             phaseCount = prac_matchCount;
           end
