@@ -1588,23 +1588,20 @@ if expParam.sessionNum == 1
         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
         % assigns family names based on the phaseCount
-        if phaseCount == 1 || phaseCount == 4 || phaseCount == 7 || phaseCount == 10
+        if ismember(phaseCount, [1, 4, 7, 10])
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
-        end
-        if phaseCount == 3 || phaseCount == 6 || phaseCount == 9 || phaseCount == 12
+        elseif ismember(phaseCount, [3, 6, 9, 12])
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_', 'sg_'};
-        end
-        if phaseCount == 2 || phaseCount == 8
+        elseif ismember(phaseCount, [2, 8])
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_hi8_', 'sg_hi8_'};
-        end
-        if phaseCount == 5 || phaseCount == 11
+        elseif ismember(phaseCount, [5, 11])
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_lo8_', 'sg_lo8_'};
         end
         
         % hack
         cfg.stim.(sesName).(phaseName)(phaseCount).refillFamiliesIfEmpty = true;
         
-        if phaseCount == 1 || phaseCount == 3 || phaseCount == 4 || phaseCount == 6 || phaseCount == 7 || phaseCount == 9 || phaseCount == 10 || phaseCount == 12
+        if ismember(phaseCount, [1, 3, 4, 6, 7, 9, 10, 12])
           % 360 trials per phase (for eyetracking matching and moving
           % window phases)
           
@@ -1650,7 +1647,7 @@ if expParam.sessionNum == 1
           cfg.stim.(sesName).(phaseName)(phaseCount).rmStims_pair = false;
           cfg.stim.(sesName).(phaseName)(phaseCount).shuffleFirst = true;
           
-        elseif phaseCount == 2 || phaseCount == 5 || phaseCount == 8 || phaseCount == 11
+        elseif ismember(phaseCount, [2, 5, 8, 11])
           % 2 blocks, 180 trials per block (for eyetracking foveal and
           % peripheral masking blocks)
           
@@ -1762,20 +1759,15 @@ if expParam.sessionNum == 1
         % only use stimuli from particular families
 %         cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = cfg.stim.familyNames;
         
-        
         if phaseCount == 1
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'a', 's'};
-        end
-        if phaseCount == 2
+        elseif phaseCount == 2
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_', 'sg_'};
-        end
-        if phaseCount == 3
+        elseif phaseCount == 3
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_hi8_', 'sg_hi8_'};
-        end
-        if phaseCount == 4
+        elseif phaseCount == 4
             cfg.stim.(sesName).(phaseName)(phaseCount).familyNames = {'ag_lo8_', 'sg_lo8_'};
         end
-        
         
         cfg.stim.(sesName).(phaseName)(phaseCount).forceFamilyRefill = true;
         
