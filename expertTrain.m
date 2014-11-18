@@ -421,7 +421,7 @@ try
   % Hack: something's weird with fonts in Mac Matlab (only 2013b? but
   % possibly also 2012b). It seems that the window needs to be closed and
   % opened again to get the font set correctly.
-  if ismac && (~isempty(strfind(version,'2012b')) || ~isempty(strfind(version,'2013a')) || ~isempty(strfind(version,'2013b')))
+  if ismac %&& (~isempty(strfind(version,'2012b')) || ~isempty(strfind(version,'2013a')) || ~isempty(strfind(version,'2013b')))
     Screen('CloseAll');
     Screen('Preference','DefaultFontName',DefaultFontName);
     Screen('Preference','DefaultFontStyle',DefaultFontStyle);
