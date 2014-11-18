@@ -190,8 +190,7 @@ if expParam.sessionNum == 1
   % family names correspond to the directories in which stimuli reside;
   % includes manipulations
 %   cfg.stim.familyNames = {'a', 's'};
-  cfg.stim.familyNames = {'a', 'ag_hi8_', 'ag_lo8_', 'ag_', 's', 'sg_hi8_', 'sg_lo8_', 'sg_'};  
-
+  cfg.stim.familyNames = {'a', 'ag_hi8_', 'ag_lo8_', 'ag_', 's', 'sg_hi8_', 'sg_lo8_', 'sg_'};
   
   % assumes that each family has the same number of species
   cfg.stim.nSpecies = 10;
@@ -244,15 +243,11 @@ if expParam.sessionNum == 1
   
   % basic/subordinate families (counterbalance based on even/odd subNum)
   if expParam.isEven
-    cfg.stim.famNumBasic = 1;
-    cfg.stim.famNumSubord = 2;
-    %cfg.stim.famNumBasic = [1 2 3 4 5];
-    %cfg.stim.famNumSubord = [6 7 8 9 10];
+    cfg.stim.famNumBasic = [1 2 3 4];
+    cfg.stim.famNumSubord = [5 6 7 8];
   else
-    cfg.stim.famNumBasic = 2;
-    cfg.stim.famNumSubord = 1;
-    %cfg.stim.famNumBasic = [6 7 8 9 10];
-    %cfg.stim.famNumSubord = [1 2 3 4 5];
+    cfg.stim.famNumBasic = [5 6 7 8];
+    cfg.stim.famNumSubord = [1 2 3 4];
   end
   % what to call the basic-level family in viewing and naming tasks
   cfg.text.basicFamStr = 'Other';
