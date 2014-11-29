@@ -138,7 +138,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2004';
     'SPACE2005';
     'SPACE2006';
-    'SPACE2007';
+    'SPACE2007'; % terrible performance
     'SPACE2008';
     'SPACE2009'; % DNF session 2
     'SPACE2010';
@@ -148,12 +148,13 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2014';
     'SPACE2015';
     'SPACE2016';
-    'SPACE2017';
+    'SPACE2017'; % terrible performance
     'SPACE2018';
     'SPACE2019';
     'SPACE2020';
     'SPACE2021';
     'SPACE2022';
+    'SPACE2023';
     };
 end
 

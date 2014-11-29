@@ -45,7 +45,7 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2004';
     'SPACE2005';
     'SPACE2006';
-    'SPACE2007';
+    'SPACE2007'; % terrible performance
     'SPACE2008';
     'SPACE2009'; % DNF session 2
     'SPACE2010';
@@ -55,12 +55,13 @@ if ~exist('subjects','var') || isempty(subjects)
     'SPACE2014';
     'SPACE2015';
     'SPACE2016';
-    'SPACE2017';
+    'SPACE2017'; % terrible performance
     'SPACE2018';
     'SPACE2019';
     'SPACE2020';
     'SPACE2021';
     'SPACE2022';
+    'SPACE2023';
     };
 end
 
@@ -338,7 +339,7 @@ for sub = 1:length(subjects)
                       %%%% TODO
                       
                       if events.(sesName).(destPhase).data(ev).lag == -1
-                        events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                        %events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
                         events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
                         events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
                       else
@@ -347,7 +348,7 @@ for sub = 1:length(subjects)
                       end
                     end
                   else
-                    events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                    %events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
                     events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
                     events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
                   end
@@ -357,7 +358,7 @@ for sub = 1:length(subjects)
                 % did not finish this phase
                 if ~isempty(events.(sesName).(destPhase).data)
                   for ev = 1:length(events.(sesName).(destPhase).data)
-                    events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
+                    %events.(sesName).(destPhase).data(ev).cr_recog_acc = false;
                     events.(sesName).(destPhase).data(ev).cr_recall_resp = false;
                     events.(sesName).(destPhase).data(ev).cr_recall_spellCorr = false;
                   end
