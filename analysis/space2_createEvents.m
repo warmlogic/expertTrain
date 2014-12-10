@@ -477,7 +477,7 @@ switch phaseName
                   log(i).recall_spellCorr = 1;
                   fprintf('\nCorrect: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
                   fprintf('\tWord: %s\n',log(i).recall_origword);
-                elseif allowIncorrectPlural && (strcmpi(cat(2,log(i).recall_resp,'s'),log(i).recall_origword) || strcmpi(cat(2,log(i).recall_resp,'es'),log(i).recall_origword) || strcmpi(log(i).recall_resp,cat(2,log(i).recall_origword,'s')))
+                elseif allowIncorrectPlural && (strcmpi(cat(2,log(i).recall_resp,'s'),log(i).recall_origword) || strcmpi(cat(2,log(i).recall_resp,'es'),log(i).recall_origword) || strcmpi(log(i).recall_resp,cat(2,log(i).recall_origword,'s')) || strcmpi(log(i).recall_resp,cat(2,log(i).recall_origword,'es')))
                   % auto spell check
                   log(i).recall_spellCorr = 1;
                   fprintf('\nWrong plural marked as correct: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
