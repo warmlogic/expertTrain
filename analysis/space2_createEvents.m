@@ -305,6 +305,7 @@ switch phaseName
   case {'cued_recall', 'prac_cued_recall', 'cued_recall_only', 'prac_cued_recall_only'}
     % whether to interactively check the spelling of cued recall trials
     checkSpelling = true;
+    allowIncorrectPlural = true;
     
     switch phaseName
       case {'cued_recall', 'prac_cued_recall'}
@@ -466,14 +467,22 @@ switch phaseName
             if isempty(log(i).recall_resp) || strcmpi(log(i).recall_resp,'NO_RESPONSE')
               log(i).recall_spellCorr = 0;
               % debug
-              %fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
-              %fprintf('\tNo recall response!!\n')
+              fprintf('\No recall response: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+              fprintf('\tWord: %s\n',log(i).recall_origword);
             else
               if checkSpelling
                 % if we want to check the spelling on their recall responses
                 if strcmpi(log(i).recall_resp,log(i).recall_origword)
                   % auto spell check
                   log(i).recall_spellCorr = 1;
+                  fprintf('\nCorrect: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+                  fprintf('\tWord: %s\n',log(i).recall_origword);
+                elseif allowIncorrectPlural && (strcmpi(cat(2,log(i).recall_resp,'s'),log(i).recall_origword) || strcmpi(cat(2,log(i).recall_resp,'es'),log(i).recall_origword) || strcmpi(log(i).recall_resp,cat(2,log(i).recall_origword,'s')))
+                  % auto spell check
+                  log(i).recall_spellCorr = 1;
+                  fprintf('\nWrong plural marked as correct: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+                  fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
+                  fprintf('\tTheir response: %s\n',log(i).recall_resp);
                 else
                   % manual spell check
                   fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
