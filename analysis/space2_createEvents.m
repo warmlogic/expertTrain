@@ -22,129 +22,129 @@ end
 isPilotData = false;
 
 switch phaseName
-  case {'expo', 'prac_expo'}
-    logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_expo_%d.txt',sesName,phaseName,phaseCount));
-    
-    formatStr = '%.6f%s%s%s%d%d%s%d%s%s%s%s%s%s%s%s%s%s';
-    if exist(logFile,'file')
-      
-      % set up column numbers denoting kinds of data in the log file
-      expoS = struct;
-      
-      % common
-      expoS.time = 1;
-      expoS.subject = 2;
-      expoS.session = 3;
-      expoS.phase = 4;
-      expoS.phaseCount = 5;
-      expoS.isExp = 6;
-      expoS.type = 7;
-      expoS.trial = 8;
-      
-      % unique to {'EXPO_IMAGE'}
-      expoS.s_stimStr = 9;
-      expoS.s_stimNum = 10;
-      expoS.s_targ = 11;
-      expoS.s_spaced = 12;
-      expoS.s_lag = 13;
-      expoS.s_presNum = 14;
-      expoS.s_pairNum = 15;
-      expoS.s_pairOrd = 16;
-      expoS.s_catStr = 17;
-      expoS.s_catNum = 18;
-      
-      % unique to {'EXPO_RESP'}
-      expoS.r_resp = 9;
-      expoS.r_respKey = 10;
-      expoS.r_rt = 11;
-      
-      % read the real file
-      fid = fopen(logFile,'r');
-      logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
-      fclose(fid);
-      
-      if isempty(logData{1})
-        error('Log file seems to be empty, something is wrong: %s',logFile);
-      end
-    else
-      %error('Log file file not found: %s',logFile);
-      warning('Log file file not found: %s',logFile);
-      events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = false;
-      return
-    end
-    
-    % set all fields here so we can easily concatenate events later
-    log = struct('subject',subject,'session',sesNum,'sesName',sesName,...
-      'phaseName',phaseName,'phaseCount',phaseCount,...
-      'isExp',num2cell(logical(logData{expoS.isExp})), 'time',num2cell(logData{expoS.time}),...
-      'type',logData{expoS.type}, 'trial',num2cell(single(logData{expoS.trial})),...
-      'stimStr',[], 'stimNum',[], 'targ',[],...
-      'spaced',[], 'lag',[],...
-      'presNum',[], 'pairNum',[], 'pairOrd',[],...
-      'i_catStr',[], 'i_catNum',[],...
-      'resp',[], 'rt',[],...
-      'cr_recall_resp', [], 'cr_recall_spellCorr', []);
-    
-    for i = 1:length(log)
-      switch log(i).type
-        case {'EXPO_IMAGE'}
-          % unique to EXPO_IMAGE
-          log(i).stimStr = logData{expoS.s_stimStr}{i};
-          log(i).stimNum = str2double(logData{expoS.s_stimNum}{i});
-          log(i).targ = logical(str2double(logData{expoS.s_targ}{i}));
-          log(i).spaced = logical(str2double(logData{expoS.s_spaced}{i}));
-          log(i).lag = str2double(logData{expoS.s_lag}{i});
-          log(i).presNum = str2double(logData{expoS.s_presNum}{i});
-          log(i).pairNum = str2double(logData{expoS.s_pairNum}{i});
-          log(i).pairOrd = str2double(logData{expoS.s_pairOrd}{i});
-          log(i).i_catStr = logData{expoS.s_catStr}{i};
-          log(i).i_catNum = str2double(logData{expoS.s_catNum}{i});
-          
-        case {'EXPO_RESP'}
-          % unique to EXPO_RESP
-          if strcmp(logData{expoS.r_resp}{i},'v_appeal')
-            log(i).resp = 4;
-          elseif strcmp(logData{expoS.r_resp}{i},'s_appeal')
-            log(i).resp = 3;
-          elseif strcmp(logData{expoS.r_resp}{i},'s_unappeal')
-            log(i).resp = 2;
-          elseif strcmp(logData{expoS.r_resp}{i},'v_unappeal')
-            log(i).resp = 1;
-          else
-          %elseif strcmp(logData{expoS.r_resp}{i},'NO_RESPONSE')
-            log(i).resp = 0;
-          end
-          log(i).rt = single(str2double(logData{expoS.r_rt}(i)));
-          
-          % get info from stimulus presentations
-          log(i).stimStr = log(i-1).stimStr;
-          log(i).stimNum = log(i-1).stimNum;
-          log(i).targ = log(i-1).targ;
-          log(i).spaced = log(i-1).spaced;
-          log(i).lag = log(i-1).lag;
-          log(i).presNum = log(i-1).presNum;
-          log(i).pairNum = log(i-1).pairNum;
-          log(i).pairOrd = log(i-1).pairOrd;
-          log(i).i_catStr = log(i-1).i_catStr;
-          log(i).i_catNum = log(i-1).i_catNum;
-          
-          % put info in stimulus presentations
-          log(i-1).resp = log(i).resp;
-          log(i-1).rt = log(i).rt;
-      end
-    end
-    
-    % only keep certain types of events
-    log = log(ismember({log.type},{'EXPO_IMAGE', 'EXPO_RESP'}));
-    
-    % store the log struct in the events struct
-    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
-    events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
-    
-    % mark the subject as complete
-    if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
-      events.isComplete = true;
-    end
+%   case {'expo', 'prac_expo'}
+%     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_expo_%d.txt',sesName,phaseName,phaseCount));
+%     
+%     formatStr = '%.6f%s%s%s%d%d%s%d%s%s%s%s%s%s%s%s%s%s';
+%     if exist(logFile,'file')
+%       
+%       % set up column numbers denoting kinds of data in the log file
+%       expoS = struct;
+%       
+%       % common
+%       expoS.time = 1;
+%       expoS.subject = 2;
+%       expoS.session = 3;
+%       expoS.phase = 4;
+%       expoS.phaseCount = 5;
+%       expoS.isExp = 6;
+%       expoS.type = 7;
+%       expoS.trial = 8;
+%       
+%       % unique to {'EXPO_IMAGE'}
+%       expoS.s_stimStr = 9;
+%       expoS.s_stimNum = 10;
+%       expoS.s_targ = 11;
+%       expoS.s_spaced = 12;
+%       expoS.s_lag = 13;
+%       expoS.s_presNum = 14;
+%       expoS.s_pairNum = 15;
+%       expoS.s_pairOrd = 16;
+%       expoS.s_catStr = 17;
+%       expoS.s_catNum = 18;
+%       
+%       % unique to {'EXPO_RESP'}
+%       expoS.r_resp = 9;
+%       expoS.r_respKey = 10;
+%       expoS.r_rt = 11;
+%       
+%       % read the real file
+%       fid = fopen(logFile,'r');
+%       logData = textscan(fid,formatStr,'Delimiter','\t','emptyvalue',NaN, 'CommentStyle',commentStyle);
+%       fclose(fid);
+%       
+%       if isempty(logData{1})
+%         error('Log file seems to be empty, something is wrong: %s',logFile);
+%       end
+%     else
+%       %error('Log file file not found: %s',logFile);
+%       warning('Log file file not found: %s',logFile);
+%       events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = false;
+%       return
+%     end
+%     
+%     % set all fields here so we can easily concatenate events later
+%     log = struct('subject',subject,'session',sesNum,'sesName',sesName,...
+%       'phaseName',phaseName,'phaseCount',phaseCount,...
+%       'isExp',num2cell(logical(logData{expoS.isExp})), 'time',num2cell(logData{expoS.time}),...
+%       'type',logData{expoS.type}, 'trial',num2cell(single(logData{expoS.trial})),...
+%       'stimStr',[], 'stimNum',[], 'targ',[],...
+%       'spaced',[], 'lag',[],...
+%       'presNum',[], 'pairNum',[], 'pairOrd',[],...
+%       'i_catStr',[], 'i_catNum',[],...
+%       'resp',[], 'rt',[],...
+%       'cr_recall_resp', [], 'cr_recall_spellCorr', []);
+%     
+%     for i = 1:length(log)
+%       switch log(i).type
+%         case {'EXPO_IMAGE'}
+%           % unique to EXPO_IMAGE
+%           log(i).stimStr = logData{expoS.s_stimStr}{i};
+%           log(i).stimNum = str2double(logData{expoS.s_stimNum}{i});
+%           log(i).targ = logical(str2double(logData{expoS.s_targ}{i}));
+%           log(i).spaced = logical(str2double(logData{expoS.s_spaced}{i}));
+%           log(i).lag = str2double(logData{expoS.s_lag}{i});
+%           log(i).presNum = str2double(logData{expoS.s_presNum}{i});
+%           log(i).pairNum = str2double(logData{expoS.s_pairNum}{i});
+%           log(i).pairOrd = str2double(logData{expoS.s_pairOrd}{i});
+%           log(i).i_catStr = logData{expoS.s_catStr}{i};
+%           log(i).i_catNum = str2double(logData{expoS.s_catNum}{i});
+%           
+%         case {'EXPO_RESP'}
+%           % unique to EXPO_RESP
+%           if strcmp(logData{expoS.r_resp}{i},'v_appeal')
+%             log(i).resp = 4;
+%           elseif strcmp(logData{expoS.r_resp}{i},'s_appeal')
+%             log(i).resp = 3;
+%           elseif strcmp(logData{expoS.r_resp}{i},'s_unappeal')
+%             log(i).resp = 2;
+%           elseif strcmp(logData{expoS.r_resp}{i},'v_unappeal')
+%             log(i).resp = 1;
+%           else
+%           %elseif strcmp(logData{expoS.r_resp}{i},'NO_RESPONSE')
+%             log(i).resp = 0;
+%           end
+%           log(i).rt = single(str2double(logData{expoS.r_rt}(i)));
+%           
+%           % get info from stimulus presentations
+%           log(i).stimStr = log(i-1).stimStr;
+%           log(i).stimNum = log(i-1).stimNum;
+%           log(i).targ = log(i-1).targ;
+%           log(i).spaced = log(i-1).spaced;
+%           log(i).lag = log(i-1).lag;
+%           log(i).presNum = log(i-1).presNum;
+%           log(i).pairNum = log(i-1).pairNum;
+%           log(i).pairOrd = log(i-1).pairOrd;
+%           log(i).i_catStr = log(i-1).i_catStr;
+%           log(i).i_catNum = log(i-1).i_catNum;
+%           
+%           % put info in stimulus presentations
+%           log(i-1).resp = log(i).resp;
+%           log(i-1).rt = log(i).rt;
+%       end
+%     end
+%     
+%     % only keep certain types of events
+%     log = log(ismember({log.type},{'EXPO_IMAGE', 'EXPO_RESP'}));
+%     
+%     % store the log struct in the events struct
+%     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).data = log;
+%     events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete = true;
+%     
+%     % mark the subject as complete
+%     if events.(sesName).(sprintf('%s_%d',phaseName,phaseCount)).isComplete
+%       events.isComplete = true;
+%     end
     
   case {'multistudy', 'prac_multistudy'}
     logFile = fullfile(dataroot,subject,sesDir,sprintf('phaseLog_%s_%s_multistudy_%d.txt',sesName,phaseName,phaseCount));
@@ -396,13 +396,13 @@ switch phaseName
       return
     end
     
-    % Subjects 1-7 had lures (targ=0) marked as spaced=-1. needs to be
-    % false instead because logical(-1)=1.
-    if str2double(subject(end-2:end)) <= 7
-      logData{crS.spaced}([logData{crS.targ}] == 0 & logData{crS.trial} ~= 0) = false;
-      % % another method
-      % logData{crS.spaced}([logData{crS.spaced}] == -1) = false;
-    end
+%     % SPACE Subjects 1-7 had lures (targ=0) marked as spaced=-1. needs to be
+%     % false instead because logical(-1)=1.
+%     if str2double(subject(end-2:end)) <= 7
+%       logData{crS.spaced}([logData{crS.targ}] == 0 & logData{crS.trial} ~= 0) = false;
+%       % % another method
+%       % logData{crS.spaced}([logData{crS.spaced}] == -1) = false;
+%     end
     
     % set all fields here so we can easily concatenate events later
     log = struct('subject',subject,'session',sesNum,'sesName',sesName,...
@@ -463,50 +463,6 @@ switch phaseName
       propagateNewRecall = false;
       
       switch log(i).type
-%         case {'RECOGTEST_RECOGRESP'}
-%           % unique to RECOGTEST_RECOGRESP
-%           log(i).recog_resp = logData{crS.recog_resp}{i};
-%           log(i).recog_acc = logical(logData{crS.recog_acc}(i));
-%           log(i).recog_rt = single(logData{crS.recog_rt}(i));
-%           
-%           if isempty(log(i).recog_resp) || strcmp(log(i).recog_resp,'NO_RESPONSE')
-%             log(i).new_resp = '';
-%             log(i).new_acc = false;
-%             log(i).new_rt = -1;
-%             
-%             log(i).recall_origword = '';
-%             log(i).recall_resp = '';
-%             log(i).recall_spellCorr = 0;
-%             log(i).recall_rt = -1;
-%             
-%             propagateNewRecall = true;
-%           end
-%           
-%           % find the corresponding RECOGTEST_RECOGSTIM
-%           thisRecogStim = strcmp({log.type},'RECOGTEST_STIM') & [log.stimNum] == log(i).stimNum & [log.i_catNum] == log(i).i_catNum;
-%           if sum(thisRecogStim) == 1
-%             % put info in stimulus presentations
-%             log(thisRecogStim).recog_resp = log(i).recog_resp;
-%             log(thisRecogStim).recog_acc = log(i).recog_acc;
-%             log(thisRecogStim).recog_rt = log(i).recog_rt;
-%           else
-%             keyboard
-%           end
-%           
-%         case {'RECOGTEST_NEWRESP'}
-%           % unique to RECOGTEST_NEWRESP
-%           log(i).new_resp = logData{crS.new_resp}{i};
-%           log(i).new_acc = logical(logData{crS.new_acc}(i));
-%           log(i).new_rt = single(logData{crS.new_rt}(i));
-%           
-%           % didn't make a recall response
-%           log(i).recall_resp = '';
-%           log(i).recall_origword = '';
-%           log(i).recall_spellCorr = 0;
-%           log(i).recall_rt = -1;
-%           
-%           propagateNewRecall = true;
-          
         case {'TEST_RECALLRESP'}
           % unique to RECOGTEST_RECALLRESP
           log(i).recall_resp = logData{crS.recall_resp}{i};
