@@ -8,7 +8,7 @@ function [events] = space2_createEvents(events,dataroot,subject,sesNum,sesName,p
 % if you want you could maybe create a space_processData script to put it
 % all in a summary spreadsheet and space_visualizeData to make some plots
 
-fprintf('Processing %s %s (session_%d) %s (%d)...',subject,sesName,sesNum,phaseName,phaseCount);
+fprintf('Processing %s %s (session_%d) %s (%d)...\n',subject,sesName,sesNum,phaseName,phaseCount);
 
 sesDir = sprintf('session_%d',sesNum);
 
@@ -305,7 +305,10 @@ switch phaseName
   case {'cued_recall', 'prac_cued_recall', 'cued_recall_only', 'prac_cued_recall_only'}
     % whether to interactively check the spelling of cued recall trials
     checkSpelling = true;
+    respMustBeLongerThanOneLetter = true;
     allowIncorrectPlural = true;
+    useEditDist = true;
+    checkLetterTranspose = true;
     
     switch phaseName
       case {'cued_recall', 'prac_cued_recall'}
@@ -467,29 +470,61 @@ switch phaseName
             if isempty(log(i).recall_resp) || strcmpi(log(i).recall_resp,'NO_RESPONSE')
               log(i).recall_spellCorr = 0;
               % debug
-              fprintf('\No recall response: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+              fprintf('No recall: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
               fprintf('\tWord: %s\n',log(i).recall_origword);
             else
               if checkSpelling
                 % if we want to check the spelling on their recall responses
-                if strcmpi(log(i).recall_resp,log(i).recall_origword)
+                if strcmpi(log(i).recall_origword,log(i).recall_resp)
                   % auto spell check
                   log(i).recall_spellCorr = 1;
-                  fprintf('\nCorrect: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+                  fprintf('Correct: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
                   fprintf('\tWord: %s\n',log(i).recall_origword);
-                elseif allowIncorrectPlural && (strcmpi(cat(2,log(i).recall_resp,'s'),log(i).recall_origword) || strcmpi(cat(2,log(i).recall_resp,'es'),log(i).recall_origword) || strcmpi(log(i).recall_resp,cat(2,log(i).recall_origword,'s')) || strcmpi(log(i).recall_resp,cat(2,log(i).recall_origword,'es')))
+                elseif respMustBeLongerThanOneLetter && length(log(i).recall_resp) == 1
+                  log(i).recall_spellCorr = 0;
+                  fprintf('Incorrect: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+                  fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
+                  fprintf('\tTheir response: %s\n',log(i).recall_resp);
+                elseif allowIncorrectPlural && (strcmpi(log(i).recall_origword,cat(2,log(i).recall_resp,'s')) || strcmpi(log(i).recall_origword,cat(2,log(i).recall_resp,'es')) || strcmpi(cat(2,log(i).recall_origword,'s'),log(i).recall_resp) || strcmpi(cat(2,log(i).recall_origword,'es'),log(i).recall_resp))
                   % auto spell check
                   log(i).recall_spellCorr = 1;
-                  fprintf('\nWrong plural marked as correct: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
+                  fprintf('Wrong plural, marking correct: %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
                   fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                 else
-                  % manual spell check
+                  % other auto checks, fall back on manual spell check
                   fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
                   fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                   
-                  while 1
+                  % initialize
+                  decision = -1;
+                  
+                  if useEditDist
+                    d = EditDist(log(i).recall_origword,log(i).recall_resp);
+                    if d == 1
+                      decision = 1;
+                      fprintf('\tCorrect: Found that response was off by 1 letter using EditDist.m\n');
+                    end
+                  end
+                  
+                  % check letter transposition
+                  if checkLetterTranspose
+                    lttr = 1;
+                    while lttr <= length(log(i).recall_resp)
+                      lttr = lttr + 1;
+                      resp = log(i).recall_resp;
+                      resp(lttr) = log(i).recall_resp(lttr - 1);
+                      resp(lttr - 1) = log(i).recall_resp(lttr);
+                      if strcmpi(log(i).recall_origword,resp)
+                        decision = 1;
+                        fprintf('\tCorrect: Found neighboring letter transposition.\n');
+                        break
+                      end
+                    end
+                  end
+                  
+                  while decision < 0
                     decision = input('                Correct, incorrect, or synonym?  (1, 0, or s?). ','s');
                     if ~isempty(decision) && length(decision) == 1
                       if isstrprop(decision,'digit') && (str2double(decision) == 1 || str2double(decision) == 0)
@@ -517,6 +552,8 @@ switch phaseName
                       end
                     end
                   end
+                  
+                  % store the grade
                   log(i).recall_spellCorr = decision;
                 end
               else
@@ -534,14 +571,16 @@ switch phaseName
 %           log(i).new_acc = false;
 %           log(i).new_rt = -1;
           
+          % flag to put info in stimulus presentations
           propagateNewRecall = true;
       end % switch
       
       if propagateNewRecall
-        % find the corresponding RECOGTEST_RECOGSTIM
+        % put info in stimulus presentations
+        
+        % find the corresponding TEST_STIM
         thisRecogStim = strcmp({log.type},'TEST_STIM') & [log.stimNum] == log(i).stimNum & [log.i_catNum] == log(i).i_catNum;
         if sum(thisRecogStim) == 1
-          % put info in stimulus presentations
 %           log(thisRecogStim).new_resp = log(i).new_resp;
 %           log(thisRecogStim).new_acc = log(i).new_acc;
 %           log(thisRecogStim).new_rt = log(i).new_rt;
