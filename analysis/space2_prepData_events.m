@@ -37,6 +37,8 @@ else
 end
 saveDir = dataroot;
 
+% only re-graded subjects with session 2
+
 if ~exist('subjects','var') || isempty(subjects)
   subjects = {
     'SPACE2001';
