@@ -1,5 +1,5 @@
-function [events] = space2_createEvents(events,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
-% function [events] = space2_createEvents(events,dataroot,subject,sesNum,sesName,phaseName,phaseCount)
+function [events,sessionCRList] = space2_createEvents(events,dataroot,subject,sesNum,sesName,phaseName,phaseCount,sessionCRList)
+% function [events,sessionCRList] = space2_createEvents(events,dataroot,subject,sesNum,sesName,phaseName,phaseCount,sessionCRList)
 %
 % create event struct for SPACE
 %
@@ -414,6 +414,51 @@ switch phaseName
       'pairNum',num2cell(single(logData{crS.pairNum})), 'i_catStr',logData{crS.i_catStr}, 'i_catNum',num2cell(single(logData{crS.i_catNum})),...
       'recall_origword',[], 'recall_resp',[], 'recall_spellCorr',[], 'recall_rt',[]);
     
+    studyPhaseStr = 'multistudy';
+    if strncmp(phaseName,'prac_',5)
+      studyPhaseStr = sprintf('prac_%s',studyPhaseStr);
+    end
+    % store all the words studied on this phase, including buffers
+    phaseCRList = lower({events.(sesName).(sprintf('%s_%d',studyPhaseStr,phaseCount)).data.stimStr});
+    for pl = 1:length(phaseCRList)
+      if ~isempty(strfind(phaseCRList{pl},'.'))
+        phaseCRList{pl} = '';
+      end
+    end
+    phaseCRList = unique(phaseCRList(~ismember(phaseCRList,'')),'stable');
+    if size(phaseCRList,1) > 1
+      phaseCRList = phaseCRList';
+    end
+    fprintf('Studied words on this list:\n%s\n',sprintf(repmat(' %s',1,length(phaseCRList)),phaseCRList{:}));
+    
+    % store all the words studied in previous sessions, including buffers
+    studyPhaseStrs = {'prac_multistudy','multistudy'};
+    prevSesCRList = {};
+    if sesNum > 1
+      prevSesNumInit = sesNum - 1;
+      for ps = prevSesNumInit:-1:1
+        fn = fieldnames(events.(sprintf('day%d',ps)));
+        for f = 1:length(fn)
+          for sps = 1:length(studyPhaseStrs)
+            studyPhaseStr = studyPhaseStrs{sps};
+            if strcmp(fn{f},studyPhaseStr)
+              prevPhaseCRList = lower({events.(sprintf('day%d',ps)).(fn{f}).data.stimStr});
+              for pl = 1:length(prevPhaseCRList)
+                if ~isempty(strfind(prevPhaseCRList{pl},'.'))
+                  prevPhaseCRList{pl} = '';
+                end
+              end
+              prevPhaseCRList = unique(prevPhaseCRList(~ismember(prevPhaseCRList,'')),'stable');
+              if size(prevPhaseCRList,1) > 1
+                prevPhaseCRList = prevPhaseCRList';
+              end
+              prevSesCRList = cat(2,prevSesCRList,prevPhaseCRList);
+            end
+          end
+        end
+      end
+    end
+    
     for i = 1:length(log)
       propagateNewRecall = false;
       
@@ -492,15 +537,25 @@ switch phaseName
                   fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                 else
+                  % initialize
+                  decision = -1;
+                  
                   % other auto checks, fall back on manual spell check
                   fprintf('\nRecall for %s (%d) trial %d of %d (%s, %s, session_%d):\n',phaseName,phaseCount,log(i).trial,max([log.trial]),subject,sesName,sesNum);
                   fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                   
-                  % initialize
-                  decision = -1;
+                  if ismember(log(i).recall_resp,phaseCRList)
+                    fprintf('\t\tIncorrect: CURRENT LIST INTRUSION (studied on this list)!\n');
+                    decision = 0;
+                  elseif ismember(log(i).recall_resp,sessionCRList)
+                    fprintf('\t\tIncorrect: PRIOR LIST INTRUSION (studied on previous list this session)!\n');
+                    decision = 0;
+                  elseif ~strncmp(phaseName,'prac_',5) && ismember(log(i).recall_resp,prevSesCRList)
+                    warning('PRIOR SESSION INTRUSION (studied on previous session)!');
+                  end
                   
-                  if useEditDist
+                  if useEditDist && decision < 0
                     d = EditDist(log(i).recall_origword,log(i).recall_resp);
                     if d == 1
                       decision = 1;
@@ -509,9 +564,9 @@ switch phaseName
                   end
                   
                   % check letter transposition
-                  if checkLetterTranspose
+                  if checkLetterTranspose && decision < 0
                     lttr = 1;
-                    while lttr <= length(log(i).recall_resp)
+                    while lttr < length(log(i).recall_resp)
                       lttr = lttr + 1;
                       resp = log(i).recall_resp;
                       resp(lttr) = log(i).recall_resp(lttr - 1);
@@ -573,6 +628,8 @@ switch phaseName
           
           % flag to put info in stimulus presentations
           propagateNewRecall = true;
+          
+          sessionCRList = cat(2,sessionCRList,phaseCRList);
       end % switch
       
       if propagateNewRecall

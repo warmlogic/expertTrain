@@ -165,6 +165,8 @@ for sub = 1:length(subjects)
         uniquePhaseNames = unique(expParam.session.(sesName).phases);
         uniquePhaseCounts = zeros(1,length(unique(expParam.session.(sesName).phases)));
         
+        % initialize to store all the words used for cued recall
+        sessionCRList = {};
         for pha = 1:length(expParam.session.(sesName).phases)
           phaseName = expParam.session.(sesName).phases{pha};
           
@@ -180,7 +182,7 @@ for sub = 1:length(subjects)
           %fprintf('Creating events for %s %s (session_%d) %s (%d)...\n',subjects{sub},sesName,sesNum,phaseName,phaseCount);
           
           % create the events
-          events = space2_createEvents(events,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount);
+          [events,sessionCRList] = space2_createEvents(events,dataroot,subjects{sub},sesNum,sesName,phaseName,phaseCount,sessionCRList);
           
           % release the lockFile
           %releaseFile(eventsOutfile_sub);
