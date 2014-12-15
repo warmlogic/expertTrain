@@ -58,19 +58,20 @@ if ~exist('subjects','var') || isempty(subjects)
 %     'SPACE2017'; % terrible performance
 %     'SPACE2018';
 %     'SPACE2019';
-%     %'SPACE2020'; % DNF session 2
-    'SPACE2021';
-    'SPACE2022';
-    'SPACE2023';
-    'SPACE2024';
-    'SPACE2025';
-    'SPACE2026';
-    %'SPACE2027'; % really noisy EEG, DNF session 2
+%     'SPACE2020'; % DNF session 2
+%     'SPACE2021';
+%     'SPACE2022';
+%     'SPACE2023'; % DNF session 2
+%     'SPACE2024'; % DNF session 2
+%     'SPACE2025';
+%     'SPACE2026';
+%     %'SPACE2027'; % really noisy EEG, DNF session 2
     'SPACE2028';
     'SPACE2029';
     'SPACE2030';
     'SPACE2031';
     'SPACE2032';
+    'SPACE2033';
     };
 end
 
