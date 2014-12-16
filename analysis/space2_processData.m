@@ -1,33 +1,32 @@
-function [results] = space2_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField,quantileMeasure,quantiles,filenameSuffix)
-% function [results] = space2_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,partialCredit,prependDestField,quantileMeasure,quantiles,filenameSuffix)
+function [results] = space2_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,gradeCorrect,prependDestField,quantileMeasure,quantiles,filenameSuffix)
+% function [results] = space2_processData(results,dataroot,subjects,collapsePhases,collapseCategories,separateCategories,onlyCompleteSub,printResults,saveResults,gradeCorrect,prependDestField,quantileMeasure,quantiles,filenameSuffix)
 %
 % Processes data into basic measures like accuracy, response time, and d-prime
 %
 % e.g.,
-% [results] = space2_processData([],[],[],true,true,true,true,false,true,true,true);
+% [results] = space2_processData([],[],[],true,true,true,true,false,true,[1, 2, 3, 4],true);
+%
+% gradeCorrect is a vector of the kinds of credit options to accept.
+% Default = [1]. I would recommend starting with [1, 2, 3, 4]. Explanation:
+% Correct (1) and incorrect (0) are for typos and total intrusions,
+% respectively. Coupled (2) means intrinsically linked words and must have
+% the same word stem (staple/stapler, bank/banker, dance/dancer,
+% serve/server)  Synonym (3) means words that strictly have the same
+% meaning and can have the same word stem (sofa/couch, doctor/physician,
+% home/house, pasta/noodle, woman/lady, cash/money). Homonym (4) means
+% words that sound exactly the same (board/bored, brake/break). Related (5)
+% means closely associated words but cannot have the same word stem
+% (whiskey/rum, map/compass, sailor/boat, broccoli/carrot).
+%
 %
 % Quantile example (quantileMeasure is a cell array of phase names with
 % a paired measure name).
 %
-% [results] = space2_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},[.25 .50 .75]);
+% [results] = space2_processData([],[],[],true,true,true,true,false,true,[1, 2, 3, 4],true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},[.25 .50 .75]);
 %
-% [results] = space2_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},3);
+% [results] = space2_processData([],[],[],true,true,true,true,false,true,[1, 2, 3, 4],true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},3);
 %
-% [results] = space2_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},0.5);
-
-error('Need to change partialCredit option so it allows other credit options');
-% Correct (1) and incorrect (0) are for typos and total
-% intrusions, respectively. Coupled (2) means
-% intrinsically linked words and must have the same word
-% stem (staple/stapler, bank/banker, dance/dancer,
-% serve/server)  Synonym (3) means wordsthat strictly
-% have the same meaning and can have the same word stem
-% (sofa/couch, doctor/physician, home/house,
-% pasta/noodle, woman/lady, cash/money). Homonym (4)
-% means words that sound exactly the same (board/bored,
-% brake/break). Related (5) means closely associated
-% words but cannot have the same word stem (whiskey/rum,
-% map/compass, sailor/boat, broccoli/carrot).
+% [results] = space2_processData([],[],[],true,true,true,true,false,true,[1, 2, 3, 4],true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},0.5);
 
 plotQhist = false;
 
@@ -36,7 +35,6 @@ if nargin == 14
     filenameSuffix = '';
   end
 end
-
 
 if nargin < 14
   filenameSuffix = '';
@@ -70,7 +68,7 @@ if nargin < 14
       if nargin < 11
         prependDestField = true;
         if nargin < 10
-          partialCredit = true;
+          gradeCorrect = 1;
           if nargin < 9
             saveResults = true;
             if nargin < 8
@@ -647,10 +645,10 @@ if isempty(results)
                       % exclude missed responses ({'NO_RESPONSE', 'none'})
 %                       thisPhaseEv = thisPhaseEv(~ismember({thisPhaseEv.recog_resp},{'NO_RESPONSE', 'none'}));
                       
-                      if sum(lagConds > 0) > 1
-%                         error('%s does not yet support multiple lag conditions!',mfilename);
-                        fprintf('%s: testing out multiple lag conditions!\n',mfilename);
-                      end
+%                       if sum(lagConds > 0) > 1
+% %                         error('%s does not yet support multiple lag conditions!',mfilename);
+%                         fprintf('%s: testing out multiple lag conditions!\n',mfilename);
+%                       end
                       
                       for lc = 1:length(lagConds)
                         % targ events are either massed or spaced, depending
@@ -723,7 +721,7 @@ if isempty(results)
                             end
                             
                             results.(sesName).(fn).(lagStr) = accAndRT(targEvents,lureEvents,sub,q,results.(sesName).(fn).(lagStr),...
-                              partialCredit,mField,accField,dataFields{mf},prependDestField);
+                              gradeCorrect,mField,accField,dataFields{mf},prependDestField);
                             
                             if printResults
                               theseResults = results.(sesName).(fn).(lagStr).(mField);
@@ -835,7 +833,7 @@ if isempty(results)
                               end
                               
                               results.(sesName).(fn).(lagStr).(i_catStrs{im}) = accAndRT(targEvents,lureEvents,sub,q,results.(sesName).(fn).(lagStr).(i_catStrs{im}),...
-                                partialCredit,mField,accField,dataFields{mf},prependDestField);
+                                gradeCorrect,mField,accField,dataFields{mf},prependDestField);
                               
                               if printResults
                                 theseResults = results.(sesName).(fn).(lagStr).(i_catStrs{im}).(mField);
@@ -1327,7 +1325,7 @@ end
 
 %% Calculate accuracy and reaction time
 
-function inputStruct = accAndRT(targEv,lureEv,sub,thisQ,inputStruct,partialCredit,destField,accField,dataFields,prependDestField)
+function inputStruct = accAndRT(targEv,lureEv,sub,thisQ,inputStruct,gradeCorrect,destField,accField,dataFields,prependDestField)
 
 if ~exist('prependDestField','var') || isempty(prependDestField)
   prependDestField = false;
@@ -1374,23 +1372,23 @@ if ~isempty(lureEv)
 end
 
 % separate events
-if partialCredit
-  hitEv = targEv([targEv.(accField)] > 0);
-  missEv = targEv([targEv.(accField)] == 0);
-  
-  if ~isempty(lureEv)
-    crEv = lureEv([lureEv.(accField)] > 0);
-    faEv = lureEv([lureEv.(accField)] == 0);
-  end
-else
-  hitEv = targEv([targEv.(accField)] == 1);
-  missEv = targEv([targEv.(accField)] < 1);
-  
-  if ~isempty(lureEv)
-    crEv = lureEv([lureEv.(accField)] == 1);
-    faEv = lureEv([lureEv.(accField)] < 1);
-  end
+% if ~isempty(gradeCorrect)
+hitEv = targEv(ismember([targEv.(accField)],gradeCorrect));
+missEv = targEv(~ismember([targEv.(accField)],gradeCorrect));
+
+if ~isempty(lureEv)
+  crEv = lureEv(ismember([lureEv.(accField)],gradeCorrect));
+  faEv = lureEv(~ismember([lureEv.(accField)],gradeCorrect));
 end
+% else
+%   hitEv = targEv([targEv.(accField)] == 1);
+%   missEv = targEv([targEv.(accField)] ~= 1);
+%   
+%   if ~isempty(lureEv)
+%     crEv = lureEv([lureEv.(accField)] == 1);
+%     faEv = lureEv([lureEv.(accField)] ~= 1);
+%   end
+% end
 
 thisStr = 'nHit';
 if any(strcmp(thisStr,dataFields))
