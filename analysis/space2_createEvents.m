@@ -425,7 +425,7 @@ switch phaseName
                   % intrusions, respectively. Coupled (2) means
                   % intrinsically linked words and must have the same word
                   % stem (staple/stapler, bank/banker, dance/dancer,
-                  % serve/server)  Synonym (3) means wordsthat strictly
+                  % serve/server)  Synonym (3) means words that strictly
                   % have the same meaning and can have the same word stem
                   % (sofa/couch, doctor/physician, home/house,
                   % pasta/noodle, woman/lady, cash/money). Homonym (4)
