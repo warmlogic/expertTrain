@@ -377,6 +377,8 @@ switch phaseName
                   fprintf('\tOriginal word:  %s\n',log(i).recall_origword);
                   fprintf('\tTheir response: %s\n',log(i).recall_resp);
                   
+                  % auto: intrusions should almost always be incorrect
+                  % (just check on prior session intrusion)
                   if ismember(log(i).recall_resp,phaseCRList)
                     fprintf('\t\tIncorrect: CURRENT LIST INTRUSION (studied on this list)!\n');
                     decision = 0;
@@ -387,15 +389,22 @@ switch phaseName
                     warning('PRIOR SESSION INTRUSION (studied on previous session)!');
                   end
                   
+                  % auto: see if words are coupled
+                  if strcmpi(log(i).recall_origword,cat(2,log(i).recall_resp,'r')) || strcmpi(cat(2,log(i).recall_origword,'r'),log(i).recall_resp) || strcmpi(log(i).recall_origword,cat(2,log(i).recall_resp,'er')) || strcmpi(cat(2,log(i).recall_origword,'er'),log(i).recall_resp)
+                    decision = 2;
+                    fprintf('\tCoupled: Found exact same word stem.\n');
+                  end
+                  
+                  % auto: see if off by 1 letter (for misspellings)
                   if useEditDist && decision < 0
-                    d = EditDist(log(i).recall_origword,log(i).recall_resp);
+                    d = EditDist(lower(log(i).recall_origword),lower(log(i).recall_resp));
                     if d == 1
                       decision = 1;
                       fprintf('\tCorrect: Found that response was off by 1 letter using EditDist.m\n');
                     end
                   end
                   
-                  % check letter transposition
+                  % auto: check letter transposition
                   if checkLetterTranspose && decision < 0
                     lttr = 1;
                     while lttr < length(log(i).recall_resp)
@@ -411,8 +420,21 @@ switch phaseName
                     end
                   end
                   
+                  % Manual:
+                  % Correct (1) and incorrect (0) are for typos and total
+                  % intrusions, respectively. Coupled (2) means
+                  % intrinsically linked words and must have the same word
+                  % stem (staple/stapler, bank/banker, dance/dancer,
+                  % serve/server)  Synonym (3) means wordsthat strictly
+                  % have the same meaning and can have the same word stem
+                  % (sofa/couch, doctor/physician, home/house,
+                  % pasta/noodle, woman/lady, cash/money). Homonym (4)
+                  % means words that sound exactly the same (board/bored,
+                  % brake/break). Related (5) means closely associated
+                  % words but cannot have the same word stem (whiskey/rum,
+                  % map/compass, sailor/boat, broccoli/carrot).
                   while decision < 0
-                    decision = input('                Correct, incorrect, or synonym?  (1, 0, or s?). ','s');
+                    decision = input('                Correct, incorrect, coupled (same stem), synonym, homonym, related?  (1, 0, c, s, h, or r?). ','s');
                     if ~isempty(decision) && length(decision) == 1
                       if isstrprop(decision,'digit') && (str2double(decision) == 1 || str2double(decision) == 0)
                         decision = str2double(decision);
@@ -421,20 +443,53 @@ switch phaseName
                           verify = input('                Press return to mark CORRECT. Type anything else to re-grade. ','s');
                           if isempty(verify)
                             break
+                          else
+                            decision = -1;
                           end
                         elseif decision == 0
                           %fprintf('\t\tMarked incorrect.\n');
                           verify = input('                Press return to mark INCORRECT. Type anything else to re-grade. ','s');
                           if isempty(verify)
                             break
+                          else
+                            decision = -1;
                           end
                         end
+                      elseif isstrprop(decision,'alpha') && strcmp(decision,'c')
+                        decision = 2;
+                        %fprintf('\t\tMarked as coupled!\n');
+                        verify = input('                Press return to mark as COUPLED (same stem only). Type anything else to re-grade. ','s');
+                        if isempty(verify)
+                          break
+                        else
+                          decision = -1;
+                        end
                       elseif isstrprop(decision,'alpha') && strcmp(decision,'s')
-                        decision = 0.5;
+                        decision = 3;
                         %fprintf('\t\tMarked as synonym!\n');
                         verify = input('                Press return to mark as SYNONYM. Type anything else to re-grade. ','s');
                         if isempty(verify)
                           break
+                        else
+                          decision = -1;
+                        end
+                      elseif isstrprop(decision,'alpha') && strcmp(decision,'h')
+                        decision = 4;
+                        %fprintf('\t\tMarked as homonym!\n');
+                        verify = input('                Press return to mark as HOMONYM. Type anything else to re-grade. ','s');
+                        if isempty(verify)
+                          break
+                        else
+                          decision = -1;
+                        end
+                      elseif isstrprop(decision,'alpha') && strcmp(decision,'r')
+                        decision = 5;
+                        %fprintf('\t\tMarked as related!\n');
+                        verify = input('                Press return to mark as RELATED. Type anything else to re-grade. ','s');
+                        if isempty(verify)
+                          break
+                        else
+                          decision = -1;
                         end
                       end
                     end
