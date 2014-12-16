@@ -15,6 +15,20 @@ function [results] = space2_processData(results,dataroot,subjects,collapsePhases
 %
 % [results] = space2_processData([],[],[],true,true,true,true,false,true,true,true,{'expo','','multistudy','','distract_math','','cued_recall_only','recog_rt'},0.5);
 
+error('Need to change partialCredit option so it allows other credit options');
+% Correct (1) and incorrect (0) are for typos and total
+% intrusions, respectively. Coupled (2) means
+% intrinsically linked words and must have the same word
+% stem (staple/stapler, bank/banker, dance/dancer,
+% serve/server)  Synonym (3) means wordsthat strictly
+% have the same meaning and can have the same word stem
+% (sofa/couch, doctor/physician, home/house,
+% pasta/noodle, woman/lady, cash/money). Homonym (4)
+% means words that sound exactly the same (board/bored,
+% brake/break). Related (5) means closely associated
+% words but cannot have the same word stem (whiskey/rum,
+% map/compass, sailor/boat, broccoli/carrot).
+
 plotQhist = false;
 
 if nargin == 14
