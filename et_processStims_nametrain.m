@@ -29,14 +29,22 @@ for b = 1:length(phaseCfg.blockSpeciesOrder)
     for f = 1:length(cfg.stim.familyNames)
       if ismember(cfg.stim.familyNames{f},phaseCfg.familyNames)
         % get the indices for this species
-        sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,phaseCfg.blockSpeciesOrder{b}(s)));
-        % shuffle the stimulus index
-        randind = randperm(length(sInd));
+        sInd = [expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,phaseCfg.blockSpeciesOrder{b}(s));
         
-        % shuffle the exemplars
-        thisSpecies = expParam.session.(sprintf('f%dTrained',f))(sInd(randind));
+        % % get the indices for this species
+        % sInd = find([expParam.session.(sprintf('f%dTrained',f)).speciesNum] == speciesOrder(f,phaseCfg.blockSpeciesOrder{b}(s)));
+        % % shuffle the stimulus index
+        % randind = randperm(length(sInd));
+        % % shuffle the exemplars
+        % thisSpecies = expParam.session.(sprintf('f%dTrained',f))(sInd(randind));
         
-        % add them to the naming list
+        thisSpecies = expParam.session.(sprintf('f%dTrained',f))(sInd);
+        
+        % sort by exemplar number so they're always in the same order
+        [~,exemplarInd] = sort([thisSpecies.exemplarNum]);
+        thisSpecies = thisSpecies(exemplarInd);
+        
+        % add them to the naming list based on nameIndices
         expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b} = cat(1,...
           expParam.session.(sesName).(phaseName)(phaseCount).nameStims{b},...
           thisSpecies(phaseCfg.nameIndices{b}{s}));
