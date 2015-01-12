@@ -435,7 +435,7 @@ switch phaseName
                   % map/compass, sailor/boat, broccoli/carrot).
                   while decision < 0
                     decision = input('                Correct, incorrect, coupled (same stem), synonym, homonym, related?  (1, 0, c, s, h, or r?). ','s');
-                    if ~isempty(decision) && length(decision) == 1
+                    if length(decision) == 1
                       if isstrprop(decision,'digit') && (str2double(decision) == 1 || str2double(decision) == 0)
                         decision = str2double(decision);
                         if decision == 1
@@ -492,6 +492,8 @@ switch phaseName
                           decision = -1;
                         end
                       end
+                    else
+                      decision = -1;
                     end
                   end
                   
