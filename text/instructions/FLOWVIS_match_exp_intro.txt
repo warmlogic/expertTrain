@@ -2,7 +2,7 @@ This is the Matching experiment.
 
 On each trial you will see two images, one after the other.
 
-Press "sameKey" if the images of fluid flow are the same type.
-Press "diffKey" if the images of fluid flow are different types.
+Press "sameKey" if the images are the same type.
+Press "diffKey" if the images are different types.
 
-Press "contKey" to begin the matching task.
+The types are not the same as the practice. That is, they are not solids and liquids.  You must figure out what the types are.
