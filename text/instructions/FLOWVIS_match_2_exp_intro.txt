@@ -4,11 +4,9 @@ This is the Matching experiment.
 
 On each trial you will see two images, one after the other.
 
-The types are not the same as the practice. 
-That is, they are not solids and liquids. 
-You must figure out what the types are.
-
 Press "sameKey" if the images are the same type.
 Press "diffKey" if the images are different types.
+
+Please sort them using the same categories as the previous task.
 
 Press "contKey" to begin the matching task.
