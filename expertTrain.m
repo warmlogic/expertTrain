@@ -289,18 +289,6 @@ else
   % Load the experiment's config file. Must create this for each experiment.
   if exist(fullfile(pwd,sprintf('config_%s.m',expParam.expName)),'file')
     [cfg,expParam] = eval(sprintf('config_%s(cfg,expParam);',expParam.expName));
-    
-    if isfield(expParam,'doNotRunSes') && expParam.doNotRunSes(expParam.sessionNum)
-      fprintf('Exiting because expParam.doNotRunSes for this sessions is true.\n');
-      % increment the session number for running the next session
-      expParam.sessionNum = expParam.sessionNum + 1;
-      
-      % save the experiment data
-      save(cfg.files.expParamFile,'cfg','expParam');
-      
-      % exit
-      return
-    end
   else
     error('Configuration file for %s experiment does not exist: %s',fullfile(pwd,sprintf('config_%s.m',expParam.expName)));
   end
@@ -337,9 +325,21 @@ if exist(cfg.files.sesLogFile,'file')
   end
 end
 
-%% Save the current experiment data
+%% Save the current experiment data, and exit if not running this session
 
-save(cfg.files.expParamFile,'cfg','expParam');
+if isfield(expParam,'doNotRunSes') && expParam.doNotRunSes(expParam.sessionNum)
+  fprintf('Exiting because expParam.doNotRunSes for this sessions is true.\n');
+  % increment the session number for running the next session
+  expParam.sessionNum = expParam.sessionNum + 1;
+
+  % save the experiment data
+  save(cfg.files.expParamFile,'cfg','expParam');
+
+  % exit
+  return
+else
+  save(cfg.files.expParamFile,'cfg','expParam');
+end
 
 %% Run the experiment
 fprintf('Running experiment: %s, subject %s, session %d...\n',expParam.expName,expParam.subject,expParam.sessionNum);
